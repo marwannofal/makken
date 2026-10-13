@@ -1,0 +1,19 @@
+services:
+  web:
+    build:
+      context: .
+      args:
+        APP_UID: "${LOCAL_UID:-1000}"
+        APP_GID: "${LOCAL_GID:-1000}"
+    env_file:
+      - .env
+    environment:
+      DJANGO_SETTINGS_MODULE: makken.docker_settings
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - .:/app
+      - makken_database:/data
+
+volumes:
+  makken_database:
