@@ -12,3 +12,11 @@ staticfiles/
 .idea/
 .vscode/
 .DS_Store
+
+.env*
+media/
+staticfiles/
+*.sqlite3
+*.sqlite3-*
+.venv/
+.git/

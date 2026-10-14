@@ -120,6 +120,15 @@
             <nav aria-label="Main navigation">
                 <a href="#features">Discover Makken</a>
             </nav>
+
+            {% if user.is_authenticated %}
+                <form method="post" action="{% url 'accounts:logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="logout-button">
+                        Logout
+                    </button>
+                </form>
+            {% endif %}
         </header>
 
         <main>

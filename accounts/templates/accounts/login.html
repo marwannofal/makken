@@ -1,0 +1,113 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="color-scheme" content="light">
+    <title>تسجيل الدخول | مكّن</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'accounts/css/login.css' %}">
+    <script src="{% static 'accounts/js/login.js' %}" defer></script>
+</head>
+<body>
+    <main class="login-layout">
+        <section class="form-panel" aria-labelledby="login-title">
+            <div class="form-main">
+                <div class="brand">
+                    <img src="{% static 'accounts/images/header-logo.svg' %}"
+                         width="416" height="101"
+                         alt="المؤسسة العامة للتدريب التقني والمهني">
+                </div>
+                <div class="intro">
+                    <span class="eyebrow">منصة مكّن</span>
+                    <h1 id="login-title">أهلًا بعودتك</h1>
+                    <p>أدخل بيانات حسابك للمتابعة.</p>
+                </div>
+                {% if security_message or form.non_field_errors %}
+                <div class="form-alert" role="alert" tabindex="-1" data-form-alert>
+                    {% if security_message %}<p>{{ security_message }}</p>{% endif %}
+                    {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+                </div>
+                {% endif %}
+                <form method="post" action="{% url 'accounts:login' %}" novalidate data-login-form>
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ next|default:'' }}">
+                    <div class="field">
+                        <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+                        <div class="input-wrap">
+                            <svg class="field-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <circle cx="12" cy="8" r="3.5"/>
+                                <path d="M5 20v-1.5a7 7 0 0 1 14 0V20"/>
+                            </svg>
+                            {{ form.username }}
+                        </div>
+                        <div class="field-error" id="username-error" aria-live="polite"
+                             {% if not form.username.errors %}hidden{% endif %}>
+                            {% for error in form.username.errors %}{{ error }}{% endfor %}
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+                        <div class="input-wrap">
+                            <svg class="field-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <rect x="5" y="10" width="14" height="11" rx="3"/>
+                                <path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/>
+                            </svg>
+                            {{ form.password }}
+                            <button class="password-toggle" type="button" data-password-toggle
+                                    aria-label="إظهار كلمة المرور" aria-pressed="false"
+                                    aria-controls="{{ form.password.id_for_label }}" hidden>
+                                <svg class="eye-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                    <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                    <path class="eye-slash" d="M3 3l18 18"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="field-error" id="password-error" aria-live="polite"
+                             {% if not form.password.errors %}hidden{% endif %}>
+                            {% for error in form.password.errors %}{{ error }}{% endfor %}
+                        </div>
+                        <p class="caps-hint" data-caps-hint hidden>مفتاح الأحرف الكبيرة (Caps Lock) مفعّل.</p>
+                    </div>
+                    <div class="form-options">
+                        <label class="remember-me" for="{{ form.remember_me.id_for_label }}">
+                            {{ form.remember_me }}
+                            <span>{{ form.remember_me.label }}</span>
+                        </label>
+                    </div>
+                    <button class="submit-button" type="submit" data-submit>
+                        <span data-submit-label>تسجيل الدخول</span>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M19 12H5m6-6-6 6 6 6"/>
+                        </svg>
+                    </button>
+                    <p class="submit-status" aria-live="polite" data-submit-status></p>
+                </form>
+                <p class="access-note">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="m12 3 8 4v5c0 5-8 9-8 9s-8-4-8-9V7l8-4Z"/>
+                        <path d="m8.5 12 2.3 2.3 4.7-4.6"/>
+                    </svg>
+                    الدخول باستخدام حسابك المعتمد على المنصة
+                </p>
+            </div>
+            <footer class="footer">
+                <p>جميع الحقوق محفوظة لـ © المؤسسة العامة للتدريب التقني والمهني، 2024</p>
+            </footer>
+        </section>
+        <aside class="visual-panel" aria-labelledby="visual-title">
+            <div class="visual-badge"><span aria-hidden="true"></span> منصة مكّن</div>
+            <div class="visual-copy">
+                <span class="visual-line" aria-hidden="true"></span>
+                <h2 id="visual-title">معًا نمكّن<br>المستقبل.</h2>
+                <p>أهلًا بك في منصة مكّن.</p>
+            </div>
+        </aside>
+    </main>
+</body>
+</html>

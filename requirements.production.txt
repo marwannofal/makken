@@ -1,0 +1,3 @@
+-r req.txt
+gunicorn==26.2.0
+mysqlclient>=2.2.1,<3

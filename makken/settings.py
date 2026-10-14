@@ -122,3 +122,20 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# BEGIN MAKKEN LOGIN
+from accounts.configuration import *
+
+INSTALLED_APPS = list(INSTALLED_APPS)
+for _login_app in ("accounts.apps.AccountsConfig", "axes"):
+    if not any(_item == _login_app or (_login_app == "accounts.apps.AccountsConfig" and _item == "accounts")
+               for _item in INSTALLED_APPS):
+        INSTALLED_APPS.append(_login_app)
+
+MIDDLEWARE = [
+    _item for _item in MIDDLEWARE
+    if _item not in ("accounts.security.LoginSecurityMiddleware", "axes.middleware.AxesMiddleware")
+]
+MIDDLEWARE.insert(0, "accounts.security.LoginSecurityMiddleware")
+MIDDLEWARE.append("axes.middleware.AxesMiddleware")
+# END MAKKEN LOGIN

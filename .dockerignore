@@ -6,3 +6,11 @@ env/
 **/*.pyc
 db.sqlite3
 db.sqlite3-*
+
+.env*
+media/
+staticfiles/
+*.sqlite3
+*.sqlite3-*
+.venv/
+.git/
