@@ -12,3 +12,22 @@ urlpatterns = [
     _makken_login_path("", _makken_login_include("accounts.urls")),
 ] + urlpatterns
 # END MAKKEN LOGIN ROUTES
+
+# BEGIN MAKKEN FAVICON
+from django.contrib.auth.decorators import login_not_required as _makken_favicon_public
+from django.http import HttpResponseRedirect as _MakkenFaviconRedirect
+from django.templatetags.static import static as _makken_favicon_static
+from django.urls import path as _makken_favicon_path
+
+@_makken_favicon_public
+def _makken_site_favicon(request):
+    response = _MakkenFaviconRedirect(
+        _makken_favicon_static("accounts/images/favicon.ico") + "?v=090bd1f32c16"
+    )
+    response["Cache-Control"] = "no-cache"
+    return response
+
+urlpatterns = [
+    _makken_favicon_path("favicon.ico", _makken_site_favicon, name="site_favicon"),
+] + list(urlpatterns)
+# END MAKKEN FAVICON
