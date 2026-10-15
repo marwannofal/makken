@@ -1,0 +1,595 @@
+.add-sponsorship-shape {
+  white-space: nowrap;
+}
+.add-sponsorship-shape svg {
+  width: 18px;
+  height: 18px;
+}
+.sponsorship_shapes-table thead th:first-child {
+  width: 45%;
+}
+.sponsorship_shapes-table thead th:nth-child(2) {
+  width: 25%;
+}
+.sponsorship_shapes-table thead th:last-child {
+  width: 30%;
+}
+.sponsorship-shape-name {
+  display: block;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 2;
+}
+.sponsorship-shape-status,
+.status-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  padding: 7px 12px;
+  line-height: 1.8;
+}
+.sponsorship-shape-status {
+  min-height: 44px;
+  min-width: 88px;
+}
+.sponsorship-shape-status > span {
+  width: 6px;
+  height: 6px;
+  background: currentColor;
+  border-radius: 50%;
+}
+.status-active {
+  background: #e9f7f0;
+  color: #28764e;
+}
+.status-inactive {
+  background: #f0f3f3;
+  color: #758683;
+}
+.sponsorship-shape-status:hover {
+  border-color: currentColor;
+}
+.sponsorship-shape-row-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.sponsorship-shape-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 9px 12px;
+  font-size: 10px;
+  font-weight: 600;
+  background: #edf8f5;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  color: #167d76;
+}
+.sponsorship-shape-action svg {
+  width: 15px;
+  height: 15px;
+}
+.sponsorship-shape-action:hover {
+  border-color: #b1d7cc;
+}
+.action-delete {
+  background: #fff2ef;
+  color: #b45349;
+}
+.action-delete:hover {
+  border-color: #e6b5ae;
+}
+.sponsorship_shapes-empty {
+  text-align: center;
+  padding: 36px 12px;
+  color: #819b91;
+}
+.sponsorship_shapes-empty > svg {
+  width: 36px;
+  height: 36px;
+  margin-bottom: 12px;
+}
+.sponsorship_shapes-empty strong {
+  display: block;
+  font-size: 15px;
+  color: #446f62;
+}
+.sponsorship_shapes-empty p {
+  font-size: 11px;
+  margin: 6px 0 0;
+}
+.sponsorship_shapes-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 24px;
+}
+.sponsorship_shapes-pagination > span {
+  font-size: 11px;
+  color: #769187;
+}
+.sponsorship-shape-field {
+  margin-bottom: 24px;
+}
+.sponsorship-shape-field > label,
+.sponsorship-shape-status-field legend {
+  font-size: 12px;
+  font-weight: 700;
+  color: #355e53;
+}
+.sponsorship-shape-field > label > span {
+  color: #b4584b;
+}
+.sponsorship-shape-field input {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid #dce8e4;
+  background: #fbfdfc;
+  border-radius: 10px;
+  margin-top: 10px;
+  padding: 10px 13px;
+  color: var(--ink);
+  font-size: 13px;
+}
+.sponsorship-shape-field input::placeholder {
+  color: #9aaea5;
+}
+.sponsorship-shape-field .field-help {
+  margin: 8px 0 0;
+}
+.field-error {
+  font-size: 11px;
+  color: #af4539;
+  line-height: 1.9;
+}
+.field-error ul,
+.sponsorship-shape-status-field .errorlist {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+}
+.sponsorship-shape-status-field {
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+.sponsorship-shape-status-field legend {
+  margin-bottom: 12px;
+}
+.active-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.active-option {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid #dfe9e4;
+  min-height: 48px;
+  border-radius: 10px;
+  padding: 10px 13px;
+  font-size: 12px;
+  cursor: pointer;
+  background: white;
+}
+.active-option:has(input:checked) {
+  border-color: #80c6b7;
+  background: #eff9f4;
+  color: #227b6a;
+}
+.active-option input {
+  accent-color: #188a7d;
+  margin: 0;
+  width: 17px;
+  height: 17px;
+}
+.confirmation-record {
+  margin: 20px 0;
+  border: 1px solid #e0ece5;
+  background: #f8fcf9;
+  border-radius: 13px;
+  padding: 7px 18px;
+}
+.confirmation-record > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 13px 0;
+}
+.confirmation-record > div + div {
+  border-top: 1px solid #e4ece7;
+}
+.confirmation-record dt {
+  font-size: 10px;
+  color: #7b9487;
+  flex-shrink: 0;
+}
+.confirmation-record dd {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  text-align: start;
+  font-size: 13px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.confirmation-record dd > bdi {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.confirmation-record del {
+  font-size: 10px;
+  color: #94a59c;
+  font-weight: 400;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+}
+.delete-dialog .dialog-icon {
+  background: #fff0eb;
+  color: #ba5e4e;
+}
+.delete-dialog .dialog-eyebrow {
+  color: #a67569;
+}
+.delete-dialog .confirmation-record {
+  background: #fffbf9;
+  border-color: #f0e2dc;
+}
+.button-danger {
+  background: #bc5147;
+  color: white;
+}
+.button-danger:hover {
+  background: #a8443c;
+}
+.button-danger:disabled {
+  opacity: 0.65;
+}
+@media (max-width: 1100px) {
+  .sponsorship-shape-action {
+    padding-inline: 10px;
+  }
+  .sponsorship-shape-action > span {
+    display: none;
+  }
+  .sponsorship-shape-status {
+    min-width: 80px;
+    font-size: 10px;
+  }
+}
+@media (max-width: 600px) {
+  .sponsorship_shapes-introduction {
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .sponsorship_shapes-introduction h1 {
+    font-size: 25px;
+  }
+  .sponsorship_shapes-introduction .page-description {
+    font-size: 11px;
+    line-height: 1.9;
+  }
+  .add-sponsorship-shape {
+    min-height: 44px;
+    font-size: 10px;
+    padding: 9px 12px;
+    margin-top: 24px;
+    gap: 5px;
+  }
+  .add-sponsorship-shape svg {
+    width: 15px;
+    height: 15px;
+  }
+  .sponsorship_shapes-table thead th:first-child {
+    width: 42%;
+  }
+  .sponsorship_shapes-table thead th:nth-child(2) {
+    width: 30%;
+  }
+  .sponsorship_shapes-table thead th:last-child {
+    width: 28%;
+  }
+  .sponsorship_shapes-table th,
+  .sponsorship_shapes-table td {
+    padding: 14px 10px;
+  }
+  .sponsorship-shape-row-actions {
+    flex-direction: column;
+    gap: 7px;
+  }
+  .sponsorship-shape-action {
+    width: 44px;
+    padding: 10px;
+  }
+  .sponsorship-shape-status {
+    font-size: 9px;
+    min-width: 0;
+    padding: 7px 8px;
+    gap: 5px;
+  }
+  .sponsorship-shape-name {
+    font-size: 12px;
+  }
+  .sponsorship-shape-field > label,
+  .sponsorship-shape-status-field legend {
+    font-size: 11px;
+  }
+  .confirmation-record {
+    padding-inline: 14px;
+  }
+  .confirmation-record > div {
+    gap: 12px;
+  }
+  .confirmation-record dt {
+    font-size: 9px;
+  }
+  .confirmation-record dd {
+    font-size: 12px;
+  }
+  .confirmation-record .status-label {
+    font-size: 10px;
+  }
+  .sponsorship_shapes-card .states-card-header {
+    align-items: center;
+  }
+  .sponsorship_shapes-card .fixed-tag {
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .sponsorship_shapes-introduction {
+    flex-wrap: wrap;
+  }
+  .sponsorship_shapes-introduction > div {
+    width: 100%;
+  }
+  .sponsorship_shapes-introduction .add-sponsorship-shape {
+    margin-top: 0;
+  }
+}
+
+.sponsorship_shapes-table thead th:first-child {
+  width: 21%;
+}
+.sponsorship_shapes-table thead th:nth-child(2) {
+  width: 33%;
+}
+.sponsorship_shapes-table thead th:nth-child(3) {
+  width: 13%;
+}
+.sponsorship_shapes-table thead th:nth-child(4) {
+  width: 14%;
+}
+.sponsorship_shapes-table thead th:last-child {
+  width: 19%;
+}
+.sponsorship_shapes-table th,
+.sponsorship_shapes-table td {
+  padding: 18px 12px;
+  vertical-align: middle;
+}
+.sponsorship-shape-name {
+  font-size: 12px;
+}
+.shape-description {
+  margin: 0;
+  font-size: 11px;
+  line-height: 2;
+  color: #6d8b80;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.empty-description {
+  color: #99aaa2;
+}
+.employment-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 46px;
+  min-height: 32px;
+  padding: 4px 10px;
+  border: 1px solid #e3eae6;
+  border-radius: 8px;
+  background: #f4f7f5;
+  color: #82958b;
+  font-size: 11px;
+  font-weight: 600;
+}
+.employment-yes {
+  background: #eaf6fb;
+  border-color: #d9eaf2;
+  color: #427591;
+}
+.sponsorship-shape-status {
+  min-width: 76px;
+  padding-inline: 9px;
+}
+.sponsorship-shape-field textarea {
+  display: block;
+  width: 100%;
+  min-height: 120px;
+  resize: vertical;
+  border: 1px solid #dce8e4;
+  background: #fbfdfc;
+  border-radius: 10px;
+  padding: 11px 13px;
+  margin-top: 10px;
+  font-size: 12px;
+  line-height: 1.9;
+  color: var(--ink);
+}
+.optional-label {
+  font-size: 10px !important;
+  font-weight: 400;
+  color: #93a69b !important;
+  margin-inline-start: 5px;
+}
+.employment-field {
+  margin-bottom: 24px;
+}
+.employment-field legend > span {
+  color: #b4584b;
+}
+.confirmation-record .confirmation-description {
+  display: block;
+}
+.confirmation-description dd {
+  margin-top: 8px;
+  display: block;
+  white-space: pre-line;
+}
+.confirmation-description dd p {
+  margin: 0;
+  white-space: pre-line;
+  line-height: 2;
+  font-weight: 400;
+  font-size: 12px;
+}
+.confirmation-description dd del {
+  display: block;
+  margin-bottom: 7px;
+  line-height: 1.9;
+}
+#sponsorship-shape-editor,
+#sponsorship-shape-confirmation {
+  width: min(540px, calc(100vw - 32px));
+}
+@media (max-width: 1400px) {
+  .sponsorship-shape-action > span {
+    display: none;
+  }
+  .sponsorship-shape-row-actions {
+    gap: 6px;
+  }
+  .sponsorship-shape-action {
+    padding: 9px;
+    min-width: 44px;
+  }
+}
+@media (max-width: 1100px) {
+  .sponsorship_shapes-table,
+  .sponsorship_shapes-table tbody {
+    display: block;
+    width: 100%;
+  }
+  .sponsorship_shapes-table thead {
+    display: none;
+  }
+  .sponsorship_shapes-table tbody > tr[data-sponsorship-shape-row] {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    padding: 21px;
+    gap: 17px;
+    border-bottom: 1px solid #e5eee8;
+  }
+  .sponsorship_shapes-table tbody > tr[data-sponsorship-shape-row] > th {
+    grid-column: 1/-1;
+    font-size: 14px;
+    padding: 0 !important;
+    border: 0;
+  }
+  .sponsorship_shapes-table tbody > tr[data-sponsorship-shape-row] > td {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+    padding: 0 !important;
+    border: 0;
+    min-width: 0;
+  }
+  .sponsorship_shapes-table
+    tbody
+    > tr[data-sponsorship-shape-row]
+    > td::before {
+    content: attr(data-label);
+    font-size: 10px;
+    color: #81968a;
+  }
+  .sponsorship_shapes-table
+    tbody
+    > tr[data-sponsorship-shape-row]
+    > .shape-description-cell {
+    grid-column: 1/-1;
+  }
+  .sponsorship_shapes-table .action-cell {
+    text-align: start;
+  }
+  .sponsorship-shape-row-actions {
+    flex-direction: row;
+    gap: 8px;
+  }
+  .sponsorship-shape-action {
+    width: auto;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 9px 12px;
+  }
+  .sponsorship-shape-action > span {
+    display: inline;
+  }
+  .sponsorship_shapes-table .sponsorship-shape-status {
+    min-width: 88px;
+    font-size: 10px;
+  }
+  .sponsorship_shapes-table tbody > tr > td[colspan] {
+    display: block;
+    padding: 25px 18px;
+  }
+  .sponsorship-shape-name {
+    font-size: 14px;
+  }
+}
+@media (max-width: 600px) {
+  .sponsorship_shapes-introduction {
+    flex-wrap: wrap;
+  }
+  .sponsorship_shapes-introduction > div {
+    width: 100%;
+  }
+  .sponsorship_shapes-introduction .add-sponsorship-shape {
+    margin-top: 0;
+  }
+  .sponsorship_shapes-introduction h1 {
+    font-size: 24px;
+  }
+  .sponsorship-shape-action > span {
+    display: none;
+  }
+  .sponsorship-shape-action {
+    width: 44px;
+    padding: 9px;
+  }
+  .sponsorship_shapes-card .fixed-tag {
+    padding-inline: 8px;
+  }
+  .sponsorship_shapes-table tbody > tr[data-sponsorship-shape-row] {
+    padding: 19px 16px;
+  }
+  .confirmation-description dd p {
+    font-size: 11px;
+  }
+}
+
+.sponsorship-shape-field textarea {
+  font-family: inherit;
+}

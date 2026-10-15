@@ -189,7 +189,7 @@ def index(request):
         context["error"], status = str(exc), 409
     except (IntegrityError, ProtectedError, RestrictedError):
         context["error"], status = "تعذّر تنفيذ الطلب. الاسم مستخدم بالفعل أو تغيّرت البيانات. لم يُحفظ أي تغيير.", 409
-    page = Paginator(TrainingProgram.objects.prefetch_related("expense_items").all(), 15).get_page(request.GET.get("page"))
+    page = Paginator(TrainingProgram.objects.prefetch_related("expense_items").all(), 10).get_page(request.GET.get("page"))
     rows = []
     for item in page:
         rows.append({"id": item.pk, "name": item.name, "is_active": item.is_active, "category_label": item.get_category_display(),

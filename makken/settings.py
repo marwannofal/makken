@@ -184,3 +184,8 @@ if not any(_app == "expense_items" or _app.startswith("expense_items.") for _app
 if not any(_app == "training_programs" or _app.startswith("training_programs.") for _app in INSTALLED_APPS):
     INSTALLED_APPS = [*INSTALLED_APPS, "training_programs.apps.TrainingProgramsConfig"]
 # END MAKKEN TRAINING PROGRAMS APP
+
+# BEGIN MAKKEN SPONSORSHIP SHAPES APP
+if not any(_app == "sponsorship_shapes" or _app.startswith("sponsorship_shapes.") for _app in INSTALLED_APPS):
+    INSTALLED_APPS = [*INSTALLED_APPS, "sponsorship_shapes.apps.SponsorshipShapesConfig"]
+# END MAKKEN SPONSORSHIP SHAPES APP
