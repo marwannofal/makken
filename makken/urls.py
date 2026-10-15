@@ -72,3 +72,8 @@ urlpatterns = [_sectors_path("settings/sectors/", _sectors_include("sectors.urls
 from django.urls import include as _expense_items_include, path as _expense_items_path
 urlpatterns = [_expense_items_path("settings/expense-items/", _expense_items_include("expense_items.urls"))] + list(urlpatterns)
 # END MAKKEN EXPENSE ITEMS
+
+# BEGIN MAKKEN TRAINING PROGRAMS
+from django.urls import include as _training_programs_include, path as _training_programs_path
+urlpatterns = [_training_programs_path("settings/training-programs/", _training_programs_include("training_programs.urls"))] + list(urlpatterns)
+# END MAKKEN TRAINING PROGRAMS

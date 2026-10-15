@@ -12,7 +12,7 @@
     <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 20h16M6 16V9m6 7V4m6 12v-5"/></svg><span>حالة تطور المنظمات للرعاية</span><span class="nav-dot" aria-hidden="true"></span>
   </a>
   <a class="nav-link{% if active_page == 'levels' %} is-active{% endif %}" href="{% url 'levels:index' %}"{% if active_page == 'levels' %} aria-current="page"{% endif %}>
-    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5Zm-9 9 9 5 9-5M3 16l9 5 9-5"/></svg><span>المستوى</span><span class="nav-dot" aria-hidden="true"></span>
+    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5Zm-9 9 9 5 9-5M3 16l9 5 9-5"/></svg><span>إدارة المستويات</span><span class="nav-dot" aria-hidden="true"></span>
   </a>
   <a class="nav-link{% if active_page == 'regions' %} is-active{% endif %}" href="{% url 'regions:index' %}"{% if active_page == 'regions' %} aria-current="page"{% endif %}>
     <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 10c0 6-8 11-8 11S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg><span>إدارة المناطق</span><span class="nav-dot" aria-hidden="true"></span>
@@ -28,6 +28,9 @@
   </a>
   <a class="nav-link{% if active_page == 'expense_items' %} is-active{% endif %}" href="{% url 'expense_items:index' %}"{% if active_page == 'expense_items' %} aria-current="page"{% endif %}>
     <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2ZM9 7h6m-6 4h6m-6 4h3"/></svg><span>إدارة بنود الصرف</span><span class="nav-dot" aria-hidden="true"></span>
+  </a>
+  <a class="nav-link{% if active_page == 'training_programs' %} is-active{% endif %}" href="{% url 'training_programs:index' %}"{% if active_page == 'training_programs' %} aria-current="page"{% endif %}>
+    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m2 8 10-5 10 5-10 5ZM6 10v7c4 3 8 3 12 0v-7m4-2v8"/></svg><span>إدارة برامج التدريب</span><span class="nav-dot" aria-hidden="true"></span>
   </a>
 </nav>
 <div class="sidebar-footer">
