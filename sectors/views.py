@@ -188,7 +188,7 @@ def index(request):
         context["error"], status = str(exc), 409
     except (IntegrityError, ProtectedError, RestrictedError):
         context["error"], status = "تعذّر تنفيذ الطلب. الاسم مستخدم بالفعل أو تغيّرت التخصصات. لم يُحفظ أي تغيير.", 409
-    page = Paginator(Sector.objects.prefetch_related("specializations").all(), 15).get_page(request.GET.get("page"))
+    page = Paginator(Sector.objects.prefetch_related("specializations").all(), 10).get_page(request.GET.get("page"))
     rows = []
     for item in page:
         rows.append({"id": item.pk, "name": item.name, "is_active": item.is_active, "specializations": list(item.specializations.all()),

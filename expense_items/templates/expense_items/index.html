@@ -1,0 +1,51 @@
+{% extends "core/makken_base.html" %}
+{% load static %}
+{% block title %}إدارة بنود الصرف | مكّن{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'care_states/states.css' %}?v=20261015-1">
+<link rel="stylesheet" href="{% static 'expense_items/expense_items.css' %}?v=20261015-1">
+<script src="{% static 'expense_items/expense_items.js' %}?v=20261015-1" defer></script>
+{% endblock %}
+{% block content %}
+<section class="page-introduction expense_items-introduction" aria-labelledby="page-heading"><div><p class="eyebrow">الإعدادات</p><h1 id="page-heading">إدارة بنود الصرف<span class="greeting-dot">.</span></h1><p class="page-description">إدارة بنود الصرف وحالة تفعيلها في مكان واحد.</p></div><a href="?edit=new" class="button button-primary add-expense-item" data-add-expense-item data-snapshot="{{ add_snapshot }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>إضافة بند صرف</a></section>
+{% if error %}<div class="feedback feedback-error" role="alert">{{ error }}</div>{% endif %}
+{% if notice %}<div class="feedback feedback-info" role="status">{{ notice }}</div>{% endif %}
+{% for message in messages %}<div class="feedback feedback-success" role="status">{{ message }}</div>{% endfor %}
+<section class="states-card expense_items-card" aria-labelledby="table-heading">
+  <header class="states-card-header"><div><h2 id="table-heading">قائمة بنود الصرف</h2><p>أضف بنود الصرف، وعدّل بياناتها أو حالة تفعيلها.</p></div><span class="fixed-tag">عدد بنود الصرف: {{ page_obj.paginator.count }}</span></header>
+  <table class="states-table expense_items-table"><caption class="visually-hidden">قائمة بنود الصرف وحالة تفعيل كل بند صرف</caption><thead><tr><th scope="col">بند الصرف</th><th scope="col">حالة السجل</th><th scope="col" class="action-cell">الإجراء</th></tr></thead>
+    <tbody>{% for row in rows %}<tr data-expense-item-row="{{ row.id }}">
+      <th scope="row"><bdi class="expense-item-name">{{ row.name }}</bdi></th>
+      <td><form method="post" action="{% url 'expense_items:index' %}">{% csrf_token %}<input type="hidden" name="action" value="preview"><input type="hidden" name="snapshot" value="{{ row.toggle_snapshot }}"><button class="expense-item-status{% if row.is_active %} status-active{% else %} status-inactive{% endif %}" type="submit" aria-label="{% if row.is_active %}إيقاف{% else %}تفعيل{% endif %} بند الصرف {{ row.name }}"><span aria-hidden="true"></span>{% if row.is_active %}نشط{% else %}غير نشط{% endif %}</button></form></td>
+      <td class="action-cell"><div class="expense-item-row-actions"><a class="expense-item-action" href="?edit={{ row.id }}" data-edit-expense-item data-name="{{ row.name }}" data-active="{% if row.is_active %}1{% else %}0{% endif %}" data-snapshot="{{ row.edit_snapshot }}" aria-label="تعديل بند الصرف {{ row.name }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m16 4 4 4M4 20l5-1L20 8a2.8 2.8 0 0 0-4-4L5 15Z"/></svg><span>تعديل</span></a>
+        <form method="post" action="{% url 'expense_items:index' %}">{% csrf_token %}<input type="hidden" name="action" value="preview"><input type="hidden" name="snapshot" value="{{ row.delete_snapshot }}"><button class="expense-item-action action-delete" type="submit" aria-label="حذف بند الصرف {{ row.name }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7"/></svg><span>حذف</span></button></form>
+      </div></td>
+    </tr>{% empty %}<tr><td colspan="3"><div class="expense_items-empty"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2ZM9 7h6m-6 4h6m-6 4h3"/></svg><strong>لا توجد بنود صرف بعد</strong><p>ابدأ بإضافة أول بند صرف من الزر أعلاه.</p></div></td></tr>{% endfor %}</tbody>
+  </table>
+  <div class="states-card-footer"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10h.01"/></svg><p>اضغط على حالة السجل لتغييرها. جميع التغييرات تحتاج إلى تأكيد قبل تنفيذها.</p></div>
+</section>
+{% if page_obj.paginator.num_pages > 1 %}<nav class="expense_items-pagination" aria-label="صفحات بنود الصرف">{% if page_obj.has_previous %}<a class="button button-secondary" href="?page={{ page_obj.previous_page_number }}">السابق</a>{% endif %}<span>صفحة {{ page_obj.number }} من {{ page_obj.paginator.num_pages }}</span>{% if page_obj.has_next %}<a class="button button-secondary" href="?page={{ page_obj.next_page_number }}">التالي</a>{% endif %}</nav>{% endif %}
+<div class="states-page-actions"><a class="button button-secondary close-page" href="{% url 'makken_home' %}">إغلاق</a></div>
+
+<dialog id="expense-item-editor" class="color-dialog" aria-labelledby="editor-title" data-expense-item-dialog{% if editing %} open data-return-on-close{% endif %}>
+  <form method="post" action="{% url 'expense_items:index' %}" class="dialog-content" data-expense-item-form>
+    {% csrf_token %}<input type="hidden" name="action" value="preview">{{ editor_form.operation }}{{ editor_form.snapshot }}
+    <div class="dialog-heading"><span class="dialog-icon"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2ZM9 7h6m-6 4h6m-6 4h3"/></svg></span><a class="icon-button dialog-close" href="{% url 'expense_items:index' %}" data-close-expense-item aria-label="إغلاق"><svg aria-hidden="true"><use href="#icon-close"></use></svg></a></div>
+    <p class="dialog-eyebrow">إدارة بنود الصرف</p><h2 id="editor-title" data-editor-title>{% if editor_operation == 'edit' %}تعديل بند الصرف{% else %}إضافة بند صرف جديد{% endif %}</h2><p class="dialog-description">أدخل بند الصرف وحدّد حالته، ثم راجع البيانات قبل الحفظ.</p>
+    {% if editor_form.non_field_errors %}<div class="feedback feedback-error" role="alert">{{ editor_form.non_field_errors }}</div>{% endif %}
+    <div class="expense-item-field"><label for="expense-item-name">بند الصرف <span aria-hidden="true">*</span></label>{{ editor_form.name }}<p id="name-help" class="field-help">اسم واضح وفريد، بحد أقصى 200 حرف.</p><div id="name-error" class="field-error" role="alert">{{ editor_form.name.errors }}</div></div>
+    <fieldset class="expense-item-status-field"><legend>حالة السجل</legend><div class="active-options">{% for radio in editor_form.is_active %}<label class="active-option">{{ radio.tag }}<span>{{ radio.choice_label }}</span></label>{% endfor %}</div>{{ editor_form.is_active.errors }}</fieldset>
+    <div class="dialog-actions"><button class="button button-primary" type="submit">مراجعة البيانات</button><a class="button button-secondary" href="{% url 'expense_items:index' %}" data-close-expense-item>إلغاء</a></div>
+  </form>
+</dialog>
+{% if pending %}
+<dialog id="expense-item-confirmation" class="color-dialog{% if pending.operation == 'delete' %} delete-dialog{% endif %}" aria-labelledby="confirmation-title" aria-describedby="confirmation-description" data-expense-item-dialog data-return-on-close open>
+  <div class="dialog-content"><div class="dialog-heading"><span class="dialog-icon"><svg aria-hidden="true" viewBox="0 0 24 24">{% if pending.operation == 'delete' %}<path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7"/>{% else %}<path d="M12 3 3 7v5c0 5 9 9 9 9s9-4 9-9V7Z"/><path d="m8 12 3 3 5-6"/>{% endif %}</svg></span><a class="icon-button dialog-close" href="{% url 'expense_items:index' %}" aria-label="إلغاء الطلب"><svg aria-hidden="true"><use href="#icon-close"></use></svg></a></div>
+    <p class="dialog-eyebrow">خطوة أخيرة</p><h2 id="confirmation-title">{{ pending.title }}</h2><p id="confirmation-description" class="dialog-description">{% if pending.operation == 'delete' %}هل تريد حذف هذا البند؟ سيتم حذفه نهائيًا بعد التأكيد.{% elif pending.operation == 'toggle' %}هل تريد {% if pending.is_active %}تفعيل{% else %}إيقاف{% endif %} هذا البند؟{% else %}راجع بيانات بند الصرف أدناه قبل تأكيد الحفظ.{% endif %}</p>
+    <dl class="confirmation-record"><div><dt>بند الصرف</dt><dd>{% if pending.operation == 'edit' and pending.old_name != pending.name %}<del><bdi>{{ pending.old_name }}</bdi></del>{% endif %}<bdi>{{ pending.name }}</bdi></dd></div><div><dt>{% if pending.operation == 'delete' %}حالة السجل{% else %}الحالة بعد التأكيد{% endif %}</dt><dd>{% if pending.old_name and pending.operation != 'delete' and pending.old_active != pending.is_active %}<del>{% if pending.old_active %}نشط{% else %}غير نشط{% endif %}</del>{% endif %}<span class="status-label{% if pending.is_active %} status-active{% else %} status-inactive{% endif %}">{% if pending.is_active %}نشط{% else %}غير نشط{% endif %}</span></dd></div></dl>
+    <p class="confirmation-hint">{% if pending.operation == 'delete' %}يمكنك إلغاء الطلب والاحتفاظ ببند الصرف.{% else %}لن تُحفظ البيانات إلا بعد الضغط على زر التأكيد.{% endif %}</p>
+    <form method="post" action="{% url 'expense_items:index' %}" class="dialog-actions" data-confirm-form>{% csrf_token %}<input type="hidden" name="action" value="confirm"><input type="hidden" name="token" value="{{ pending.token }}"><button class="button{% if pending.operation == 'delete' %} button-danger{% else %} button-primary{% endif %}" type="submit" data-confirm-label="{{ pending.button }}"{% if pending.operation != 'delete' %} autofocus{% endif %}>{{ pending.button }}</button><a class="button button-secondary" href="{% url 'expense_items:index' %}"{% if pending.operation == 'delete' %} autofocus{% endif %}>إلغاء</a></form>
+  </div>
+</dialog>
+{% endif %}
+{% endblock %}

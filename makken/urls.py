@@ -67,3 +67,8 @@ urlpatterns = [_specializations_path("settings/specializations/", _specializatio
 from django.urls import include as _sectors_include, path as _sectors_path
 urlpatterns = [_sectors_path("settings/sectors/", _sectors_include("sectors.urls"))] + list(urlpatterns)
 # END MAKKEN SECTORS
+
+# BEGIN MAKKEN EXPENSE ITEMS
+from django.urls import include as _expense_items_include, path as _expense_items_path
+urlpatterns = [_expense_items_path("settings/expense-items/", _expense_items_include("expense_items.urls"))] + list(urlpatterns)
+# END MAKKEN EXPENSE ITEMS
