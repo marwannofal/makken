@@ -139,3 +139,8 @@ MIDDLEWARE = [
 MIDDLEWARE.insert(0, "accounts.security.LoginSecurityMiddleware")
 MIDDLEWARE.append("axes.middleware.AxesMiddleware")
 # END MAKKEN LOGIN
+
+# BEGIN MAKKEN HOME APP
+if not any(_app == "core" or _app.startswith("core.") for _app in INSTALLED_APPS):
+    INSTALLED_APPS = [*INSTALLED_APPS, "core"]
+# END MAKKEN HOME APP

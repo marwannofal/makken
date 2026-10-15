@@ -1,0 +1,41 @@
+{% load static %}
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>{% block title %}الرئيسية | مكّن{% endblock %}</title>
+  {% include "accounts/includes/favicon.html" %}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'core/css/makken-home.css' %}?v=20261015-1">
+  <script src="{% static 'core/js/makken-home.js' %}?v=20261015-1" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">انتقل إلى المحتوى</a>
+  {% include "core/partials/makken_icons.html" %}
+  <div class="app-layout">
+    <aside class="desktop-sidebar sidebar" aria-label="القائمة الرئيسية">
+      {% include "core/partials/makken_sidebar.html" %}
+    </aside>
+    <div class="workspace">
+      <header class="topbar">
+        <div class="page-location">
+          <button class="icon-button menu-toggle" type="button" data-menu-open aria-label="فتح القائمة" aria-controls="mobile-sidebar" aria-expanded="false" hidden>
+            <svg aria-hidden="true"><use href="#icon-menu"></use></svg>
+          </button>
+          <span class="breadcrumb-brand">مكّن</span><span class="breadcrumb-divider" aria-hidden="true">/</span><span>الرئيسية</span>
+        </div>
+        <div class="account-chip"><span class="status-dot" aria-hidden="true"></span><span>مرحبًا، <bdi>{{ display_name }}</bdi></span></div>
+      </header>
+      <main id="main-content" class="main-content" tabindex="-1">{% block content %}{% endblock %}</main>
+      <footer class="site-footer">جميع الحقوق محفوظة لـ © المؤسسة العامة للتدريب التقني والمهني، 2026</footer>
+    </div>
+  </div>
+  <dialog id="mobile-sidebar" class="mobile-sidebar sidebar" aria-label="القائمة الرئيسية">
+    {% include "core/partials/makken_sidebar.html" with mobile=True %}
+  </dialog>
+</body>
+</html>

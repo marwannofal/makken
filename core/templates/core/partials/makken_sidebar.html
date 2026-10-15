@@ -1,0 +1,24 @@
+{% load static %}
+<div class="sidebar-brand">
+  <a class="brand-link" href="{% url 'makken_home' %}" aria-label="مكّن — الصفحة الرئيسية"><img src="{% static 'accounts/images/header-logo.svg' %}" alt="المؤسسة العامة للتدريب التقني والمهني" width="220" height="82"></a>
+  {% if mobile %}<button class="icon-button drawer-close" type="button" data-menu-close aria-label="إغلاق القائمة" autofocus><svg aria-hidden="true"><use href="#icon-close"></use></svg></button>{% endif %}
+</div>
+<nav class="sidebar-navigation" aria-label="التنقل">
+  <p class="navigation-label">القائمة الرئيسية</p>
+  <a class="nav-link{% if active_page == 'home' %} is-active{% endif %}" href="{% url 'makken_home' %}"{% if active_page == 'home' %} aria-current="page"{% endif %}>
+    <svg aria-hidden="true"><use href="#icon-home"></use></svg><span>الرئيسية</span><span class="nav-dot" aria-hidden="true"></span>
+  </a>
+  {% if user.is_staff %}{% url 'admin:index' as admin_url %}{% if admin_url %}
+  <a class="nav-link" href="{{ admin_url }}"><svg aria-hidden="true"><use href="#icon-admin"></use></svg><span>لوحة الإدارة</span></a>
+  {% endif %}{% endif %}
+</nav>
+<div class="sidebar-footer">
+  <div class="user-profile">
+    <span class="user-avatar" aria-hidden="true">{{ avatar_initial }}</span>
+    <div class="user-details"><bdi class="user-name">{{ display_name }}</bdi><bdi class="user-email">{% if user.email %}{{ user.email }}{% else %}{{ user.get_username }}{% endif %}</bdi></div>
+  </div>
+  <form action="{% url 'accounts:logout' %}" method="post" class="logout-form">
+    {% csrf_token %}
+    <button class="logout-button" type="submit"><svg aria-hidden="true"><use href="#icon-logout"></use></svg><span>تسجيل الخروج</span></button>
+  </form>
+</div>

@@ -1,0 +1,18 @@
+{% extends "core/makken_base.html" %}
+{% load static %}
+{% block content %}
+<section class="page-introduction" aria-labelledby="page-heading">
+  <div><p class="eyebrow">مساحتك في مكّن</p><h1 id="page-heading">أهلًا بك، <bdi>{{ display_name }}</bdi><span class="greeting-dot">.</span></h1><p class="page-description">خطوتك الأولى تبدأ من هنا.</p></div>
+  <span class="page-tag"><svg aria-hidden="true"><use href="#icon-home"></use></svg>الصفحة الرئيسية</span>
+</section>
+<section class="welcome-panel" aria-labelledby="welcome-heading">
+  <div class="welcome-copy">
+    <span class="welcome-label"><span aria-hidden="true"></span>منصة مكّن</span>
+    <h2 id="welcome-heading">معًا نمكّن<br><span>المستقبل.</span></h2>
+    <p>مرحبًا بك في مساحتك. يمكنك الوصول إلى الصفحات المتاحة لك من القائمة الرئيسية.</p>
+    <div class="welcome-note"><span class="note-line" aria-hidden="true"></span><span>بداية واحدة، وإمكانات بلا حدود</span></div>
+  </div>
+  <div class="welcome-visual" aria-hidden="true"><img src="{% static 'accounts/images/login-img.png' %}" alt="" fetchpriority="high"><span class="visual-caption">نحو مستقبلٍ أكثر تمكينًا</span></div>
+</section>
+<div class="workspace-note"><img src="{% static 'accounts/images/flower.svg' %}" width="28" height="28" alt=""><p>مساحة تجمع خطواتك، وتقرّب طموحك.</p></div>
+{% endblock %}

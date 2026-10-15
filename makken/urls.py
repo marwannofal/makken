@@ -31,3 +31,9 @@ urlpatterns = [
     _makken_favicon_path("favicon.ico", _makken_site_favicon, name="site_favicon"),
 ] + list(urlpatterns)
 # END MAKKEN FAVICON
+
+# BEGIN MAKKEN HOME
+from core.makken_home import home as _makken_home_view
+from django.urls import path as _makken_home_path
+urlpatterns = [_makken_home_path("", _makken_home_view, name="makken_home")] + list(urlpatterns)
+# END MAKKEN HOME
