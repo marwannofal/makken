@@ -154,3 +154,8 @@ if not any(_app == "care_states" or _app.startswith("care_states.") for _app in 
 if not any(_app == "levels" or _app.startswith("levels.") for _app in INSTALLED_APPS):
     INSTALLED_APPS = [*INSTALLED_APPS, "levels.apps.LevelsConfig"]
 # END MAKKEN LEVELS APP
+
+# BEGIN MAKKEN REGIONS APP
+if not any(_app == "regions" or _app.startswith("regions.") for _app in INSTALLED_APPS):
+    INSTALLED_APPS = [*INSTALLED_APPS, "regions.apps.RegionsConfig"]
+# END MAKKEN REGIONS APP

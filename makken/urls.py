@@ -47,3 +47,8 @@ urlpatterns = [_care_path("settings/development-states/", _care_include("care_st
 from django.urls import include as _levels_include, path as _levels_path
 urlpatterns = [_levels_path("settings/levels/", _levels_include("levels.urls"))] + list(urlpatterns)
 # END MAKKEN LEVELS
+
+# BEGIN MAKKEN REGIONS
+from django.urls import include as _regions_include, path as _regions_path
+urlpatterns = [_regions_path("settings/regions/", _regions_include("regions.urls"))] + list(urlpatterns)
+# END MAKKEN REGIONS
