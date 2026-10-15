@@ -52,3 +52,8 @@ urlpatterns = [_levels_path("settings/levels/", _levels_include("levels.urls"))]
 from django.urls import include as _regions_include, path as _regions_path
 urlpatterns = [_regions_path("settings/regions/", _regions_include("regions.urls"))] + list(urlpatterns)
 # END MAKKEN REGIONS
+
+# BEGIN MAKKEN ENTITIES
+from django.urls import include as _entities_include, path as _entities_path
+urlpatterns = [_entities_path("settings/entities/", _entities_include("entities.urls"))] + list(urlpatterns)
+# END MAKKEN ENTITIES
