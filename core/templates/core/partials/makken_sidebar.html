@@ -20,6 +20,9 @@
   <a class="nav-link{% if active_page == 'entities' %} is-active{% endif %}" href="{% url 'entities:index' %}"{% if active_page == 'entities' %} aria-current="page"{% endif %}>
     <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 21h18M5 21V5l7-3v19M12 8h7v13M8 7h1m-1 4h1m-1 4h1m6-3h1m-1 4h1"/></svg><span>إدارة الكيانات</span><span class="nav-dot" aria-hidden="true"></span>
   </a>
+  <a class="nav-link{% if active_page == 'specializations' %} is-active{% endif %}" href="{% url 'specializations:index' %}"{% if active_page == 'specializations' %} aria-current="page"{% endif %}>
+    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m2 9 10-5 10 5-10 5Zm4 2v6c4 3 8 3 12 0v-6M22 9v8"/></svg><span>إدارة التخصصات</span><span class="nav-dot" aria-hidden="true"></span>
+  </a>
 </nav>
 <div class="sidebar-footer">
   <div class="user-profile">

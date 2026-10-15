@@ -155,7 +155,7 @@ def index(request):
         context["error"], status = "انتهت صلاحية الطلب أو تغيّر محتواه. أعد فتح الصفحة وحاول مجددًا.", 400
     except (IntegrityError, ProtectedError, RestrictedError):
         context["error"], status = "تعذّر تنفيذ الطلب. الاسم مستخدم بالفعل أو الكيان مرتبط بسجلات أخرى. راجع القائمة وحاول مجددًا.", 409
-    page = Paginator(Entity.objects.all(), 15).get_page(request.GET.get("page"))
+    page = Paginator(Entity.objects.all(), 10).get_page(request.GET.get("page"))
     rows = []
     for item in page:
         rows.append({"id": item.pk, **_item_data(item), "kind_label": item.get_entity_type_display(), "branch_label": item.get_branch_display() if item.branch else "—", "edit_snapshot": _snapshot(item, "edit", request.user), "toggle_snapshot": _snapshot(item, "toggle", request.user), "delete_snapshot": _snapshot(item, "delete", request.user)})

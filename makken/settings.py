@@ -164,3 +164,8 @@ if not any(_app == "regions" or _app.startswith("regions.") for _app in INSTALLE
 if not any(_app == "entities" or _app.startswith("entities.") for _app in INSTALLED_APPS):
     INSTALLED_APPS = [*INSTALLED_APPS, "entities.apps.EntitiesConfig"]
 # END MAKKEN ENTITIES APP
+
+# BEGIN MAKKEN SPECIALIZATIONS APP
+if not any(_app == "specializations" or _app.startswith("specializations.") for _app in INSTALLED_APPS):
+    INSTALLED_APPS = [*INSTALLED_APPS, "specializations.apps.SpecializationsConfig"]
+# END MAKKEN SPECIALIZATIONS APP
