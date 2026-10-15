@@ -23,6 +23,9 @@
   <a class="nav-link{% if active_page == 'specializations' %} is-active{% endif %}" href="{% url 'specializations:index' %}"{% if active_page == 'specializations' %} aria-current="page"{% endif %}>
     <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m2 9 10-5 10 5-10 5Zm4 2v6c4 3 8 3 12 0v-6M22 9v8"/></svg><span>إدارة التخصصات</span><span class="nav-dot" aria-hidden="true"></span>
   </a>
+  <a class="nav-link{% if active_page == 'sectors' %} is-active{% endif %}" href="{% url 'sectors:index' %}"{% if active_page == 'sectors' %} aria-current="page"{% endif %}>
+    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 21h18M4 21V9l6 3V7l6 3V3h4v18M8 16h1m3 0h1m3 0h1"/></svg><span>إدارة القطاعات</span><span class="nav-dot" aria-hidden="true"></span>
+  </a>
 </nav>
 <div class="sidebar-footer">
   <div class="user-profile">

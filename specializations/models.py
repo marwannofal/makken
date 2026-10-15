@@ -14,6 +14,7 @@ def validate_name(value):
 
 
 class Specialization(models.Model):
+    sector = models.ForeignKey("sectors.Sector", null=True, blank=True, on_delete=models.SET_NULL, related_name="specializations", verbose_name="القطاع")
     name = models.CharField("التخصص", max_length=200, validators=[validate_name])
     name_key = models.CharField(max_length=600, unique=True, editable=False)
     is_active = models.BooleanField("نشط", default=True)

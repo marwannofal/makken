@@ -62,3 +62,8 @@ urlpatterns = [_entities_path("settings/entities/", _entities_include("entities.
 from django.urls import include as _specializations_include, path as _specializations_path
 urlpatterns = [_specializations_path("settings/specializations/", _specializations_include("specializations.urls"))] + list(urlpatterns)
 # END MAKKEN SPECIALIZATIONS
+
+# BEGIN MAKKEN SECTORS
+from django.urls import include as _sectors_include, path as _sectors_path
+urlpatterns = [_sectors_path("settings/sectors/", _sectors_include("sectors.urls"))] + list(urlpatterns)
+# END MAKKEN SECTORS

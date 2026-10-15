@@ -1,0 +1,61 @@
+{% extends "core/makken_base.html" %}
+{% load static %}
+{% block title %}إدارة القطاعات | مكّن{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'care_states/states.css' %}?v=20261015-1">
+<link rel="stylesheet" href="{% static 'sectors/sectors.css' %}?v=20261015-1">
+<script src="{% static 'sectors/sectors.js' %}?v=20261015-1" defer></script>
+{% endblock %}
+{% block content %}
+<section class="page-introduction sectors-introduction" aria-labelledby="page-heading"><div><p class="eyebrow">الإعدادات</p><h1 id="page-heading">إدارة القطاعات<span class="greeting-dot">.</span></h1><p class="page-description">نظّم القطاعات واربط كل قطاع بالتخصصات التابعة له.</p></div><a href="?edit=new" class="button button-primary add-sector" data-add-sector><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>إضافة قطاع</a></section>
+{% if error %}<div class="feedback feedback-error" role="alert">{{ error }}</div>{% endif %}
+{% if notice %}<div class="feedback feedback-info" role="status">{{ notice }}</div>{% endif %}
+{% for message in messages %}<div class="feedback feedback-success" role="status">{{ message }}</div>{% endfor %}
+<section class="states-card sectors-card" aria-labelledby="table-heading">
+  <header class="states-card-header"><div><h2 id="table-heading">قائمة القطاعات</h2><p>لكل قطاع تخصصاته، ولكل تخصص قطاع واحد فقط.</p></div><span class="fixed-tag">عدد القطاعات: {{ page_obj.paginator.count }}</span></header>
+  <table class="states-table sectors-table"><caption class="visually-hidden">قائمة القطاعات وحالة تفعيل كل قطاع</caption><thead><tr><th scope="col">اسم القطاع</th><th scope="col">التخصصات / المهن</th><th scope="col">حالة السجل</th><th scope="col" class="action-cell">الإجراء</th></tr></thead>
+    <tbody>{% for row in rows %}<tr data-sector-row="{{ row.id }}">
+      <th scope="row"><bdi class="sector-name">{{ row.name }}</bdi></th>
+      <td class="sector-specializations" data-label="التخصصات / المهن"><div class="specialization-tags">{% for specialization in row.specializations %}<bdi class="specialization-tag{% if not specialization.is_active %} specialization-inactive{% endif %}">{{ specialization.name }}{% if not specialization.is_active %}<span>غير نشط</span>{% endif %}</bdi>{% empty %}<span class="unassigned-label">لا توجد تخصصات مرتبطة</span>{% endfor %}</div></td>
+      <td data-label="حالة السجل"><form method="post" action="{% url 'sectors:index' %}">{% csrf_token %}<input type="hidden" name="action" value="preview"><input type="hidden" name="snapshot" value="{{ row.toggle_snapshot }}"><button class="sector-status{% if row.is_active %} status-active{% else %} status-inactive{% endif %}" type="submit" aria-label="{% if row.is_active %}إيقاف{% else %}تفعيل{% endif %} القطاع {{ row.name }}"><span aria-hidden="true"></span>{% if row.is_active %}نشط{% else %}غير نشط{% endif %}</button></form></td>
+      <td class="action-cell" data-label="الإجراء"><div class="sector-row-actions"><a class="sector-action" href="?edit={{ row.id }}" data-edit-sector data-name="{{ row.name }}" data-active="{% if row.is_active %}1{% else %}0{% endif %}" data-snapshot="{{ row.edit_snapshot }}" aria-label="تعديل القطاع {{ row.name }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m16 4 4 4M4 20l5-1L20 8a2.8 2.8 0 0 0-4-4L5 15Z"/></svg><span>تعديل</span></a>
+        <form method="post" action="{% url 'sectors:index' %}">{% csrf_token %}<input type="hidden" name="action" value="preview"><input type="hidden" name="snapshot" value="{{ row.delete_snapshot }}"><button class="sector-action action-delete" type="submit" aria-label="حذف القطاع {{ row.name }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7"/></svg><span>حذف</span></button></form>
+      </div></td>
+    </tr>{% empty %}<tr><td colspan="4"><div class="sectors-empty"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5Zm-9 9 9 5 9-5M3 16l9 5 9-5"/></svg><strong>لا توجد قطاعات بعد</strong><p>ابدأ بإضافة أول قطاع من الزر أعلاه.</p></div></td></tr>{% endfor %}</tbody>
+  </table>
+  <div class="states-card-footer"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10h.01"/></svg><p>كل تخصص يرتبط بقطاع واحد فقط. اضغط على حالة السجل لتغييرها بعد التأكيد.</p></div>
+</section>
+{% if page_obj.paginator.num_pages > 1 %}<nav class="sectors-pagination" aria-label="صفحات القطاعات">{% if page_obj.has_previous %}<a class="button button-secondary" href="?page={{ page_obj.previous_page_number }}">السابق</a>{% endif %}<span>صفحة {{ page_obj.number }} من {{ page_obj.paginator.num_pages }}</span>{% if page_obj.has_next %}<a class="button button-secondary" href="?page={{ page_obj.next_page_number }}">التالي</a>{% endif %}</nav>{% endif %}
+<div class="states-page-actions"><a class="button button-secondary close-page" href="{% url 'makken_home' %}">إغلاق</a></div>
+
+<dialog id="sector-editor" class="color-dialog" aria-labelledby="editor-title" data-sector-dialog{% if editing %} open data-return-on-close{% endif %}>
+  <form method="post" action="{% url 'sectors:index' %}" class="dialog-content" data-sector-form>
+    {% csrf_token %}<input type="hidden" name="action" value="preview">{{ editor_form.operation }}{{ editor_form.snapshot }}
+    <div class="dialog-heading"><span class="dialog-icon"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5Zm-9 9 9 5 9-5M3 16l9 5 9-5"/></svg></span><a class="icon-button dialog-close" href="{% url 'sectors:index' %}" data-close-sector aria-label="إغلاق"><svg aria-hidden="true"><use href="#icon-close"></use></svg></a></div>
+    <p class="dialog-eyebrow">إدارة القطاعات</p><h2 id="editor-title" data-editor-title>{% if editor_operation == 'edit' %}تعديل القطاع{% else %}إضافة قطاع جديد{% endif %}</h2><p class="dialog-description">أدخل اسم القطاع واختر تخصصًا واحدًا أو أكثر، ثم حدّد حالة السجل.</p>
+    {% if editor_form.non_field_errors %}<div class="feedback feedback-error" role="alert">{{ editor_form.non_field_errors }}</div>{% endif %}
+    <div class="sector-field"><label for="sector-name">اسم القطاع <span aria-hidden="true">*</span></label>{{ editor_form.name }}<p id="name-help" class="field-help">اسم واضح وفريد، بحد أقصى 200 حرف.</p><div id="name-error" class="field-error" role="alert">{{ editor_form.name.errors }}</div></div>
+    <div class="sector-field multi-field"><label for="sector-specializations">التخصصات / المهن <span aria-hidden="true">*</span></label>
+      {{ editor_form.specializations }}
+      <div class="multi-select" data-multi-select hidden>
+        <button type="button" class="multi-trigger" data-multi-trigger aria-expanded="false" aria-controls="specializations-panel" aria-describedby="specializations-help specializations-error"><span data-multi-summary>اختر التخصصات</span><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
+        <div class="multi-panel" id="specializations-panel" hidden><div class="multi-search"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5"/></svg><input type="search" data-multi-search placeholder="ابحث عن تخصص…" aria-label="البحث في التخصصات" autocomplete="off"></div><div class="multi-options" data-multi-options role="group" aria-label="التخصصات المتاحة"></div><p class="multi-empty" data-multi-empty hidden>لا توجد تخصصات مطابقة للبحث.</p><p class="multi-availability" data-multi-availability hidden>لا توجد تخصصات متاحة حاليًا. أضف تخصصًا جديدًا أو حرّر ارتباطه بقطاع آخر.</p><p class="multi-count" data-multi-count aria-live="polite"></p></div>
+        <div class="selected-tags" data-selected-tags aria-label="التخصصات المختارة"></div>
+      </div>
+      <p id="specializations-help" class="field-help">اختر تخصصًا واحدًا على الأقل. تظهر التخصصات المتاحة فقط، مع تخصصات هذا القطاع عند التعديل.</p><div id="specializations-error" class="field-error" role="alert">{{ editor_form.specializations.errors }}<span data-multi-error></span></div>
+    </div>
+    <fieldset class="sector-status-field"><legend>حالة السجل</legend><div class="active-options">{% for radio in editor_form.is_active %}<label class="active-option">{{ radio.tag }}<span>{{ radio.choice_label }}</span></label>{% endfor %}</div>{{ editor_form.is_active.errors }}</fieldset>
+    <div class="dialog-actions"><button class="button button-primary" type="submit">مراجعة البيانات</button><a class="button button-secondary" href="{% url 'sectors:index' %}" data-close-sector>إلغاء</a></div>
+  </form>
+</dialog>
+{% if pending %}
+<dialog id="sector-confirmation" class="color-dialog{% if pending.operation == 'delete' %} delete-dialog{% endif %}" aria-labelledby="confirmation-title" aria-describedby="confirmation-description" data-sector-dialog data-return-on-close open>
+  <div class="dialog-content"><div class="dialog-heading"><span class="dialog-icon"><svg aria-hidden="true" viewBox="0 0 24 24">{% if pending.operation == 'delete' %}<path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7"/>{% else %}<path d="M12 3 3 7v5c0 5 9 9 9 9s9-4 9-9V7Z"/><path d="m8 12 3 3 5-6"/>{% endif %}</svg></span><a class="icon-button dialog-close" href="{% url 'sectors:index' %}" aria-label="إلغاء الطلب"><svg aria-hidden="true"><use href="#icon-close"></use></svg></a></div>
+    <p class="dialog-eyebrow">خطوة أخيرة</p><h2 id="confirmation-title">{{ pending.title }}</h2><p id="confirmation-description" class="dialog-description">{% if pending.operation == 'delete' %}هل تريد حذف هذا القطاع؟ ستبقى التخصصات محفوظة وتصبح متاحة للربط بقطاع آخر.{% elif pending.operation == 'toggle' %}هل تريد {% if pending.is_active %}تفعيل{% else %}إيقاف{% endif %} هذا القطاع؟{% else %}راجع بيانات القطاع أدناه قبل تأكيد الحفظ.{% endif %}</p>
+    <dl class="confirmation-record"><div><dt>القطاع</dt><dd>{% if pending.operation == 'edit' and pending.old_name != pending.name %}<del><bdi>{{ pending.old_name }}</bdi></del>{% endif %}<bdi>{{ pending.name }}</bdi></dd></div><div><dt>{% if pending.operation == 'delete' %}حالة السجل{% else %}الحالة بعد التأكيد{% endif %}</dt><dd>{% if pending.old_name and pending.operation != 'delete' and pending.old_active != pending.is_active %}<del>{% if pending.old_active %}نشط{% else %}غير نشط{% endif %}</del>{% endif %}<span class="status-label{% if pending.is_active %} status-active{% else %} status-inactive{% endif %}">{% if pending.is_active %}نشط{% else %}غير نشط{% endif %}</span></dd></div><div class="confirmation-specializations"><dt>{% if pending.operation == 'delete' %}تخصصات ستصبح متاحة{% elif pending.operation == 'edit' %}التخصصات بعد التأكيد{% else %}التخصصات / المهن{% endif %}</dt><dd><div class="specialization-tags">{% for specialization in pending.specializations %}<bdi class="specialization-tag">{{ specialization.name }}</bdi>{% empty %}<span class="unassigned-label">لا توجد تخصصات مرتبطة</span>{% endfor %}</div></dd></div>{% if pending.operation == 'edit' %}<div class="confirmation-specializations"><dt>التخصصات الحالية</dt><dd><div class="specialization-tags">{% for specialization in pending.old_specializations %}<bdi class="specialization-tag">{{ specialization.name }}</bdi>{% empty %}<span class="unassigned-label">لا توجد تخصصات مرتبطة</span>{% endfor %}</div></dd></div>{% endif %}</dl>
+    <p class="confirmation-hint">{% if pending.operation == 'delete' %}يمكنك إلغاء الطلب والاحتفاظ بالقطاع.{% else %}لن تُحفظ البيانات إلا بعد الضغط على زر التأكيد.{% endif %}</p>
+    <form method="post" action="{% url 'sectors:index' %}" class="dialog-actions" data-confirm-form>{% csrf_token %}<input type="hidden" name="action" value="confirm"><input type="hidden" name="token" value="{{ pending.token }}"><button class="button{% if pending.operation == 'delete' %} button-danger{% else %} button-primary{% endif %}" type="submit" data-confirm-label="{{ pending.button }}"{% if pending.operation != 'delete' %} autofocus{% endif %}>{{ pending.button }}</button><a class="button button-secondary" href="{% url 'sectors:index' %}"{% if pending.operation == 'delete' %} autofocus{% endif %}>إلغاء</a></form>
+  </div>
+</dialog>
+{% endif %}
+{% endblock %}
