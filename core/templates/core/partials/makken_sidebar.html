@@ -8,9 +8,9 @@
   <a class="nav-link{% if active_page == 'home' %} is-active{% endif %}" href="{% url 'makken_home' %}"{% if active_page == 'home' %} aria-current="page"{% endif %}>
     <svg aria-hidden="true"><use href="#icon-home"></use></svg><span>الرئيسية</span><span class="nav-dot" aria-hidden="true"></span>
   </a>
-  {% if user.is_staff %}{% url 'admin:index' as admin_url %}{% if admin_url %}
-  <a class="nav-link" href="{{ admin_url }}"><svg aria-hidden="true"><use href="#icon-admin"></use></svg><span>لوحة الإدارة</span></a>
-  {% endif %}{% endif %}
+  <a class="nav-link{% if active_page == 'care_states' %} is-active{% endif %}" href="{% url 'care_states:index' %}"{% if active_page == 'care_states' %} aria-current="page"{% endif %}>
+    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 20h16M6 16V9m6 7V4m6 12v-5"/></svg><span>حالة تطور المنظمات للرعاية</span><span class="nav-dot" aria-hidden="true"></span>
+  </a>
 </nav>
 <div class="sidebar-footer">
   <div class="user-profile">

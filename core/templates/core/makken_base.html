@@ -12,6 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'core/css/makken-home.css' %}?v=20261015-1">
   <script src="{% static 'core/js/makken-home.js' %}?v=20261015-1" defer></script>
+  {% block extra_head %}{% endblock %}
 </head>
 <body>
   <a class="skip-link" href="#main-content">انتقل إلى المحتوى</a>
@@ -26,7 +27,7 @@
           <button class="icon-button menu-toggle" type="button" data-menu-open aria-label="فتح القائمة" aria-controls="mobile-sidebar" aria-expanded="false" hidden>
             <svg aria-hidden="true"><use href="#icon-menu"></use></svg>
           </button>
-          <span class="breadcrumb-brand">مكّن</span><span class="breadcrumb-divider" aria-hidden="true">/</span><span>الرئيسية</span>
+          <span class="breadcrumb-brand">مكّن</span><span class="breadcrumb-divider" aria-hidden="true">/</span><span class="current-location">{{ page_heading|default:"الرئيسية" }}</span>
         </div>
         <div class="account-chip"><span class="status-dot" aria-hidden="true"></span><span>مرحبًا، <bdi>{{ display_name }}</bdi></span></div>
       </header>

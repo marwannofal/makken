@@ -1,0 +1,64 @@
+{% extends "core/makken_base.html" %}
+{% load static %}
+{% block title %}حالة تطور المنظمات للرعاية | مكّن{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'care_states/states.css' %}?v=20261015-1">
+<script src="{% static 'care_states/states.js' %}?v=20261015-1" defer></script>
+{% endblock %}
+{% block content %}
+<section class="page-introduction states-introduction" aria-labelledby="page-heading">
+  <div><p class="eyebrow">الإعدادات</p><h1 id="page-heading">حالة تطور المنظمات للرعاية<span class="greeting-dot">.</span></h1></div>
+</section>
+{% if error %}<div class="feedback feedback-error" role="alert">{{ error }}</div>{% endif %}
+{% if notice %}<div class="feedback feedback-info" role="status">{{ notice }}</div>{% endif %}
+{% for message in messages %}<div class="feedback feedback-success" role="status">{{ message }}</div>{% endfor %}
+<section class="states-card" aria-labelledby="table-heading">
+  <header class="states-card-header"><div><h2 id="table-heading">الحالات والألوان</h2><p>تعديل بسيط للون، مع تأكيد قبل الحفظ.</p></div><span class="fixed-tag"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>حالات ثابتة</span></header>
+  <table class="states-table">
+    <caption class="visually-hidden">حالات تطور المنظمات للرعاية وألوانها الحالية</caption>
+    <thead><tr><th scope="col">حالة التطور</th><th scope="col">اللون</th><th scope="col" class="action-cell">الإجراء</th></tr></thead>
+    <tbody>{% for row in rows %}
+      <tr data-state-row="{{ row.state }}">
+        <th scope="row"><span class="state-name">{{ row.label }}</span></th>
+        <td><div class="color-value"><input class="color-swatch" type="color" value="{{ row.color }}" disabled aria-label="لون حالة {{ row.label }}: {{ row.color }}"><code dir="ltr">{{ row.color }}</code></div></td>
+        <td class="action-cell"><a class="edit-color" href="?edit={{ row.state }}" data-edit-color data-state="{{ row.state }}" data-label="{{ row.label }}" data-color="{{ row.color }}" data-snapshot="{{ row.snapshot }}" aria-label="تعديل لون حالة {{ row.label }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m16 4 4 4M4 20l5-1L20 8a2.8 2.8 0 0 0-4-4L5 15Z"/></svg><span>تعديل</span></a></td>
+      </tr>
+    {% endfor %}</tbody>
+  </table>
+  <div class="states-card-footer"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10h.01"/></svg><p>الأسماء ثابتة. تغييرات الألوان تُحفظ لجميع المستخدمين بعد التأكيد.</p></div>
+</section>
+<div class="states-page-actions"><a class="button button-secondary close-page" href="{% url 'makken_home' %}">إغلاق</a></div>
+
+<dialog id="color-editor" class="color-dialog" aria-labelledby="editor-title" data-color-dialog{% if editing %} open data-return-on-close{% endif %}>
+  <form method="post" action="{% url 'care_states:index' %}" class="dialog-content" data-edit-form>
+    {% csrf_token %}<input type="hidden" name="action" value="preview"><input type="hidden" name="state" value="{{ editing.state }}"><input type="hidden" name="snapshot" value="{{ editing.snapshot }}">
+    <div class="dialog-heading"><span class="dialog-icon"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m16 4 4 4M4 20l5-1L20 8a2.8 2.8 0 0 0-4-4L5 15Z"/></svg></span><a class="icon-button dialog-close" href="{% url 'care_states:index' %}" data-close-editor aria-label="إغلاق"><svg aria-hidden="true"><use href="#icon-close"></use></svg></a></div>
+    <p class="dialog-eyebrow">تخصيص اللون</p><h2 id="editor-title">تعديل لون حالة <span data-edit-label>{{ editing.label }}</span></h2>
+    <p class="dialog-description">اختر اللون المناسب، ثم راجع التغيير قبل تأكيده.</p>
+    <div class="color-editor-fields">
+      <div class="picker-wrapper"><label for="color-picker">اختر لونًا</label><input id="color-picker" type="color" value="{{ editing.color|default:'#24B3AF' }}" data-color-picker></div>
+      <div class="hex-wrapper"><label for="color-hex">رمز اللون</label><input id="color-hex" type="text" name="color" value="{{ editing.color|default:'#24B3AF' }}" dir="ltr" pattern="#[0-9a-fA-F]{6}" minlength="7" maxlength="7" autocomplete="off" spellcheck="false" required aria-describedby="color-help" data-color-hex></div>
+    </div>
+    <p id="color-help" class="field-help">استخدم رمزًا من 6 خانات، مثل <bdi>#24B3AF</bdi>.</p>
+    <div class="dialog-actions"><button class="button button-primary" type="submit">مراجعة التغيير</button><a class="button button-secondary" href="{% url 'care_states:index' %}" data-close-editor>إلغاء</a></div>
+  </form>
+</dialog>
+{% if pending %}
+<dialog id="color-confirmation" class="color-dialog" aria-labelledby="confirmation-title" aria-describedby="confirmation-description" data-color-dialog data-return-on-close open>
+  <div class="dialog-content">
+    <div class="dialog-heading"><span class="dialog-icon"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3 3 7v5c0 5 9 9 9 9s9-4 9-9V7Z"/><path d="m8 12 3 3 5-6"/></svg></span><a class="icon-button dialog-close" href="{% url 'care_states:index' %}" aria-label="إلغاء التغيير"><svg aria-hidden="true"><use href="#icon-close"></use></svg></a></div>
+    <p class="dialog-eyebrow">خطوة أخيرة</p><h2 id="confirmation-title">تأكيد تغيير اللون</h2><p id="confirmation-description" class="dialog-description">هل تريد حفظ اللون الجديد لحالة <strong>«{{ pending.label }}»</strong>؟</p>
+    <div class="color-comparison">
+      <div class="comparison-item"><span>اللون الحالي</span><input class="comparison-swatch" type="color" value="{{ pending.old_color }}" disabled aria-label="اللون الحالي {{ pending.old_color }}"><code dir="ltr">{{ pending.old_color }}</code></div>
+      <svg class="comparison-arrow" aria-hidden="true"><use href="#icon-arrow"></use></svg>
+      <div class="comparison-item new-color"><span>اللون الجديد</span><input class="comparison-swatch" type="color" value="{{ pending.new_color }}" disabled aria-label="اللون الجديد {{ pending.new_color }}"><code dir="ltr">{{ pending.new_color }}</code></div>
+    </div>
+    <p class="confirmation-hint">سيظهر اللون الجديد لجميع المستخدمين بعد التأكيد.</p>
+    <form method="post" action="{% url 'care_states:index' %}" class="dialog-actions" data-confirm-form>
+      {% csrf_token %}<input type="hidden" name="action" value="confirm"><input type="hidden" name="token" value="{{ pending.token }}">
+      <button class="button button-primary" type="submit" autofocus>تأكيد التغيير</button><a class="button button-secondary" href="{% url 'care_states:index' %}">إلغاء</a>
+    </form>
+  </div>
+</dialog>
+{% endif %}
+{% endblock %}

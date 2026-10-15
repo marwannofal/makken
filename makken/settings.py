@@ -144,3 +144,8 @@ MIDDLEWARE.append("axes.middleware.AxesMiddleware")
 if not any(_app == "core" or _app.startswith("core.") for _app in INSTALLED_APPS):
     INSTALLED_APPS = [*INSTALLED_APPS, "core"]
 # END MAKKEN HOME APP
+
+# BEGIN MAKKEN CARE STATES APP
+if not any(_app == "care_states" or _app.startswith("care_states.") for _app in INSTALLED_APPS):
+    INSTALLED_APPS = [*INSTALLED_APPS, "care_states.apps.CareStatesConfig"]
+# END MAKKEN CARE STATES APP

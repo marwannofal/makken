@@ -37,3 +37,8 @@ from core.makken_home import home as _makken_home_view
 from django.urls import path as _makken_home_path
 urlpatterns = [_makken_home_path("", _makken_home_view, name="makken_home")] + list(urlpatterns)
 # END MAKKEN HOME
+
+# BEGIN MAKKEN CARE STATES
+from django.urls import include as _care_include, path as _care_path
+urlpatterns = [_care_path("settings/development-states/", _care_include("care_states.urls"))] + list(urlpatterns)
+# END MAKKEN CARE STATES
