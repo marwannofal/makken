@@ -1,3 +1,356 @@
-.add-region{white-space:nowrap}.add-region svg{width:18px;height:18px}.regions-table thead th:first-child{width:45%}.regions-table thead th:nth-child(2){width:25%}.regions-table thead th:last-child{width:30%}.region-name{display:block;overflow-wrap:anywhere;font-size:13px;font-weight:700;line-height:2}.region-status,.status-label{display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:8px;font-size:11px;font-weight:600;border:1px solid transparent;white-space:nowrap;padding:7px 12px;line-height:1.8}.region-status{min-height:44px;min-width:88px}.region-status>span{width:6px;height:6px;background:currentColor;border-radius:50%}.status-active{background:#e9f7f0;color:#28764e}.status-inactive{background:#f0f3f3;color:#758683}.region-status:hover{border-color:currentColor}.region-row-actions{display:flex;align-items:center;justify-content:center;gap:8px}.region-action{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;min-width:44px;padding:9px 12px;font-size:10px;font-weight:600;background:#edf8f5;border:1px solid transparent;border-radius:9px;color:#167d76}.region-action svg{width:15px;height:15px}.region-action:hover{border-color:#b1d7cc}.action-delete{background:#fff2ef;color:#b45349}.action-delete:hover{border-color:#e6b5ae}.regions-empty{text-align:center;padding:36px 12px;color:#819b91}.regions-empty>svg{width:36px;height:36px;margin-bottom:12px}.regions-empty strong{display:block;font-size:15px;color:#446f62}.regions-empty p{font-size:11px;margin:6px 0 0}.regions-pagination{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:24px}.regions-pagination>span{font-size:11px;color:#769187}.region-field{margin-bottom:24px}.region-field>label,.region-status-field legend{font-size:12px;font-weight:700;color:#355e53}.region-field>label>span{color:#b4584b}.region-field input{width:100%;min-height:48px;border:1px solid #dce8e4;background:#fbfdfc;border-radius:10px;margin-top:10px;padding:10px 13px;color:var(--ink);font-size:13px}.region-field input::placeholder{color:#9aaea5}.region-field .field-help{margin:8px 0 0}.field-error{font-size:11px;color:#af4539;line-height:1.9}.field-error ul,.region-status-field .errorlist{list-style:none;margin:8px 0 0;padding:0}.region-status-field{padding:0;margin:0;border:0}.region-status-field legend{margin-bottom:12px}.active-options{display:grid;grid-template-columns:1fr 1fr;gap:12px}.active-option{display:flex;align-items:center;gap:9px;border:1px solid #dfe9e4;min-height:48px;border-radius:10px;padding:10px 13px;font-size:12px;cursor:pointer;background:white}.active-option:has(input:checked){border-color:#80c6b7;background:#eff9f4;color:#227b6a}.active-option input{accent-color:#188a7d;margin:0;width:17px;height:17px}.confirmation-record{margin:20px 0;border:1px solid #e0ece5;background:#f8fcf9;border-radius:13px;padding:7px 18px}.confirmation-record>div{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:13px 0}.confirmation-record>div+div{border-top:1px solid #e4ece7}.confirmation-record dt{font-size:10px;color:#7b9487;flex-shrink:0}.confirmation-record dd{margin:0;display:flex;flex-direction:column;align-items:flex-start;gap:6px;text-align:start;font-size:13px;font-weight:700;overflow-wrap:anywhere;min-width:0}.confirmation-record dd>bdi{max-width:100%;overflow-wrap:anywhere}.confirmation-record del{font-size:10px;color:#94a59c;font-weight:400;overflow-wrap:anywhere;max-width:100%}.delete-dialog .dialog-icon{background:#fff0eb;color:#ba5e4e}.delete-dialog .dialog-eyebrow{color:#a67569}.delete-dialog .confirmation-record{background:#fffbf9;border-color:#f0e2dc}.button-danger{background:#bc5147;color:white}.button-danger:hover{background:#a8443c}.button-danger:disabled{opacity:.65}
-@media(max-width:1100px){.region-action{padding-inline:10px}.region-action>span{display:none}.region-status{min-width:80px;font-size:10px}}
-@media(max-width:600px){.regions-introduction{align-items:flex-start;gap:12px}.regions-introduction h1{font-size:25px}.regions-introduction .page-description{font-size:11px;line-height:1.9}.add-region{min-height:44px;font-size:10px;padding:9px 12px;margin-top:24px;gap:5px}.add-region svg{width:15px;height:15px}.regions-table thead th:first-child{width:42%}.regions-table thead th:nth-child(2){width:30%}.regions-table thead th:last-child{width:28%}.regions-table th,.regions-table td{padding:14px 10px}.region-row-actions{flex-direction:column;gap:7px}.region-action{width:44px;padding:10px}.region-status{font-size:9px;min-width:0;padding:7px 8px;gap:5px}.region-name{font-size:12px}.region-field>label,.region-status-field legend{font-size:11px}.confirmation-record{padding-inline:14px}.confirmation-record>div{gap:12px}.confirmation-record dt{font-size:9px}.confirmation-record dd{font-size:12px}.confirmation-record .status-label{font-size:10px}.regions-card .states-card-header{align-items:center}.regions-card .fixed-tag{flex-shrink:0}}
+.add-region {
+  white-space: nowrap;
+}
+.add-region svg {
+  width: 18px;
+  height: 18px;
+}
+.regions-table thead th:first-child {
+  width: 45%;
+}
+.regions-table thead th:nth-child(2) {
+  width: 25%;
+}
+.regions-table thead th:last-child {
+  width: 30%;
+}
+.region-name {
+  display: block;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 2;
+}
+.region-status,
+.status-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  padding: 7px 12px;
+  line-height: 1.8;
+}
+.region-status {
+  min-height: 44px;
+  min-width: 88px;
+}
+.region-status > span {
+  width: 6px;
+  height: 6px;
+  background: currentColor;
+  border-radius: 50%;
+}
+.status-active {
+  background: #e9f7f0;
+  color: #28764e;
+}
+.status-inactive {
+  background: #f0f3f3;
+  color: #758683;
+}
+.region-status:hover {
+  border-color: currentColor;
+}
+.region-row-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.region-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 9px 12px;
+  font-size: 10px;
+  font-weight: 600;
+  background: #edf8f5;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  color: #167d76;
+}
+.region-action svg {
+  width: 15px;
+  height: 15px;
+}
+.region-action:hover {
+  border-color: #b1d7cc;
+}
+.action-delete {
+  background: #fff2ef;
+  color: #b45349;
+}
+.action-delete:hover {
+  border-color: #e6b5ae;
+}
+.regions-empty {
+  text-align: center;
+  padding: 36px 12px;
+  color: #819b91;
+}
+.regions-empty > svg {
+  width: 36px;
+  height: 36px;
+  margin-bottom: 12px;
+}
+.regions-empty strong {
+  display: block;
+  font-size: 15px;
+  color: #446f62;
+}
+.regions-empty p {
+  font-size: 11px;
+  margin: 6px 0 0;
+}
+.regions-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 24px;
+}
+.regions-pagination > span {
+  font-size: 11px;
+  color: #769187;
+}
+.region-field {
+  margin-bottom: 24px;
+}
+.region-field > label,
+.region-status-field legend {
+  font-size: 12px;
+  font-weight: 700;
+  color: #355e53;
+}
+.region-field > label > span {
+  color: #b4584b;
+}
+.region-field input {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid #dce8e4;
+  background: #fbfdfc;
+  border-radius: 10px;
+  margin-top: 10px;
+  padding: 10px 13px;
+  color: var(--ink);
+  font-size: 13px;
+}
+.region-field input::placeholder {
+  color: #9aaea5;
+}
+.region-field .field-help {
+  margin: 8px 0 0;
+}
+.field-error {
+  font-size: 11px;
+  color: #af4539;
+  line-height: 1.9;
+}
+.field-error ul,
+.region-status-field .errorlist {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+}
+.region-status-field {
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+.region-status-field legend {
+  margin-bottom: 12px;
+}
+.active-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.active-option {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid #dfe9e4;
+  min-height: 48px;
+  border-radius: 10px;
+  padding: 10px 13px;
+  font-size: 12px;
+  cursor: pointer;
+  background: white;
+}
+.active-option:has(input:checked) {
+  border-color: #80c6b7;
+  background: #eff9f4;
+  color: #227b6a;
+}
+.active-option input {
+  accent-color: #188a7d;
+  margin: 0;
+  width: 17px;
+  height: 17px;
+}
+.confirmation-record {
+  margin: 20px 0;
+  border: 1px solid #e0ece5;
+  background: #f8fcf9;
+  border-radius: 13px;
+  padding: 7px 18px;
+}
+.confirmation-record > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 13px 0;
+}
+.confirmation-record > div + div {
+  border-top: 1px solid #e4ece7;
+}
+.confirmation-record dt {
+  font-size: 10px;
+  color: #7b9487;
+  flex-shrink: 0;
+}
+.confirmation-record dd {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  text-align: start;
+  font-size: 13px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.confirmation-record dd > bdi {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.confirmation-record del {
+  font-size: 10px;
+  color: #94a59c;
+  font-weight: 400;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+}
+.delete-dialog .dialog-icon {
+  background: #fff0eb;
+  color: #ba5e4e;
+}
+.delete-dialog .dialog-eyebrow {
+  color: #a67569;
+}
+.delete-dialog .confirmation-record {
+  background: #fffbf9;
+  border-color: #f0e2dc;
+}
+.button-danger {
+  background: #bc5147;
+  color: white;
+}
+.button-danger:hover {
+  background: #a8443c;
+}
+.button-danger:disabled {
+  opacity: 0.65;
+}
+@media (max-width: 1100px) {
+  .region-action {
+    padding-inline: 10px;
+  }
+  .region-action > span {
+    display: none;
+  }
+  .region-status {
+    min-width: 80px;
+    font-size: 10px;
+  }
+}
+@media (max-width: 600px) {
+  .regions-introduction {
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .regions-introduction h1 {
+    font-size: 25px;
+  }
+  .regions-introduction .page-description {
+    font-size: 11px;
+    line-height: 1.9;
+  }
+  .add-region {
+    min-height: 44px;
+    font-size: 10px;
+    padding: 9px 12px;
+    margin-top: 24px;
+    gap: 5px;
+  }
+  .add-region svg {
+    width: 15px;
+    height: 15px;
+  }
+  .regions-table thead th:first-child {
+    width: 42%;
+  }
+  .regions-table thead th:nth-child(2) {
+    width: 30%;
+  }
+  .regions-table thead th:last-child {
+    width: 28%;
+  }
+  .regions-table th,
+  .regions-table td {
+    padding: 14px 10px;
+  }
+  .region-row-actions {
+    flex-direction: column;
+    gap: 7px;
+  }
+  .region-action {
+    width: 44px;
+    padding: 10px;
+  }
+  .region-status {
+    font-size: 9px;
+    min-width: 0;
+    padding: 7px 8px;
+    gap: 5px;
+  }
+  .region-name {
+    font-size: 12px;
+  }
+  .region-field > label,
+  .region-status-field legend {
+    font-size: 11px;
+  }
+  .confirmation-record {
+    padding-inline: 14px;
+  }
+  .confirmation-record > div {
+    gap: 12px;
+  }
+  .confirmation-record dt {
+    font-size: 9px;
+  }
+  .confirmation-record dd {
+    font-size: 12px;
+  }
+  .confirmation-record .status-label {
+    font-size: 10px;
+  }
+  .regions-card .states-card-header {
+    align-items: center;
+  }
+  .regions-card .fixed-tag {
+    flex-shrink: 0;
+  }
+}

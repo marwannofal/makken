@@ -1,5 +1,368 @@
-.add-expense-item{white-space:nowrap}.add-expense-item svg{width:18px;height:18px}.expense_items-table thead th:first-child{width:45%}.expense_items-table thead th:nth-child(2){width:25%}.expense_items-table thead th:last-child{width:30%}.expense-item-name{display:block;overflow-wrap:anywhere;font-size:13px;font-weight:700;line-height:2}.expense-item-status,.status-label{display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:8px;font-size:11px;font-weight:600;border:1px solid transparent;white-space:nowrap;padding:7px 12px;line-height:1.8}.expense-item-status{min-height:44px;min-width:88px}.expense-item-status>span{width:6px;height:6px;background:currentColor;border-radius:50%}.status-active{background:#e9f7f0;color:#28764e}.status-inactive{background:#f0f3f3;color:#758683}.expense-item-status:hover{border-color:currentColor}.expense-item-row-actions{display:flex;align-items:center;justify-content:center;gap:8px}.expense-item-action{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;min-width:44px;padding:9px 12px;font-size:10px;font-weight:600;background:#edf8f5;border:1px solid transparent;border-radius:9px;color:#167d76}.expense-item-action svg{width:15px;height:15px}.expense-item-action:hover{border-color:#b1d7cc}.action-delete{background:#fff2ef;color:#b45349}.action-delete:hover{border-color:#e6b5ae}.expense_items-empty{text-align:center;padding:36px 12px;color:#819b91}.expense_items-empty>svg{width:36px;height:36px;margin-bottom:12px}.expense_items-empty strong{display:block;font-size:15px;color:#446f62}.expense_items-empty p{font-size:11px;margin:6px 0 0}.expense_items-pagination{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:24px}.expense_items-pagination>span{font-size:11px;color:#769187}.expense-item-field{margin-bottom:24px}.expense-item-field>label,.expense-item-status-field legend{font-size:12px;font-weight:700;color:#355e53}.expense-item-field>label>span{color:#b4584b}.expense-item-field input{width:100%;min-height:48px;border:1px solid #dce8e4;background:#fbfdfc;border-radius:10px;margin-top:10px;padding:10px 13px;color:var(--ink);font-size:13px}.expense-item-field input::placeholder{color:#9aaea5}.expense-item-field .field-help{margin:8px 0 0}.field-error{font-size:11px;color:#af4539;line-height:1.9}.field-error ul,.expense-item-status-field .errorlist{list-style:none;margin:8px 0 0;padding:0}.expense-item-status-field{padding:0;margin:0;border:0}.expense-item-status-field legend{margin-bottom:12px}.active-options{display:grid;grid-template-columns:1fr 1fr;gap:12px}.active-option{display:flex;align-items:center;gap:9px;border:1px solid #dfe9e4;min-height:48px;border-radius:10px;padding:10px 13px;font-size:12px;cursor:pointer;background:white}.active-option:has(input:checked){border-color:#80c6b7;background:#eff9f4;color:#227b6a}.active-option input{accent-color:#188a7d;margin:0;width:17px;height:17px}.confirmation-record{margin:20px 0;border:1px solid #e0ece5;background:#f8fcf9;border-radius:13px;padding:7px 18px}.confirmation-record>div{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:13px 0}.confirmation-record>div+div{border-top:1px solid #e4ece7}.confirmation-record dt{font-size:10px;color:#7b9487;flex-shrink:0}.confirmation-record dd{margin:0;display:flex;flex-direction:column;align-items:flex-start;gap:6px;text-align:start;font-size:13px;font-weight:700;overflow-wrap:anywhere;min-width:0}.confirmation-record dd>bdi{max-width:100%;overflow-wrap:anywhere}.confirmation-record del{font-size:10px;color:#94a59c;font-weight:400;overflow-wrap:anywhere;max-width:100%}.delete-dialog .dialog-icon{background:#fff0eb;color:#ba5e4e}.delete-dialog .dialog-eyebrow{color:#a67569}.delete-dialog .confirmation-record{background:#fffbf9;border-color:#f0e2dc}.button-danger{background:#bc5147;color:white}.button-danger:hover{background:#a8443c}.button-danger:disabled{opacity:.65}
-@media(max-width:1100px){.expense-item-action{padding-inline:10px}.expense-item-action>span{display:none}.expense-item-status{min-width:80px;font-size:10px}}
-@media(max-width:600px){.expense_items-introduction{align-items:flex-start;gap:12px}.expense_items-introduction h1{font-size:25px}.expense_items-introduction .page-description{font-size:11px;line-height:1.9}.add-expense-item{min-height:44px;font-size:10px;padding:9px 12px;margin-top:24px;gap:5px}.add-expense-item svg{width:15px;height:15px}.expense_items-table thead th:first-child{width:42%}.expense_items-table thead th:nth-child(2){width:30%}.expense_items-table thead th:last-child{width:28%}.expense_items-table th,.expense_items-table td{padding:14px 10px}.expense-item-row-actions{flex-direction:column;gap:7px}.expense-item-action{width:44px;padding:10px}.expense-item-status{font-size:9px;min-width:0;padding:7px 8px;gap:5px}.expense-item-name{font-size:12px}.expense-item-field>label,.expense-item-status-field legend{font-size:11px}.confirmation-record{padding-inline:14px}.confirmation-record>div{gap:12px}.confirmation-record dt{font-size:9px}.confirmation-record dd{font-size:12px}.confirmation-record .status-label{font-size:10px}.expense_items-card .states-card-header{align-items:center}.expense_items-card .fixed-tag{flex-shrink:0}}
+.add-expense-item {
+  white-space: nowrap;
+}
+.add-expense-item svg {
+  width: 18px;
+  height: 18px;
+}
+.expense_items-table thead th:first-child {
+  width: 45%;
+}
+.expense_items-table thead th:nth-child(2) {
+  width: 25%;
+}
+.expense_items-table thead th:last-child {
+  width: 30%;
+}
+.expense-item-name {
+  display: block;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 2;
+}
+.expense-item-status,
+.status-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  padding: 7px 12px;
+  line-height: 1.8;
+}
+.expense-item-status {
+  min-height: 44px;
+  min-width: 88px;
+}
+.expense-item-status > span {
+  width: 6px;
+  height: 6px;
+  background: currentColor;
+  border-radius: 50%;
+}
+.status-active {
+  background: #e9f7f0;
+  color: #28764e;
+}
+.status-inactive {
+  background: #f0f3f3;
+  color: #758683;
+}
+.expense-item-status:hover {
+  border-color: currentColor;
+}
+.expense-item-row-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.expense-item-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 9px 12px;
+  font-size: 10px;
+  font-weight: 600;
+  background: #edf8f5;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  color: #167d76;
+}
+.expense-item-action svg {
+  width: 15px;
+  height: 15px;
+}
+.expense-item-action:hover {
+  border-color: #b1d7cc;
+}
+.action-delete {
+  background: #fff2ef;
+  color: #b45349;
+}
+.action-delete:hover {
+  border-color: #e6b5ae;
+}
+.expense_items-empty {
+  text-align: center;
+  padding: 36px 12px;
+  color: #819b91;
+}
+.expense_items-empty > svg {
+  width: 36px;
+  height: 36px;
+  margin-bottom: 12px;
+}
+.expense_items-empty strong {
+  display: block;
+  font-size: 15px;
+  color: #446f62;
+}
+.expense_items-empty p {
+  font-size: 11px;
+  margin: 6px 0 0;
+}
+.expense_items-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 24px;
+}
+.expense_items-pagination > span {
+  font-size: 11px;
+  color: #769187;
+}
+.expense-item-field {
+  margin-bottom: 24px;
+}
+.expense-item-field > label,
+.expense-item-status-field legend {
+  font-size: 12px;
+  font-weight: 700;
+  color: #355e53;
+}
+.expense-item-field > label > span {
+  color: #b4584b;
+}
+.expense-item-field input {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid #dce8e4;
+  background: #fbfdfc;
+  border-radius: 10px;
+  margin-top: 10px;
+  padding: 10px 13px;
+  color: var(--ink);
+  font-size: 13px;
+}
+.expense-item-field input::placeholder {
+  color: #9aaea5;
+}
+.expense-item-field .field-help {
+  margin: 8px 0 0;
+}
+.field-error {
+  font-size: 11px;
+  color: #af4539;
+  line-height: 1.9;
+}
+.field-error ul,
+.expense-item-status-field .errorlist {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+}
+.expense-item-status-field {
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+.expense-item-status-field legend {
+  margin-bottom: 12px;
+}
+.active-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.active-option {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid #dfe9e4;
+  min-height: 48px;
+  border-radius: 10px;
+  padding: 10px 13px;
+  font-size: 12px;
+  cursor: pointer;
+  background: white;
+}
+.active-option:has(input:checked) {
+  border-color: #80c6b7;
+  background: #eff9f4;
+  color: #227b6a;
+}
+.active-option input {
+  accent-color: #188a7d;
+  margin: 0;
+  width: 17px;
+  height: 17px;
+}
+.confirmation-record {
+  margin: 20px 0;
+  border: 1px solid #e0ece5;
+  background: #f8fcf9;
+  border-radius: 13px;
+  padding: 7px 18px;
+}
+.confirmation-record > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 13px 0;
+}
+.confirmation-record > div + div {
+  border-top: 1px solid #e4ece7;
+}
+.confirmation-record dt {
+  font-size: 10px;
+  color: #7b9487;
+  flex-shrink: 0;
+}
+.confirmation-record dd {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  text-align: start;
+  font-size: 13px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.confirmation-record dd > bdi {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.confirmation-record del {
+  font-size: 10px;
+  color: #94a59c;
+  font-weight: 400;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+}
+.delete-dialog .dialog-icon {
+  background: #fff0eb;
+  color: #ba5e4e;
+}
+.delete-dialog .dialog-eyebrow {
+  color: #a67569;
+}
+.delete-dialog .confirmation-record {
+  background: #fffbf9;
+  border-color: #f0e2dc;
+}
+.button-danger {
+  background: #bc5147;
+  color: white;
+}
+.button-danger:hover {
+  background: #a8443c;
+}
+.button-danger:disabled {
+  opacity: 0.65;
+}
+@media (max-width: 1100px) {
+  .expense-item-action {
+    padding-inline: 10px;
+  }
+  .expense-item-action > span {
+    display: none;
+  }
+  .expense-item-status {
+    min-width: 80px;
+    font-size: 10px;
+  }
+}
+@media (max-width: 600px) {
+  .expense_items-introduction {
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .expense_items-introduction h1 {
+    font-size: 25px;
+  }
+  .expense_items-introduction .page-description {
+    font-size: 11px;
+    line-height: 1.9;
+  }
+  .add-expense-item {
+    min-height: 44px;
+    font-size: 10px;
+    padding: 9px 12px;
+    margin-top: 24px;
+    gap: 5px;
+  }
+  .add-expense-item svg {
+    width: 15px;
+    height: 15px;
+  }
+  .expense_items-table thead th:first-child {
+    width: 42%;
+  }
+  .expense_items-table thead th:nth-child(2) {
+    width: 30%;
+  }
+  .expense_items-table thead th:last-child {
+    width: 28%;
+  }
+  .expense_items-table th,
+  .expense_items-table td {
+    padding: 14px 10px;
+  }
+  .expense-item-row-actions {
+    flex-direction: column;
+    gap: 7px;
+  }
+  .expense-item-action {
+    width: 44px;
+    padding: 10px;
+  }
+  .expense-item-status {
+    font-size: 9px;
+    min-width: 0;
+    padding: 7px 8px;
+    gap: 5px;
+  }
+  .expense-item-name {
+    font-size: 12px;
+  }
+  .expense-item-field > label,
+  .expense-item-status-field legend {
+    font-size: 11px;
+  }
+  .confirmation-record {
+    padding-inline: 14px;
+  }
+  .confirmation-record > div {
+    gap: 12px;
+  }
+  .confirmation-record dt {
+    font-size: 9px;
+  }
+  .confirmation-record dd {
+    font-size: 12px;
+  }
+  .confirmation-record .status-label {
+    font-size: 10px;
+  }
+  .expense_items-card .states-card-header {
+    align-items: center;
+  }
+  .expense_items-card .fixed-tag {
+    flex-shrink: 0;
+  }
+}
 
-@media(max-width:600px){.expense_items-introduction{flex-wrap:wrap}.expense_items-introduction>div{width:100%}.expense_items-introduction .add-expense-item{margin-top:0}}
+@media (max-width: 600px) {
+  .expense_items-introduction {
+    flex-wrap: wrap;
+  }
+  .expense_items-introduction > div {
+    width: 100%;
+  }
+  .expense_items-introduction .add-expense-item {
+    margin-top: 0;
+  }
+}
