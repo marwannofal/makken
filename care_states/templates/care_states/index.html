@@ -3,11 +3,11 @@
 {% block title %}حالة تطور المنظمات للرعاية | مكّن{% endblock %}
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'care_states/states.css' %}?v=20261015-1">
-<script src="{% static 'care_states/states.js' %}?v=20261015-1" defer></script>
+<script src="{% static 'care_states/states.js' %}?v=20261015-2" defer></script>
 {% endblock %}
 {% block content %}
 <section class="page-introduction states-introduction" aria-labelledby="page-heading">
-  <div><p class="eyebrow">الإعدادات</p><h1 id="page-heading">حالة تطور المنظمات للرعاية<span class="greeting-dot">.</span></h1></div>
+  <div><p class="eyebrow">الإعدادات</p><h1 id="page-heading">حالة تطور المنظمات للرعاية<span class="greeting-dot">.</span></h1><p class="page-description">ثلاث حالات ثابتة، وألوان تناسب طريقة عملك.</p></div>
 </section>
 {% if error %}<div class="feedback feedback-error" role="alert">{{ error }}</div>{% endif %}
 {% if notice %}<div class="feedback feedback-info" role="status">{{ notice }}</div>{% endif %}

@@ -42,3 +42,8 @@ urlpatterns = [_makken_home_path("", _makken_home_view, name="makken_home")] + l
 from django.urls import include as _care_include, path as _care_path
 urlpatterns = [_care_path("settings/development-states/", _care_include("care_states.urls"))] + list(urlpatterns)
 # END MAKKEN CARE STATES
+
+# BEGIN MAKKEN LEVELS
+from django.urls import include as _levels_include, path as _levels_path
+urlpatterns = [_levels_path("settings/levels/", _levels_include("levels.urls"))] + list(urlpatterns)
+# END MAKKEN LEVELS

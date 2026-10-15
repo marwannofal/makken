@@ -47,7 +47,7 @@
     dialog.addEventListener("close", () => {
       document.documentElement.classList.remove("color-dialog-open");
       if (dialog.hasAttribute("data-return-on-close")) {
-        window.location.assign(form.action);
+        window.location.assign(form.getAttribute("action"));
       } else if (opener) opener.focus();
     });
     if (dialog.open) open(dialog);
