@@ -82,3 +82,8 @@ urlpatterns = [_training_programs_path("settings/training-programs/", _training_
 from django.urls import include as _sponsorship_shapes_include, path as _sponsorship_shapes_path
 urlpatterns = [_sponsorship_shapes_path("settings/sponsorship-shapes/", _sponsorship_shapes_include("sponsorship_shapes.urls"))] + list(urlpatterns)
 # END MAKKEN SPONSORSHIP SHAPES
+
+# BEGIN MAKKEN PARTNERSHIPS
+from django.urls import include as _partnerships_include, path as _partnerships_path
+urlpatterns = [_partnerships_path("partnerships/", _partnerships_include("partnerships.urls"))] + list(urlpatterns)
+# END MAKKEN PARTNERSHIPS

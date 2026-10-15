@@ -109,6 +109,10 @@ def _apply(payload, user):
                 item.version += 1
                 item.save()
             released = [s.pk for s in owned if s.pk not in selected_ids]
+            # MAKKEN PARTNERSHIP SPECIALIZATION GUARD
+            from partnerships.models import OfferingSpecialization
+            if OfferingSpecialization.objects.filter(specialization_id__in=released).exists():
+                raise AssignmentConflict("لا يمكن إلغاء ربط تخصص مستخدم في سجل شراكة. عدّل بند الشراكة أولًا.")
             acquired = [s.pk for s in selected if s.sector_id != item.pk]
             now = timezone.now()
             if released:

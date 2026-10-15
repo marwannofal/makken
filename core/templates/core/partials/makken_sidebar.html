@@ -8,7 +8,11 @@
   <a class="nav-link{% if active_page == 'home' %} is-active{% endif %}" href="{% url 'makken_home' %}"{% if active_page == 'home' %} aria-current="page"{% endif %}>
     <svg aria-hidden="true"><use href="#icon-home"></use></svg><span>الرئيسية</span><span class="nav-dot" aria-hidden="true"></span>
   </a>
-  <details class="nav-management{% if active_page and active_page != 'home' %} has-active-page{% endif %}" data-management-group{% if active_page and active_page != 'home' %} open{% endif %}>
+    <details
+    class="nav-management{% if active_page and active_page != 'home' and active_page != 'partnerships' %} has-active-page{% endif %}"
+    data-management-group
+    {% if active_page and active_page != 'home' and active_page != 'partnerships' %}open{% endif %}
+    >
     <summary class="nav-management-toggle">
       <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m12 3 2 3 3 .5.5 3 3 2-3 2-.5 3-3 .5-2 3-2-3-3-.5-.5-3-3-2 3-2 .5-3 3-.5Z"/><circle cx="12" cy="12" r="3"/></svg>
       <span>الإدارة</span>
@@ -42,8 +46,14 @@
       <a class="nav-link{% if active_page == 'sponsorship_shapes' %} is-active{% endif %}" href="{% url 'sponsorship_shapes:index' %}"{% if active_page == 'sponsorship_shapes' %} aria-current="page"{% endif %}>
         <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 21S3 15 3 9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 6-9 12-9 12Z"/><path d="M8 12h8m-4-4v8"/></svg><span>أشكال الرعاية</span><span class="nav-dot" aria-hidden="true"></span>
       </a>
+      <a class="nav-link{% if active_page == 'partnership_editor' %} is-active{% endif %}" href="{% url 'partnerships:create' %}"{% if active_page == 'partnership_editor' %} aria-current="page"{% endif %}>
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M15 5H5v15h15V10M16 2v8m-4-4h8M8 12h6m-6 4h8"/></svg><span>إدارة سجل الشراكات المحتملة التي لها القدرة</span><span class="nav-dot" aria-hidden="true"></span>
+      </a>
     </div>
   </details>
+  <a class="nav-link{% if active_page == 'partnerships' %} is-active{% endif %}" href="{% url 'partnerships:index' %}"{% if active_page == 'partnerships' %} aria-current="page"{% endif %}>
+    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2ZM9 7h6m-6 4h6m-6 4h3"/></svg><span>سجل الشراكات التي لها القدرة</span><span class="nav-dot" aria-hidden="true"></span>
+  </a>
 </nav>
 <div class="sidebar-footer">
   <div class="user-profile">
