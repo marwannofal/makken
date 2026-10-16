@@ -11,7 +11,7 @@ from sponsorship_shapes.models import SponsorshipShape
 from .models import Partnership, Scope
 
 
-COUNTRIES = [(code, f"{code} +{phonenumbers.country_code_for_region(code)}") for code in sorted(phonenumbers.SUPPORTED_REGIONS)]
+COUNTRIES = [(code, f"{code} +{phonenumbers.country_code_for_region(code)}") for code in sorted(phonenumbers.SUPPORTED_REGIONS - {"IL"})]
 
 
 def offering_data(item):

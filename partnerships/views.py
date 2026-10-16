@@ -99,7 +99,7 @@ def _catalog(item):
         "specializations": list(Specialization.objects.filter(Q(is_active=True) | Q(pk__in=spec_ids)).values("id", "name", "sector_id", "is_active")),
         "shapes": list(SponsorshipShape.objects.filter(Q(is_active=True) | Q(pk__in=shape_ids)).values("id", "name", "description", "is_active")),
         "entities": list(Entity.objects.filter(Q(is_active=True) | Q(pk=item.entity_id if item else None)).values("id", "name", "entity_type", "is_active")),
-        "countries": [{"id": code, "dial": "+" + str(phonenumbers.country_code_for_region(code))} for code in sorted(phonenumbers.SUPPORTED_REGIONS)],
+        "countries": [{"id": code, "dial": "+" + str(phonenumbers.country_code_for_region(code))} for code in sorted(phonenumbers.SUPPORTED_REGIONS - {"IL"})],
     }
 
 
