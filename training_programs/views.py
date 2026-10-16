@@ -14,6 +14,8 @@ from expense_items.models import ExpenseItem
 from .forms import TrainingProgramForm
 from .models import TrainingProgram
 
+from core.settings_filters import apply as _makken_settings_apply, context as _makken_settings_context, redirect as _makken_settings_redirect
+
 SNAPSHOT_SALT = "makken.training_programs.snapshot.v2"
 CONFIRM_SALT = "makken.training_programs.confirm.v2"
 TOKEN_AGE = 20 * 60
@@ -168,7 +170,7 @@ def index(request):
                 _apply(payload)
                 message = {"add": "تمت إضافة البرنامج بنجاح.", "edit": "تم تعديل البرنامج بنجاح.", "delete": "تم حذف البرنامج مع الاحتفاظ ببنود الصرف.", "toggle": "تم تحديث حالة البرنامج بنجاح."}[payload["operation"]]
                 messages.success(request, message)
-                return add_login_headers(redirect("training_programs:index"))
+                return add_login_headers(_makken_settings_redirect(request, "training_programs:index"))
             else:
                 context["error"], status = "طلب غير صالح. لم يتم تغيير السجلات.", 400
         else:
@@ -189,11 +191,13 @@ def index(request):
         context["error"], status = str(exc), 409
     except (IntegrityError, ProtectedError, RestrictedError):
         context["error"], status = "تعذّر تنفيذ الطلب. الاسم مستخدم بالفعل أو تغيّرت البيانات. لم يُحفظ أي تغيير.", 409
-    page = Paginator(TrainingProgram.objects.prefetch_related("expense_items").all(), 10).get_page(request.GET.get("page"))
+    page = Paginator(_makken_settings_apply(request, TrainingProgram.objects.prefetch_related("expense_items").all()), 10).get_page(request.GET.get("page"))
     rows = []
     for item in page:
         rows.append({"id": item.pk, "name": item.name, "is_active": item.is_active, "category_label": item.get_category_display(),
                      "type_labels": item.training_type_labels, "expense_items": list(item.expense_items.all()),
                      "toggle_snapshot": _snapshot(item, "toggle", request.user), "delete_snapshot": _snapshot(item, "delete", request.user)})
     context.update(rows=rows, page_obj=page)
+    # MAKKEN SETTINGS FILTER CONTEXT
+    context.update(_makken_settings_context(request))
     return add_login_headers(render(request, "training_programs/index.html", context, status=status))

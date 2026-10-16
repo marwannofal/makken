@@ -12,6 +12,8 @@ from accounts.security import add_login_headers
 from .forms import RegionForm
 from .models import Region
 
+from core.settings_filters import apply as _makken_settings_apply, context as _makken_settings_context, redirect as _makken_settings_redirect
+
 SNAPSHOT_SALT = "makken.regions.snapshot.v1"
 CONFIRM_SALT = "makken.regions.confirm.v1"
 TOKEN_AGE = 20 * 60
@@ -113,7 +115,7 @@ def index(request):
                 if status == 200:
                     message = {"add": "تمت إضافة المنطقة بنجاح.", "edit": "تم تعديل المنطقة بنجاح.", "delete": "تم حذف المنطقة بنجاح.", "toggle": "تم تحديث حالة المنطقة بنجاح."}[operation]
                     messages.success(request, message)
-                    return add_login_headers(redirect("regions:index"))
+                    return add_login_headers(_makken_settings_redirect(request, "regions:index"))
             else:
                 context["error"], status = "طلب غير صالح. لم يتم تغيير السجلات.", 400
         else:
@@ -130,9 +132,11 @@ def index(request):
         context["error"], status = "انتهت صلاحية الطلب أو تغيّر محتواه. أعد فتح الصفحة وحاول مجددًا.", 400
     except (IntegrityError, ProtectedError, RestrictedError):
         context["error"], status = "تعذّر تنفيذ الطلب. الاسم مستخدم بالفعل أو المنطقة مرتبطة بسجلات أخرى. راجع القائمة وحاول مجددًا.", 409
-    page = Paginator(Region.objects.all(), 10).get_page(request.GET.get("page"))
+    page = Paginator(_makken_settings_apply(request, Region.objects.all()), 10).get_page(request.GET.get("page"))
     rows = []
     for item in page:
         rows.append({"id": item.pk, "name": item.name, "is_active": item.is_active, "edit_snapshot": _snapshot(item, "edit", request.user), "toggle_snapshot": _snapshot(item, "toggle", request.user), "delete_snapshot": _snapshot(item, "delete", request.user)})
     context.update(rows=rows, page_obj=page)
+    # MAKKEN SETTINGS FILTER CONTEXT
+    context.update(_makken_settings_context(request))
     return add_login_headers(render(request, "regions/index.html", context, status=status))

@@ -11,6 +11,8 @@ from accounts.security import add_login_headers
 from .forms import SponsorshipShapeForm
 from .models import SponsorshipShape
 
+from core.settings_filters import apply as _makken_settings_apply, context as _makken_settings_context, redirect as _makken_settings_redirect
+
 SNAPSHOT_SALT = "makken.sponsorship_shapes.snapshot.v1"
 CONFIRM_SALT = "makken.sponsorship_shapes.confirm.v1"
 TOKEN_AGE = 20 * 60
@@ -114,7 +116,7 @@ def index(request):
                 if status == 200:
                     message = {"add": "تمت إضافة شكل الرعاية بنجاح.", "edit": "تم تعديل شكل الرعاية بنجاح.", "delete": "تم حذف شكل الرعاية بنجاح.", "toggle": "تم تحديث حالة شكل الرعاية بنجاح."}[operation]
                     messages.success(request, message)
-                    return add_login_headers(redirect("sponsorship_shapes:index"))
+                    return add_login_headers(_makken_settings_redirect(request, "sponsorship_shapes:index"))
             else:
                 context["error"], status = "طلب غير صالح. لم يتم تغيير السجلات.", 400
         else:
@@ -131,9 +133,11 @@ def index(request):
         context["error"], status = "انتهت صلاحية الطلب أو تغيّر محتواه. أعد فتح الصفحة وحاول مجددًا.", 400
     except (IntegrityError, ProtectedError, RestrictedError):
         context["error"], status = "تعذّر تنفيذ الطلب. الاسم مستخدم بالفعل أو شكل الرعاية مرتبط بسجلات أخرى. راجع القائمة وحاول مجددًا.", 409
-    page = Paginator(SponsorshipShape.objects.all(), 10).get_page(request.GET.get("page"))
+    page = Paginator(_makken_settings_apply(request, SponsorshipShape.objects.all()), 10).get_page(request.GET.get("page"))
     rows = []
     for item in page:
         rows.append({"id": item.pk, "name": item.name, "description": item.description, "is_employment": item.is_employment, "is_active": item.is_active, "edit_snapshot": _snapshot(item, "edit", request.user), "toggle_snapshot": _snapshot(item, "toggle", request.user), "delete_snapshot": _snapshot(item, "delete", request.user)})
     context.update(rows=rows, page_obj=page)
+    # MAKKEN SETTINGS FILTER CONTEXT
+    context.update(_makken_settings_context(request))
     return add_login_headers(render(request, "sponsorship_shapes/index.html", context, status=status))
