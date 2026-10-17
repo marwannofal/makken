@@ -10,3 +10,9 @@ urlpatterns = [
     path("logout", LogoutView.as_view(next_page="accounts:login"), name="logout"),
     path("logout/", LogoutView.as_view(next_page="accounts:login"), name="logout_slash"),
 ]
+
+from .profile_views import profile
+
+# BEGIN MAKKEN PROFILE URL
+urlpatterns = [path("profile/", profile, name="profile")] + list(urlpatterns)
+# END MAKKEN PROFILE URL

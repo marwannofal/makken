@@ -1,0 +1,8 @@
+<div class="profile-field{% if wide %} profile-field-wide{% endif %}">
+  <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span aria-hidden="true">*</span>{% endif %}</label>
+  {% if field.field.widget.input_type == 'password' %}
+  <div class="profile-password-control">{{ field }}<button type="button" class="profile-password-toggle" data-password-toggle aria-controls="{{ field.id_for_label }}" aria-pressed="false" aria-label="إظهار {{ field.label }}"><svg class="profile-eye" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg><svg class="profile-eye-off" viewBox="0 0 24 24" aria-hidden="true" hidden><path d="m3 3 18 18M9.5 5.3A12 12 0 0 1 12 5c6.5 0 10 7 10 7a19 19 0 0 1-3 4M6.3 6.3A22 22 0 0 0 2 12s3.5 7 10 7a12 12 0 0 0 5.7-1.5M10 10a3 3 0 0 0 4 4"/></svg></button></div>
+  {% else %}{{ field }}{% endif %}
+  {% if help %}<p class="profile-field-help">{{ help }}</p>{% endif %}
+  <div class="profile-field-error" id="error-{{ field.name }}"{% if field.errors %} role="alert"{% endif %}>{{ field.errors }}</div>
+</div>

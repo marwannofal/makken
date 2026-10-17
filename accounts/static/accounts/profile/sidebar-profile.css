@@ -1,0 +1,47 @@
+/* Only the account footer link; preserve the existing sidebar/navigation theme. */
+.sidebar .profile-sidebar-link {
+  border-radius: 12px;
+  padding-block: 8px;
+  padding-inline: 6px;
+  color: inherit;
+  transition: background 0.16s;
+}
+.sidebar .profile-sidebar-link:hover {
+  background: rgb(255 255 255 / 14%);
+}
+.sidebar .profile-sidebar-link .user-details {
+  flex: 1;
+}
+.sidebar .profile-sidebar-edit {
+  display: flex;
+  flex-shrink: 0;
+  margin-inline-start: auto;
+  opacity: 0.8;
+}
+.sidebar .profile-sidebar-edit svg {
+  width: 16px;
+  height: 16px;
+}
+.sidebar .profile-sidebar-link[aria-current="page"] {
+  background: #fff;
+  color: #168b87;
+}
+.sidebar .profile-sidebar-link[aria-current="page"] .user-name,
+.sidebar .profile-sidebar-link[aria-current="page"] .user-email {
+  color: #168b87;
+}
+.sidebar .profile-sidebar-link[aria-current="page"] .user-avatar {
+  background: #24b3af;
+  color: #fff;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sidebar .profile-sidebar-link {
+    transition: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .desktop-sidebar .profile-sidebar-link {
+    display: flex;
+  }
+}
