@@ -1,0 +1,222 @@
+.financial-capacity-field {
+  grid-column: 1/-1;
+}
+
+.financial-money-control {
+  height: 48px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: stretch;
+  max-width: 100%;
+  min-width: 0;
+  direction: rtl;
+  border: 1px solid #d7e6e2;
+  border-radius: 11px;
+  background: white;
+  overflow: hidden;
+}
+
+.financial-money-control #id_financial_capacity {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-sizing: border-box;
+  font-variant-numeric: tabular-nums;
+}
+
+.financial-currency-addon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 53px;
+  border-inline-start: 1px solid #dcebe6;
+  background: #edf8f4;
+}
+
+.financial-currency-addon img {
+  display: block;
+  object-fit: contain;
+  opacity: .75;
+}
+
+.financial-money-value {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.financial-money-value img {
+  display: block;
+  object-fit: contain;
+  flex-shrink: 0;
+  opacity: .75;
+}
+
+.financial-unset {
+  color: #8b9c98;
+  font-size: 11px;
+}
+
+.register-table td.financial-capacity-cell {
+  min-width: 150px;
+}
+
+/* Register filters: a single aligned desktop row. */
+.register-search:has(.financial-range-filter) {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) 140px minmax(220px, 260px) auto auto;
+  grid-template-areas: "search status financial submit reset";
+  align-items: end;
+  gap: 14px;
+}
+
+.register-search:has(.financial-range-filter) > .search-field {
+  grid-area: search;
+  min-width: 0;
+}
+
+.register-search:has(.financial-range-filter) > .filter-field {
+  grid-area: status;
+  min-width: 0;
+}
+
+.register-search:has(.financial-range-filter) > button.button {
+  grid-area: submit;
+}
+
+.register-search:has(.financial-range-filter) > a.button {
+  grid-area: reset;
+}
+
+.register-search:has(.financial-range-filter) > .button {
+  height: 48px;
+  min-height: 48px;
+  padding-block: 0;
+  white-space: nowrap;
+}
+
+.register-search:has(.financial-range-filter) .search-control {
+  height: 48px;
+  box-sizing: border-box;
+}
+
+.register-search:has(.financial-range-filter) .search-control input {
+  height: 46px;
+  min-height: 0;
+}
+
+.financial-range-filter {
+  grid-area: financial;
+  min-width: 0;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.financial-range-filter legend {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0;
+  margin-bottom: 9px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.8;
+  color: #274c4f;
+}
+
+.financial-range-currency {
+  display: inline-flex;
+  align-items: center;
+}
+
+.financial-range-currency img {
+  opacity: .7;
+  object-fit: contain;
+}
+
+.financial-range-layout {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: center;
+  gap: 10px;
+}
+
+.financial-range-entry {
+  position: relative;
+  min-width: 0;
+}
+
+.register-search .financial-range-entry label {
+  position: absolute;
+  inset-inline-start: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0;
+  font-size: 10px;
+  font-weight: 600;
+  color: #748c86;
+  cursor: text;
+}
+
+.register-search .financial-range-entry input {
+  width: 100%;
+  height: 48px;
+  min-height: 48px;
+  padding: 0 30px 0 8px;
+  box-sizing: border-box;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.financial-confirmation-value {
+  margin-top: 12px;
+  padding: 13px 16px;
+  border: 1px solid #dcece6;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+}
+
+.financial-money-control:focus-within {
+  outline: 2px solid #12817e;
+  outline-offset: 2px;
+}
+
+.financial-money-control input:focus-visible {
+  outline: 0;
+}
+
+@media (max-width: 1250px) {
+  .register-search:has(.financial-range-filter) {
+    grid-template-columns: minmax(0, 1fr) 140px auto auto;
+    grid-template-areas: "search status submit reset" "financial financial financial financial";
+    gap: 18px 12px;
+  }
+}
+
+@media (max-width: 600px) {
+  .register-search:has(.financial-range-filter) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas: "search search" "status status" "financial financial" "submit reset";
+    gap: 16px 10px;
+  }
+  .register-search:has(.financial-range-filter) > .button {
+    width: 100%;
+  }
+  .financial-currency-addon {
+    width: 46px;
+  }
+}

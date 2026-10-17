@@ -43,6 +43,7 @@ services:
     ports:
       - "127.0.0.1:18000:8000"
     volumes:
+      - /var/lib/makken/private_uploads:/app/private_uploads
       - ./staticfiles:/app/staticfiles
       - ./media:/app/media
     healthcheck:

@@ -1,0 +1,2 @@
+{% load static %}
+{% if amount != None %}<span class="financial-money-value"><bdi dir="ltr">{{ amount|floatformat:"2g" }}</bdi><img src="{% static 'partnerships/saudi-riyal.svg' %}" width="16" height="18" alt="ريال سعودي"></span>{% else %}<span class="financial-unset">غير محددة</span>{% endif %}

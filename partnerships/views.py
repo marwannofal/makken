@@ -10,7 +10,7 @@ from django.core.paginator import Paginator
 from django.db import IntegrityError, transaction
 from django.db.models import Q, Prefetch
 from django.db.models.deletion import ProtectedError
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -26,8 +26,16 @@ from sponsorship_shapes.models import SponsorshipShape
 from .forms import PartnershipForm, offering_data
 from .models import Partnership, PartnershipOffering, DevelopmentHistory, Scope
 
+from .financial import FinancialRange, amount_string, financial_search_clause, financial_redirect
+from .willingness import WillingnessTransitionForm, save_supporting_files
+from .attachment_storage import delete_private_files
+
 SALT = "makken.partnerships.v1"
 AGE = 20 * 60
+
+
+class InvalidWillingnessForm(Exception):
+    pass
 
 
 class Conflict(Exception):
@@ -55,7 +63,7 @@ def _base(request, title, active):
 def _query():
     return Partnership.objects.select_related("entity", "development_state").prefetch_related(
         Prefetch("offerings", queryset=PartnershipOffering.objects.select_related("sector", "sponsorship_shape").prefetch_related("specializations")),
-        "development_history__state")
+        "development_history__state", "willingness_attachments")
 
 
 def _history(item):
@@ -81,13 +89,13 @@ def _fingerprint(data, lock=False):
 
 
 def _serialized(cleaned):
-    return {"name": cleaned["name"], "representative": cleaned["representative"], "phone_country": cleaned["phone_country"], "phone": cleaned["phone"], "email": cleaned["email"], "entity_type": cleaned["entity_type"], "entity": str(cleaned["entity"].pk), "scope": cleaned["scope"], "is_active": cleaned["is_active"], "offerings": json.dumps(cleaned["offerings"])}
+    return {"name": cleaned["name"], "representative": cleaned["representative"], "phone_country": cleaned["phone_country"], "phone": cleaned["phone"], "email": cleaned["email"], "entity_type": cleaned["entity_type"], "entity": str(cleaned["entity"].pk), "scope": cleaned["scope"], "is_active": cleaned["is_active"], "offerings": json.dumps(cleaned["offerings"]), "financial_capacity": amount_string(cleaned["financial_capacity"])}
 
 
 def _initial(item):
     if not item:
         return {"phone_country": "SA", "is_active": "1", "offerings": "[]"}
-    return {"name": item.name, "representative": item.representative, "phone_country": item.phone_country, "phone": item.phone, "email": item.email, "entity_type": item.entity.entity_type, "entity": item.entity_id, "scope": item.scope, "is_active": "1" if item.is_active else "0", "offerings": json.dumps(offering_data(item))}
+    return {"name": item.name, "representative": item.representative, "phone_country": item.phone_country, "phone": item.phone, "email": item.email, "entity_type": item.entity.entity_type, "entity": item.entity_id, "scope": item.scope, "is_active": "1" if item.is_active else "0", "offerings": json.dumps(offering_data(item)), "financial_capacity": amount_string(item.financial_capacity)}
 
 
 def _catalog(item):
@@ -125,7 +133,7 @@ def _save(payload, user):
             if not StateColor.objects.filter(pk=DevelopmentState.CAPABILITY).exists():
                 raise Conflict("حالة قدرة غير موجودة. تأكد من تطبيق ترحيلات حالات تطور المنظمات للرعاية.")
             item = Partnership(request_key=payload["nonce"], created_by=user)
-        for field in ["name", "representative", "phone_country", "phone", "email", "entity", "scope"]:
+        for field in ["name", "representative", "phone_country", "phone", "email", "entity", "scope", "financial_capacity"]:
             setattr(item, field, clean[field])
         item.is_active = clean["is_active"] == "1"
         if not new:
@@ -162,7 +170,7 @@ def editor(request, pk=None):
                 if form.is_valid():
                     data = _serialized(form.cleaned_data)
                     token = _sign({**original, "kind": "save", "data": data, "catalog": _fingerprint(data)}, request.user)
-                    pending = {"title": "تأكيد تعديل الجهة" if item else "تأكيد إضافة الجهة", "name": data["name"], "token": token, "action": "save", "button": "تأكيد الحفظ"}
+                    pending = {"title": "تأكيد تعديل الجهة" if item else "تأكيد إضافة الجهة", "name": data["name"], "token": token, "action": "save", "button": "تأكيد الحفظ", "financial_capacity": data["financial_capacity"]}
                 else:
                     status = 400
             elif action == "confirm":
@@ -200,7 +208,7 @@ def _search(query, term):
             if term == label:
                 return query.filter(**{field: value})
     for word in term.split()[:12]:
-        condition = Q(name__icontains=word) | Q(representative__icontains=word) | Q(phone__icontains=word) | Q(email__icontains=word) | Q(entity__name__icontains=word) | Q(offerings__sector__name__icontains=word) | Q(offerings__specializations__name__icontains=word) | Q(offerings__sponsorship_shape__name__icontains=word)
+        condition = (Q(name__icontains=word) | Q(representative__icontains=word) | Q(phone__icontains=word) | Q(email__icontains=word) | Q(entity__name__icontains=word) | Q(offerings__sector__name__icontains=word) | Q(offerings__specializations__name__icontains=word) | Q(offerings__sponsorship_shape__name__icontains=word)) | financial_search_clause(word)
         for field, choices in [("entity__entity_type", EntityType.choices), ("entity__branch", EntityBranch.choices), ("scope", Scope.choices), ("development_state_id", DevelopmentState.choices)]:
             found = [value for value, label in choices if word in label]
             if found:
@@ -216,25 +224,50 @@ def _search(query, term):
 @login_required(login_url="accounts:login")
 @require_http_methods(["GET", "POST"])
 def index(request):
-    context = _base(request, "إدارة سجل الشراكات التي لها القدرة", "partnerships")
+    context = _base(request, "إدارة سجل الشراكات", "partnerships")
     status, pending = 200, None
+    saved_paths = []
+    willingness_form = WillingnessTransitionForm()
     try:
         if request.method == "POST":
             action = request.POST.get("action")
             if action not in {"preview", "confirm"}:
                 raise signing.BadSignature
             data = _load(request.POST.get("token"), request.user, "row" if action == "preview" else "row-confirm")
-            if data.get("operation") not in {"delete", "toggle"}:
+            if data.get("operation") not in {"delete", "toggle", "advance"}:
                 raise signing.BadSignature
             with transaction.atomic():
                 item = Partnership.objects.select_for_update().filter(pk=data.get("id")).first()
                 if not item or item.version != data.get("version"):
                     raise Conflict("تغيّر هذا السجل أو حُذف، أو تم تنفيذ الطلب مسبقًا. حدّث القائمة وحاول مجددًا.")
+                if data["operation"] == "advance":
+                    if item.development_state_id != DevelopmentState.CAPABILITY:
+                        raise Conflict("يمكن الانتقال إلى رغبة فقط عندما تكون الحالة الحالية قدرة. لم يتغير السجل.")
+                    if not StateColor.objects.filter(pk=DevelopmentState.WILLINGNESS).exists():
+                        raise Conflict("حالة رغبة غير موجودة. تأكد من تطبيق ترحيلات حالات التطور.")
                 if action == "preview":
                     operation = data["operation"]
                     pending = {"title": "تأكيد حذف الجهة" if operation == "delete" else "تأكيد تغيير حالة السجل", "name": item.name, "action": operation, "button": "نعم، حذف الجهة" if operation == "delete" else "تأكيد التغيير", "token": _sign({**data, "kind": "row-confirm"}, request.user)}
+                    if operation == "advance":
+                        pending.update(title="التحويل من قدرة إلى رغبة", button="حفظ والتحويل إلى رغبة")
                 else:
-                    if data["operation"] == "delete":
+                    if data["operation"] == "advance":
+                        willingness_form = WillingnessTransitionForm(request.POST, request.FILES)
+                        if not willingness_form.is_valid():
+                            pending = {"title": "التحويل إلى رغبة", "name": item.name, "action": "advance", "button": "حفظ والتحويل إلى رغبة", "token": request.POST.get("token")}
+                            raise InvalidWillingnessForm
+                        # No state/date changes until every document is validated and stored.
+                        save_supporting_files(item, willingness_form.cleaned_data, request.user, saved_paths)
+                        entered_at = timezone.now()
+                        if not item.development_history.filter(state_id=DevelopmentState.CAPABILITY).exists():
+                            DevelopmentHistory.objects.create(partnership=item, state_id=DevelopmentState.CAPABILITY, entered_at=item.development_state_at)
+                        DevelopmentHistory.objects.create(partnership=item, state_id=DevelopmentState.WILLINGNESS, entered_at=entered_at)
+                        item.development_state_id = DevelopmentState.WILLINGNESS
+                        item.development_state_at = entered_at
+                        item.version += 1
+                        item.save(update_fields=["development_state", "development_state_at", "preliminary_agreement_type", "version", "updated_at"])
+                        message = "تم حفظ الاتفاق والمرفقات وتحويل الجهة إلى رغبة وتسجيل تاريخ الدخول إليها بنجاح."
+                    elif data["operation"] == "delete":
                         item.delete()
                         message = "تم حذف الجهة وبيانات شراكتها بنجاح."
                     else:
@@ -243,21 +276,42 @@ def index(request):
                         item.save(update_fields=["is_active", "version", "updated_at"])
                         message = "تم تحديث حالة السجل بنجاح."
                     messages.success(request, message)
-                    return add_login_headers(redirect("partnerships:index"))
+                    destination = financial_redirect(request)
+                    if data["operation"] == "advance" and request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                        return add_login_headers(JsonResponse({"redirect": destination.url}))
+                    return add_login_headers(destination)
+    except InvalidWillingnessForm:
+        context["error"], status = "راجع نوع الاتفاق والمرفقات قبل تأكيد التحويل.", 400
     except signing.BadSignature:
         context["error"], status = "انتهت صلاحية الطلب أو تغيّر محتواه. أعد فتح الصفحة وحاول مجددًا.", 400
     except (Conflict, IntegrityError, ProtectedError) as exc:
         context["error"], status = str(exc) if isinstance(exc, Conflict) else "تعذّر تنفيذ الطلب لوجود بيانات مرتبطة.", 409
+    except OSError:
+        context["error"], status = "تعذّر حفظ المرفقات. لم تتغير حالة الجهة. حاول مرة أخرى أو تواصل مع مسؤول النظام.", 503
+    except Exception:
+        delete_private_files(saved_paths)
+        raise
+    if saved_paths and status >= 400:
+        delete_private_files(saved_paths)
+    if status >= 400 and request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        return add_login_headers(JsonResponse({"error": context.get("error", "تعذّر الحفظ."), "errors": willingness_form.errors.get_json_data()}, status=status))
+    context["willingness_form"] = willingness_form
     q = request.GET.get("q", "").strip()[:200]
     active = request.GET.get("status", "")
     query = _search(_query(), q)
     if active in {"1", "0"}:
         query = query.filter(is_active=active == "1")
+    # MAKKEN FINANCIAL RANGE
+    financial = FinancialRange(request, query)
+    context.update(financial.context)
+    if not financial.valid:
+        status = 400
+    query = financial.queryset
     page = Paginator(query, 15).get_page(request.GET.get("page"))
     rows = []
     for item in page:
         token = {"kind": "row", "id": item.pk, "version": item.version}
-        rows.append({"item": item, "toggle": _sign({**token, "operation": "toggle"}, request.user), "delete": _sign({**token, "operation": "delete"}, request.user)})
+        rows.append({"item": item, "toggle": _sign({**token, "operation": "toggle"}, request.user), "delete": _sign({**token, "operation": "delete"}, request.user), "advance": _sign({**token, "operation": "advance"}, request.user) if item.development_state_id == DevelopmentState.CAPABILITY else None})
     detail = None
     if request.GET.get("detail"):
         value = request.GET["detail"]
@@ -265,6 +319,9 @@ def index(request):
             raise Http404
         detail = get_object_or_404(_query(), pk=int(value))
     params = {"q": q, "status": active, "page": page.number}
+    # MAKKEN FINANCIAL QUERY PARAMS
+    params.update(financial.params)
+    context["financial_pagination_query"] = urlencode({key: value for key, value in params.items() if key != "page"})
     result_query = urlencode(params)
     context.update(rows=rows, page_obj=page, q=q, selected_status=active, pending=pending, detail=detail, history=_history(detail), result_query=result_query, list_url=reverse("partnerships:index") + "?" + result_query)
     return add_login_headers(render(request, "partnerships/index.html", context, status=status))

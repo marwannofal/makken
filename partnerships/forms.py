@@ -10,6 +10,8 @@ from specializations.models import Specialization
 from sponsorship_shapes.models import SponsorshipShape
 from .models import Partnership, Scope
 
+from .financial import MoneyField
+
 
 COUNTRIES = [(code, f"{code} +{phonenumbers.country_code_for_region(code)}") for code in sorted(phonenumbers.SUPPORTED_REGIONS - {"IL"})]
 
@@ -26,6 +28,7 @@ class PartnershipForm(forms.Form):
     phone_country = forms.ChoiceField(label="رمز الدولة", choices=COUNTRIES, initial="SA")
     phone = forms.CharField(label="هاتف التواصل", max_length=40, widget=forms.TextInput(attrs={"type": "tel", "inputmode": "tel", "autocomplete": "tel-national", "dir": "ltr", "placeholder": "050 123 4567"}))
     email = forms.EmailField(label="البريد الإلكتروني", max_length=254, error_messages={"invalid": "أدخل بريدًا إلكترونيًا صحيحًا."}, widget=forms.EmailInput(attrs={"autocomplete": "email", "dir": "ltr", "placeholder": "name@example.com"}))
+    financial_capacity = MoneyField(label="القدرة المالية")
     entity_type = forms.ChoiceField(label="نوع الكيان", choices=[("", "اختر نوع الكيان"), *EntityType.choices])
     entity = forms.ModelChoiceField(label="الكيان", queryset=Entity.objects.none(), empty_label="اختر الكيان")
     scope = forms.ChoiceField(label="النطاق", choices=[("", "اختر النطاق"), *Scope.choices])

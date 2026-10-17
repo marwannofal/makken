@@ -14,3 +14,5 @@ staticfiles/
 *.sqlite3-*
 .venv/
 .git/
+
+private_uploads/

@@ -830,6 +830,7 @@
 
 .partnership-field #id_entity_type,
 .partnership-field #id_entity,
+.partnership-field #id_scope,
 #id_entity + .search-select .search-select-trigger {
   appearance: none;
   -webkit-appearance: none;

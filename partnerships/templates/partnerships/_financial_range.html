@@ -1,0 +1,9 @@
+{% load static %}
+<fieldset class="financial-range-filter" data-financial-range>
+  <legend>نطاق القدرة المالية <span class="financial-range-currency"><img src="{% static 'partnerships/saudi-riyal.svg' %}" width="16" height="18" alt="ريال سعودي"></span></legend>
+  <div class="financial-range-layout">
+    <div class="financial-range-entry"><label for="capacity-min">من</label>{{ financial_range_form.capacity_min }}</div>
+    <div class="financial-range-entry"><label for="capacity-max">إلى</label>{{ financial_range_form.capacity_max }}</div>
+  </div>
+  <div class="field-error" id="capacity-filter-errors" role="alert">{{ financial_range_form.non_field_errors }}{{ financial_range_form.capacity_min.errors }}{{ financial_range_form.capacity_max.errors }}</div>
+</fieldset>

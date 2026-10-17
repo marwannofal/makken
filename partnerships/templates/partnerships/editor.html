@@ -1,7 +1,8 @@
 {% extends "core/makken_base.html" %}
 {% load static %}
 {% block title %}{{ page_heading }} | مكّن{% endblock %}
-{% block extra_head %}<link rel="stylesheet" href="{% static 'care_states/states.css' %}?v=20261015-1"><link rel="stylesheet" href="{% static 'partnerships/partnerships.css' %}?v=20261015-1"><script src="{% static 'partnerships/partnerships.js' %}?v=20261015-1" defer></script>{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'care_states/states.css' %}?v=20261015-1"><link rel="stylesheet" href="{% static 'partnerships/partnerships.css' %}?v=20261015-1"><script src="{% static 'partnerships/partnerships.js' %}?v=20261015-1" defer></script>{% include "partnerships/_financial_assets.html" %}
+{% endblock %}
 {% block content %}
 <section class="page-introduction partnership-intro"><div><p class="eyebrow">الإدارة · الشراكات المحتملة</p><h1>{{ page_heading }}<span class="greeting-dot">.</span></h1><p class="page-description">بيانات واضحة للجهة، وروابط دقيقة لكل فرصة رعاية.</p></div><a class="button button-secondary" href="{% url 'partnerships:index' %}">العودة للسجل</a></section>
 {% if error %}<div class="feedback feedback-error" role="alert">{{ error }}</div>{% endif %}
@@ -15,6 +16,7 @@
 {% include "partnerships/_field.html" with field=form.representative %}
 <div class="partnership-field"><label for="id_phone">هاتف التواصل <span class="required" aria-hidden="true">*</span></label><div class="phone-control"><div class="country-control"><label class="visually-hidden" for="id_phone_country">الدولة ورمز الاتصال</label>{{ form.phone_country }}</div>{{ form.phone }}</div><p class="field-help">اختر الدولة وأدخل رقم الجوال المحلي أو الرقم الدولي كاملًا.</p><div id="error-phone_country" class="field-error" role="alert">{{ form.phone_country.errors }}</div><div id="error-phone" class="field-error" role="alert">{{ form.phone.errors }}</div></div>
 {% include "partnerships/_field.html" with field=form.email %}
+{% include "partnerships/_financial_field.html" %}
 {% include "partnerships/_field.html" with field=form.entity_type %}
 {% include "partnerships/_field.html" with field=form.entity %}
 {% include "partnerships/_field.html" with field=form.scope %}

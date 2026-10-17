@@ -24,12 +24,13 @@
   });
   $$('[data-dismiss-dialog]').forEach(button => button.addEventListener('click', () => button.closest('dialog').close()));
   $$('[data-confirm-form]').forEach(form => form.addEventListener('submit', () => {
+    if (form.matches('[data-willingness-form]')) return;
     const button = $('button[type=submit]', form);
     button.disabled = true;
     button.textContent = 'جارٍ التنفيذ…';
   }));
   $$('[data-partnership-row]').forEach(row => row.addEventListener('click', event => {
-    if (event.target.closest('a,button,input,select,textarea,label,form') || getSelection()?.toString()) return;
+    if (event.target.closest('a,button,input,select,textarea,label,form,[data-development-cell]') || getSelection()?.toString()) return;
     location.assign(row.dataset.rowUrl);
   }));
 

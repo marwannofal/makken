@@ -1,0 +1,32 @@
+<form method="post" enctype="multipart/form-data" class="willingness-form" data-willingness-form>
+  {% csrf_token %}
+  <input type="hidden" name="action" value="confirm">
+  <input type="hidden" name="token" value="{{ pending.token }}">
+  <div class="willingness-field">
+    <label for="willingness-agreement">نوع الاتفاق المبدئي <span aria-hidden="true">*</span></label>
+    {{ willingness_form.agreement_type }}
+    <div class="field-error" id="agreement-errors" role="alert">{{ willingness_form.agreement_type.errors }}</div>
+  </div>
+  <div class="willingness-field">
+    <label for="willingness-files">المرفقات الداعمة <span aria-hidden="true">*</span></label>
+    <div class="willingness-upload-box">
+      <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 16V3m-5 5 5-5 5 5M4 15v5h16v-5"/></svg>
+      <p>أرفق المستندات الداعمة للاتفاق المبدئي</p>
+      <div class="willingness-picker"><span aria-hidden="true">اختيار المرفقات</span>{{ willingness_form.attachments }}</div>
+      <p class="willingness-upload-help" id="willingness-upload-help">PDF، PNG، JPG، JPEG · حتى 100 MB لكل ملف · حتى 20 مرفقًا</p>
+    </div>
+    <div class="field-error" id="attachments-errors" role="alert">{{ willingness_form.attachments.errors }}</div>
+    <ul class="willingness-selected-files" data-selected-files aria-label="المرفقات المحددة"></ul>
+  </div>
+  <div class="willingness-upload-progress" data-upload-progress hidden>
+    <div><span data-upload-status role="status" aria-live="polite">جارٍ رفع المرفقات…</span><bdi data-upload-percent>0%</bdi></div>
+    <progress value="0" max="100" aria-label="تقدم رفع المرفقات"></progress>
+    <p>يتم التحويل إلى «رغبة» بعد اكتمال الرفع والتحقق وحفظ المرفقات.</p>
+  </div>
+  <p class="field-error willingness-upload-error" data-upload-error role="alert"></p>
+  <div class="dialog-actions">
+    <button class="button button-primary" type="submit">حفظ والتحويل إلى رغبة</button>
+    <button class="button button-secondary" type="button" data-dismiss-dialog autofocus>إلغاء</button>
+  </div>
+  <noscript><p class="muted">سيتم رفع المرفقات وحفظ التحويل عند الإرسال. لا تغلق الصفحة حتى اكتمال الطلب.</p></noscript>
+</form>

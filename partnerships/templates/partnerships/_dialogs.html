@@ -1,8 +1,12 @@
 {% if pending %}
-<dialog id="partnership-confirmation" class="partnership-dialog confirmation-dialog" aria-labelledby="confirmation-title" open data-server-dialog>
+<dialog id="partnership-confirmation" class="partnership-dialog confirmation-dialog{% if pending.action == 'advance' %} willingness-dialog{% endif %}" aria-labelledby="confirmation-title" open data-server-dialog>
   <div class="dialog-body"><div class="dialog-top"><span class="dialog-symbol{% if pending.action == 'delete' %} danger-symbol{% endif %}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3 3 7v5c0 5 9 9 9 9s9-4 9-9V7Z"/><path d="m8 12 3 3 5-6"/></svg></span><button type="button" class="icon-button" data-dismiss-dialog aria-label="إغلاق"><svg aria-hidden="true"><use href="#icon-close"/></svg></button></div>
-  <p class="eyebrow">تأكيد العملية</p><h2 id="confirmation-title">{{ pending.title }}</h2><p class="dialog-description">{% if pending.action == 'delete' %}سيُحذف سجل الجهة وبنود شراكتها وتواريخ تطورها. هل تريد المتابعة؟{% elif pending.action == 'toggle' %}هل تريد تغيير حالة تفعيل هذه الجهة؟{% else %}راجع البيانات وبنود الشراكة في الصفحة قبل تأكيد الحفظ. لن تُحفظ التغييرات إلا بعد التأكيد.{% endif %}</p><div class="confirm-name"><bdi>{{ pending.name }}</bdi></div>
+  <p class="eyebrow">تأكيد العملية</p><h2 id="confirmation-title">{{ pending.title }}</h2><p class="dialog-description">{% if pending.action == 'delete' %}سيُحذف سجل الجهة وبنود شراكتها وتواريخ تطورها. هل تريد المتابعة؟{% elif pending.action == 'advance' %}<strong>اختر نوع الاتفاق المبدئي وأرفق المستندات الداعمة، ثم اضغط «حفظ والتحويل إلى رغبة». تُسجّل حالة «رغبة» وتاريخها بعد اكتمال رفع المرفقات والتحقق منها، مع الاحتفاظ بتاريخ «قدرة». لا يمكن التراجع عن التحويل من هنا.</strong>{% elif pending.action == 'toggle' %}هل تريد تغيير حالة تفعيل هذه الجهة؟{% else %}راجع البيانات وبنود الشراكة في الصفحة قبل تأكيد الحفظ. لن تُحفظ التغييرات إلا بعد التأكيد.{% endif %}</p><div class="confirm-name"><bdi>{{ pending.name }}</bdi></div>{% if pending.action == "save" %}<div class="financial-confirmation-value"><span>القدرة المالية</span>{% include "partnerships/_financial_value.html" with amount=pending.financial_capacity %}</div>{% endif %}
+  {% if pending.action == 'advance' %}
+  {% include "partnerships/_willingness_form.html" %}
+  {% else %}
   <form method="post" class="dialog-actions" data-confirm-form>{% csrf_token %}<input type="hidden" name="action" value="confirm"><input type="hidden" name="token" value="{{ pending.token }}"><button class="button {% if pending.action == 'delete' %}button-danger{% else %}button-primary{% endif %}" type="submit">{{ pending.button }}</button><button class="button button-secondary" type="button" data-dismiss-dialog autofocus>إلغاء</button></form>
+  {% endif %}
   <noscript><p class="muted">يمكنك العودة للصفحة السابقة لإلغاء العملية.</p></noscript></div>
 </dialog>
 {% endif %}

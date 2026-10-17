@@ -31,7 +31,7 @@ class PartnershipTests(TestCase):
         self.client.force_login(self.user)
 
     def data(self, **changes):
-        values = {'name':'شركة الشراكة التجريبية', 'representative':'أحمد محمد', 'phone_country':'SA', 'phone':'0501234567', 'email':'partner@example.com', 'entity_type':'government', 'entity':str(self.entity.pk), 'scope':'local', 'is_active':'1', 'offerings':json.dumps([{'sector':self.sector.pk, 'specializations':[self.spec.pk,self.second_spec.pk], 'shape':self.shape.pk, 'is_active':True}])}
+        values = {'name':'شركة الشراكة التجريبية', 'representative':'أحمد محمد', 'phone_country':'SA', 'phone':'0501234567', 'email':'partner@example.com', 'entity_type':'government', 'entity':str(self.entity.pk), 'scope':'local', 'is_active':'1', 'offerings':json.dumps([{'sector':self.sector.pk, 'specializations':[self.spec.pk,self.second_spec.pk], 'shape':self.shape.pk, 'is_active':True}]), "financial_capacity": "100000.00"}
         values.update(changes)
         return values
 
