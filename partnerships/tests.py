@@ -1,3 +1,4 @@
+from regions.models import Region
 import json
 
 from django.contrib.auth import get_user_model
@@ -32,6 +33,7 @@ class PartnershipTests(TestCase):
 
     def data(self, **changes):
         values = {'name':'شركة الشراكة التجريبية', 'representative':'أحمد محمد', 'phone_country':'SA', 'phone':'0501234567', 'email':'partner@example.com', 'entity_type':'government', 'entity':str(self.entity.pk), 'scope':'local', 'is_active':'1', 'offerings':json.dumps([{'sector':self.sector.pk, 'specializations':[self.spec.pk,self.second_spec.pk], 'shape':self.shape.pk, 'is_active':True}]), "financial_capacity": "100000.00"}
+        values["coverage_regions"] = [str(Region.objects.get_or_create(name="منطقة اختبار الشراكة")[0].pk)]
         values.update(changes)
         return values
 

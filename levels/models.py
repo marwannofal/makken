@@ -14,6 +14,7 @@ def validate_name(value):
 
 
 class Level(models.Model):
+    funding_key = models.CharField(max_length=16, unique=True, null=True, blank=True, editable=False)
     name = models.CharField("المستوى", max_length=100, validators=[validate_name])
     name_key = models.CharField(max_length=300, unique=True, editable=False)
     is_active = models.BooleanField("نشط", default=True)

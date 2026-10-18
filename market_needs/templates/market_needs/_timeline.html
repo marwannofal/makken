@@ -1,0 +1,10 @@
+<section class="market-development-history" aria-labelledby="market-development-title">
+  <h3 id="market-development-title">تتبع حالة تطور المنظمة للرعاية</h3>
+  <p class="muted">تاريخ حالة تطور المنظمة للرعاية — يُسجّل وقت الدخول إلى الحالة ولا يتغير عند تعديل بيانات الجهة. لا تُضاف حالة «رغبة» تلقائيًا عند الانتقال من «قدرة» مباشرة إلى «رعاية».</p>
+  <div class="development-grid">{% for state in development_history %}
+    <article class="development-item{% if state.current %} current-development{% endif %}">
+      <div class="development-name"><svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5" fill="{{ state.color }}"/></svg><strong>{{ state.label }}</strong>{% if state.current %}<span>الحالة الحالية</span>{% endif %}</div>
+      {% if state.date %}<time datetime="{{ state.date|date:'c' }}" dir="ltr">{{ state.date|date:'Y/m/d H:i:s T' }}</time>{% else %}<p class="muted">لا يوجد تاريخ مسجّل لهذه الحالة</p>{% endif %}
+    </article>
+  {% endfor %}</div>
+</section>

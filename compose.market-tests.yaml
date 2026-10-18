@@ -1,0 +1,35 @@
+name: makken-market-tests
+services:
+  mysql-tests:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: makken_market_checks
+      MYSQL_ROOT_PASSWORD: isolated-market-tests-only
+      MYSQL_ROOT_HOST: "%"
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci", "--innodb-buffer-pool-size=64M", "--max-connections=20", "--performance-schema=OFF"]
+    tmpfs:
+      - /var/lib/mysql:size=512m
+    mem_limit: 512m
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "--silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+    networks: [checks]
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+    entrypoint: ["python", "/app/manage.py"]
+    command: ["test", "market_needs", "--settings=market_needs.mysql_checks_settings", "--noinput", "--verbosity=2"]
+    environment:
+      MAKKEN_ISOLATED_MYSQL_TESTS: "1"
+      DJANGO_SETTINGS_MODULE: market_needs.mysql_checks_settings
+    depends_on:
+      mysql-tests:
+        condition: service_healthy
+    networks: [checks]
+networks:
+  checks:
+    internal: true

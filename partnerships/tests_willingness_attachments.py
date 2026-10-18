@@ -117,7 +117,9 @@ class WillingnessAttachmentTests(TestCase):
         self.assertTrue(b''.join(response.streaming_content).startswith(b'%PDF-'))
         self.assertEqual(self.client.get(url.replace(f'/{self.item.pk}/',f'/{self.item.pk+9999}/',1)).status_code,404)
         self.assertEqual(Client().get('/private_uploads/'+attachment.file.name).status_code,404)
-        response=self.client.get(url);response.close()
+        response=self.client.get(url)
+        self.assertEqual(sum(map(len, response.streaming_content)), attachment.size)
+        self.assertTrue(Partnership.objects.filter(pk=self.item.pk).exists())
 
     def test_existing_willingness_and_replay_do_not_add_files(self):
         token=self.transition_preview()

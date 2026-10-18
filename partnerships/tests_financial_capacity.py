@@ -1,3 +1,4 @@
+from regions.models import Region
 import json
 from decimal import Decimal
 from urllib.parse import parse_qs, urlsplit
@@ -5,6 +6,7 @@ from django.contrib.auth import get_user_model
 from django.db import IntegrityError, transaction, connection
 from django.db.migrations.executor import MigrationExecutor
 from django.test import TestCase, TransactionTestCase
+from django.utils.translation import override
 from entities.models import Entity
 from sectors.models import Sector
 from specializations.models import Specialization
@@ -25,6 +27,7 @@ class FinancialCapacityTests(TestCase):
     def setUp(self):self.client.force_login(self.user)
     def data(self,**changes):
         data={'name':'جهة اختبار مالي','representative':'الممثل التجريبي','phone_country':'SA','phone':'0501234567','email':'financial@example.com','entity_type':'government','entity':self.entity.pk,'scope':'local','is_active':'1','financial_capacity':'125000.50','offerings':json.dumps([{'sector':self.sector.pk,'specializations':[self.spec.pk],'shape':self.shape.pk,'is_active':True}])}
+        data["coverage_regions"] = [str(Region.objects.get_or_create(name="منطقة اختبار الشراكة")[0].pk)]
         data.update(changes);return data
     def preview(self,path='/partnerships/new/',**changes):
         snapshot=self.client.get(path).context['snapshot']
@@ -64,6 +67,7 @@ class FinancialCapacityTests(TestCase):
         self.client.post(path,{'action':'confirm','token':preview.context['pending']['token']})
         item.refresh_from_db();self.assertEqual(item.financial_capacity,Decimal('987654.32'));self.assertEqual(item.development_state_at,date);self.assertEqual(item.development_history.count(),1)
 
+    @override('en')
     def test_table_replaces_representative_and_detail_keeps_both(self):
         item=self.save()
         response=self.client.get('/partnerships/')
@@ -110,6 +114,7 @@ class FinancialCapacityTests(TestCase):
         response=self.client.get('/partnerships/',{'q':'1,250.50'})
         self.assertEqual(self.ids(response),{target.pk})
 
+    @override('en')
     def test_legacy_amount_not_fabricated_and_zero_is_visible(self):
         legacy=self.record('جهة سابقة',None)
         response=self.client.get('/partnerships/')
@@ -138,9 +143,15 @@ class FinancialCapacityTests(TestCase):
 
 
 class FinancialMigrationTests(TransactionTestCase):
+    def restore_latest_schema(self):
+        executor = MigrationExecutor(connection)
+        executor.migrate(executor.loader.graph.leaf_nodes())
+
     def test_existing_record_keeps_fields_and_gets_unknown_capacity(self):
+        self.addCleanup(self.restore_latest_schema)
         executor=MigrationExecutor(connection);executor.migrate([('partnerships','0001_initial')])
         old=executor.loader.project_state([('partnerships','0001_initial')]).apps
+        old.get_model('care_states','StateColor').objects.get_or_create(state='capability',defaults={'color':'#BA1D1D'})
         entity=old.get_model('entities','Entity').objects.create(name='كيان قديم',name_key='كيان قديم',entity_type='government',branch='')
         item=old.get_model('partnerships','Partnership').objects.create(name='شراكة قديمة',name_key='شراكة قديمة',representative='ممثل قديم',phone_country='SA',phone='+966501234567',email='old@example.com',entity_id=entity.pk,scope='local')
         original_date=item.development_state_at
@@ -149,4 +160,4 @@ class FinancialMigrationTests(TransactionTestCase):
             current=executor.loader.project_state([('partnerships','0002_financial_capacity')]).apps.get_model('partnerships','Partnership').objects.get(pk=item.pk)
             self.assertIsNone(current.financial_capacity);self.assertEqual(current.name,'شراكة قديمة');self.assertEqual(current.representative,'ممثل قديم');self.assertEqual(current.development_state_at,original_date)
         finally:
-            MigrationExecutor(connection).migrate([('partnerships','0002_financial_capacity')])
+            self.restore_latest_schema()

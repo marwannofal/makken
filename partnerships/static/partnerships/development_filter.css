@@ -1,0 +1,39 @@
+.register-search:has(.development-state-filter) {
+  grid-template-columns: minmax(150px, 1fr) 130px 190px minmax(190px, 230px) auto auto;
+  grid-template-areas: "search status development financial submit reset";
+}
+.register-search > .development-state-filter {
+  grid-area: development;
+  min-width: 0;
+}
+.register-search #register-development-state {
+  width: 100%;
+  height: 48px;
+  min-height: 48px;
+  box-sizing: border-box;
+  appearance: none;
+  -webkit-appearance: none;
+  padding-left: 40px;
+  padding-right: 13px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23557775' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left 14px center;
+  background-size: 16px 16px;
+}
+@media (max-width: 1400px) {
+  .register-search:has(.development-state-filter) {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto auto;
+    grid-template-areas: "search search status development" "financial financial submit reset";
+  }
+}
+@media (max-width: 800px) {
+  .register-search:has(.development-state-filter) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas: "search search" "status development" "financial financial" "submit reset";
+  }
+}
+@media (max-width: 600px) {
+  .register-search:has(.development-state-filter) {
+    grid-template-areas: "search search" "status status" "development development" "financial financial" "submit reset";
+  }
+}

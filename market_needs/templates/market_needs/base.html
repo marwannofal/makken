@@ -1,0 +1,17 @@
+{% extends "core/makken_base.html" %}{% load static %}
+{% block title %}{{ page_heading }} | مكّن{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'care_states/states.css' %}?v=20261015-1">
+<link rel="stylesheet" href="{% static 'partnerships/partnerships.css' %}?v=20261015-1">
+<link rel="stylesheet" href="{% static 'partnerships/development_column.css' %}?v=20261017-transition">
+<link rel="stylesheet" href="{% static 'market_needs/market.css' %}?v=20261018-funding-details">
+<script src="{% static 'market_needs/market.js' %}?v=20261018-funding-details" defer></script>
+{% endblock %}
+{% block content %}
+<section class="page-introduction partnership-intro"><div><p class="eyebrow">مكّن · احتياجات السوق والرعاية</p><h1>{{ page_heading }}<span class="greeting-dot">.</span></h1><p class="page-description">من تسجيل الحاجة إلى مطابقة الجهات ومتابعة الدعم المعتمد.</p></div><div class="market-page-actions">{% block page_actions %}{% endblock %}</div></section>
+{% if error %}<div class="feedback feedback-error" role="alert">{{ error }}</div>{% endif %}
+{% block market_content %}{% endblock %}
+<dialog id="market-confirm" class="partnership-dialog confirmation-dialog" aria-labelledby="market-confirm-title"><div class="dialog-body"><div class="dialog-top"><span class="dialog-symbol"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3 3 7v5c0 5 9 9 9 9s9-4 9-9V7Z"/><path d="m8 12 3 3 5-6"/></svg></span><button type="button" class="icon-button" data-market-close aria-label="إغلاق"><svg aria-hidden="true"><use href="#icon-close"/></svg></button></div><p class="eyebrow">مراجعة وتأكيد</p><h2 id="market-confirm-title">تأكيد العملية</h2><p class="dialog-description" data-confirm-text></p><div class="dialog-actions"><button class="button button-primary" type="button" data-confirm-yes>تأكيد</button><button class="button button-secondary" type="button" data-market-close autofocus>إلغاء</button></div></div></dialog>
+{% if messages %}<dialog class="partnership-dialog confirmation-dialog" aria-labelledby="market-success-title" open data-market-server><div class="dialog-body"><div class="dialog-top"><span class="dialog-symbol"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m7 12 3 3 7-7"/></svg></span><button class="icon-button" type="button" data-market-close aria-label="إغلاق"><svg aria-hidden="true"><use href="#icon-close"/></svg></button></div><h2 id="market-success-title">تمت العملية بنجاح</h2>{% for message in messages %}<p class="dialog-description" role="status">{{ message }}</p>{% endfor %}<div class="dialog-actions"><button class="button button-primary" type="button" data-market-close autofocus>حسنًا</button></div></div></dialog>{% endif %}
+{% if error and not reopen_followup %}<dialog class="partnership-dialog confirmation-dialog" aria-labelledby="market-error-title" open data-market-server><div class="dialog-body"><div class="dialog-top"><span class="dialog-symbol danger-symbol"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v6m0 3v1"/></svg></span><button class="icon-button" type="button" data-market-close aria-label="إغلاق"><svg aria-hidden="true"><use href="#icon-close"/></svg></button></div><h2 id="market-error-title">تعذّر إتمام العملية</h2><p class="dialog-description">{{ error }}</p><div class="dialog-actions"><button class="button button-primary" type="button" data-market-close autofocus>مراجعة البيانات</button></div></div></dialog>{% endif %}
+{% endblock %}

@@ -107,7 +107,7 @@ class FinancialRange:
 
 def financial_redirect(request):
     params = {}
-    for key in ('q', 'status', 'page', 'capacity_min', 'capacity_max'):
+    for key in ('q', 'status', 'page', 'capacity_min', 'capacity_max', 'development_state'):
         value = request.GET.get(key, '')[:200 if key == 'q' else 40]
         if value:
             params[key] = value

@@ -1,0 +1,12 @@
+{% load market_tags %}
+<div class="row-actions">
+{% if row.record.status != 'rejected' and need.is_active %}
+<a class="row-action" href="?{{ filter_query }}&amp;record={{ row.record.pk }}&amp;operation=notes" data-followup-open data-operation="notes" data-snapshot="{{ row.notes_token }}" data-name="{{ row.record.partnership.name }}" data-notes="{{ row.record.notes }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m16 4 4 4M4 20l5-1L20 8a2.8 2.8 0 0 0-4-4L5 15Z"/></svg>تعديل الملاحظات</a>
+{% endif %}
+{% if row.record.status == 'new' and need.is_active %}
+<a class="row-action" href="?{{ filter_query }}&amp;record={{ row.record.pk }}&amp;operation=approve" data-followup-open data-operation="approve" data-allowed-lines="{{ row.allowed_lines }}" data-snapshot="{{ row.approve_token }}" data-name="{{ row.record.partnership.name }}" data-notes="{{ row.record.notes }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg>اعتماد</a>
+<a class="row-action delete-action" href="?{{ filter_query }}&amp;record={{ row.record.pk }}&amp;operation=reject" data-followup-open data-operation="reject" data-snapshot="{{ row.reject_token }}" data-name="{{ row.record.partnership.name }}" data-notes="{{ row.record.notes }}"><svg aria-hidden="true"><use href="#icon-close"/></svg>رفض</a>
+{% elif row.record.unallocated_amount and need.is_active %}
+<a class="row-action" href="?{{ filter_query }}&amp;record={{ row.record.pk }}&amp;operation=allocate" data-followup-open data-operation="allocate" data-snapshot="{{ row.allocate_token }}" data-name="{{ row.record.partnership.name }}" data-notes="{{ row.record.notes }}" data-record-amount="{{ row.record.amount|money_raw }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 4h16v16H4M8 4v16M4 10h16M4 15h16"/></svg>توزيع دعم سابق</a>
+{% endif %}
+</div>

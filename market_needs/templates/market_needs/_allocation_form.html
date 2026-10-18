@@ -1,0 +1,9 @@
+<section class="market-allocation-section" data-allocation-fields{% if operation != 'approve' and operation != 'allocate' %} hidden{% endif %}>
+  <h3>توزيع الدعم الفعلي على بنود الصرف</h3>
+  <p class="muted">أدخل حصة كل بند من هذه المساهمة. اترك البنود غير المشمولة فارغة. البنود التي لا يغطيها شكل رعاية الجهة تكون غير متاحة عند الاعتماد. يجب أن يساوي مجموع التوزيع مبلغ المساهمة، وألا يتجاوز المتبقي لأي بند.</p>
+  <div class="field-error" role="alert" id="error-__all__">{{ followup_form.non_field_errors }}</div>
+  <div class="table-scroll" tabindex="0" aria-label="توزيع الدعم، جدول يمكن تمريره أفقيًا"><table class="partnership-table market-allocation-table"><thead><tr><th scope="col">بنود الصرف</th><th scope="col">شكل الرعاية</th><th scope="col">المبلغ المتبقي</th><th scope="col">قيمة الدعم للبند</th></tr></thead><tbody>
+  {% for item in followup_form.allocation_rows %}<tr><th scope="row">{{ item.line.expense_item.name }}</th><td>{{ item.line.sponsorship_shape.name }}</td><td>{% include 'market_needs/_money.html' with value=item.line.remaining_amount %}</td><td>{% include 'market_needs/_field.html' with field=item.field %}</td></tr>{% endfor %}
+  </tbody></table></div>
+  <p class="market-help">مجموع التوزيع: <strong dir="ltr" data-allocation-total>0.00</strong> ريال. <span role="status" data-allocation-status></span></p>
+</section>

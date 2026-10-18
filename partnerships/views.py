@@ -27,10 +27,11 @@ from .forms import PartnershipForm, offering_data
 from .models import Partnership, PartnershipOffering, DevelopmentHistory, Scope
 
 from .financial import FinancialRange, amount_string, financial_search_clause, financial_redirect
+from .development_filter import DevelopmentFilter
 from .willingness import WillingnessTransitionForm, save_supporting_files
 from .attachment_storage import delete_private_files
 
-SALT = "makken.partnerships.v1"
+SALT = "makken.partnerships.v2-no-geography"
 AGE = 20 * 60
 
 
@@ -301,6 +302,11 @@ def index(request):
     query = _search(_query(), q)
     if active in {"1", "0"}:
         query = query.filter(is_active=active == "1")
+    development = DevelopmentFilter(request, query)
+    context.update(development.context)
+    if not development.valid:
+        status = 400
+    query = development.queryset
     # MAKKEN FINANCIAL RANGE
     financial = FinancialRange(request, query)
     context.update(financial.context)
@@ -321,6 +327,7 @@ def index(request):
     params = {"q": q, "status": active, "page": page.number}
     # MAKKEN FINANCIAL QUERY PARAMS
     params.update(financial.params)
+    params.update(development.params)
     context["financial_pagination_query"] = urlencode({key: value for key, value in params.items() if key != "page"})
     result_query = urlencode(params)
     context.update(rows=rows, page_obj=page, q=q, selected_status=active, pending=pending, detail=detail, history=_history(detail), result_query=result_query, list_url=reverse("partnerships:index") + "?" + result_query)

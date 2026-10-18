@@ -9,9 +9,9 @@
     <svg aria-hidden="true"><use href="#icon-home"></use></svg><span>الرئيسية</span><span class="nav-dot" aria-hidden="true"></span>
   </a>
     <details
-    class="nav-management{% if active_page and active_page != 'home' and active_page != 'profile' and active_page != 'partnerships' %} has-active-page{% endif %}"
+    class="nav-management{% if active_page and active_page != 'home' and active_page != 'profile' and active_page != 'partnerships'  and active_page != 'market_needs' or active_page == 'market_need_editor' %} has-active-page{% endif %}"
     data-management-group
-    {% if active_page and active_page != 'home' and active_page != 'profile' and active_page != 'partnerships' %}open{% endif %}
+    {% if active_page and active_page != 'home' and active_page != 'profile' and active_page != 'partnerships'  and active_page != 'market_needs' or active_page == 'market_need_editor' %}open{% endif %}
     >
     <summary class="nav-management-toggle">
       <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m12 3 2 3 3 .5.5 3 3 2-3 2-.5 3-3 .5-2 3-2-3-3-.5-.5-3-3-2 3-2 .5-3 3-.5Z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -49,11 +49,14 @@
       <a class="nav-link{% if active_page == 'partnership_editor' %} is-active{% endif %}" href="{% url 'partnerships:create' %}"{% if active_page == 'partnership_editor' %} aria-current="page"{% endif %}>
         <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M15 5H5v15h15V10M16 2v8m-4-4h8M8 12h6m-6 4h8"/></svg><span>إدارة الشراكات</span><span class="nav-dot" aria-hidden="true"></span>
       </a>
+      {% include "market_needs/_navigation_editor.html" %}
     </div>
   </details>
+
   <a class="nav-link{% if active_page == 'partnerships' %} is-active{% endif %}" href="{% url 'partnerships:index' %}"{% if active_page == 'partnerships' %} aria-current="page"{% endif %}>
     <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2ZM9 7h6m-6 4h6m-6 4h3"/></svg><span>الشراكات</span><span class="nav-dot" aria-hidden="true"></span>
   </a>
+  {% include "market_needs/_navigation_list.html" %}
 </nav>
 <div class="sidebar-footer">
   <a class="user-profile profile-sidebar-link" href="{% url 'accounts:profile' %}" aria-label="الملف الشخصي — تعديل بيانات الحساب"{% if active_page == 'profile' %} aria-current="page"{% endif %}>

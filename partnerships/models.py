@@ -118,3 +118,4 @@ def remove_willingness_file(sender, instance, **kwargs):
     if instance.file.name:
         name = instance.file.name
         transaction.on_commit(lambda: delete_private_files([name]))
+
