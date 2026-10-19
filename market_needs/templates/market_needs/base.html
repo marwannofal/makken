@@ -1,4 +1,6 @@
-{% extends "core/makken_base.html" %}{% load static %}
+{% extends "core/makken_base.html" %}
+{% load access_tags %}{# MAKKEN ACCESS UI v1 #}
+{% load static %}
 {% block title %}{{ page_heading }} | مكّن{% endblock %}
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'care_states/states.css' %}?v=20261015-1">

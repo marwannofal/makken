@@ -1,3 +1,5 @@
+from access_control.enforcement import module_view, service_operation
+# MAKKEN RBAC INTEGRATION v1
 
 from core.dependencies import DependencyBlocked, ensure_allowed, blocked_context
 # MAKKEN LINKED RECORD PROTECTION v1
@@ -52,6 +54,7 @@ def _stale():
     return "تغيّر هذا المستوى أو حُذف، أو تم تنفيذ الطلب مسبقًا. راجع القائمة وحاول مجددًا."
 
 
+@module_view('levels')
 @login_required(login_url="accounts:login")
 @require_http_methods(["GET", "POST"])
 def index(request):

@@ -1,3 +1,5 @@
+# MAKKEN RBAC BUSINESS FIXTURES v1
+# MAKKEN RBAC INTEGRATION v1
 # MAKKEN DEPENDENCY TEST POLICY v1
 import json
 import uuid
@@ -27,8 +29,8 @@ from .services import save_provider, row_action, Conflict
 class ProviderTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.user=get_user_model().objects.create_user(username='provider-tests',password='Provider!Test123')
-        cls.other=get_user_model().objects.create_user(username='provider-other')
+        cls.user=get_user_model().objects.create_user(username='provider-tests',password='Provider!Test123', is_superuser=True)
+        cls.other=get_user_model().objects.create_user(username='provider-other', is_superuser=True)
         cls.region=Region.objects.create(name='منطقة مزود الأولى')
         cls.region2=Region.objects.create(name='منطقة مزود الثانية')
         cls.sector=Sector.objects.create(name='قطاع مزودي التدريب')

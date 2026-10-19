@@ -52,5 +52,7 @@
   </dialog>
 {% include "core/partials/dependency_block.html" %}
 <script src="{% static 'core/js/dependencies.js' %}?v=20261019-1" defer></script>
+{% load access_tags %}{% current_access as operation_access %}{{ operation_access|json_script:'makken-operation-access' }}
+<script src="{% static 'access_control/permissions-ui.js' %}?v=20261019-1" defer></script>
 </body>
 </html>

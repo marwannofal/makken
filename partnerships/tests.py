@@ -1,3 +1,5 @@
+# MAKKEN RBAC BUSINESS FIXTURES v1
+# MAKKEN RBAC INTEGRATION v1
 # MAKKEN DEPENDENCY TEST POLICY v1
 from regions.models import Region
 import json
@@ -18,8 +20,8 @@ from .models import Partnership, PartnershipOffering, DevelopmentHistory
 class PartnershipTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.user = get_user_model().objects.create_user(username='partner-user', password='Testing!123456')
-        cls.other = get_user_model().objects.create_user(username='other-user', password='Testing!123456')
+        cls.user = get_user_model().objects.create_user(username='partner-user', password='Testing!123456', is_superuser=True)
+        cls.other = get_user_model().objects.create_user(username='other-user', password='Testing!123456', is_superuser=True)
         cls.entity = Entity.objects.create(name='هيئة حكومية تجريبية', entity_type='government')
         cls.private = Entity.objects.create(name='شركة أهلية', entity_type='non_government', branch='private_large')
         cls.sector = Sector.objects.create(name='قطاع الحاسب')

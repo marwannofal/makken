@@ -1,3 +1,5 @@
+# MAKKEN RBAC BUSINESS FIXTURES v1
+# MAKKEN RBAC INTEGRATION v1
 from decimal import Decimal
 from urllib.parse import parse_qs, urlencode, urlsplit
 
@@ -12,7 +14,7 @@ from .models import Partnership
 class DevelopmentFilterTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.user = get_user_model().objects.create_user(username="state-filter-user")
+        cls.user = get_user_model().objects.create_user(username="state-filter-user", is_superuser=True)
         cls.entity = Entity.objects.create(name="كيان اختبار التصفية", entity_type="government")
         for key, label in DevelopmentState.choices:
             StateColor.objects.get_or_create(state=key, defaults={"color": DEFAULT_COLORS[key]})

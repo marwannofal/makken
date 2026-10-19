@@ -1,3 +1,5 @@
+
+{% load access_tags %}{# MAKKEN ACCESS UI v1 #}
 <div class="partnership-field" id="partnership-entity-field"{% if not form.show_entity %} hidden{% endif %}>
   <label for="id_entity">الكيان <span class="required" aria-hidden="true">*</span></label>
   {{ form.entity }}

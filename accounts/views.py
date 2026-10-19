@@ -1,3 +1,5 @@
+from access_control.integration import permission_aware_login
+# MAKKEN RBAC INTEGRATION v1
 from django.contrib.auth.views import LoginView
 from django.shortcuts import render
 from django.views.csrf import csrf_failure as default_csrf_failure
@@ -6,6 +8,7 @@ from .forms import SiteAuthenticationForm
 from .security import add_login_headers
 
 
+@permission_aware_login
 class SiteLoginView(LoginView):
     template_name = "accounts/login.html"
     authentication_form = SiteAuthenticationForm

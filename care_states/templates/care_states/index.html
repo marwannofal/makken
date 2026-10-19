@@ -1,4 +1,6 @@
 {% extends "core/makken_base.html" %}
+{% load access_tags %}{# MAKKEN ACCESS UI v1 #}
+
 {% load static %}
 {% block title %}حالة تطور المنظمات للرعاية | مكّن{% endblock %}
 {% block extra_head %}
@@ -21,7 +23,7 @@
       <tr data-state-row="{{ row.state }}">
         <th scope="row"><span class="state-name">{{ row.label }}</span></th>
         <td><div class="color-value"><input class="color-swatch" type="color" value="{{ row.color }}" disabled aria-label="لون حالة {{ row.label }}: {{ row.color }}"><code dir="ltr">{{ row.color }}</code></div></td>
-        <td class="action-cell"><a class="edit-color" href="?edit={{ row.state }}" data-edit-color data-state="{{ row.state }}" data-label="{{ row.label }}" data-color="{{ row.color }}" data-snapshot="{{ row.snapshot }}" aria-label="تعديل لون حالة {{ row.label }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m16 4 4 4M4 20l5-1L20 8a2.8 2.8 0 0 0-4-4L5 15Z"/></svg><span>تعديل</span></a></td>
+        <td class="action-cell">{% allowed 'care_states' 'edit' %}<a class="edit-color" href="?edit={{ row.state }}" data-edit-color data-state="{{ row.state }}" data-label="{{ row.label }}" data-color="{{ row.color }}" data-snapshot="{{ row.snapshot }}" aria-label="تعديل لون حالة {{ row.label }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m16 4 4 4M4 20l5-1L20 8a2.8 2.8 0 0 0-4-4L5 15Z"/></svg><span>تعديل</span></a>{% endallowed %}</td>
       </tr>
     {% endfor %}</tbody>
   </table>

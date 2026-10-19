@@ -1,3 +1,5 @@
+# MAKKEN RBAC BUSINESS FIXTURES v1
+# MAKKEN RBAC INTEGRATION v1
 # MAKKEN PAGINATION AND DEPENDENCY TEST COMPAT v2
 # MAKKEN DEPENDENCY TEST POLICY v1
 import time
@@ -16,7 +18,7 @@ from .views import TOKEN_AGE
 
 class TrainingProgramsTests(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_user("programs-test", password="test-only-password")
+        self.user = get_user_model().objects.create_user("programs-test", password="test-only-password", is_superuser=True)
         self.client.force_login(self.user)
         self.url = reverse("training_programs:index")
         self.ids = list(ExpenseItem.objects.values_list("pk", flat=True))
@@ -280,7 +282,7 @@ class TrainingProgramsTests(TestCase):
             self.assertEqual(self.client.post(self.url, {"action": "confirm", "token": token}).status_code, 400)
         snapshot = self.client.get(self.url).context["add_snapshot"]
         self.assertEqual(self.client.post(self.url, {"action": "preview", "operation": "edit", "snapshot": snapshot}).status_code, 400)
-        self.client.force_login(get_user_model().objects.create_user("other-program-user"))
+        self.client.force_login(get_user_model().objects.create_user("other-program-user", is_superuser=True))
         self.assertEqual(self.client.post(self.url, {"action": "confirm", "token": token}).status_code, 400)
         self.assertEqual(TrainingProgram.objects.count(), 0)
 

@@ -1,4 +1,6 @@
 """Agreement validation, private file persistence and authenticated downloads."""
+from access_control.enforcement import module_view
+# MAKKEN RBAC INTEGRATION v1
 import unicodedata
 import uuid
 import warnings
@@ -102,6 +104,7 @@ def save_supporting_files(item, cleaned, user, saved_paths):
     item.preliminary_agreement_type = cleaned['agreement_type']
 
 
+@module_view('partnerships')
 @login_required(login_url='accounts:login')
 @require_GET
 def download_attachment(request, pk, attachment_id):

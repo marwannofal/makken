@@ -1,3 +1,5 @@
+# MAKKEN RBAC BUSINESS FIXTURES v1
+# MAKKEN RBAC INTEGRATION v1
 import json
 from decimal import Decimal
 from django.contrib.auth import get_user_model
@@ -13,7 +15,7 @@ from .models import Partnership
 class EditorFieldTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.user = get_user_model().objects.create_user(username="editor-field-user")
+        cls.user = get_user_model().objects.create_user(username="editor-field-user", is_superuser=True)
         cls.government = Entity.objects.filter(entity_type=EntityType.GOVERNMENT, is_active=True).first()
         cls.private = Entity.objects.filter(branch="private_large").first()
         cls.sector = Sector.objects.create(name="قطاع فحص حقول الجهة")

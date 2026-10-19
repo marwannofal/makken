@@ -216,3 +216,9 @@ CSRF_FAILURE_VIEW = "core.error_pages.csrf_failure"
 if not any(_app == "service_providers" or _app.startswith("service_providers.") for _app in INSTALLED_APPS):
     INSTALLED_APPS = [*INSTALLED_APPS, "service_providers.apps.ServiceProvidersConfig"]
 # END MAKKEN SERVICE PROVIDERS
+
+# MAKKEN RBAC INTEGRATION v1
+if not any(app == 'access_control' or app.startswith('access_control.') for app in INSTALLED_APPS):
+    INSTALLED_APPS = [*INSTALLED_APPS, 'access_control.apps.AccessControlConfig']
+if 'access_control.middleware.AccessBoundaryMiddleware' not in MIDDLEWARE:
+    MIDDLEWARE = [*MIDDLEWARE, 'access_control.middleware.AccessBoundaryMiddleware']

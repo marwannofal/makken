@@ -26,7 +26,7 @@ def validate_name(value):
 
 class Region(models.Model):
     name = models.CharField("المنطقة", max_length=100, validators=[validate_name])
-    name_key = models.CharField(max_length=300, unique=True, editable=False)
+    name_key = models.CharField(max_length=300, editable=False)
     is_active = models.BooleanField("نشط", default=True)
     version = models.PositiveBigIntegerField(default=1, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -35,6 +35,8 @@ class Region(models.Model):
     class Meta:
         ordering = ["id"]
         default_permissions = ()
+
+        constraints = [models.UniqueConstraint(fields=["name_key"], name="mk_regions_name_uq")]
 
     def clean(self):
         super().clean()
@@ -50,3 +52,5 @@ class Region(models.Model):
 
     def __str__(self):
         return self.name
+
+# MAKKEN NAMED NAME KEY UNIQUE v1

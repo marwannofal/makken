@@ -1,2 +1,4 @@
+
+{% load access_tags %}{# MAKKEN ACCESS UI v1 #}
 {% load static %}
 <div class="partnership-field financial-capacity-field"><label for="id_financial_capacity">القدرة المالية <span class="required" aria-hidden="true">*</span></label><div class="financial-money-control">{{ form.financial_capacity }}<span class="financial-currency-addon"><img src="{% static 'partnerships/saudi-riyal.svg' %}" width="21" height="24" alt="ريال سعودي"></span></div><p class="field-help">أدخل المبلغ بالريال السعودي؛ الصفر مسموح وبحد أقصى منزلتين عشريتين.</p><div class="field-error" id="error-financial_capacity" role="alert">{{ form.financial_capacity.errors }}</div></div>

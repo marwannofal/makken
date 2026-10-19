@@ -3,6 +3,8 @@
 On MySQL/InnoDB SELECT FOR UPDATE provides cross-worker serialization. SQLite
 is suitable for local UI tests only; run the concurrency suite on MySQL.
 """
+from access_control.enforcement import service_operation
+# MAKKEN RBAC INTEGRATION v1
 
 from core.dependencies import DependencyBlocked, ensure_allowed, blocked_context
 # MAKKEN LINKED RECORD PROTECTION v1
@@ -55,6 +57,7 @@ def lock_need(pk, version):
     return need
 
 
+@service_operation('market_needs', 'save_need')
 @transaction.atomic
 def save_need(data, actor, pk=None, version=None, nonce=None):
     need = lock_need(pk, version) if pk else None
@@ -143,6 +146,7 @@ def recompute(need, actor):
         audit(need, actor, "تحديث حالة الدعم", old, after)
 
 
+@service_operation('market_needs', 'add_candidates')
 @transaction.atomic
 def add_candidates(pk, version, ids, filters, actor):
     need = lock_need(pk, version)
@@ -164,6 +168,7 @@ def add_candidates(pk, version, ids, filters, actor):
     return need
 
 
+@service_operation('market_needs', 'followup')
 def followup(pk, version, sponsorship_id, record_version, operation, data, files, actor):
     saved_paths = []
     try:
@@ -250,6 +255,7 @@ def followup(pk, version, sponsorship_id, record_version, operation, data, files
         raise
 
 
+@service_operation('market_needs', 'card_action')
 @transaction.atomic
 def card_action(pk, version, operation, actor):
     need = lock_need(pk, version)

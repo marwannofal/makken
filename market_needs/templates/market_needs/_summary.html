@@ -1,3 +1,5 @@
+
+{% load access_tags %}{# MAKKEN ACCESS UI v1 #}
 {% load market_tags %}
 <div class="market-summary" aria-label="ملخص التمويل"><div><span>إجمالي تكلفة الحاجة</span><strong>{% include "market_needs/_money.html" with value=need.total_cost %}</strong></div><div><span>إجمالي الدعم المعتمد</span><strong>{% include "market_needs/_money.html" with value=need.approved_support %}</strong></div><div><span>المبلغ المتبقي</span><strong>{% include "market_needs/_money.html" with value=need.remaining %}</strong></div><div><span>نسبة الدعم</span><strong><bdi>{{ need.funding_percent }}%</bdi></strong><progress max="100" value="{{ need.funding_percent|stringformat:'f' }}" aria-label="نسبة الدعم المعتمد"></progress></div></div>
 <p class="market-help">نسبة الدعم = المساهمات المعتمدة ÷ إجمالي تكلفة الحاجة × 100. الدعم المطلوب: {% include "market_needs/_money.html" with value=need.requested_support %}. نوع الدعم: <strong>{{ need.arrangement }}</strong>.</p>

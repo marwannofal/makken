@@ -1,0 +1,15 @@
+{% extends "access_control/base.html" %}
+{% block access_content %}
+<form method="post" data-ac-confirm="تأكيد حفظ الحساب والأدوار والصفحات والصلاحيات؟ تسري التغييرات فورًا على الطلبات التالية." data-ac-dirty data-user-editor{% if target_user.is_superuser %} data-superuser="1"{% endif %}>
+{% csrf_token %}{{ form.snapshot }}{% if form.non_field_errors %}<div class="feedback feedback-error" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+<section class="partnership-card"><header class="card-heading"><div><h2>{% if target_user %}إدارة حساب {{ target_user.get_username }}{% else %}إضافة مستخدم جديد{% endif %}</h2><p class="muted">لا تُمنح صلاحية مدير النظام الأعلى من خلال تعيين دور.</p></div>{% if target_user %}<a class="button button-secondary" href="{% url 'access_control:password' target_user.pk %}">إعادة تعيين كلمة المرور</a>{% endif %}</header>
+{% if target_user.is_superuser %}<p class="ac-note"><strong>هذا الحساب مدير نظام أعلى فعلي.</strong> صلاحياته الكاملة مرتبطة بعلامة Django المحمية is_superuser، ولا تلغيها قيود الأدوار والصفحات أدناه.</p>{% endif %}
+<div class="ac-grid">{% include 'access_control/_field.html' with field=form.full_name %}{% include 'access_control/_field.html' with field=form.username %}{% include 'access_control/_field.html' with field=form.email %}{% include 'access_control/_field.html' with field=form.is_active %}{% if not target_user %}{% include 'access_control/_field.html' with field=form.new_password1 %}{% include 'access_control/_field.html' with field=form.new_password2 %}{% endif %}</div>
+{% if not target_user %}{% include 'access_control/_password_policy.html' %}{% endif %}
+</section>
+<section class="partnership-card" id="page-access"><header class="card-heading"><div><h2>الأدوار والصفحات</h2><p class="muted">جميع الصفحات تعني الصفحات التي تسمح بها الصلاحيات، ولا تمنح الوصول من تلقاء نفسها.</p></div></header><div class="ac-grid">{% include 'access_control/_field.html' with field=form.roles wide=True %}{% include 'access_control/_field.html' with field=form.page_scope %}<div data-ac-pages>{% include 'access_control/_field.html' with field=form.allowed_pages %}</div></div></section>
+{% include 'access_control/_matrix.html' %}
+<div class="ac-save"><button class="button button-primary" type="submit">حفظ الحساب والصلاحيات</button><a class="button button-secondary" href="{% url 'access_control:index' %}">إلغاء</a>{% if target_user %}<a class="button button-secondary" href="{% url 'access_control:logs' %}?user={{ target_user.pk }}">سجل تغييرات المستخدم</a>{% endif %}</div>
+</form>
+{{ role_catalog|json_script:'ac-role-catalog' }}
+{% endblock %}

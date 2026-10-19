@@ -1,3 +1,5 @@
+from access_control.enforcement import module_view, service_operation
+# MAKKEN RBAC INTEGRATION v1
 
 from core.dependencies import DependencyBlocked, ensure_allowed, blocked_context
 # MAKKEN LINKED RECORD PROTECTION v1
@@ -130,6 +132,7 @@ def _apply(payload):
             item.delete()  # Cascades links only; shared expense-item records remain intact.
 
 
+@module_view('training_programs')
 @login_required(login_url="accounts:login")
 @require_http_methods(["GET", "POST"])
 def index(request):

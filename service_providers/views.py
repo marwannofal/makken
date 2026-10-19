@@ -1,3 +1,5 @@
+from access_control.enforcement import module_view, service_operation
+# MAKKEN RBAC INTEGRATION v1
 
 from core.dependencies import DependencyBlocked, ensure_allowed, blocked_context
 # MAKKEN LINKED RECORD PROTECTION v1
@@ -92,6 +94,7 @@ def list_context(request):
     return context
 
 
+@module_view('service_providers')
 @login_required(login_url="accounts:login")
 @require_http_methods(["GET", "POST"])
 def index(request):
@@ -135,6 +138,7 @@ def index(request):
     return add_login_headers(render(request, "service_providers/index.html", context, status=status))
 
 
+@module_view('service_providers')
 @login_required(login_url="accounts:login")
 @require_http_methods(["GET", "POST"])
 def editor(request, pk=None):

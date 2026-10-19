@@ -24,7 +24,7 @@ class PreliminaryAgreementType(models.TextChoices):
 
 class Partnership(models.Model):
     name = models.CharField("اسم الجهة", max_length=200, validators=[validate_name])
-    name_key = models.CharField(max_length=600, unique=True, editable=False)
+    name_key = models.CharField(max_length=600, editable=False)
     representative = models.CharField("اسم الممثل عن الجهة", max_length=200, validators=[validate_name])
     phone_country = models.CharField(max_length=2, default="SA")
     phone = models.CharField("هاتف التواصل", max_length=16)
@@ -45,7 +45,8 @@ class Partnership(models.Model):
     class Meta:
         ordering = ["-id"]
         default_permissions = ()
-        constraints = [models.CheckConstraint(condition=models.Q(preliminary_agreement_type__in=["", *PreliminaryAgreementType.values]), name="partnership_agreement_enum"), models.CheckConstraint(condition=models.Q(scope__in=Scope.values), name="partnership_scope_enum"), models.CheckConstraint(condition=models.Q(financial_capacity__isnull=True) | models.Q(financial_capacity__gte=0), name="partnership_financial_nonnegative")]
+        constraints = [
+            models.UniqueConstraint(fields=["name_key"], name="mk_partnerships_name_uq"),models.CheckConstraint(condition=models.Q(preliminary_agreement_type__in=["", *PreliminaryAgreementType.values]), name="partnership_agreement_enum"), models.CheckConstraint(condition=models.Q(scope__in=Scope.values), name="partnership_scope_enum"), models.CheckConstraint(condition=models.Q(financial_capacity__isnull=True) | models.Q(financial_capacity__gte=0), name="partnership_financial_nonnegative")]
 
     def save(self, *args, **kwargs):
         self.name = normalize_name(self.name)
@@ -119,3 +120,4 @@ def remove_willingness_file(sender, instance, **kwargs):
         name = instance.file.name
         transaction.on_commit(lambda: delete_private_files([name]))
 
+# MAKKEN NAMED NAME KEY UNIQUE v1

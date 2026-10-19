@@ -1,1 +1,2 @@
-{% include "core/partials/sidebar/_link.html" with nav_page="partnership_editor" nav_url="partnerships:create" nav_label="إدارة الشراكات" nav_path="M15 5H5v15h15V10M16 2v8m-4-4h8M8 12h6m-6 4h8" active_page=active_page request=request only %}
+{% load access_tags %}{# MAKKEN ACCESS NAV v1 #}{% allowed 'partnerships' 'create' %}{% include "core/partials/sidebar/_link.html" with nav_page="partnership_editor" nav_url="partnerships:create" nav_label="إدارة الشراكات" nav_path="M15 5H5v15h15V10M16 2v8m-4-4h8M8 12h6m-6 4h8" active_page=active_page request=request only %}
+{% endallowed %}

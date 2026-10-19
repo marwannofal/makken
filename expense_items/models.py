@@ -15,7 +15,7 @@ def validate_name(value):
 
 class ExpenseItem(models.Model):
     name = models.CharField("بند الصرف", max_length=200, validators=[validate_name])
-    name_key = models.CharField(max_length=600, unique=True, editable=False)
+    name_key = models.CharField(max_length=600, editable=False)
     is_active = models.BooleanField("نشط", default=True)
     version = models.PositiveBigIntegerField(default=1, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -24,6 +24,8 @@ class ExpenseItem(models.Model):
     class Meta:
         ordering = ["id"]
         default_permissions = ()
+
+        constraints = [models.UniqueConstraint(fields=["name_key"], name="mk_expense_items_name_uq")]
 
     def clean(self):
         super().clean()
@@ -39,3 +41,5 @@ class ExpenseItem(models.Model):
 
     def __str__(self):
         return self.name
+
+# MAKKEN NAMED NAME KEY UNIQUE v1

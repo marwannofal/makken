@@ -1,3 +1,5 @@
+# MAKKEN RBAC BUSINESS FIXTURES v1
+# MAKKEN RBAC INTEGRATION v1
 # MAKKEN DEPENDENCY TEST POLICY v1
 from urllib.parse import parse_qs, urlencode, urlsplit
 from html.parser import HTMLParser
@@ -26,7 +28,7 @@ class SettingsFiltersTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.user=get_user_model().objects.create_user(username='settings-filter-user',password='Testing!123456')
+        cls.user=get_user_model().objects.create_user(username='settings-filter-user',password='Testing!123456', is_superuser=True)
         cls.records={}
         for app,model in [('levels',Level),('regions',Region),('entities',Entity),('specializations',Specialization),('sectors',Sector),('expense_items',ExpenseItem),('training_programs',TrainingProgram),('sponsorship_shapes',SponsorshipShape)]:
             records=[]

@@ -1,8 +1,11 @@
+from access_control.enforcement import module_view
+# MAKKEN RBAC INTEGRATION v1
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from accounts.security import add_login_headers
 
 
+@module_view('dashboard')
 @login_required(login_url="accounts:login")
 def home(request):
     name = request.user.get_short_name() or request.user.get_username()

@@ -1,3 +1,5 @@
+# MAKKEN RBAC BUSINESS FIXTURES v1
+# MAKKEN RBAC INTEGRATION v1
 # MAKKEN DEPENDENCY TEST POLICY v1
 from core.dependencies import DependencyBlocked
 """Conversion is unavailable; previous records and private evidence remain valid."""
@@ -22,7 +24,7 @@ from .models import ServiceProvider,ProviderAudit
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.MD5PasswordHasher'])
 class ConversionRemovalTests(TestCase):
     def setUp(self):
-        self.user=get_user_model().objects.create_user(username='provider-conversion-removed')
+        self.user=get_user_model().objects.create_user(username='provider-conversion-removed', is_superuser=True)
         self.client.force_login(self.user,backend='accounts.backends.EmailOrUsernameBackend')
         self.item=ServiceProvider.objects.create(name='مزود اختبار إلغاء التحويل',provider_type='government',scope='local')
         folder=TemporaryDirectory();self.addCleanup(folder.cleanup)

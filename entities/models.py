@@ -27,7 +27,7 @@ def validate_name(value):
 
 class Entity(models.Model):
     name = models.CharField("اسم الكيان", max_length=200, validators=[validate_name])
-    name_key = models.CharField(max_length=600, unique=True, editable=False)
+    name_key = models.CharField(max_length=600, editable=False)
     entity_type = models.CharField("الكيان", max_length=20, choices=EntityType.choices)
     branch = models.CharField("فرع الكيان", max_length=32, choices=EntityBranch.choices, blank=True, default="")
     is_active = models.BooleanField("نشط", default=True)
@@ -39,6 +39,7 @@ class Entity(models.Model):
         ordering = ["id"]
         default_permissions = ()
         constraints = [
+            models.UniqueConstraint(fields=["name_key"], name="mk_entities_name_uq"),
             models.CheckConstraint(condition=models.Q(entity_type__in=EntityType.values), name="entity_type_fixed_enum"),
             models.CheckConstraint(
                 condition=(models.Q(entity_type=EntityType.GOVERNMENT, branch="") | models.Q(entity_type=EntityType.NON_GOVERNMENT, branch__in=EntityBranch.values)),
@@ -64,3 +65,5 @@ class Entity(models.Model):
 
     def __str__(self):
         return self.name
+
+# MAKKEN NAMED NAME KEY UNIQUE v1

@@ -1,3 +1,5 @@
+# MAKKEN RBAC BUSINESS FIXTURES v1
+# MAKKEN RBAC INTEGRATION v1
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError, transaction
 from django.test import Client, TestCase
@@ -13,7 +15,7 @@ class StateColorsTests(TestCase):
         # run before this suite without rerunning data migrations.
         for state in DevelopmentState:
             StateColor.objects.get_or_create(state=state.value, defaults={"color": DEFAULT_COLORS[state]})
-        self.user = get_user_model().objects.create_user("color-test", password="test-only-password")
+        self.user = get_user_model().objects.create_user("color-test", password="test-only-password", is_superuser=True)
         self.client.force_login(self.user)
         self.url = reverse("care_states:index")
 
@@ -77,7 +79,7 @@ class StateColorsTests(TestCase):
         import time
         with patch("django.core.signing.time.time", return_value=time.time() + TOKEN_AGE + 10):
             self.assertEqual(self.client.post(self.url, {"action": "confirm", "token": token}).status_code, 400)
-        other = get_user_model().objects.create_user("other-color-test", password="test-only-password")
+        other = get_user_model().objects.create_user("other-color-test", password="test-only-password", is_superuser=True)
         self.client.force_login(other)
         self.assertEqual(self.client.post(self.url, {"action": "confirm", "token": token}).status_code, 400)
         self.assertEqual(StateColor.objects.get(state="capability").version, 1)

@@ -1,3 +1,5 @@
+# MAKKEN RBAC BUSINESS FIXTURES v1
+# MAKKEN RBAC INTEGRATION v1
 from regions.models import Region
 import json
 from decimal import Decimal
@@ -19,7 +21,7 @@ from .financial import MoneyField, FinancialRangeForm
 class FinancialCapacityTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.user=get_user_model().objects.create_user(username='financial-user',password='Testing!123456')
+        cls.user=get_user_model().objects.create_user(username='financial-user',password='Testing!123456', is_superuser=True)
         cls.entity=Entity.objects.create(name='هيئة اختبار مالي',entity_type='government')
         cls.sector=Sector.objects.create(name='قطاع الاختبار المالي')
         cls.spec=Specialization.objects.create(name='تخصص الاختبار المالي',sector=cls.sector)

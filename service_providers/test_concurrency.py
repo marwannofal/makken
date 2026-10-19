@@ -1,3 +1,5 @@
+# MAKKEN RBAC BUSINESS FIXTURES v1
+# MAKKEN RBAC INTEGRATION v1
 from concurrent.futures import ThreadPoolExecutor
 import json
 from tempfile import TemporaryDirectory
@@ -20,7 +22,7 @@ from .services import save_provider, row_action, Conflict
 @skipUnless(connection.vendor == 'mysql', 'Requires real MySQL row locks; run compose.providers-tests.yaml.')
 class ProviderConcurrencyTests(TransactionTestCase):
     def setUp(self):
-        self.user=get_user_model().objects.create_user(username='provider-concurrency')
+        self.user=get_user_model().objects.create_user(username='provider-concurrency', is_superuser=True)
         self.region=Region.objects.create(name='منطقة اختبار التزامن')
         sector=Sector.objects.create(name='قطاع اختبار التزامن')
         self.spec=Specialization.objects.create(name='تخصص اختبار التزامن',sector=sector)

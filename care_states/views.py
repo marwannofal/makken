@@ -1,3 +1,5 @@
+from access_control.enforcement import module_view, service_operation
+# MAKKEN RBAC INTEGRATION v1
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core import signing
@@ -35,6 +37,7 @@ def _load_token(value, salt, user):
     return payload
 
 
+@module_view('care_states')
 @login_required(login_url="accounts:login")
 @require_http_methods(["GET", "POST"])
 def index(request):

@@ -1,1 +1,3 @@
+
+{% load access_tags %}{# MAKKEN ACCESS UI v1 #}
 <div class="table-footer"><span>عرض {{ page_obj.start_index }}–{{ page_obj.end_index }} من {{ page_obj.paginator.count }} سجل</span><nav class="pagination" aria-label="ترقيم الصفحات">{% if page_obj.has_previous %}<a class="button button-secondary" href="?{{ filter_query }}&amp;page={{ page_obj.previous_page_number }}">السابق</a>{% endif %}<span>صفحة {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>{% if page_obj.has_next %}<a class="button button-secondary" href="?{{ filter_query }}&amp;page={{ page_obj.next_page_number }}">التالي</a>{% endif %}</nav></div>

@@ -1,4 +1,6 @@
 """Transactional writes, reference validation, idempotency and immutable audit entries."""
+from access_control.enforcement import service_operation
+# MAKKEN RBAC INTEGRATION v1
 
 from core.dependencies import DependencyBlocked, ensure_allowed, blocked_context
 # MAKKEN LINKED RECORD PROTECTION v1
@@ -38,6 +40,7 @@ def lock_references(data):
         raise Conflict("تغيّر قطاع أحد التخصصات أثناء المراجعة. حدّث الاختيارات قبل المتابعة.")
 
 
+@service_operation('service_providers', 'save_provider')
 def save_provider(payload, user):
     with transaction.atomic():
         item = ServiceProvider.objects.select_for_update().filter(pk=payload.get("id")).first() if payload.get("id") else None
@@ -73,6 +76,7 @@ def save_provider(payload, user):
         return item
 
 
+@service_operation('service_providers', 'row_action')
 def row_action(payload, user):
     with transaction.atomic():
         item = ServiceProvider.objects.select_for_update().filter(pk=payload["id"]).first()

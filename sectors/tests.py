@@ -1,3 +1,5 @@
+# MAKKEN RBAC BUSINESS FIXTURES v1
+# MAKKEN RBAC INTEGRATION v1
 # MAKKEN DEPENDENCY TEST POLICY v1
 import time
 from unittest.mock import patch
@@ -13,7 +15,7 @@ from .views import TOKEN_AGE
 
 class SectorsTests(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_user("sectors-test", password="test-password-only")
+        self.user = get_user_model().objects.create_user("sectors-test", password="test-password-only", is_superuser=True)
         self.client.force_login(self.user)
         self.url = reverse("sectors:index")
         self.specializations = list(Specialization.objects.all())
@@ -219,7 +221,7 @@ class SectorsTests(TestCase):
             self.assertEqual(self.client.post(self.url, {"action": "confirm", "token": token}).status_code, 400)
         snapshot = self.client.get(self.url).context["add_snapshot"]
         self.assertEqual(self.client.post(self.url, {"action": "preview", "operation": "edit", "snapshot": snapshot}).status_code, 400)
-        other = get_user_model().objects.create_user("other-sector-user")
+        other = get_user_model().objects.create_user("other-sector-user", is_superuser=True)
         self.client.force_login(other)
         self.assertEqual(self.client.post(self.url, {"action": "confirm", "token": token}).status_code, 400)
         self.assertEqual(Sector.objects.count(), 0)

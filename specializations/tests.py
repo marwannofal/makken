@@ -1,3 +1,5 @@
+# MAKKEN RBAC BUSINESS FIXTURES v1
+# MAKKEN RBAC INTEGRATION v1
 from unittest.mock import patch
 import time
 
@@ -11,7 +13,7 @@ from .views import TOKEN_AGE
 
 class SpecializationsTests(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_user("specializations-test", password="test-only-password")
+        self.user = get_user_model().objects.create_user("specializations-test", password="test-only-password", is_superuser=True)
         self.client.force_login(self.user)
         self.url = reverse("specializations:index")
 
@@ -123,7 +125,7 @@ class SpecializationsTests(TestCase):
         self.assertEqual(self.client.post(self.url, {"action": "confirm", "token": token + "tampered"}).status_code, 400)
         with patch("django.core.signing.time.time", return_value=time.time() + TOKEN_AGE + 10):
             self.assertEqual(self.client.post(self.url, {"action": "confirm", "token": token}).status_code, 400)
-        other = get_user_model().objects.create_user("another-specialization-test")
+        other = get_user_model().objects.create_user("another-specialization-test", is_superuser=True)
         self.client.force_login(other)
         self.assertEqual(self.client.post(self.url, {"action": "confirm", "token": token}).status_code, 400)
         self.assertEqual(Specialization.objects.count(), 12)

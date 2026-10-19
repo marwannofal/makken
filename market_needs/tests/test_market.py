@@ -1,3 +1,5 @@
+# MAKKEN RBAC BUSINESS FIXTURES v1
+# MAKKEN RBAC INTEGRATION v1
 # MAKKEN DEPENDENCY TEST POLICY v1
 from core.dependencies import DependencyBlocked
 import json
@@ -39,8 +41,8 @@ class MarketFixtures:
         from levels.models import Level
         for key, label in [('bronze','برونزي'),('silver','فضي'),('gold','ذهبي'),('strategic','استراتيجي')]:
             Level.objects.get_or_create(funding_key=key, defaults={'name':label})
-        cls.user = get_user_model().objects.create_user(username='market-tests', password='Makken!SafeTest930')
-        cls.other = get_user_model().objects.create_user(username='market-other', password='Makken!OtherSafe931')
+        cls.user = get_user_model().objects.create_user(username='market-tests', password='Makken!SafeTest930', is_superuser=True)
+        cls.other = get_user_model().objects.create_user(username='market-other', password='Makken!OtherSafe931', is_superuser=True)
         for state,color in [('capability','#ba1d1d'),('willingness','#fdd2cf'),('care','#1c5d34')]:
             StateColor.objects.update_or_create(state=state, defaults={'color':color})
         cls.region = Region.objects.create(name='منطقة تجريبية الأولى')

@@ -1,3 +1,5 @@
+
+{% load access_tags %}{# MAKKEN ACCESS UI v1 #}
 {% load market_tags %}
 <dialog id="market-followup-dialog" class="partnership-dialog market-funding-dialog" aria-labelledby="followup-dialog-title"{% if reopen_followup %} open data-market-server{% endif %}>
 <form method="post" enctype="multipart/form-data" class="dialog-body" data-followup-form data-operation="{{ operation }}" data-allowed-lines="{% if operation == 'approve' %}{% for item in followup_form.allocation_rows %}{% if not item.field.field.widget.attrs.disabled %}{{ item.line.pk }},{% endif %}{% endfor %}{% endif %}" data-total-cost="{{ need.total_cost|money_raw }}" data-record-amount="{{ selected_record.amount|money_raw }}" data-limit="{{ upload_limit }}" data-max-files="{{ upload_max_files }}" data-market-confirm="هل تريد تأكيد حفظ نتيجة المتابعة وتوزيع الدعم؟ لا يمكن التراجع عن قرار الاعتماد أو الرفض من هذه الشاشة.">

@@ -1,3 +1,5 @@
+# MAKKEN RBAC BUSINESS FIXTURES v1
+# MAKKEN RBAC INTEGRATION v1
 # MAKKEN PAGINATION AND DEPENDENCY TEST COMPAT v2
 from unittest.mock import patch
 import time
@@ -12,7 +14,7 @@ from .views import TOKEN_AGE
 
 class ExpenseItemsTests(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_user("expense_items-test", password="test-only-password")
+        self.user = get_user_model().objects.create_user("expense_items-test", password="test-only-password", is_superuser=True)
         self.client.force_login(self.user)
         self.url = reverse("expense_items:index")
 
@@ -137,7 +139,7 @@ class ExpenseItemsTests(TestCase):
         self.assertEqual(self.client.post(self.url, {"action": "confirm", "token": token + "tampered"}).status_code, 400)
         with patch("django.core.signing.time.time", return_value=time.time() + TOKEN_AGE + 10):
             self.assertEqual(self.client.post(self.url, {"action": "confirm", "token": token}).status_code, 400)
-        other = get_user_model().objects.create_user("another-expense-item-test")
+        other = get_user_model().objects.create_user("another-expense-item-test", is_superuser=True)
         self.client.force_login(other)
         self.assertEqual(self.client.post(self.url, {"action": "confirm", "token": token}).status_code, 400)
         self.assertEqual(ExpenseItem.objects.count(), 10)

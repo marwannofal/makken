@@ -1,5 +1,6 @@
-{% if active_page == 'care_states' or active_page == 'levels' or active_page == 'regions' or active_page == 'entities' or active_page == 'specializations' or active_page == 'sectors' or active_page == 'expense_items' or active_page == 'training_programs' or active_page == 'sponsorship_shapes' %}
+{% load access_tags %}{# MAKKEN ACCESS NAV v1 #}{% access_can 'care_states' as access_care_states %}{% access_can 'levels' as access_levels %}{% access_can 'regions' as access_regions %}{% access_can 'entities' as access_entities %}{% access_can 'specializations' as access_specializations %}{% access_can 'sectors' as access_sectors %}{% access_can 'expense_items' as access_expense_items %}{% access_can 'training_programs' as access_training_programs %}{% access_can 'sponsorship_shapes' as access_sponsorship_shapes %}{% if access_care_states or access_levels or access_regions or access_entities or access_specializations or access_sectors or access_expense_items or access_training_programs or access_sponsorship_shapes %}{% if active_page == 'care_states' or active_page == 'levels' or active_page == 'regions' or active_page == 'entities' or active_page == 'specializations' or active_page == 'sectors' or active_page == 'expense_items' or active_page == 'training_programs' or active_page == 'sponsorship_shapes' %}
   {% include "core/partials/sidebar/_management_group.html" with management_active=True %}
 {% else %}
   {% include "core/partials/sidebar/_management_group.html" with management_active=False %}
+{% endif %}
 {% endif %}

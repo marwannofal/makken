@@ -1,3 +1,5 @@
+# MAKKEN RBAC BUSINESS FIXTURES v1
+# MAKKEN RBAC INTEGRATION v1
 import json
 
 from django.contrib.auth import get_user_model
@@ -13,7 +15,7 @@ from .models import Partnership, PartnershipOffering
 class SingleSpecializationTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.user = get_user_model().objects.create_user(username="single-specialty-user")
+        cls.user = get_user_model().objects.create_user(username="single-specialty-user", is_superuser=True)
         cls.entity = Entity.objects.create(name="كيان الاختيار الفردي", entity_type="government")
         cls.sector = Sector.objects.create(name="قطاع الاختيار الفردي")
         cls.specs = [Specialization.objects.create(name=f"تخصص فردي {i}", sector=cls.sector) for i in range(3)]

@@ -12,7 +12,7 @@ class ProviderType(models.TextChoices):
 
 class ServiceProvider(models.Model):
     name = models.CharField("اسم مزود الخدمة", max_length=200, validators=[validate_name])
-    name_key = models.CharField(max_length=600, unique=True, editable=False)
+    name_key = models.CharField(max_length=600, editable=False)
     representative = models.CharField("اسم الممثل عن مزود الخدمة", max_length=200, blank=True, validators=[validate_name])
     phone_country = models.CharField(max_length=2, default="SA")
     phone = models.CharField("هاتف التواصل لمزود الخدمة", max_length=16, blank=True)
@@ -34,6 +34,7 @@ class ServiceProvider(models.Model):
         default_permissions = ()
         indexes = [models.Index(fields=["is_active", "id"], name="provider_status_idx")]
         constraints = [
+            models.UniqueConstraint(fields=["name_key"], name="mk_service_providers_name_uq"),
             models.CheckConstraint(condition=models.Q(provider_type__in=ProviderType.values), name="provider_type_valid"),
             models.CheckConstraint(condition=models.Q(scope__in=Scope.values), name="provider_scope_valid"),
             models.CheckConstraint(condition=(models.Q(converted_partnership__isnull=True, converted_at__isnull=True) | models.Q(converted_partnership__isnull=False, converted_at__isnull=False)), name="provider_conversion_consistent"),
@@ -85,3 +86,5 @@ class ProviderAudit(models.Model):
     class Meta:
         ordering = ["-id"]
         default_permissions = ()
+
+# MAKKEN NAMED NAME KEY UNIQUE v1

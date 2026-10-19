@@ -17,7 +17,7 @@ class TrainingProgram(models.Model):
         OPERATIONAL = "operational", "تشغيلي"
 
     name = models.CharField("البرنامج التدريبي", max_length=200, validators=[validate_name])
-    name_key = models.CharField(max_length=600, unique=True, editable=False)
+    name_key = models.CharField(max_length=600, editable=False)
     category = models.CharField("تصنيف البرامج", max_length=32, choices=Category.choices)
     expense_items = models.ManyToManyField("expense_items.ExpenseItem", through="ProgramExpenseItem", related_name="training_programs", verbose_name="بنود الصرف")
     is_training = models.BooleanField("تدريبي", default=True)
@@ -31,6 +31,7 @@ class TrainingProgram(models.Model):
         ordering = ["id"]
         default_permissions = ()
         constraints = [
+            models.UniqueConstraint(fields=["name_key"], name="mk_training_programs_name_uq"),
             models.CheckConstraint(condition=models.Q(category__in=["intermediate_diploma", "associate_diploma", "qualifying_program", "qualifying_course", "development_course"]), name="makken_program_category_valid"),
             models.CheckConstraint(condition=models.Q(is_training=True, is_operational=False) | models.Q(is_training=False, is_operational=True), name="makken_program_type_single"),
         ]
@@ -68,3 +69,5 @@ class ProgramExpenseItem(models.Model):
     class Meta:
         default_permissions = ()
         constraints = [models.UniqueConstraint(fields=["program", "expense_item"], name="makken_program_expense_unique")]
+
+# MAKKEN NAMED NAME KEY UNIQUE v1

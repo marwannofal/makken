@@ -1,3 +1,5 @@
+
+{% load access_tags %}{# MAKKEN ACCESS UI v1 #}
 {% load partnership_states %}
 <section class="partnership-card" id="market-followup-records"><header class="card-heading"><div><p class="eyebrow">متابعة برنامج بطاقة حاجة السوق وفقًا للتخصص</p><h2>متابعة الجهات المرشحة</h2><p class="muted">اضغط على أي سجل لعرض التفاصيل. الرفض نهائي لهذه الحاجة فقط، وتُحتسب المساهمات المعتمدة وحدها.</p></div><span class="subtle-badge">{% include "core/partials/record_count.html" with record_count=record_page.paginator.count only %}</span></header>
 <p class="market-help"><strong>المستوى يُحسب لكل جهة من مساهمتها المعتمدة ÷ إجمالي تكلفة الحاجة: 100% استراتيجي، من 80% إلى أقل من 100% ذهبي، من 60% إلى أقل من 80% فضي، وما دون 60% برونزي للمساهمات الموجبة. وجود أكثر من جهة معتمدة يُكوّن تحالفًا، ويحتفظ كل عضو بمستواه المستقل.</strong></p>

@@ -1,4 +1,6 @@
 """Database-free error response tests; URLs are used only with ROOT_URLCONF override."""
+# MAKKEN RBAC ERROR TEST COMPAT v2
+from django.conf import settings as _rbac_test_settings
 from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.http import HttpResponse, HttpResponseNotAllowed, JsonResponse, StreamingHttpResponse
 from django.test import Client, RequestFactory, SimpleTestCase, override_settings
@@ -40,7 +42,7 @@ handler404 = "core.error_pages.page_not_found"
 handler500 = "core.error_pages.server_error"
 
 
-@override_settings(DEBUG=False, ROOT_URLCONF=__name__, SECURE_SSL_REDIRECT=False, MAKKEN_ERROR_ASSET_BASE="/static/core/errors/")
+@override_settings(DEBUG=False, ROOT_URLCONF=__name__, SECURE_SSL_REDIRECT=False, MAKKEN_ERROR_ASSET_BASE="/static/core/errors/", MIDDLEWARE=[entry for entry in _rbac_test_settings.MIDDLEWARE if entry != 'access_control.middleware.AccessBoundaryMiddleware'])
 class ErrorPageTests(SimpleTestCase):
     def setUp(self):
         self.factory = RequestFactory()
