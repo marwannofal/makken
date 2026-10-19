@@ -14,7 +14,7 @@
 {% if notice %}<div class="feedback feedback-info" role="status">{{ notice }}</div>{% endif %}
 {% for message in messages %}<div class="feedback feedback-success" role="status">{{ message }}</div>{% endfor %}
 <section class="states-card specializations-card" aria-labelledby="table-heading">
-  <header class="states-card-header"><div><h2 id="table-heading">قائمة التخصصات</h2><p>أضف التخصصات، وعدّل بياناتها أو حالة تفعيلها.</p></div><span class="fixed-tag">عدد التخصصات: {{ page_obj.paginator.count }}</span></header>
+  <header class="states-card-header"><div><h2 id="table-heading">قائمة التخصصات</h2><p>أضف التخصصات، وعدّل بياناتها أو حالة تفعيلها.</p></div><span class="fixed-tag">{% include "core/partials/record_count.html" with record_count=page_obj.paginator.count only %}</span></header>
   <table class="states-table specializations-table"><caption class="visually-hidden">قائمة التخصصات وحالة تفعيل كل تخصص</caption><thead><tr><th scope="col">اسم التخصص</th><th scope="col">حالة السجل</th><th scope="col" class="action-cell">الإجراء</th></tr></thead>
     <tbody>{% for row in rows %}<tr data-specialization-row="{{ row.id }}">
       <th scope="row"><bdi class="specialization-name">{{ row.name }}</bdi></th>

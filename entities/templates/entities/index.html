@@ -15,7 +15,7 @@
 {% if notice %}<div class="feedback feedback-info" role="status">{{ notice }}</div>{% endif %}
 {% for message in messages %}<div class="feedback feedback-success" role="status">{{ message }}</div>{% endfor %}
 <section class="states-card entities-card" aria-labelledby="table-heading">
-  <header class="states-card-header"><div><h2 id="table-heading">قائمة الكيانات</h2><p>أضف الكيانات، وعدّل بياناتها أو حالة تفعيلها.</p></div><span class="fixed-tag">عدد الكيانات: {{ page_obj.paginator.count }}</span></header>
+  <header class="states-card-header"><div><h2 id="table-heading">قائمة الكيانات</h2><p>أضف الكيانات، وعدّل بياناتها أو حالة تفعيلها.</p></div><span class="fixed-tag">{% include "core/partials/record_count.html" with record_count=page_obj.paginator.count only %}</span></header>
   <table class="states-table entities-table" role="table"><caption class="visually-hidden">قائمة الكيانات وحالة تفعيل كل كيان</caption><thead role="rowgroup"><tr role="row"><th scope="col">الكيان</th><th scope="col">فرع الكيان</th><th scope="col">حالة السجل</th><th scope="col" class="action-cell">الإجراء</th></tr></thead>
     <tbody role="rowgroup">{% for row in rows %}<tr data-entity-row="{{ row.id }}" role="row">
       <th scope="row" class="name-cell" role="rowheader"><span class="cell-label" aria-hidden="true">الكيان</span><span class="entity-kind">{{ row.kind_label }}</span></th>

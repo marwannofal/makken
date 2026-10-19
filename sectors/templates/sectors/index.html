@@ -14,7 +14,7 @@
 {% if notice %}<div class="feedback feedback-info" role="status">{{ notice }}</div>{% endif %}
 {% for message in messages %}<div class="feedback feedback-success" role="status">{{ message }}</div>{% endfor %}
 <section class="states-card sectors-card" aria-labelledby="table-heading">
-  <header class="states-card-header"><div><h2 id="table-heading">قائمة القطاعات</h2><p>لكل قطاع تخصصاته، ولكل تخصص قطاع واحد فقط.</p></div><span class="fixed-tag">عدد القطاعات: {{ page_obj.paginator.count }}</span></header>
+  <header class="states-card-header"><div><h2 id="table-heading">قائمة القطاعات</h2><p>لكل قطاع تخصصاته، ولكل تخصص قطاع واحد فقط.</p></div><span class="fixed-tag">{% include "core/partials/record_count.html" with record_count=page_obj.paginator.count only %}</span></header>
   <table class="states-table sectors-table"><caption class="visually-hidden">قائمة القطاعات وحالة تفعيل كل قطاع</caption><thead><tr><th scope="col">اسم القطاع</th><th scope="col">التخصصات / المهن</th><th scope="col">حالة السجل</th><th scope="col" class="action-cell">الإجراء</th></tr></thead>
     <tbody>{% for row in rows %}<tr data-sector-row="{{ row.id }}">
       <th scope="row"><bdi class="sector-name">{{ row.name }}</bdi></th>

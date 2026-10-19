@@ -14,7 +14,7 @@
 {% if notice %}<div class="feedback feedback-info" role="status">{{ notice }}</div>{% endif %}
 {% for message in messages %}<div class="feedback feedback-success" role="status">{{ message }}</div>{% endfor %}
 <section class="states-card expense_items-card" aria-labelledby="table-heading">
-  <header class="states-card-header"><div><h2 id="table-heading">قائمة بنود الصرف</h2><p>أضف بنود الصرف، وعدّل بياناتها أو حالة تفعيلها.</p></div><span class="fixed-tag">عدد بنود الصرف: {{ page_obj.paginator.count }}</span></header>
+  <header class="states-card-header"><div><h2 id="table-heading">قائمة بنود الصرف</h2><p>أضف بنود الصرف، وعدّل بياناتها أو حالة تفعيلها.</p></div><span class="fixed-tag">{% include "core/partials/record_count.html" with record_count=page_obj.paginator.count only %}</span></header>
   <table class="states-table expense_items-table"><caption class="visually-hidden">قائمة بنود الصرف وحالة تفعيل كل بند صرف</caption><thead><tr><th scope="col">بند الصرف</th><th scope="col">حالة السجل</th><th scope="col" class="action-cell">الإجراء</th></tr></thead>
     <tbody>{% for row in rows %}<tr data-expense-item-row="{{ row.id }}">
       <th scope="row"><bdi class="expense-item-name">{{ row.name }}</bdi></th>

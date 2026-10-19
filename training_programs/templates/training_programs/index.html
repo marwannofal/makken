@@ -14,7 +14,7 @@
 {% if notice %}<div class="feedback feedback-info" role="status">{{ notice }}</div>{% endif %}
 {% for message in messages %}<div class="feedback feedback-success" role="status">{{ message }}</div>{% endfor %}
 <section class="states-card training_programs-card" aria-labelledby="table-heading">
-  <header class="states-card-header"><div><h2 id="table-heading">قائمة برامج التدريب</h2><p>تصنيفات ثابتة وبنود صرف مشتركة بين البرامج.</p></div><span class="fixed-tag">عدد برامج التدريب: {{ page_obj.paginator.count }}</span></header>
+  <header class="states-card-header"><div><h2 id="table-heading">قائمة برامج التدريب</h2><p>تصنيفات ثابتة وبنود صرف مشتركة بين البرامج.</p></div><span class="fixed-tag">{% include "core/partials/record_count.html" with record_count=page_obj.paginator.count only %}</span></header>
   <table class="states-table training_programs-table"><caption class="visually-hidden">قائمة برامج التدريب وحالة تفعيل كل برنامج</caption><thead><tr><th scope="col">البرنامج التدريبي</th><th scope="col">تصنيف البرامج</th><th scope="col">بنود الصرف</th><th scope="col">نوع التدريب للبرنامج</th><th scope="col">حالة السجل</th><th scope="col" class="action-cell">الإجراء</th></tr></thead>
     <tbody>{% for row in rows %}<tr data-program-row="{{ row.id }}">
       <th scope="row"><bdi class="program-name">{{ row.name }}</bdi></th>
