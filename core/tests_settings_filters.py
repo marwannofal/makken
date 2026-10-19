@@ -112,15 +112,20 @@ class SettingsFiltersTests(TestCase):
                 self.assertContains(response,'نتائج البحث:')
 
     def test_pagination_and_form_actions_keep_filters(self):
-        for index in range(20):Level.objects.create(name=f'مجموعة صفحات {index}',is_active=True)
         params={'q':'مجموعة صفحات','status':'1'}
+        page_size=self.client.get(self.url('levels'),params).context['page_obj'].paginator.per_page
+        for index in range(page_size + 5):Level.objects.create(name=f'مجموعة صفحات {index}',is_active=True)
         response=self.client.get(self.url('levels'),params)
-        self.assertEqual(response.context['page_obj'].paginator.count,20)
-        self.assertEqual(len(response.context['rows']),15)
+        self.assertEqual(response.context['page_obj'].paginator.count,page_size + 5)
+        self.assertEqual(response.context['page_obj'].paginator.num_pages,2)
+        self.assertEqual(len(response.context['rows']),page_size)
+        first_ids=self.ids(response)
         links=LinkCollector();links.feed(response.content.decode())
         self.assertIn({'q':[params['q']], 'status':['1'], 'page':['2']}, [parse_qs(urlsplit(link).query) for link in links.links])
         response=self.client.get(self.url('levels'),{**params,'page':2})
         self.assertEqual(len(response.context['rows']),5)
+        self.assertFalse(first_ids & self.ids(response))
+        self.assertEqual(first_ids | self.ids(response),set(Level.objects.filter(name__startswith='مجموعة صفحات').values_list('pk',flat=True)))
         self.assertIn('page=2',response.context['settings_filter_query'])
         self.assertContains(response,'&amp;page=2&amp;edit=')
         self.assertContains(response,'action="/settings/levels/?')

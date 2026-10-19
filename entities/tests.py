@@ -57,18 +57,18 @@ class EntitiesTests(TestCase):
         self.client.get(self.url)
         self.assertEqual(Entity.objects.count(), 5)
         self.assertRedirects(self.confirm(response), self.url)
-        self.assertFalse(Entity.objects.get(name="كيان مخصص").is_active)
+        self.assertFalse(Entity.objects.get(name=response.context["pending"]["name"]).is_active)
         self.assertEqual(self.confirm(response).status_code, 409)
-        self.assertEqual(Entity.objects.filter(name="كيان مخصص").count(), 1)
+        self.assertEqual(Entity.objects.filter(name=response.context["pending"]["name"]).count(), 1)
 
-    def test_edit_updates_name_and_status_only_after_confirmation(self):
+    def test_edit_preserves_historical_name_and_changes_status_after_confirmation(self):
         item = Entity.objects.first()
         response = self.preview("edit", item.pk, name="حكومي محدث", active="0")
         item.refresh_from_db()
         self.assertEqual(item.name, "حكومي")
         self.assertRedirects(self.confirm(response), self.url)
         item.refresh_from_db()
-        self.assertEqual((item.name, item.is_active, item.version), ("حكومي محدث", False, 2))
+        self.assertEqual((item.name, item.is_active, item.version), ("حكومي", False, 2))
 
     def test_status_toggle_both_directions_and_cancel(self):
         item = Entity.objects.first()
@@ -93,21 +93,18 @@ class EntitiesTests(TestCase):
         self.assertFalse(Entity.objects.filter(pk=item.pk).exists())
         self.assertEqual(self.confirm(response).status_code, 409)
 
-    def test_duplicate_names_and_normalization(self):
-        for name in ["حكومي", "  حكومي   "]:
-            response = self.preview("add", name=name)
-            self.assertEqual(response.status_code, 400)
-            self.assertContains(response, "يوجد كيان بهذا الاسم", status_code=400)
-        response = self.preview("add", name="  Test   Entity  ")
-        self.assertRedirects(self.confirm(response), self.url)
-        self.assertEqual(Entity.objects.get(name_key="test entity").name, "Test Entity")
-        self.assertEqual(self.preview("add", name="test entity").status_code, 400)
-        item = Entity.objects.first()
-        self.assertEqual(self.preview("edit", item.pk, name="خاص كبير").status_code, 400)
+    def test_generated_labels_are_unique_and_posted_names_are_ignored(self):
+        names = []
+        for supplied in ["", "   ", "a" * 201, "<script>alert(1)</script>", "اسم غير مطلوب"]:
+            response = self.preview("add", name=supplied)
+            self.assertEqual(response.status_code, 200)
+            names.append(response.context["pending"]["name"])
+            self.assertRedirects(self.confirm(response), self.url)
+        self.assertEqual(len(set(names)), len(names))
+        self.assertTrue(all(name.startswith("حكومي (") for name in names))
+        self.assertEqual(Entity.objects.get(pk=1).name, "حكومي")
 
-    def test_invalid_names_status_and_actions(self):
-        for name in ["", "   ", "a" * 201, "<script>alert(1)</script>", "bad\x00name", "bad\u202ename", "＜script＞"]:
-            self.assertEqual(self.preview("add", name=name).status_code, 400, repr(name))
+    def test_invalid_status_and_actions(self):
         self.assertEqual(self.preview("add", active="unexpected").status_code, 400)
         self.assertEqual(self.client.post(self.url, {"action": "delete"}).status_code, 400)
         self.assertEqual(Entity.objects.count(), 5)
@@ -138,7 +135,7 @@ class EntitiesTests(TestCase):
     def test_stale_edit_toggle_delete_and_snapshot(self):
         item = Entity.objects.first()
         stale_snapshot = self.row(item.pk)["edit_snapshot"]
-        pending = [self.preview(operation, item.pk, name="كيان محدث") for operation in ["edit", "toggle", "delete"]]
+        pending = [self.preview(operation, item.pk, name="كيان محدث", active="0") for operation in ["edit", "toggle", "delete"]]
         item.version += 1
         item.save()
         for response in pending:
@@ -163,16 +160,26 @@ class EntitiesTests(TestCase):
 
     def test_pagination_empty_state_and_escaping(self):
         Entity.objects.all().delete()
-        self.assertContains(self.client.get(self.url), "لا توجد كيانات بعد")
-        for i in range(16):
+        empty = self.client.get(self.url)
+        self.assertContains(empty, "لا توجد كيانات بعد")
+        page_size = empty.context["page_obj"].paginator.per_page
+        for i in range(page_size + 1):
             Entity.objects.create(name=f"Entity {i}", entity_type="government")
-        self.assertEqual(len(self.client.get(self.url).context["rows"]), 15)
-        self.assertEqual(len(self.client.get(self.url, {"page": "2"}).context["rows"]), 1)
+        first = self.client.get(self.url)
+        second = self.client.get(self.url, {"page": "2"})
+        self.assertEqual(first.context["page_obj"].paginator.count, page_size + 1)
+        self.assertEqual(first.context["page_obj"].paginator.num_pages, 2)
+        self.assertEqual(len(first.context["rows"]), page_size)
+        self.assertEqual(len(second.context["rows"]), 1)
+        first_ids = {row["id"] for row in first.context["rows"]}
+        second_ids = {row["id"] for row in second.context["rows"]}
+        self.assertFalse(first_ids & second_ids)
+        self.assertEqual(first_ids | second_ids, set(Entity.objects.values_list("pk", flat=True)))
         Entity.objects.all().delete()
         Entity.objects.create(name='<script>alert("x")</script>', entity_type="government")
         response = self.client.get(self.url)
         self.assertNotContains(response, '<script>alert("x")</script>')
-        self.assertContains(response, "&lt;script&gt;")
+        self.assertNotContains(response, "entity-name")
 
     def test_sidebar_preserves_care_states_and_hides_admin(self):
         self.user.is_staff = True
@@ -200,7 +207,7 @@ class EntitiesTests(TestCase):
         for branch in EntityBranch:
             response = self.preview("add", name=f"كيان {branch.label}", kind="non_government", branch=branch.value)
             self.assertRedirects(self.confirm(response), self.url)
-            self.assertEqual(Entity.objects.get(name=f"كيان {branch.label}").branch, branch.value)
+            self.assertEqual(Entity.objects.get(name=response.context["pending"]["name"]).branch, branch.value)
 
     def test_government_discards_forged_or_stale_branch(self):
         for i, branch in enumerate(["private_large", "invented", ""]):
@@ -208,7 +215,7 @@ class EntitiesTests(TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.context["pending"]["branch"], "")
             self.assertRedirects(self.confirm(response), self.url)
-            self.assertEqual(Entity.objects.get(name=f"كيان حكومي {i}").branch, "")
+            self.assertEqual(Entity.objects.get(name=response.context["pending"]["name"]).branch, "")
 
     def test_switching_non_government_to_government_clears_branch_only_after_confirmation(self):
         item = Entity.objects.get(branch="private_large")
@@ -233,7 +240,7 @@ class EntitiesTests(TestCase):
             self.assertEqual(self.preview("add", kind=kind).status_code, 400)
         snapshot = self.client.get(self.url).context["add_snapshot"]
         base = {"action": "preview", "operation": "add", "snapshot": snapshot, "name": "اسم", "entity_type": "non_government", "branch": "private_sme", "is_active": "1"}
-        for key in ["name", "entity_type", "branch", "is_active"]:
+        for key in ["entity_type", "branch", "is_active"]:
             data = base.copy()
             del data[key]
             self.assertEqual(self.client.post(self.url, data).status_code, 400, key)
@@ -252,3 +259,31 @@ class EntitiesTests(TestCase):
         self.assertTrue(form.fields["branch"].required)
         self.assertFalse(form.fields["branch"].disabled)
         self.assertEqual(form.initial["branch"], "nonprofit_community")
+
+    def test_name_absent_from_form_table_and_confirmation(self):
+        form = EntityForm()
+        self.assertNotIn("name", form.fields)
+        response = self.client.get(self.url, {"edit": "new"})
+        self.assertNotContains(response, "اسم الكيان")
+        self.assertNotContains(response, 'name="name"')
+        preview = self.preview("add")
+        self.assertNotContains(preview, "اسم الكيان")
+        self.assertEqual([f["label"] for f in preview.context["pending"]["fields"]], ["الكيان", "حالة السجل"])
+
+    def test_concurrent_duplicate_internal_label_rejected_without_duplicate_record(self):
+        first, second = self.preview("add"), self.preview("add")
+        self.assertEqual(first.context["pending"]["name"], second.context["pending"]["name"])
+        self.assertEqual(self.confirm(first).status_code, 302)
+        self.assertEqual(self.confirm(second).status_code, 409)
+        self.assertEqual(Entity.objects.count(), 6)
+
+    def test_existing_partnership_reference_and_name_preserved(self):
+        from partnerships.models import Partnership
+        entity = Entity.objects.first()
+        item = Partnership.objects.create(name="جهة مرتبطة قبل إزالة الحقل", representative="ممثل", phone_country="SA", phone="+966501234567", email="existing@example.com", entity=entity, scope="local")
+        old_name = entity.name
+        response = self.preview("edit", entity.pk, name="اسم مزور", active="0")
+        self.assertEqual(self.confirm(response).status_code, 302)
+        entity.refresh_from_db(); item.refresh_from_db()
+        self.assertEqual(entity.name, old_name)
+        self.assertEqual(item.entity_id, entity.pk)

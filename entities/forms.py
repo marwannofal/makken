@@ -1,15 +1,10 @@
 from django import forms
-from .models import Entity, EntityType, EntityBranch, normalize_name, validate_name
+from .models import Entity, EntityType, EntityBranch
 
 
 class EntityForm(forms.Form):
     operation = forms.ChoiceField(choices=[("add", "add"), ("edit", "edit")], widget=forms.HiddenInput)
     snapshot = forms.CharField(max_length=4096, widget=forms.HiddenInput)
-    name = forms.CharField(
-        max_length=200, label="اسم الكيان", validators=[validate_name],
-        error_messages={"required": "أدخل اسم الكيان.", "max_length": "اسم الكيان يجب ألا يتجاوز 200 حرف."},
-        widget=forms.TextInput(attrs={"id": "entity-name", "placeholder": "أدخل اسم الكيان", "autocomplete": "off", "dir": "auto", "aria-describedby": "name-help name-error"}),
-    )
     entity_type = forms.ChoiceField(
         label="الكيان", choices=EntityType.choices,
         error_messages={"required": "اختر الكيان.", "invalid_choice": "اختر حكومي أو غير حكومي فقط."},
@@ -25,9 +20,11 @@ class EntityForm(forms.Form):
         error_messages={"required": "حدّد حالة السجل.", "invalid_choice": "اختر حالة صحيحة: نشط أو غير نشط."},
     )
 
-    def __init__(self, *args, instance_id=None, **kwargs):
+    def __init__(self, *args, instance_id=None, stored_name=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.instance_id = instance_id
+        # Only the view supplies stored_name from a verified confirmation token.
+        self.stored_name = stored_name
         kind = self.data.get("entity_type") if self.is_bound else self.initial.get("entity_type", EntityType.GOVERNMENT)
         self.show_branch = kind == EntityType.NON_GOVERNMENT
         self.fields["branch"].required = self.show_branch
@@ -36,22 +33,26 @@ class EntityForm(forms.Form):
         if not self.show_branch:
             self.initial["branch"] = ""
 
-    def clean_name(self):
-        name = normalize_name(self.cleaned_data["name"])
-        validate_name(name)
-        if not name:
-            raise forms.ValidationError("أدخل اسم الكيان.")
-        if len(name) > 200:
-            raise forms.ValidationError("اسم الكيان يجب ألا يتجاوز 200 حرف.")
-        existing = Entity.objects.filter(name_key=name.casefold())
-        if self.instance_id is not None:
-            existing = existing.exclude(pk=self.instance_id)
-        if existing.exists():
-            raise forms.ValidationError("يوجد كيان بهذا الاسم بالفعل. اختر اسمًا آخر.")
-        return name
-
     def clean(self):
         data = super().clean()
         if data.get("entity_type") == EntityType.GOVERNMENT:
             data["branch"] = ""
+        if self.errors:
+            return data
+        if self.instance_id is not None:
+            # Preserve historical names and all foreign-key relationships.
+            data["name"] = Entity.objects.get(pk=self.instance_id).name
+        elif self.stored_name is not None:
+            if Entity.objects.filter(name_key=self.stored_name.casefold()).exists():
+                raise forms.ValidationError("تغيّرت بيانات الكيانات منذ المراجعة. أعد فتح النموذج وحاول مجددًا.")
+            data["name"] = self.stored_name
+        else:
+            label = EntityBranch(data["branch"]).label if data["entity_type"] == EntityType.NON_GOVERNMENT else EntityType.GOVERNMENT.label
+            # Classification can recur; keep the existing unique-name schema.
+            used = set(Entity.objects.filter(name_key__startswith=label.casefold()).values_list("name_key", flat=True))
+            name, number = label, 2
+            while name.casefold() in used:
+                name = f"{label} ({number})"
+                number += 1
+            data["name"] = name
         return data

@@ -1,0 +1,31 @@
+/* Shared Arabic form alignment, including dialogs and generated search fields. */
+:root[dir="rtl"] :is(
+  input:not([type]), input[type="text"], input[type="search"],
+  input[type="email"], input[type="tel"], input[type="url"],
+  input[type="password"], input[type="number"], textarea
+) {
+  text-align: right !important;
+}
+
+:root[dir="rtl"] :is(
+  input:not([type]), input[type="text"], input[type="search"],
+  input[type="email"], input[type="tel"], input[type="url"],
+  input[type="password"], input[type="number"], textarea
+)::placeholder {
+  text-align: right !important;
+}
+
+/* Empty natural-language fields start at the Arabic edge, even with dir=auto. */
+:root[dir="rtl"] :is(
+  input:not([type]), input[type="text"], input[type="search"], textarea
+):not([dir="ltr"]):not([inputmode="numeric"]):not([inputmode="decimal"]) {
+  direction: rtl !important;
+}
+
+/* Align these values on the right while retaining their LTR character order. */
+:root[dir="rtl"] :is(
+  input[type="email"], input[type="tel"], input[type="url"],
+  input[type="number"], input[inputmode="numeric"], input[inputmode="decimal"]
+) {
+  direction: ltr !important;
+}

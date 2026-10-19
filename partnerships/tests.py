@@ -77,7 +77,7 @@ class PartnershipTests(TestCase):
         self.assertTrue(form.is_valid(),form.errors)
 
     def test_required_fields_and_email(self):
-        for field in ['name','representative','email','phone','phone_country','entity','entity_type','scope','is_active']:
+        for field in ['name','representative','email','phone','phone_country','entity_type','scope','is_active']:
             with self.subTest(field=field):
                 form = PartnershipForm(self.data(**{field:''}))
                 self.assertFalse(form.is_valid())

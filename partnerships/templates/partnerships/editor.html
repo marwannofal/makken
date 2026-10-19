@@ -3,6 +3,7 @@
 {% block title %}{{ page_heading }} | مكّن{% endblock %}
 {% block extra_head %}<link rel="stylesheet" href="{% static 'partnerships/single_specialization.css' %}?v=20261019-2"><link rel="stylesheet" href="{% static 'care_states/states.css' %}?v=20261015-1"><link rel="stylesheet" href="{% static 'partnerships/partnerships.css' %}?v=20261015-1"><script src="{% static 'partnerships/partnerships.js' %}?v=20261019-single-specialization" defer></script>{% include "partnerships/_financial_assets.html" %}
 
+{% include "partnerships/_editor_fields_assets.html" %}
 {% endblock %}
 {% block content %}
 <section class="page-introduction partnership-intro"><div><p class="eyebrow">الإدارة · الشراكات المحتملة</p><h1>{{ page_heading }}<span class="greeting-dot">.</span></h1><p class="page-description">بيانات واضحة للجهة، وروابط دقيقة لكل فرصة رعاية.</p></div><a class="button button-secondary" href="{% url 'partnerships:index' %}">العودة للسجل</a></section>
@@ -19,7 +20,7 @@
 {% include "partnerships/_field.html" with field=form.email %}
 {% include "partnerships/_financial_field.html" %}
 {% include "partnerships/_field.html" with field=form.entity_type %}
-{% include "partnerships/_field.html" with field=form.entity %}
+{% include "partnerships/_editor_entity_field.html" %}
 {% include "partnerships/_field.html" with field=form.scope %}
 
 <fieldset class="partnership-field"><legend>حالة السجل <span class="required" aria-hidden="true">*</span></legend><div class="status-choices">{% for radio in form.is_active %}<label>{{ radio.tag }}<span>{{ radio.choice_label }}</span></label>{% endfor %}</div><div class="field-error" id="error-is_active" role="alert">{{ form.is_active.errors }}</div></fieldset>

@@ -39,6 +39,9 @@ class PartnershipForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.instance = instance
         self.existing_rows = offering_data(instance)
+        kind = self.data.get("entity_type") if self.is_bound else self.initial.get("entity_type", "")
+        self.show_entity = kind == EntityType.NON_GOVERNMENT
+        self.fields["entity"].required = self.show_entity
         self.fields["entity"].queryset = Entity.objects.filter(Q(is_active=True) | Q(pk=instance.entity_id if instance else None)).order_by("name")
         self.fields["entity"].label_from_instance = lambda e: e.name + (" (غير نشط)" if not e.is_active else "")
         for name, field in self.fields.items():
@@ -110,6 +113,17 @@ class PartnershipForm(forms.Form):
     def clean(self):
         data = super().clean()
         entity, kind = data.get("entity"), data.get("entity_type")
+        if kind == EntityType.GOVERNMENT and not entity and "entity" not in self.errors:
+            # The hidden field still needs a valid FK; retain a legacy government
+            # reference on edit, otherwise use an existing active classification.
+            if self.instance and self.instance.entity.entity_type == EntityType.GOVERNMENT:
+                entity = self.instance.entity
+            else:
+                entity = Entity.objects.filter(entity_type=EntityType.GOVERNMENT, is_active=True).order_by("pk").first()
+            if entity is None:
+                self.add_error("entity_type", "فعّل كيانًا حكوميًا في إدارة الكيانات قبل حفظ جهة حكومية.")
+            else:
+                data["entity"] = entity
         if entity and kind and entity.entity_type != kind:
             self.add_error("entity", "الكيان المحدد لا يتبع نوع الكيان المختار.")
         country, raw = data.get("phone_country"), data.get("phone")

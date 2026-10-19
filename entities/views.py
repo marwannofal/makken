@@ -13,8 +13,8 @@ from .models import Entity, EntityType, EntityBranch
 
 from core.settings_filters import apply as _makken_settings_apply, context as _makken_settings_context, redirect as _makken_settings_redirect
 
-SNAPSHOT_SALT = "makken.entities.snapshot.v1"
-CONFIRM_SALT = "makken.entities.confirm.v1"
+SNAPSHOT_SALT = "makken.entities.snapshot.v2-classification"
+CONFIRM_SALT = "makken.entities.confirm.v2-classification"
 TOKEN_AGE = 20 * 60
 OPERATIONS = {"add", "edit", "delete", "toggle"}
 
@@ -49,7 +49,7 @@ def _pending(operation, item, data, user):
     titles = {"add": "تأكيد إضافة الكيان", "edit": "تأكيد تعديل الكيان", "delete": "تأكيد حذف الكيان", "toggle": "تأكيد تغيير حالة الكيان"}
     buttons = {"add": "تأكيد الإضافة", "edit": "تأكيد التعديل", "delete": "نعم، حذف الكيان", "toggle": "تأكيد التغيير"}
     old = _item_data(item) if item else {}
-    labels = {"name": "اسم الكيان", "entity_type": "الكيان", "branch": "فرع الكيان", "is_active": "حالة السجل"}
+    labels = {"entity_type": "الكيان", "branch": "فرع الكيان", "is_active": "حالة السجل"}
     def display(key, value):
         if key == "entity_type":
             return EntityType(value).label
@@ -121,9 +121,9 @@ def index(request):
                             context["error"], status = _stale(), 409
                     if status == 200:
                         if operation in {"add", "edit"}:
-                            form = EntityForm({"operation": operation, "name": payload["name"], "entity_type": payload.get("entity_type"), "branch": payload.get("branch", ""), "is_active": "1" if payload["is_active"] else "0", "snapshot": "validated"}, instance_id=item.pk if item else None)
+                            form = EntityForm({"operation": operation, "entity_type": payload.get("entity_type"), "branch": payload.get("branch", ""), "is_active": "1" if payload["is_active"] else "0", "snapshot": "validated"}, instance_id=item.pk if item else None, stored_name=payload["name"])
                             if not form.is_valid():
-                                context["error"], status = "تعذّر الحفظ. قد يكون الاسم مستخدمًا بالفعل. أعد فتح النموذج وراجع البيانات.", 409
+                                context["error"], status = "تغيّرت بيانات الكيانات منذ المراجعة. أعد فتح النموذج وراجع البيانات.", 409
                             elif operation == "add":
                                 Entity.objects.create(**_form_data(form))
                             else:
@@ -156,7 +156,7 @@ def index(request):
     except signing.BadSignature:
         context["error"], status = "انتهت صلاحية الطلب أو تغيّر محتواه. أعد فتح الصفحة وحاول مجددًا.", 400
     except (IntegrityError, ProtectedError, RestrictedError):
-        context["error"], status = "تعذّر تنفيذ الطلب. الاسم مستخدم بالفعل أو الكيان مرتبط بسجلات أخرى. راجع القائمة وحاول مجددًا.", 409
+        context["error"], status = "تعذّر تنفيذ الطلب. تغيّرت البيانات أو الكيان مرتبط بسجلات أخرى. راجع القائمة وحاول مجددًا.", 409
     page = Paginator(_makken_settings_apply(request, Entity.objects.all()), 10).get_page(request.GET.get("page"))
     rows = []
     for item in page:

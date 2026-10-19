@@ -199,3 +199,9 @@ if not any(_app == "partnerships" or _app.startswith("partnerships.") for _app i
 if not any(_app == "market_needs" or _app.startswith("market_needs.") for _app in INSTALLED_APPS):
     INSTALLED_APPS = [*INSTALLED_APPS, "market_needs.apps.MarketNeedsConfig"]
 # END MAKKEN MARKET NEEDS
+
+# BEGIN MAKKEN ARABIC VALIDATION
+LANGUAGE_CODE = "ar"
+USE_I18N = True
+LANGUAGES = [("ar", "العربية")]
+# END MAKKEN ARABIC VALIDATION

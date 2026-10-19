@@ -1,0 +1,8 @@
+/* Capacity follows the same responsive column size as the other fields. */
+.partnership-form-grid > .financial-capacity-field {
+  grid-column: auto;
+  min-width: 0;
+}
+#partnership-entity-field[hidden] {
+  display: none !important;
+}

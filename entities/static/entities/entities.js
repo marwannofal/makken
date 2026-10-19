@@ -25,16 +25,14 @@
     opener = link;
     form.elements.namedItem("operation").value = edit ? "edit" : "add";
     form.elements.namedItem("snapshot").value = link.dataset.snapshot;
-    form.elements.namedItem("name").value = edit ? link.dataset.name : "";
     form.elements.namedItem("is_active").value = edit ? link.dataset.active : "1";
     kind.value = edit ? link.dataset.kind : "government";
     branch.value = edit ? link.dataset.branch : "";
     syncBranch();
     form.querySelector("[data-editor-title]").textContent = edit ? "تعديل الكيان" : "إضافة كيان جديد";
     form.querySelectorAll(".field-error").forEach(field => { field.textContent = ""; });
-    form.elements.namedItem("name").setCustomValidity("");
     open(editor);
-    form.elements.namedItem("name").focus();
+    kind.focus();
   };
   document.querySelectorAll("[data-add-entity], [data-edit-entity]").forEach(link => link.addEventListener("click", event => {
     if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;

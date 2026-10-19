@@ -868,3 +868,20 @@
   padding-block: 0;
   line-height: normal;
 }
+
+
+#id_phone{
+  text-align: start !important;
+}
+
+#id_phone::placeholder {
+  text-align: start !important;
+}
+
+#id_financial_capacity{
+  text-align: start !important;
+}
+
+#id_financial_capacity::placeholder {
+  text-align: start !important;
+}
