@@ -32,7 +32,7 @@ class PartnershipTests(TestCase):
         self.client.force_login(self.user)
 
     def data(self, **changes):
-        values = {'name':'شركة الشراكة التجريبية', 'representative':'أحمد محمد', 'phone_country':'SA', 'phone':'0501234567', 'email':'partner@example.com', 'entity_type':'government', 'entity':str(self.entity.pk), 'scope':'local', 'is_active':'1', 'offerings':json.dumps([{'sector':self.sector.pk, 'specializations':[self.spec.pk,self.second_spec.pk], 'shape':self.shape.pk, 'is_active':True}]), "financial_capacity": "100000.00"}
+        values = {'name':'شركة الشراكة التجريبية', 'representative':'أحمد محمد', 'phone_country':'SA', 'phone':'0501234567', 'email':'partner@example.com', 'entity_type':'government', 'entity':str(self.entity.pk), 'scope':'local', 'is_active':'1', 'offerings':json.dumps([{'sector':self.sector.pk, 'specializations':[self.spec.pk], 'shape':self.shape.pk, 'is_active':True}]), "financial_capacity": "100000.00"}
         values["coverage_regions"] = [str(Region.objects.get_or_create(name="منطقة اختبار الشراكة")[0].pk)]
         values.update(changes)
         return values
@@ -59,7 +59,7 @@ class PartnershipTests(TestCase):
         self.assertEqual(item.phone,'+966501234567')
         self.assertEqual(item.development_state_id,'capability')
         self.assertEqual(item.development_history.get().entered_at,item.development_state_at)
-        self.assertEqual(item.offerings.get().specializations.count(),2)
+        self.assertEqual(item.offerings.get().specializations.count(),1)
         self.client.post('/partnerships/new/', {'action':'confirm','token':token})
         self.assertEqual(Partnership.objects.count(),1)
         self.assertEqual(DevelopmentHistory.objects.count(),1)

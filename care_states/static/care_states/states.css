@@ -359,7 +359,8 @@
     font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
     color:var(--ink);
     font-size:14px;
-    letter-spacing:.06em
+    letter-spacing:.06em;
+    text-align: end;
 }
 .field-help{
     font-size:10px;

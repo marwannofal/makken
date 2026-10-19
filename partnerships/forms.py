@@ -89,6 +89,14 @@ class PartnershipForm(forms.Form):
             sector, shape, selected = row["sector"], row["shape"], row["specializations"]
             if type(sector) is not int or type(shape) is not int or type(row["is_active"]) is not bool or not isinstance(selected, list) or not 1 <= len(selected) <= 100 or any(type(s) is not int for s in selected) or len(set(selected)) != len(selected):
                 raise forms.ValidationError(f"البند {number}: اختر القطاع والتخصصات وشكل الرعاية وحالة السجل.")
+            # Retain historical multi-specialty rows without allowing new ones.
+            unchanged_legacy = any(
+                old["sector"] == sector and old["shape"] == shape
+                and set(old["specializations"]) == set(selected)
+                for old in self.existing_rows
+            )
+            if len(selected) != 1 and not unchanged_legacy:
+                raise forms.ValidationError(f"البند {number}: اختر تخصصًا واحدًا فقط لكل بند شراكة.")
             if sector not in sectors or shape not in shapes or any(s not in specs or specs[s].sector_id != sector for s in selected):
                 raise forms.ValidationError(f"البند {number}: بعض الاختيارات غير متاحة، أو التخصص غير مرتبط بالقطاع المحدد.")
             for spec in selected:

@@ -185,15 +185,16 @@
   catalog.sectors.forEach(sector => sectorSelect.add(new Option(sector.name + (sector.is_active ? '' : ' (غير نشط)'), sector.id)));
   catalog.shapes.forEach(shape => shapeSelect.add(new Option(shape.name + (shape.is_active ? '' : ' (غير نشط)'), shape.id)));
   enhance(sectorSelect, 'اختر القطاع');
-  enhance(specsSelect, 'اختر التخصصات');
+  enhance(specsSelect, 'اختر التخصص');
   enhance(shapeSelect, 'اختر شكل الرعاية');
   function filterSpecs(selected = []) {
-    specsSelect.replaceChildren();
+    specsSelect.replaceChildren(new Option('اختر التخصص', ''));
     catalog.specializations.filter(spec => String(spec.sector_id) === sectorSelect.value).forEach(spec => {
       const option = new Option(spec.name + (spec.is_active ? '' : ' (غير نشط)'), spec.id);
-      option.selected = selected.includes(spec.id);
+      option.selected = selected.length === 1 && selected.includes(spec.id);
       specsSelect.add(option);
     });
+    specsSelect.value = selected.length === 1 ? String(selected[0]) : '';
     controls.get(specsSelect).update();
   }
   sectorSelect.addEventListener('change', () => filterSpecs());
@@ -226,6 +227,9 @@
     controls.get(sectorSelect).update();
     controls.get(shapeSelect).update();
     filterSpecs(row?.specializations || []);
+    if (row && row.specializations.length > 1) {
+      lineError.textContent = 'هذا بند سابق يحتوي على عدة تخصصات. اختر تخصصًا واحدًا لحفظ تعديله؛ الإلغاء يحتفظ بجميع بياناته السابقة.';
+    }
     $('#offering-description').value = catalog.shapes.find(s => String(s.id) === shapeSelect.value)?.description || '';
     $(`input[name=offering_active][value="${row && !row.is_active ? '0' : '1'}"]`, lineForm).checked = true;
     show(lineDialog);
@@ -234,7 +238,8 @@
   $('[data-add-offering]').addEventListener('click', () => openEditor());
   lineForm.addEventListener('submit', event => {
     event.preventDefault();
-    const row = {sector: Number(sectorSelect.value), specializations: [...specsSelect.selectedOptions].map(o => Number(o.value)), shape: Number(shapeSelect.value), is_active: $('input[name=offering_active]:checked', lineForm).value === '1'};
+    if (!lineForm.reportValidity()) return;
+    const row = {sector: Number(sectorSelect.value), specializations: [Number(specsSelect.value)], shape: Number(shapeSelect.value), is_active: $('input[name=offering_active]:checked', lineForm).value === '1'};
     if (rows.some((old, index) => index !== editingIndex && old.sector === row.sector && old.shape === row.shape && old.specializations.some(id => row.specializations.includes(id)))) {
       lineError.textContent = 'هذا التخصص وشكل الرعاية موجودان بالفعل داخل القطاع نفسه.';
       return;

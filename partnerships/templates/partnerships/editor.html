@@ -1,7 +1,7 @@
 {% extends "core/makken_base.html" %}
 {% load static %}
 {% block title %}{{ page_heading }} | مكّن{% endblock %}
-{% block extra_head %}<link rel="stylesheet" href="{% static 'care_states/states.css' %}?v=20261015-1"><link rel="stylesheet" href="{% static 'partnerships/partnerships.css' %}?v=20261015-1"><script src="{% static 'partnerships/partnerships.js' %}?v=20261015-1" defer></script>{% include "partnerships/_financial_assets.html" %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'partnerships/single_specialization.css' %}?v=20261019-2"><link rel="stylesheet" href="{% static 'care_states/states.css' %}?v=20261015-1"><link rel="stylesheet" href="{% static 'partnerships/partnerships.css' %}?v=20261015-1"><script src="{% static 'partnerships/partnerships.js' %}?v=20261019-single-specialization" defer></script>{% include "partnerships/_financial_assets.html" %}
 
 {% endblock %}
 {% block content %}
@@ -31,7 +31,7 @@
 {% if item %}{% include "partnerships/_history.html" %}{% endif %}
 <dialog id="offering-editor" class="partnership-dialog offering-dialog" aria-labelledby="offering-title"><form class="dialog-body" data-offering-form><div class="dialog-top"><span class="dialog-symbol"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 21h18M4 21V9l6 3V7l6 3V3h4v18"/></svg></span><button type="button" class="icon-button" data-dismiss-dialog aria-label="إغلاق"><svg aria-hidden="true"><use href="#icon-close"/></svg></button></div><p class="eyebrow">بند شراكة</p><h2 id="offering-title">إضافة قطاع وشكل رعاية</h2><p class="dialog-description">تظهر فقط التخصصات المرتبطة بالقطاع المختار.</p>
 <div class="partnership-field"><label for="offering-sector">اسم القطاع <span class="required">*</span></label><select id="offering-sector" required><option value="">اختر القطاع</option></select></div>
-<div class="partnership-field"><label for="offering-specializations">التخصصات المرتبطة <span class="required">*</span></label><select id="offering-specializations" required multiple size="5"></select><p class="field-help">يمكنك اختيار أكثر من تخصص من القطاع نفسه.</p></div>
+<div class="partnership-field"><label for="offering-specializations">التخصصات المرتبطة <span class="required">*</span></label><select id="offering-specializations" required><option value="">اختر التخصص</option></select><p class="field-help">اختر تخصصًا واحدًا فقط من القطاع المحدد.</p></div>
 <div class="partnership-field"><label for="offering-shape">شكل الرعاية <span class="required">*</span></label><select id="offering-shape" required><option value="">اختر شكل الرعاية</option></select></div>
 <div class="partnership-field"><label for="offering-description">وصف شكل الرعاية</label><textarea id="offering-description" readonly rows="3" placeholder="يظهر الوصف تلقائيًا بعد اختيار شكل الرعاية."></textarea></div>
 <fieldset class="partnership-field"><legend>حالة السجل</legend><div class="status-choices"><label><input type="radio" name="offering_active" value="1" checked required><span>نشط</span></label><label><input type="radio" name="offering_active" value="0" required><span>غير نشط</span></label></div></fieldset><p class="field-error" data-offering-error role="alert"></p><div class="dialog-actions"><button class="button button-primary" type="submit">إضافة البند</button><button class="button button-secondary" type="button" data-dismiss-dialog>إلغاء</button></div></form></dialog>

@@ -42,8 +42,9 @@ label { display: block; margin-bottom: 9px; font-size: 13px; font-weight: 700; }
     border-radius: 12px; background: #fafcfb; color: var(--ink);
     padding: 13px 48px; font-size: 14px; outline: none;
     transition: border-color .15s, box-shadow .15s, background .15s;
+    text-align: end;
 }
-.input-wrap input::placeholder { color: #647a77; opacity: 1; font-size: 12px; }
+.input-wrap input::placeholder { color: #647a77; opacity: 1; font-size: 12px; text-align: end; }
 .input-wrap input:focus {
     background: white; border-color: var(--primary-dark);
     box-shadow: 0 0 0 3px rgb(36 179 175 / 15%);
