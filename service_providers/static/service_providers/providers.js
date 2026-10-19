@@ -4,7 +4,7 @@
   const $$ = (s, root=document) => [...root.querySelectorAll(s)];
   const page = $('[data-provider-page]');
   if (!page) return;
-  let busy = false, confirmAction = null;
+  let confirmAction = null;
   // Keep native constraint feedback Arabic even in an English browser.
   const nativeMessages=new WeakMap();
   page.addEventListener('invalid',event=>{
@@ -18,7 +18,7 @@
   const dialog = $('#provider-confirm');
   function open(target) {target._providerReturn=document.activeElement;target.showModal();}
   $$('dialog.partnership-dialog').forEach(target=>target.addEventListener('close',()=>{const previous=target._providerReturn;if(previous?.isConnected&&previous.getClientRects().length)previous.focus();}));
-  $$('[data-provider-close]').forEach(button=>button.addEventListener('click',()=>{if(!busy)button.closest('dialog')?.close();}));
+  $$('[data-provider-close]').forEach(button=>button.addEventListener('click',()=>button.closest('dialog')?.close()));
   function ask(text, action, danger=false) {
     $('[data-provider-confirm-text]').textContent=text;
     const button=$('[data-provider-confirm-yes]');button.classList.toggle('button-danger',danger);button.classList.toggle('button-primary',!danger);
@@ -89,44 +89,4 @@
     render();
   }
 
-  const conversion=$('[data-provider-conversion]');
-  if(conversion){
-    const files=$('#conversion-attachments'),fileList=$('[data-provider-selected-files]');
-    files.addEventListener('change',()=>{
-      fileList.replaceChildren();files.setCustomValidity('');
-      if(files.files.length>20)files.setCustomValidity('يمكن اختيار 20 مرفقًا كحد أقصى.');
-      for(const file of files.files){
-        const row=document.createElement('div'),name=document.createElement('span'),size=document.createElement('small');
-        name.textContent=file.name;size.textContent=(file.size/1024/1024).toFixed(2)+' MiB';name.append(size);row.append(name);fileList.append(row);
-        if(!file.size||file.size>100*1024*1024||!/[.](pdf|png|jpe?g)$/i.test(file.name))files.setCustomValidity('اختر ملفات PDF أو PNG أو JPG أو JPEG غير فارغة، وبحد 100 MiB لكل ملف.');
-      }
-    });
-    conversion.addEventListener('click',event=>{if(busy&&event.target.closest('a')){event.preventDefault();$('[data-provider-upload-status]').textContent='جارٍ التحقق والحفظ. انتظر اكتمال العملية قبل مغادرة الصفحة.';}},true);
-    const money=$('#conversion-financial_capacity');
-    let moneyDisplay=money.value,moneyEditing=false,moneyError='';
-    money.addEventListener('beforeinput',event=>{moneyEditing=money.value===moneyDisplay&&!/paste|drop|replacement/i.test(event.inputType||'')&&!/[٬,]/.test(event.data||'');});
-    function formatMoney(){
-      const value=money.value.trim().replace(/[٠-٩۰-۹]/g,c=>String(c.charCodeAt(0)-(c<='٩'?1632:1776))).replace(/٬/g,',').replace(/٫/g,'.');
-      const grouping=!value.includes(',')||moneyEditing||/^\d{1,3}(?:,\d{3})+(?:\.\d{0,2})?$/.test(value);
-      moneyEditing=false;
-      if(!value){if(money.validationMessage===moneyError)money.setCustomValidity('');moneyError='';moneyDisplay='';return;}
-      const raw=value.replace(/,/g,'');
-      if(!grouping||!/^\d+(?:\.\d{0,2})?$/.test(raw)){moneyError='أدخل مبلغًا صحيحًا بفواصل آلاف صحيحة ومنزلتين عشريتين كحد أقصى.';money.setCustomValidity(moneyError);return;}
-      if(money.validationMessage===moneyError)money.setCustomValidity('');moneyError='';
-      const position=money.selectionStart,offset=position===null?null:money.value.slice(0,position).replace(/[٬,]/g,'').length;
-      const [whole,part]=raw.split('.');moneyDisplay=whole.replace(/\B(?=(\d{3})+(?!\d))/g,',')+(part===undefined?'':'.'+part);money.value=moneyDisplay;
-      if(offset!==null&&document.activeElement===money){let cursor=0,seen=0;while(cursor<moneyDisplay.length&&seen<offset){if(moneyDisplay[cursor]!==',')seen++;cursor++;}money.setSelectionRange(cursor,cursor);}
-    }
-    money.addEventListener('input',formatMoney);formatMoney();
-    conversion.addEventListener('submit',event=>{event.preventDefault();if(busy||!conversion.reportValidity())return;ask('سيتم إنشاء جهة بحالة رغبة، وربطها بالمزود وحفظ الاتفاق والمرفقات الخاصة. هل تريد المتابعة؟',()=>{
-      const body=new FormData(conversion),error=$('[data-provider-upload-error]'),area=$('[data-provider-upload-progress]'),bar=$('progress',area),status=$('[data-provider-upload-status]'),submit=$('[data-provider-convert-submit]');
-      busy=true;area.hidden=false;error.hidden=true;bar.value=0;status.textContent='جارٍ رفع المرفقات…';conversion.setAttribute('aria-busy','true');const disabled=$$('button,input,select,textarea',conversion).map(node=>({node,previous:node.disabled}));disabled.forEach(({node})=>node.disabled=true);
-      const xhr=new XMLHttpRequest();xhr.open('POST',conversion.action);xhr.setRequestHeader('X-Requested-With','XMLHttpRequest');xhr.timeout=600000;
-      xhr.upload.addEventListener('progress',e=>{if(e.lengthComputable){bar.value=Math.floor(e.loaded/e.total*100);status.textContent=bar.value<100?'جارٍ رفع المرفقات: '+bar.value+'%':'اكتمل الإرسال؛ جارٍ التحقق والحفظ…';}});
-      function unlock(message){busy=false;conversion.removeAttribute('aria-busy');disabled.forEach(({node,previous})=>node.disabled=previous);error.hidden=false;error.textContent=message;status.textContent='لم تكتمل العملية. راجع الرسالة قبل تكرارها.';}
-      xhr.addEventListener('load',()=>{let result;try{result=JSON.parse(xhr.responseText);}catch{}if(xhr.status>=200&&xhr.status<300&&result?.redirect){location.assign(result.redirect);return;}unlock([result?.error||'تعذّر التحويل. حدّث الصفحة للتحقق من النتيجة.',...Object.values(result?.fields||{}).flat().map(row=>row.message)].join(' '));});
-      xhr.addEventListener('error',()=>unlock('انقطع الاتصال. حدّث السجل للتأكد من النتيجة قبل إعادة التحويل.'));xhr.addEventListener('timeout',()=>unlock('انتهت مهلة الاتصال. تحقق من السجل قبل تكرار الطلب.'));xhr.send(body);
-    });});
-    $('#provider-conversion').addEventListener('cancel',event=>{event.preventDefault();if(!busy)location.assign(event.currentTarget.dataset.closeUrl);});
-  }
 })();

@@ -2,15 +2,11 @@ import json
 import re
 import phonenumbers
 from django import forms
-from django.db.models import Q
 from accounts.profile_forms import COUNTRIES
-from entities.models import Entity, EntityType, normalize_name, validate_name
+from entities.models import normalize_name, validate_name
 from regions.models import Region
 from specializations.models import Specialization
-from sponsorship_shapes.models import SponsorshipShape
 from partnerships.models import Scope
-from partnerships.financial import MoneyField
-from partnerships.willingness import WillingnessTransitionForm
 from .models import ServiceProvider, ProviderType
 
 
@@ -128,41 +124,3 @@ class ProviderForm(forms.Form):
         return data
 
 
-class ConversionForm(WillingnessTransitionForm):
-    representative = forms.CharField(label="اسم الممثل عن الجهة", max_length=200, validators=[validate_name])
-    phone_country = forms.ChoiceField(label="رمز الدولة", choices=COUNTRIES)
-    phone = forms.CharField(label="هاتف التواصل", max_length=40, widget=forms.TextInput(attrs={"type": "tel", "inputmode": "tel", "dir": "ltr"}))
-    email = forms.EmailField(label="البريد الإلكتروني", max_length=254, error_messages={"invalid": "أدخل بريدًا إلكترونيًا صحيحًا."}, widget=forms.EmailInput(attrs={"dir": "ltr"}))
-    financial_capacity = MoneyField(label="القدرة المالية")
-    entity = forms.ModelChoiceField(label="الكيان", queryset=Entity.objects.none(), required=False, empty_label="اختر الكيان")
-    sponsorship_shape = forms.ModelChoiceField(label="شكل الرعاية للتخصصات المنقولة", queryset=SponsorshipShape.objects.none(), empty_label="اختر شكل الرعاية")
-
-    def __init__(self, *args, provider, **kwargs):
-        self.provider = provider
-        super().__init__(*args, **kwargs)
-        kind = EntityType.GOVERNMENT if provider.provider_type == ProviderType.GOVERNMENT else EntityType.NON_GOVERNMENT
-        self.fields["entity"].queryset = Entity.objects.filter(is_active=True, entity_type=kind)
-        self.fields["entity"].required = kind == EntityType.NON_GOVERNMENT
-        self.fields["entity"].label_from_instance = lambda e: e.get_entity_type_display() + (" — " + e.get_branch_display() if e.branch else "")
-        self.fields["sponsorship_shape"].queryset = SponsorshipShape.objects.filter(is_active=True)
-        setup_fields(self, "conversion")
-
-    def clean_representative(self):
-        name = normalize_name(self.cleaned_data["representative"])
-        validate_name(name)
-        if len(name) > 200:
-            raise forms.ValidationError("الحد الأقصى لاسم الممثل هو 200 حرف.")
-        return name
-
-    def clean(self):
-        data = super().clean()
-        if self.provider.provider_type == ProviderType.GOVERNMENT and not data.get("entity"):
-            data["entity"] = self.fields["entity"].queryset.first()
-            if not data["entity"]:
-                self.add_error("entity", "أضف كيانًا حكوميًا نشطًا في الإعدادات قبل التحويل.")
-        if data.get("phone") and data.get("phone_country"):
-            try:
-                data["phone"] = phone_value(data["phone"], data["phone_country"])
-            except forms.ValidationError as error:
-                self.add_error("phone", error)
-        return data

@@ -4,12 +4,11 @@ from urllib.parse import urlencode
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core import signing
-from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.db import IntegrityError
 from django.db.models import Q, Prefetch
 from django.db.models.deletion import ProtectedError
-from django.http import Http404, JsonResponse
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
@@ -17,7 +16,7 @@ from accounts.security import add_login_headers
 from partnerships.models import Scope
 from regions.models import Region
 from specializations.models import Specialization
-from .forms import ProviderForm, ConversionForm, coverage_data
+from .forms import ProviderForm, coverage_data
 from .models import ServiceProvider, ProviderCoverage, ProviderType
 from . import services
 
@@ -44,7 +43,7 @@ def base(request, title, active):
 
 
 def query():
-    return ServiceProvider.objects.select_related("converted_partnership", "created_by", "updated_by").prefetch_related(Prefetch("coverage", queryset=ProviderCoverage.objects.select_related("region").prefetch_related("specializations__sector")))
+    return ServiceProvider.objects.select_related("created_by", "updated_by").prefetch_related(Prefetch("coverage", queryset=ProviderCoverage.objects.select_related("region").prefetch_related("specializations__sector")))
 
 
 def catalog(item):
@@ -86,7 +85,7 @@ def list_context(request):
         item.row_token = token({"operation": "row", "id": item.pk, "version": item.version}, request.user)
         item.specialty_names = list(dict.fromkeys(s.name for row in item.coverage.all() for s in row.specializations.all()))
         item.region_names = list(dict.fromkeys(row.region.name for row in item.coverage.all()))
-    context.update(page_obj=page, q=term, selected_status=status, filter_query=urlencode({"q": term, "status": status}), detail=None, pending=None, conversion_form=None)
+    context.update(page_obj=page, q=term, selected_status=status, filter_query=urlencode({"q": term, "status": status}), detail=None, pending=None)
     return context
 
 
@@ -177,38 +176,3 @@ def editor(request, pk=None):
     return add_login_headers(render(request, "service_providers/editor.html", context, status=status))
 
 
-@login_required(login_url="accounts:login")
-@require_http_methods(["GET", "POST"])
-def convert(request, pk):
-    item = get_object_or_404(query(), pk=pk)
-    if item.converted_partnership_id and request.method == "GET":
-        return redirect(reverse("partnerships:index") + "?" + urlencode({"detail": item.converted_partnership_id}))
-    context, status = list_context(request), 200
-    if not item.is_active and request.method == "GET":
-        context["error"] = "فعّل سجل المزود قبل تحويله إلى رغبة."
-        return add_login_headers(render(request, "service_providers/index.html", context, status=409))
-    snapshot = token({"operation": "convert", "id": item.pk, "version": item.version, "nonce": str(uuid.uuid4())}, request.user)
-    form = ConversionForm(initial={"representative": item.representative, "phone_country": item.phone_country, "phone": item.phone, "email": item.email}, provider=item)
-    try:
-        if request.method == "POST":
-            data = load(request.POST.get("snapshot"), request.user, "convert")
-            if data["id"] != pk:
-                raise signing.BadSignature
-            snapshot = request.POST["snapshot"]
-            form = ConversionForm(request.POST, request.FILES, provider=item)
-            if form.is_valid():
-                partner = services.convert_provider(data, request.POST, request.FILES, request.user)
-                destination = reverse("partnerships:index") + "?" + urlencode({"development_state": "رغبة", "detail": partner.pk})
-                messages.success(request, "تم إنشاء الجهة بحالة رغبة وربطها بمزود الخدمة بنجاح.")
-                if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-                    return add_login_headers(JsonResponse({"redirect": destination}))
-                return redirect(destination)
-            status = 400
-    except (signing.BadSignature, signing.SignatureExpired):
-        context["error"], status = "انتهت صلاحية طلب التحويل. أعد فتح النافذة.", 400
-    except (services.Conflict, IntegrityError, ValidationError, ValueError) as error:
-        context["error"], status = str(error) if isinstance(error, services.Conflict) else "تعذّر التحويل. راجع البيانات والمرفقات أو حدّث الصفحة للتأكد من النتيجة.", 409
-    if request.method == "POST" and request.headers.get("X-Requested-With") == "XMLHttpRequest":
-        return add_login_headers(JsonResponse({"error": context.get("error", "راجع الحقول والمرفقات الموضحة."), "fields": form.errors.get_json_data()}, status=status))
-    context.update(conversion_form=form, conversion_item=item, conversion_snapshot=snapshot)
-    return add_login_headers(render(request, "service_providers/index.html", context, status=status))

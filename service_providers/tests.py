@@ -1,12 +1,9 @@
 import json
 import uuid
-from decimal import Decimal
 from io import BytesIO
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 from django.contrib.auth import get_user_model
-from django.core import signing
-from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import IntegrityError, transaction
 from django.db.models.deletion import ProtectedError
@@ -20,11 +17,9 @@ from regions.models import Region
 from sectors.models import Sector
 from specializations.models import Specialization
 from sponsorship_shapes.models import SponsorshipShape
-from partnerships.models import Partnership, DevelopmentHistory, WillingnessAttachment
 from .forms import ProviderForm
 from .models import ServiceProvider, ProviderCoverage, CoverageSpecialization, ProviderAudit
-from .services import save_provider, row_action, convert_provider, Conflict
-from .views import token, SALT
+from .services import save_provider, row_action, Conflict
 
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.MD5PasswordHasher'])
@@ -62,9 +57,6 @@ class ProviderTests(TestCase):
         stream=BytesIO();Image.new('RGB',(4,4),'white').save(stream,'PNG')
         return SimpleUploadedFile(name,stream.getvalue(),content_type='image/png')
 
-    def conversion(self,**changes):
-        values={'representative':'ممثل جهة التدريب','phone_country':'SA','phone':'0501234567','email':'converted@example.com','financial_capacity':'1,234,567.89','entity':'','sponsorship_shape':str(self.shape.pk),'agreement_type':'official_letter'}
-        values.update(changes);return values
 
     def test_create_edit_roundtrip_and_actor_history(self):
         page=self.client.get(reverse('service_providers:create'))
@@ -154,75 +146,13 @@ class ProviderTests(TestCase):
             self.assertEqual(self.client.post(reverse('service_providers:create'),self.data(action='preview',snapshot=snapshot)).status_code,400)
         self.assertEqual(ServiceProvider.objects.count(),1)
 
-    def test_conversion_creates_one_willing_partner_and_private_evidence(self):
-        item=self.create();payload=self.payload(item)
-        partner=convert_provider(payload,self.conversion(),{'attachments':[self.attachment()]},self.user)
-        self.assertEqual(partner.development_state_id,'willingness');self.assertEqual(partner.financial_capacity,Decimal('1234567.89'))
-        self.assertEqual(partner.development_history.count(),1);self.assertEqual(partner.development_history.get().state_id,'willingness')
-        self.assertEqual(partner.offerings.count(),2)
-        self.assertTrue(all(offering.specializations.count()==1 for offering in partner.offerings.all()))
-        self.assertEqual(partner.preliminary_agreement_type,'official_letter')
-        item.refresh_from_db();self.assertEqual(item.converted_partnership_id,partner.pk)
-        self.assertEqual(convert_provider(payload,self.conversion(),{},self.user).pk,partner.pk)
-        attachment=partner.willingness_attachments.get()
-        response=self.client.get(reverse('partnerships:attachment_download',args=[partner.pk,attachment.pk]))
-        self.assertEqual(response.status_code,200);self.assertEqual(sum(map(len,response.streaming_content)),attachment.size)
-        self.client.logout();self.assertEqual(self.client.get(reverse('partnerships:attachment_download',args=[partner.pk,attachment.pk])).status_code,302)
 
-    def test_conversion_requires_contacts_agreement_and_files(self):
-        item=self.create()
-        for values,files in [(self.conversion(agreement_type=''),{'attachments':[self.attachment()]}),(self.conversion(),{}),(self.conversion(email='bad'),{'attachments':[self.attachment()]}),(self.conversion(),{'attachments':[SimpleUploadedFile('fake.pdf',b'not a PDF')]})]:
-            with self.assertRaises(ValidationError):convert_provider(self.payload(item),values,files,self.user)
-        item.refresh_from_db();self.assertIsNone(item.converted_partnership_id);self.assertEqual(Partnership.objects.count(),0)
 
-    def test_conversion_filters_inactive_rows_specs_and_regions(self):
-        item=self.create();self.spec.is_active=False;self.spec.save()
-        partner=convert_provider(self.payload(item),self.conversion(),{'attachments':[self.attachment()]},self.user)
-        self.assertEqual(partner.offerings.count(),1);self.assertEqual(partner.offerings.get().specializations.get(),self.spec2)
-        item2=self.create(name='مزود دون تغطية نشطة',coverage=json.dumps([{'region':self.region2.pk,'specializations':[self.spec2.pk],'is_active':True}]));item2.coverage.update(is_active=False)
-        with self.assertRaises(Conflict):convert_provider(self.payload(item2),self.conversion(),{'attachments':[self.attachment()]},self.user)
 
-    def test_private_conversion_requires_non_government_entity(self):
-        item=self.create(provider_type='private')
-        with self.assertRaises(ValidationError):convert_provider(self.payload(item),self.conversion(),{'attachments':[self.attachment()]},self.user)
-        partner=convert_provider(self.payload(item),self.conversion(entity=str(self.private.pk)),{'attachments':[self.attachment()]},self.user)
-        self.assertEqual(partner.entity,self.private)
 
-    def test_conversion_conflicts_and_converted_delete_protection(self):
-        item=self.create();payload=self.payload(item)
-        row_action({**payload,'operation':'toggle'},self.user);item.refresh_from_db()
-        with self.assertRaises(Conflict):convert_provider(payload,self.conversion(),{'attachments':[self.attachment()]},self.user)
-        with self.assertRaises(Conflict):convert_provider(self.payload(item),self.conversion(),{'attachments':[self.attachment()]},self.user)
-        row_action({**self.payload(item),'operation':'toggle'},self.user);item.refresh_from_db()
-        partner=convert_provider(self.payload(item),self.conversion(),{'attachments':[self.attachment()]},self.user);item.refresh_from_db()
-        with self.assertRaises(Conflict):row_action({**self.payload(item),'operation':'delete'},self.user)
-        with self.assertRaises(ProtectedError):partner.delete()
 
-    def test_conversion_duplicate_name_never_rewrites_existing_partner(self):
-        item=self.create();partner=Partnership.objects.create(name=item.name,representative='existing',phone='+966501234567',email='existing@example.com',entity=self.entity,scope='local')
-        with self.assertRaises(Conflict):convert_provider(self.payload(item),self.conversion(),{'attachments':[self.attachment()]},self.user)
-        partner.refresh_from_db();self.assertEqual(partner.development_state_id,'capability');self.assertEqual(Partnership.objects.count(),1)
 
-    def test_failed_file_save_rolls_back_database_and_cleans_files(self):
-        item=self.create()
-        from . import services
-        original=services.save_supporting_files
-        def fail(*args):original(*args);raise OSError('simulated disk error')
-        with patch('service_providers.services.save_supporting_files',side_effect=fail):
-            with self.assertRaises(OSError):convert_provider(self.payload(item),self.conversion(),{'attachments':[self.attachment()]},self.user)
-        from pathlib import Path
-        self.assertFalse(any(path.is_file() for path in Path(self.folder.name).rglob('*')))
-        self.assertFalse(Partnership.objects.exists());self.assertFalse(WillingnessAttachment.objects.exists());item.refresh_from_db();self.assertIsNone(item.converted_partnership_id)
 
-    def test_conversion_ajax_validation_and_success(self):
-        item=self.create();url=reverse('service_providers:convert',args=[item.pk]);page=self.client.get(url)
-        self.assertContains(page,'provider-conversion')
-        data=self.conversion(snapshot=page.context['conversion_snapshot'])
-        response=self.client.post(url,data,HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        self.assertEqual(response.status_code,400);self.assertIn('attachments',response.json()['fields'])
-        data['attachments']=[self.attachment()]
-        response=self.client.post(url,data,HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        self.assertEqual(response.status_code,200);self.assertIn('redirect',response.json())
 
     def test_navigation_list_does_not_expand_management(self):
         response=self.client.get(reverse('service_providers:index'))
@@ -235,20 +165,6 @@ class ProviderTests(TestCase):
         self.assertTrue(parsed.groups);self.assertTrue(all('open' not in group for group in parsed.groups))
         self.assertContains(response,reverse('service_providers:create'))
 
-    def test_converted_provider_participates_in_existing_market_matching(self):
-        from expense_items.models import ExpenseItem
-        from training_programs.models import TrainingProgram
-        from market_needs.models import Need, ExpenseLine
-        from market_needs.matching import candidates
-        expense=ExpenseItem.objects.create(name="بند صرف مزود التدريب")
-        program=TrainingProgram.objects.create(name="برنامج مزود التدريب",category="qualifying_program",is_training=True,is_operational=False)
-        program.expense_items.set([expense])
-        need=Need.objects.create(title="حاجة اختبار المزود",sector=self.sector,specialization=self.spec,description="وصف حاجة التدريب",duration=1,duration_unit="day",source="اختبار",beneficiaries=1,program=program,program_name=program.name,program_category=program.get_category_display(),training_type="تدريبي",total_cost=Decimal("100"),requested_support=Decimal("100"))
-        need.regions.set([self.region])
-        ExpenseLine.objects.create(need=need,expense_item=expense,sponsorship_shape=self.shape,amount=Decimal("100"))
-        item=self.create()
-        partner=convert_provider(self.payload(item),self.conversion(),{"attachments":[self.attachment()]},self.user)
-        self.assertTrue(candidates(need).filter(pk=partner.pk).exists())
 
     def test_list_queries_do_not_grow_per_provider(self):
         from django.db import connection
@@ -264,17 +180,3 @@ class ProviderTests(TestCase):
             self.assertEqual(response.status_code,200)
         self.assertLessEqual(len(many),len(first)+1)
 
-    def test_inactive_conversion_and_row_filter_preservation(self):
-        from urllib.parse import urlencode, urlparse, parse_qs
-        item=self.create()
-        row_action({**self.payload(item),"operation":"toggle"},self.user)
-        item.refresh_from_db()
-        response=self.client.get(reverse("service_providers:convert",args=[item.pk]))
-        self.assertEqual(response.status_code,409)
-        self.assertContains(response,"فعّل سجل المزود",status_code=409)
-        url=reverse("service_providers:index")+"?"+urlencode({"q":item.name,"status":"inactive"})
-        row_token=token({"operation":"row","id":item.pk,"version":item.version},self.user)
-        preview=self.client.post(url,{"action":"preview","operation":"toggle","token":row_token})
-        confirmed=self.client.post(url,{"action":"confirm","token":preview.context["pending"]["token"]})
-        parameters=parse_qs(urlparse(confirmed.url).query)
-        self.assertEqual(parameters["q"],[item.name]);self.assertEqual(parameters["status"],["inactive"])

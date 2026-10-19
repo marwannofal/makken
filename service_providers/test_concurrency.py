@@ -1,24 +1,20 @@
 from concurrent.futures import ThreadPoolExecutor
-from io import BytesIO
 import json
 from tempfile import TemporaryDirectory
 from threading import Barrier
 import uuid
 from unittest import skipUnless
 from django.contrib.auth import get_user_model
-from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import connection, close_old_connections
 from django.test import TransactionTestCase, override_settings
-from PIL import Image
 from care_states.models import StateColor
 from entities.models import Entity
 from regions.models import Region
 from sectors.models import Sector
 from specializations.models import Specialization
 from sponsorship_shapes.models import SponsorshipShape
-from partnerships.models import Partnership, WillingnessAttachment
-from .models import ServiceProvider, ProviderAudit
-from .services import save_provider, row_action, convert_provider, Conflict
+from .models import ProviderAudit
+from .services import save_provider, row_action, Conflict
 
 
 @skipUnless(connection.vendor == 'mysql', 'Requires real MySQL row locks; run compose.providers-tests.yaml.')
@@ -61,13 +57,3 @@ class ProviderConcurrencyTests(TransactionTestCase):
         self.item.refresh_from_db();self.assertEqual(self.item.version,2);self.assertFalse(self.item.is_active)
         self.assertEqual(ProviderAudit.objects.filter(action='toggle').count(),1)
 
-    def test_simultaneous_conversion_creates_one_partner_and_attachment(self):
-        payload={'id':self.item.pk,'version':1,'nonce':str(uuid.uuid4())}
-        values={'representative':'ممثل الجهة','phone_country':'SA','phone':'0501234567','email':'parallel@example.com','financial_capacity':'1000.00','entity':str(self.entity.pk),'sponsorship_shape':str(self.shape.pk),'agreement_type':'official_letter'}
-        def action(user):
-            stream=BytesIO();Image.new('RGB',(4,4),'white').save(stream,'PNG')
-            upload=SimpleUploadedFile('agreement.png',stream.getvalue(),content_type='image/png')
-            return convert_provider(payload,values,{'attachments':[upload]},user).pk
-        keys=self.parallel(action)
-        self.assertEqual(keys[0],keys[1]);self.assertEqual(Partnership.objects.count(),1);self.assertEqual(WillingnessAttachment.objects.count(),1)
-        self.assertEqual(ProviderAudit.objects.filter(action='convert').count(),1)
