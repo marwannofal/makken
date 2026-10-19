@@ -22,3 +22,4 @@ staticfiles/
 .git/
 
 private_uploads/
+.makken-error-pages-manifest.json

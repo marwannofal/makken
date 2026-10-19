@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="color-scheme" content="light">
+  <title>{{ title }} | مكّن</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ asset_base }}error.css?v=20261019-1">
+  <script src="{{ asset_base }}error.js?v=20261019-1" defer></script>
+</head>
+<body data-error-code="{{ code }}" data-auto-refresh="{{ auto_refresh }}" data-retry-seconds="{{ retry_seconds }}" data-request-method="{{ request_method }}">
+  <a class="skip-link" href="#error-content">انتقل إلى تفاصيل الرسالة</a>
+  <main class="error-layout" id="error-content">
+    <section class="error-card" aria-labelledby="error-title">
+      <header class="brand-row"><a href="/" aria-label="مكّن — الصفحة الرئيسية"><img src="{{ asset_base }}header-logo.svg" alt="المؤسسة العامة للتدريب التقني والمهني" width="220" height="82"></a><span class="portal-name">منصة مكّن</span></header>
+      <div class="error-visual" aria-hidden="true"><span class="visual-halo"></span><span class="error-symbol"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3 3 7v5c0 5 9 9 9 9s9-4 9-9V7Z"/><path d="M12 8v5m0 3h.01"/></svg></span><bdi class="error-code">{{ code }}</bdi></div>
+      <p class="eyebrow">نحن هنا لمساعدتك</p><h1 id="error-title">{{ title }}</h1><p class="error-description">{{ description }}</p>
+      <div class="recovery-panel"><div class="countdown" role="timer" aria-label="الوقت المتبقي بالثواني"><strong data-countdown>{{ retry_seconds }}</strong><span>ثانية</span></div><div class="recovery-copy"><h2>خطوة بسيطة قبل المحاولة التالية</h2><p data-retry-hint>{{ retry_hint }}</p><progress data-progress max="{{ retry_seconds }}" value="{{ retry_seconds }}" aria-label="الوقت المتبقي قبل إعادة المحاولة"></progress></div></div>
+      <label class="auto-choice" {{ auto_hidden }}><input type="checkbox" data-auto-toggle checked><span>تحديث الصفحة تلقائيًا عند انتهاء العدّاد</span></label>
+      <p class="recovery-status" data-retry-status role="status">يمكنك استخدام الصفحة الرئيسية في أي وقت.</p>
+      <div class="error-actions"><button type="button" class="button button-primary" data-retry disabled><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6 8a7 7 0 0 1 12-2l2 3M4 15l2 3a7 7 0 0 0 12-2"/></svg><span data-retry-label>انتظار انتهاء العدّاد</span></button><a class="button button-secondary" href="/"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m3 10 9-7 9 7v11H3ZM9 21v-8h6v8"/></svg>الصفحة الرئيسية</a><a class="button button-secondary" href="/login" {{ login_hidden }}>تسجيل الدخول</a></div>
+      <section class="help-panel" aria-labelledby="help-title"><h2 id="help-title">ما الذي يمكنك فعله الآن؟</h2><ul><li>{{ instruction }}</li><li>إذا ظهرت الرسالة أثناء الحفظ، فقد يكون الطلب نُفّذ بالفعل. راجع السجلات قبل إعادة الحفظ.</li><li>إذا تكرر الخطأ بعد المحاولة، أبلغ مسؤول المنصة برمز <bdi>{{ code }}</bdi> ووقت ظهوره، دون إرسال كلمة المرور أو بيانات حساسة.</li></ul></section>
+      <noscript><p class="noscript-note">التحديث التلقائي يحتاج JavaScript. انتظر {{ retry_seconds }} ثانية ثم <a href="">أعد فتح الصفحة يدويًا</a> أو ارجع إلى الصفحة الرئيسية.</p></noscript>
+      <p class="error-reference">رمز الرسالة: <bdi>{{ code }}</bdi><span aria-hidden="true"> · </span><span>مكّن — معك خطوة بخطوة</span></p>
+    </section>
+    <footer>جميع الحقوق محفوظة لـ © المؤسسة العامة للتدريب التقني والمهني، 2024</footer>
+  </main>
+</body>
+</html>

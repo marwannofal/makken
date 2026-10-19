@@ -1,0 +1,76 @@
+/* Shared sizing for record counts, table headings and table guidance. */
+:root {
+  --makken-table-label-size: 14px;
+}
+
+:root .main-content .states-card-header,
+:root .main-content .card-heading {
+  flex-wrap: wrap;
+}
+
+:root .main-content .states-card-header > div,
+:root .main-content .card-heading > div {
+  min-width: 0;
+}
+
+:root .main-content .states-card-header .fixed-tag,
+:root .main-content .card-heading > .subtle-badge {
+  max-width: 100%;
+  min-height: 40px;
+  padding: 8px 13px;
+  font-size: var(--makken-table-label-size);
+  font-weight: 700;
+  line-height: 1.8;
+  color: #486f6b;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  flex-wrap: wrap;
+}
+
+:root .main-content .states-card-header .fixed-tag svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+:root .main-content table thead th,
+:root .main-content .states-table .cell-label {
+  font-size: var(--makken-table-label-size);
+  font-weight: 700;
+  line-height: 1.85;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+:root .main-content .states-card-header p,
+:root .main-content .card-heading .muted,
+:root .main-content .states-card-footer p,
+:root .main-content .table-scroll-hint,
+:root .main-content .table-footer > span {
+  font-size: var(--makken-table-label-size);
+  font-weight: 500;
+  line-height: 1.9;
+  color: #627d79;
+}
+
+:root .main-content .states-card-footer {
+  align-items: flex-start;
+}
+
+:root .main-content .states-card-footer svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-block-start: 4px;
+}
+
+:root .main-content .table-footer {
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+@media (max-width: 600px) {
+  :root {
+    --makken-table-label-size: 13px;
+  }
+}

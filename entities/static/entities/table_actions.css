@@ -1,0 +1,59 @@
+/* Entities use the same edit/delete controls as the other settings tables. */
+.entities-table .entity-row-actions {
+  flex-direction: row;
+  gap: 8px;
+}
+
+.entities-table .entity-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: auto;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 9px 12px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: #edf8f5;
+  color: #167d76;
+  font-size: medium;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.entities-table .entity-action > span {
+  display: inline;
+}
+
+.entities-table .entity-action svg {
+  width: 19px;
+  height: 19px;
+  min-width: 19px;
+  min-height: 19px;
+  flex-shrink: 0;
+}
+
+.entities-table .entity-action:hover {
+  border-color: #b1d7cc;
+}
+
+.entities-table .entity-action.action-delete {
+  background: #fff2ef;
+  color: #b45349;
+}
+
+.entities-table .entity-action.action-delete:hover {
+  border-color: #e6b5ae;
+}
+
+@media (max-width: 1100px) {
+  .entities-table .entity-action {
+    width: 44px;
+    padding: 10px;
+  }
+
+  .entities-table .entity-action > span {
+    display: none;
+  }
+}

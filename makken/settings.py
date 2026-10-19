@@ -205,3 +205,9 @@ LANGUAGE_CODE = "ar"
 USE_I18N = True
 LANGUAGES = [("ar", "العربية")]
 # END MAKKEN ARABIC VALIDATION
+
+# BEGIN MAKKEN FRIENDLY ERRORS
+if "core.error_pages.FriendlyErrorMiddleware" not in MIDDLEWARE:
+    MIDDLEWARE = [*MIDDLEWARE, "core.error_pages.FriendlyErrorMiddleware"]
+CSRF_FAILURE_VIEW = "core.error_pages.csrf_failure"
+# END MAKKEN FRIENDLY ERRORS

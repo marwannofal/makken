@@ -7,6 +7,7 @@
 <script src="{% static 'entities/entities.js' %}?v=20261019-classification" defer></script>
 {% include "core/partials/settings_filters_assets.html" %}
 <link rel="stylesheet" href="{% static 'entities/classification.css' %}?v=20261019-1">
+  {% include "entities/_table_actions_assets.html" %}
 {% endblock %}
 {% block content %}
 <section class="page-introduction entities-introduction" aria-labelledby="page-heading"><div><p class="eyebrow">الإعدادات</p><h1 id="page-heading">إدارة الكيانات<span class="greeting-dot">.</span></h1><p class="page-description">تصنيفات الكيانات وفروعها وحالة تفعيلها، في مساحة واحدة.</p></div><a href="?{% if settings_filter_query %}{{ settings_filter_query }}&amp;{% endif %}edit=new" class="button button-primary add-entity" data-add-entity data-snapshot="{{ add_snapshot }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>إضافة كيان</a></section>

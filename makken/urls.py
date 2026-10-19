@@ -92,3 +92,10 @@ urlpatterns = [_partnerships_path("partnerships/", _partnerships_include("partne
 from django.urls import include as _market_include, path as _market_path
 urlpatterns = [_market_path("market-needs/", _market_include("market_needs.urls"))] + list(urlpatterns)
 # END MAKKEN MARKET NEEDS
+
+# BEGIN MAKKEN FRIENDLY ERRORS
+handler400 = "core.error_pages.bad_request"
+handler403 = "core.error_pages.permission_denied"
+handler404 = "core.error_pages.page_not_found"
+handler500 = "core.error_pages.server_error"
+# END MAKKEN FRIENDLY ERRORS
