@@ -1,3 +1,4 @@
+# MAKKEN DEPENDENCY TEST POLICY v1
 import json
 import uuid
 from io import BytesIO
@@ -86,10 +87,10 @@ class ProviderTests(TestCase):
             form=ProviderForm(self.data(coverage=json.dumps(rows)));self.assertFalse(form.is_valid(),rows)
 
     def test_historical_inactive_refs_preserved_but_not_new(self):
-        item=self.create();self.region.is_active=False;self.region.save();self.spec.is_active=False;self.spec.save()
+        item=self.create();self.region.is_active=False;type(self.region).objects.filter(pk=self.region.pk).update(is_active=False);self.spec.is_active=False;type(self.spec).objects.filter(pk=self.spec.pk).update(is_active=False)
         self.assertTrue(ProviderForm(self.data(),instance=item).is_valid())
         self.assertFalse(ProviderForm(self.data(name='مزود جديد')).is_valid())
-        self.sector.is_active=False;self.sector.save()
+        self.sector.is_active=False;type(self.sector).objects.filter(pk=self.sector.pk).update(is_active=False)
         self.assertFalse(ProviderForm(self.data(name='مزود جديد آخر',coverage=json.dumps([{'region':self.region2.pk,'specializations':[self.spec2.pk],'is_active':True}]))).is_valid())
 
     def test_duplicate_and_stale_update_and_reference_revalidation(self):
@@ -98,7 +99,7 @@ class ProviderTests(TestCase):
         old=self.payload(item)
         row_action({**old,'operation':'toggle'},self.user)
         with self.assertRaises(Conflict):save_provider({**old,'data':self.data()},self.user)
-        before=ServiceProvider.objects.count();self.region.is_active=False;self.region.save()
+        before=ServiceProvider.objects.count();self.region.is_active=False;type(self.region).objects.filter(pk=self.region.pk).update(is_active=False)
         with self.assertRaises(Conflict):self.create(name='مرجع تغيّر قبل الحفظ')
         self.assertEqual(ServiceProvider.objects.count(),before)
 

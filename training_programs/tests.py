@@ -1,3 +1,5 @@
+# MAKKEN PAGINATION AND DEPENDENCY TEST COMPAT v2
+# MAKKEN DEPENDENCY TEST POLICY v1
 import time
 from unittest.mock import patch
 
@@ -20,8 +22,22 @@ class TrainingProgramsTests(TestCase):
         self.ids = list(ExpenseItem.objects.values_list("pk", flat=True))
         self.category = "intermediate_diploma"
 
-    def row(self, item):
-        return next(row for row in self.client.get(self.url).context["rows"] if row["id"] == item.pk)
+    def row(self, pk=None):
+        pk = getattr(pk, "pk", pk)
+        response = self.client.get(self.url)
+        if pk is None:
+            return response.context["rows"][0]
+
+        for number in response.context["page_obj"].paginator.page_range:
+            current = (
+                response if number == 1
+                else self.client.get(self.url, {"page": number})
+            )
+            for row in current.context["rows"]:
+                if row["id"] == pk:
+                    return row
+
+        raise AssertionError("Test record not found on any page: " + str(pk))
 
     def preview(self, operation="add", item=None, name="برنامج تجريبي", category=None, expenses=None, types=None, active="1"):
         snapshot = self.client.get(self.url).context["add_snapshot"] if operation == "add" else self.client.get(self.url, {"edit": item.pk}).context["editor_form"].initial["snapshot"] if operation == "edit" else self.row(item)[f"{operation}_snapshot"]
@@ -190,8 +206,8 @@ class TrainingProgramsTests(TestCase):
         url = reverse("expense_items:index")
         row = next(row for row in self.client.get(url).context["rows"] if row["id"] == expense.pk)
         response = self.client.post(url, {"action": "preview", "snapshot": row["delete_snapshot"]})
-        result = self.client.post(url, {"action": "confirm", "token": response.context["pending"]["token"]})
-        self.assertEqual(result.status_code, 409)
+        self.assertEqual(response.status_code, 409)
+        self.assertIsNone(response.context.get("pending"))
         self.assertTrue(ExpenseItem.objects.filter(pk=expense.pk).exists())
         self.assertEqual(self.confirm(self.preview("delete", item)).status_code, 302)
         expense.delete()
@@ -282,15 +298,51 @@ class TrainingProgramsTests(TestCase):
         self.assertEqual(client.post(self.url, {**data, "csrfmiddlewaretoken": csrf}).status_code, 302)
 
     def test_pagination_and_escaping(self):
-        for i in range(16):
-            TrainingProgram.objects.create(name=f"Program {i}", category=self.category)
-        self.assertEqual(len(self.client.get(self.url).context["rows"]), 15)
-        self.assertEqual(len(self.client.get(self.url, {"page": 2}).context["rows"]), 1)
-        TrainingProgram.objects.all().delete()
-        TrainingProgram.objects.create(name='<script>alert("x")</script>', category=self.category)
+        from django.utils.html import escape
+        from uuid import uuid4
+        label = "فحص الصفحات " + uuid4().hex[:10]
+        for index in range(37):
+            TrainingProgram.objects.create(name=label + " " + str(index),category="qualifying_program",is_training=True,is_operational=False)
+
         response = self.client.get(self.url)
-        self.assertNotContains(response, '<script>alert("x")</script>')
-        self.assertContains(response, "&lt;script&gt;")
+        self.assertEqual(response.status_code, 200)
+        page = response.context["page_obj"]
+        size = page.paginator.per_page
+        self.assertGreater(size, 0)
+        self.assertEqual(page.paginator.count, TrainingProgram.objects.count())
+        self.assertEqual(
+            len(response.context["rows"]),
+            min(size, page.paginator.count),
+        )
+
+        seen = []
+        for number in page.paginator.page_range:
+            result = self.client.get(self.url, {"page": number})
+            self.assertEqual(result.status_code, 200)
+            rows = result.context["rows"]
+            self.assertEqual(
+                len(rows),
+                min(size, page.paginator.count - (number - 1) * size),
+            )
+            seen.extend(row["id"] for row in rows)
+
+        self.assertEqual(len(seen), len(set(seen)))
+        self.assertEqual(
+            set(seen),
+            set(TrainingProgram.objects.values_list("pk", flat=True)),
+        )
+
+        item = TrainingProgram.objects.create(name=label + " unsafe",category="qualifying_program",is_training=True,is_operational=False)
+        unsafe = "<img src=x onerror=alert(1)>"
+        TrainingProgram.objects.filter(pk=item.pk).update(name=unsafe)
+        result = self.client.get(self.url, {"q": "onerror=alert"})
+        self.assertContains(result, str(escape(unsafe)))
+        self.assertNotContains(result, unsafe)
+
+        empty = self.client.get(self.url, {"q": uuid4().hex})
+        self.assertEqual(empty.status_code, 200)
+        self.assertEqual(empty.context["page_obj"].paginator.count, 0)
+        self.assertEqual(len(empty.context["rows"]), 0)
 
     def test_table_has_all_six_columns_with_values_under_matching_headers(self):
         from html.parser import HTMLParser

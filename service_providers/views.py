@@ -1,3 +1,6 @@
+
+from core.dependencies import DependencyBlocked, ensure_allowed, blocked_context
+# MAKKEN LINKED RECORD PROTECTION v1
 import json
 import uuid
 from urllib.parse import urlencode
@@ -104,9 +107,10 @@ def index(request):
                 item = get_object_or_404(query(), pk=data["id"])
                 if item.version != data["version"]:
                     raise services.Conflict("تغيّر السجل. حدّث الصفحة قبل المتابعة.")
+                ensure_allowed(item, operation, not item.is_active if operation == "toggle" else None)
                 if operation == "delete" and item.converted_partnership_id:
-                    raise services.Conflict("لا يمكن حذف مزود مرتبط بسجل الشراكات. يمكنك إيقافه بدل الحذف.")
-                context["pending"] = {"name": item.name, "title": "تأكيد حذف المزود" if operation == "delete" else "تأكيد تغيير حالة السجل", "description": "سيُحذف المزود وبنود مناطقه نهائيًا، مع الاحتفاظ بسجل التغييرات." if operation == "delete" else "سيُحدّث تفعيل سجل المزود فقط؛ تبقى بيانات المناطق والشراكة المرتبطة محفوظة.", "danger": operation == "delete", "token": token({**data, "operation": "row-confirm", "row_operation": operation}, request.user)}
+                    raise services.Conflict("لا يمكن حذف مزود مرتبط بسجل الشراكات أو إيقافه قبل معالجة الارتباط.")
+                context["pending"] = {"name": item.name, "title": "تأكيد حذف المزود" if operation == "delete" else "تأكيد تغيير حالة السجل", "description": "سيُحذف المزود وبنود مناطقه نهائيًا، مع الاحتفاظ بسجل التغييرات." if operation == "delete" else "سيُحدّث تفعيل سجل المزود غير المستخدم فقط، دون تغيير بيانات المناطق والتخصصات.", "danger": operation == "delete", "token": token({**data, "operation": "row-confirm", "row_operation": operation}, request.user)}
             elif action == "confirm":
                 data = load(request.POST.get("token"), request.user, "row-confirm")
                 services.row_action({**data, "operation": data["row_operation"]}, request.user)
@@ -121,6 +125,9 @@ def index(request):
                 raise Http404
             context["detail"] = get_object_or_404(query(), pk=detail_id)
             context["detail_events"] = context["detail"].events.select_related("actor")[:30]
+    except DependencyBlocked as exc:
+        context.update(blocked_context(exc))
+        status = 409
     except (signing.BadSignature, signing.SignatureExpired):
         context["error"], status = "انتهت صلاحية الطلب أو تعذّر التحقق منه. حدّث الصفحة وحاول مجددًا.", 400
     except (services.Conflict, ProtectedError) as error:
@@ -147,6 +154,7 @@ def editor(request, pk=None):
                 editor_token = request.POST["snapshot"]
                 form = ProviderForm(request.POST, instance=item)
                 if form.is_valid():
+                    ensure_allowed(item, "edit", form.cleaned_data["is_active"] == "1")
                     values = {name: form.cleaned_data[name] for name in form.fields}
                     values["coverage"] = json.dumps(values["coverage"])
                     pending = {"name": values["name"], "title": "تأكيد حفظ مزود الخدمة", "description": "راجع بيانات المزود والمناطق والتخصصات قبل تأكيد الحفظ.", "token": token({**data, "operation": "save", "data": values}, request.user)}
@@ -161,6 +169,9 @@ def editor(request, pk=None):
                 return redirect(reverse("service_providers:index") + "?" + urlencode({"detail": saved.pk}))
             else:
                 raise signing.BadSignature
+    except DependencyBlocked as exc:
+        context.update(blocked_context(exc))
+        status = 409
     except (signing.BadSignature, signing.SignatureExpired, ValueError):
         context["error"], status = "انتهت صلاحية الطلب أو تعذّر التحقق منه. أعد فتح النموذج.", 400
     except (services.Conflict, IntegrityError, ProtectedError) as error:
@@ -170,6 +181,9 @@ def editor(request, pk=None):
         drafts = json.loads(drafts)
         if not isinstance(drafts, list):
             drafts = []
+    except DependencyBlocked as exc:
+        context.update(blocked_context(exc))
+        status = 409
     except (ValueError, TypeError):
         drafts = []
     context.update(item=item, form=form, pending=pending, snapshot=editor_token, catalog=catalog(item), drafts=drafts)

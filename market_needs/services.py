@@ -3,6 +3,9 @@
 On MySQL/InnoDB SELECT FOR UPDATE provides cross-worker serialization. SQLite
 is suitable for local UI tests only; run the concurrency suite on MySQL.
 """
+
+from core.dependencies import DependencyBlocked, ensure_allowed, blocked_context
+# MAKKEN LINKED RECORD PROTECTION v1
 import uuid
 from decimal import Decimal
 from pathlib import Path
@@ -87,6 +90,7 @@ def save_need(data, actor, pk=None, version=None, nonce=None):
     if not form.is_valid():
         raise InvalidForm(form)
     clean = form.cleaned_data
+    ensure_allowed(need, "edit", clean["is_active"] == "1")
     before = card_data(need) if need else {}
     if need and need.sponsorships.filter(status=SponsorshipStatus.APPROVED).exists():
         protected = ("sector", "specialization", "program", "beneficiaries", "requested_support")
@@ -249,10 +253,11 @@ def followup(pk, version, sponsorship_id, record_version, operation, data, files
 @transaction.atomic
 def card_action(pk, version, operation, actor):
     need = lock_need(pk, version)
+    ensure_allowed(need, operation, not need.is_active if operation == "toggle" else None)
     before = card_data(need)
     if operation == "delete":
         if need.sponsorships.filter(status=SponsorshipStatus.APPROVED).exists():
-            raise Conflict("لا يمكن حذف بطاقة لها مساهمات معتمدة. يمكنك إلغاء تفعيلها مع الاحتفاظ بالسجل.")
+            raise Conflict("لا يمكن حذف بطاقة مرتبطة بمتابعة الرعاية أو إيقافها. تبقى بيانات المتابعة والدعم محفوظة.")
         audit(need, actor, "حذف البطاقة", before)
         need.delete()
     elif operation == "toggle":

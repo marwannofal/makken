@@ -1,3 +1,6 @@
+
+from core.dependencies import DependencyBlocked, ensure_allowed, blocked_context
+# MAKKEN LINKED RECORD PROTECTION v1
 import hashlib
 import json
 import uuid
@@ -129,6 +132,7 @@ def _save(payload, user):
         if not form.is_valid():
             raise Conflict("تعذّر الحفظ. راجع الاسم والبيانات المرتبطة؛ قد تكون تغيّرت منذ المراجعة.")
         clean = form.cleaned_data
+        ensure_allowed(item, "edit", clean["is_active"] == "1")
         new = item is None
         if new:
             if not StateColor.objects.filter(pk=DevelopmentState.CAPABILITY).exists():
@@ -169,6 +173,7 @@ def editor(request, pk=None):
                 snapshot = request.POST["snapshot"]
                 form = PartnershipForm(request.POST, instance=item)
                 if form.is_valid():
+                    ensure_allowed(item, "edit", form.cleaned_data["is_active"] == "1")
                     data = _serialized(form.cleaned_data)
                     token = _sign({**original, "kind": "save", "data": data, "catalog": _fingerprint(data)}, request.user)
                     pending = {"title": "تأكيد تعديل الجهة" if item else "تأكيد إضافة الجهة", "name": data["name"], "token": token, "action": "save", "button": "تأكيد الحفظ", "financial_capacity": data["financial_capacity"]}
@@ -184,6 +189,9 @@ def editor(request, pk=None):
                 return add_login_headers(redirect("partnerships:edit", pk=saved.pk))
             else:
                 raise signing.BadSignature
+    except DependencyBlocked as exc:
+        context.update(blocked_context(exc))
+        status = 409
     except signing.BadSignature:
         context["error"], status = "انتهت صلاحية الطلب أو تغيّر محتواه. أعد فتح الصفحة وحاول مجددًا.", 400
     except (Conflict, IntegrityError, ProtectedError) as exc:
@@ -193,6 +201,9 @@ def editor(request, pk=None):
         drafts = json.loads(raw_rows)
         if not isinstance(drafts, list):
             drafts = []
+    except DependencyBlocked as exc:
+        context.update(blocked_context(exc))
+        status = 409
     except (ValueError, TypeError):
         drafts = []
     context.update(item=item, form=form, snapshot=snapshot, pending=pending, catalog=_catalog(item), drafts=drafts, history=_history(item))
@@ -241,6 +252,7 @@ def index(request):
                 item = Partnership.objects.select_for_update().filter(pk=data.get("id")).first()
                 if not item or item.version != data.get("version"):
                     raise Conflict("تغيّر هذا السجل أو حُذف، أو تم تنفيذ الطلب مسبقًا. حدّث القائمة وحاول مجددًا.")
+                ensure_allowed(item, data["operation"], not item.is_active if data["operation"] == "toggle" else None)
                 if data["operation"] == "advance":
                     if item.development_state_id != DevelopmentState.CAPABILITY:
                         raise Conflict("يمكن الانتقال إلى رغبة فقط عندما تكون الحالة الحالية قدرة. لم يتغير السجل.")
@@ -281,6 +293,9 @@ def index(request):
                     if data["operation"] == "advance" and request.headers.get("X-Requested-With") == "XMLHttpRequest":
                         return add_login_headers(JsonResponse({"redirect": destination.url}))
                     return add_login_headers(destination)
+    except DependencyBlocked as exc:
+        context.update(blocked_context(exc))
+        status = 409
     except InvalidWillingnessForm:
         context["error"], status = "راجع نوع الاتفاق والمرفقات قبل تأكيد التحويل.", 400
     except signing.BadSignature:

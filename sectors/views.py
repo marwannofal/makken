@@ -1,3 +1,6 @@
+
+from core.dependencies import DependencyBlocked, ensure_allowed, blocked_context
+# MAKKEN LINKED RECORD PROTECTION v1
 import hashlib
 
 from django.contrib import messages
@@ -53,6 +56,7 @@ def _unchanged(item, payload, owned=None):
 
 
 def _pending(operation, item, name, active, selected, user):
+    ensure_allowed(item, operation, active)
     owned = list(item.specializations.all()) if item else []
     payload = {"operation": operation, "id": item.pk if item else None, "version": item.version if item else None,
                "assignments": _fingerprint(owned), "name": name, "is_active": active,
@@ -93,6 +97,7 @@ def _apply(payload, user):
         owned = [s for s in locked if item and s.sector_id == item.pk]
         if item and not _unchanged(item, payload, owned):
             raise AssignmentConflict(_stale())
+        ensure_allowed(item, operation, payload["is_active"])
         if operation in {"add", "edit"}:
             selected_set = set(selected_ids)
             selected = [s for s in locked if s.pk in selected_set]
@@ -171,7 +176,7 @@ def index(request):
             elif action == "confirm":
                 payload = _load(request.POST.get("token"), request.user, CONFIRM_SALT)
                 _apply(payload, request.user)
-                message = {"add": "تمت إضافة القطاع بنجاح.", "edit": "تم تعديل القطاع بنجاح.", "delete": "تم حذف القطاع وإتاحة تخصصاته للاختيار مجددًا.", "toggle": "تم تحديث حالة القطاع بنجاح."}[payload["operation"]]
+                message = {"add": "تمت إضافة القطاع بنجاح.", "edit": "تم تعديل القطاع بنجاح.", "delete": "تم حذف القطاع غير المرتبط بنجاح.", "toggle": "تم تحديث حالة القطاع بنجاح."}[payload["operation"]]
                 messages.success(request, message)
                 return add_login_headers(_makken_settings_redirect(request, "sectors:index"))
             else:
@@ -188,6 +193,9 @@ def index(request):
                         "is_active": "1" if item.is_active else "0", "specializations": [s.pk for s in item.specializations.all()]}))
                 else:
                     context["error"], status = "القطاع المطلوب غير موجود.", 404
+    except DependencyBlocked as exc:
+        context.update(blocked_context(exc))
+        status = 409
     except signing.BadSignature:
         context["error"], status = "انتهت صلاحية الطلب أو تغيّر محتواه. أعد فتح الصفحة وحاول مجددًا.", 400
     except AssignmentConflict as exc:

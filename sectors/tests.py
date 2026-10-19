@@ -1,3 +1,4 @@
+# MAKKEN DEPENDENCY TEST POLICY v1
 import time
 from unittest.mock import patch
 
@@ -94,52 +95,51 @@ class SectorsTests(TestCase):
 
     def test_conflicting_edit_rolls_back_name_status_and_assignments(self):
         one = self.create(name="قطاع أول", selected=self.ids[:1])
-        pending = self.preview("edit", one, name="اسم غير محفوظ", active="0", selected=self.ids[:2])
+        pending = self.preview("edit", one, name="اسم غير محفوظ", active="1", selected=self.ids[:2])
         self.create(name="قطاع ثان", selected=self.ids[1:2])
         self.assertEqual(self.confirm(pending).status_code, 409)
         one.refresh_from_db()
         self.assertEqual((one.name, one.is_active), ("قطاع أول", True))
         self.assertEqual(set(one.specializations.values_list("pk", flat=True)), set(self.ids[:1]))
 
-    def test_edit_renames_updates_status_and_releases_removed_choices(self):
+    def test_edit_renames_and_releases_removed_choices_while_active(self):
         one = self.create()
-        response = self.preview("edit", one, name="قطاع محدث", selected=self.ids[1:3], active="0")
+        response = self.preview("edit", one, name="قطاع محدث", selected=self.ids[1:3], active="1")
         self.assertContains(response, self.specializations[0].name)
         self.assertEqual(self.confirm(response).status_code, 302)
         one.refresh_from_db()
-        self.assertEqual((one.name, one.is_active, one.version), ("قطاع محدث", False, 2))
+        self.assertEqual((one.name, one.is_active, one.version), ("قطاع محدث", True, 2))
         self.assertEqual(set(one.specializations.values_list("pk", flat=True)), set(self.ids[1:3]))
         self.assertIn(self.ids[0], self.choices())
         self.assertNotIn(self.ids[1], self.choices())
 
-    def test_toggle_does_not_release_specializations_and_requires_confirmation(self):
+    def test_linked_sector_cannot_be_deactivated(self):
         one = self.create()
         response = self.preview("toggle", one)
+        self.assertEqual(response.status_code, 409)
+        self.assertContains(response, "التخصصات", status_code=409)
         one.refresh_from_db()
         self.assertTrue(one.is_active)
-        self.assertEqual(self.confirm(response).status_code, 302)
-        one.refresh_from_db()
-        self.assertFalse(one.is_active)
         self.assertNotIn(self.ids[0], self.choices())
-        self.assertEqual(self.confirm(self.preview("toggle", one)).status_code, 302)
-        one.refresh_from_db()
-        self.assertTrue(one.is_active)
+        self.assertEqual(set(one.specializations.values_list("pk", flat=True)), set(self.ids[:2]))
 
-    def test_delete_requires_confirmation_releases_and_preserves_specializations(self):
+    def test_linked_sector_delete_is_blocked_without_detaching_specializations(self):
         one = self.create()
         response = self.preview("delete", one)
-        self.assertContains(response, "ستبقى التخصصات محفوظة")
-        self.client.get(self.url, {"action": "delete", "id": one.pk})
+        self.assertEqual(response.status_code, 409)
+        self.assertContains(response, "التخصصات", status_code=409)
+        self.assertIsNone(response.context.get("pending"))
         self.assertTrue(Sector.objects.filter(pk=one.pk).exists())
-        self.assertEqual(self.confirm(response).status_code, 302)
+        self.assertEqual(set(one.specializations.values_list("pk", flat=True)), set(self.ids[:2]))
         self.assertEqual(Specialization.objects.count(), len(self.ids))
-        self.assertEqual(self.choices(), set(self.ids))
-        self.assertEqual(self.confirm(response).status_code, 409)
 
-    def test_foreign_key_also_releases_on_direct_sector_delete(self):
+    def test_direct_sector_delete_is_also_blocked(self):
+        from core.dependencies import DependencyBlocked
+        from django.db import transaction
         one = self.create()
-        one.delete()
-        self.assertEqual(self.choices(), set(self.ids))
+        with self.assertRaises(DependencyBlocked), transaction.atomic():
+            one.delete()
+        self.assertEqual(set(one.specializations.values_list("pk", flat=True)), set(self.ids[:2]))
 
     def test_inactive_specializations_labelled_and_assignable(self):
         inactive = Specialization.objects.get(is_active=False)
@@ -168,7 +168,7 @@ class SectorsTests(TestCase):
     def test_stale_sector_snapshots_and_confirmations(self):
         one = self.create()
         snapshot = self.row(one.pk)["edit_snapshot"]
-        pending = [self.preview(operation, one, name="قطاع محدث") for operation in ["edit", "delete", "toggle"]]
+        pending = [self.preview(operation, one, name="قطاع محدث") for operation in ["edit"]]
         one.version += 1
         one.save()
         for response in pending:

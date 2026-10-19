@@ -1,3 +1,6 @@
+
+from core.dependencies import DependencyBlocked, ensure_allowed, blocked_context
+# MAKKEN LINKED RECORD PROTECTION v1
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core import signing
@@ -38,6 +41,7 @@ def _snapshot(item, operation, user):
 
 
 def _pending(operation, item, name, active, user):
+    ensure_allowed(item, operation, active)
     payload = {"operation": operation, "id": item.pk if item else None, "version": item.version if item else None, "name": name, "is_active": active}
     titles = {"add": "تأكيد إضافة المنطقة", "edit": "تأكيد تعديل المنطقة", "delete": "تأكيد حذف المنطقة", "toggle": "تأكيد تغيير حالة المنطقة"}
     buttons = {"add": "تأكيد الإضافة", "edit": "تأكيد التعديل", "delete": "نعم، حذف المنطقة", "toggle": "تأكيد التغيير"}
@@ -96,6 +100,7 @@ def index(request):
                         if item is None or item.version != payload.get("version"):
                             context["error"], status = _stale(), 409
                     if status == 200:
+                        ensure_allowed(item, operation, payload["is_active"])
                         if operation in {"add", "edit"}:
                             form = RegionForm({"operation": operation, "name": payload["name"], "is_active": "1" if payload["is_active"] else "0", "snapshot": "validated"}, instance_id=item.pk if item else None)
                             if not form.is_valid():
@@ -128,6 +133,9 @@ def index(request):
                     context.update(editing=True, editor_operation="edit", editor_form=RegionForm(initial={"operation": "edit", "snapshot": _snapshot(item, "edit", request.user), "name": item.name, "is_active": "1" if item.is_active else "0"}))
                 else:
                     context["error"], status = "المنطقة المطلوبة غير موجودة.", 404
+    except DependencyBlocked as exc:
+        context.update(blocked_context(exc))
+        status = 409
     except signing.BadSignature:
         context["error"], status = "انتهت صلاحية الطلب أو تغيّر محتواه. أعد فتح الصفحة وحاول مجددًا.", 400
     except (IntegrityError, ProtectedError, RestrictedError):

@@ -1,3 +1,4 @@
+# MAKKEN DEPENDENCY TEST POLICY v1
 from urllib.parse import parse_qs, urlencode, urlsplit
 from html.parser import HTMLParser
 
@@ -138,6 +139,13 @@ class SettingsFiltersTests(TestCase):
                 response=self.client.get(url)
                 row=response.context['rows'][0]
                 preview=self.client.post(url,{'action':'preview','snapshot':row['toggle_snapshot']})
+                if app == 'sectors':
+                    self.assertEqual(preview.status_code,409)
+                    self.assertEqual(preview.context['settings_filter_status'],'1')
+                    self.assertContains(preview,'class="settings-filters"',count=1,status_code=409)
+                    self.records[app][0].refresh_from_db()
+                    self.assertTrue(self.records[app][0].is_active)
+                    continue
                 self.assertEqual(preview.status_code,200)
                 self.assertEqual(preview.context['settings_filter_status'],'1')
                 self.assertContains(preview,'class="settings-filters"',count=1)

@@ -24,6 +24,7 @@
   {% include "core/partials/arabic_validation_assets.html" %}
   {% include "core/partials/table_actions_assets.html" %}
   {% include "core/partials/table_legibility_assets.html" %}
+<link rel="stylesheet" href="{% static 'core/css/dependencies.css' %}?v=20261019-1">
 </head>
 <body>
   <a class="skip-link" href="#main-content">انتقل إلى المحتوى</a>
@@ -49,5 +50,7 @@
   <dialog id="mobile-sidebar" class="mobile-sidebar sidebar" aria-label="القائمة الرئيسية">
     {% include "core/partials/makken_sidebar.html" with mobile=True %}
   </dialog>
+{% include "core/partials/dependency_block.html" %}
+<script src="{% static 'core/js/dependencies.js' %}?v=20261019-1" defer></script>
 </body>
 </html>

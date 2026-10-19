@@ -1,3 +1,4 @@
+# MAKKEN DEPENDENCY TEST POLICY v1
 from regions.models import Region
 import json
 
@@ -138,9 +139,9 @@ class PartnershipTests(TestCase):
 
     def test_inactive_catalog_choices(self):
         item,_=self.save()
-        self.entity.is_active=False;self.entity.save()
-        self.spec.is_active=False;self.spec.save()
-        self.shape.is_active=False;self.shape.save()
+        self.entity.is_active=False;type(self.entity).objects.filter(pk=self.entity.pk).update(is_active=False)
+        self.spec.is_active=False;type(self.spec).objects.filter(pk=self.spec.pk).update(is_active=False)
+        self.shape.is_active=False;type(self.shape).objects.filter(pk=self.shape.pk).update(is_active=False)
         self.assertFalse(PartnershipForm(self.data()).is_valid())
         form=PartnershipForm(self.data(),instance=item)
         self.assertTrue(form.is_valid(),form.errors)

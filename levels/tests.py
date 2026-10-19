@@ -1,3 +1,4 @@
+# MAKKEN PAGINATION AND DEPENDENCY TEST COMPAT v2
 from unittest.mock import patch
 import time
 
@@ -16,8 +17,21 @@ class LevelsTests(TestCase):
         self.url = reverse("levels:index")
 
     def row(self, pk=None):
-        rows = self.client.get(self.url).context["rows"]
-        return next(row for row in rows if row["id"] == pk) if pk else rows[0]
+        pk = getattr(pk, "pk", pk)
+        response = self.client.get(self.url)
+        if pk is None:
+            return response.context["rows"][0]
+
+        for number in response.context["page_obj"].paginator.page_range:
+            current = (
+                response if number == 1
+                else self.client.get(self.url, {"page": number})
+            )
+            for row in current.context["rows"]:
+                if row["id"] == pk:
+                    return row
+
+        raise AssertionError("Test record not found on any page: " + str(pk))
 
     def preview(self, operation, pk=None, name="مستوى جديد", active="1"):
         if operation == "add":
@@ -155,17 +169,51 @@ class LevelsTests(TestCase):
         self.assertEqual(client.post(self.url, {**data, "csrfmiddlewaretoken": csrf}).status_code, 302)
 
     def test_pagination_empty_state_and_escaping(self):
-        Level.objects.all().delete()
-        self.assertContains(self.client.get(self.url), "لا توجد مستويات بعد")
-        for i in range(16):
-            Level.objects.create(name=f"Level {i}")
-        self.assertEqual(len(self.client.get(self.url).context["rows"]), 15)
-        self.assertEqual(len(self.client.get(self.url, {"page": "2"}).context["rows"]), 1)
-        Level.objects.all().delete()
-        Level.objects.create(name='<script>alert("x")</script>')
+        from django.utils.html import escape
+        from uuid import uuid4
+        label = "فحص الصفحات " + uuid4().hex[:10]
+        for index in range(37):
+            Level.objects.create(name=label + " " + str(index))
+
         response = self.client.get(self.url)
-        self.assertNotContains(response, '<script>alert("x")</script>')
-        self.assertContains(response, "&lt;script&gt;")
+        self.assertEqual(response.status_code, 200)
+        page = response.context["page_obj"]
+        size = page.paginator.per_page
+        self.assertGreater(size, 0)
+        self.assertEqual(page.paginator.count, Level.objects.count())
+        self.assertEqual(
+            len(response.context["rows"]),
+            min(size, page.paginator.count),
+        )
+
+        seen = []
+        for number in page.paginator.page_range:
+            result = self.client.get(self.url, {"page": number})
+            self.assertEqual(result.status_code, 200)
+            rows = result.context["rows"]
+            self.assertEqual(
+                len(rows),
+                min(size, page.paginator.count - (number - 1) * size),
+            )
+            seen.extend(row["id"] for row in rows)
+
+        self.assertEqual(len(seen), len(set(seen)))
+        self.assertEqual(
+            set(seen),
+            set(Level.objects.values_list("pk", flat=True)),
+        )
+
+        item = Level.objects.create(name=label + " unsafe")
+        unsafe = "<img src=x onerror=alert(1)>"
+        Level.objects.filter(pk=item.pk).update(name=unsafe)
+        result = self.client.get(self.url, {"q": "onerror=alert"})
+        self.assertContains(result, str(escape(unsafe)))
+        self.assertNotContains(result, unsafe)
+
+        empty = self.client.get(self.url, {"q": uuid4().hex})
+        self.assertEqual(empty.status_code, 200)
+        self.assertEqual(empty.context["page_obj"].paginator.count, 0)
+        self.assertEqual(len(empty.context["rows"]), 0)
 
     def test_sidebar_preserves_care_states_and_hides_admin(self):
         self.user.is_staff = True

@@ -1,3 +1,6 @@
+
+from core.dependencies import DependencyBlocked, ensure_allowed, blocked_context
+# MAKKEN LINKED RECORD PROTECTION v1
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core import signing
@@ -45,6 +48,7 @@ def _item_data(item):
 
 
 def _pending(operation, item, data, user):
+    ensure_allowed(item, operation, data["is_active"])
     payload = {"operation": operation, "id": item.pk if item else None, "version": item.version if item else None, **data}
     titles = {"add": "تأكيد إضافة الكيان", "edit": "تأكيد تعديل الكيان", "delete": "تأكيد حذف الكيان", "toggle": "تأكيد تغيير حالة الكيان"}
     buttons = {"add": "تأكيد الإضافة", "edit": "تأكيد التعديل", "delete": "نعم، حذف الكيان", "toggle": "تأكيد التغيير"}
@@ -120,6 +124,7 @@ def index(request):
                         if item is None or item.version != payload.get("version"):
                             context["error"], status = _stale(), 409
                     if status == 200:
+                        ensure_allowed(item, operation, payload["is_active"])
                         if operation in {"add", "edit"}:
                             form = EntityForm({"operation": operation, "entity_type": payload.get("entity_type"), "branch": payload.get("branch", ""), "is_active": "1" if payload["is_active"] else "0", "snapshot": "validated"}, instance_id=item.pk if item else None, stored_name=payload["name"])
                             if not form.is_valid():
@@ -153,6 +158,9 @@ def index(request):
                     context.update(editing=True, editor_operation="edit", editor_form=EntityForm(initial={"operation": "edit", "snapshot": _snapshot(item, "edit", request.user), **_item_data(item), "is_active": "1" if item.is_active else "0"}))
                 else:
                     context["error"], status = "الكيان المطلوب غير موجود.", 404
+    except DependencyBlocked as exc:
+        context.update(blocked_context(exc))
+        status = 409
     except signing.BadSignature:
         context["error"], status = "انتهت صلاحية الطلب أو تغيّر محتواه. أعد فتح الصفحة وحاول مجددًا.", 400
     except (IntegrityError, ProtectedError, RestrictedError):

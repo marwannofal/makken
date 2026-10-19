@@ -1,0 +1,16 @@
+{% if dependency_block %}
+<dialog class="dependency-dialog" id="dependency-block" aria-labelledby="dependency-title" aria-describedby="dependency-description" open>
+  <div class="dependency-content">
+    <div class="dependency-heading">
+      <span class="dependency-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3 3 7v5c0 5 9 9 9 9s9-4 9-9V7Z"/><path d="M12 8v5m0 3h.01"/></svg></span>
+      <button class="icon-button" type="button" data-dependency-close aria-label="إغلاق التنبيه"><svg aria-hidden="true"><use href="#icon-close"></use></svg></button>
+    </div>
+    <p class="dependency-eyebrow">حماية السجلات المرتبطة</p>
+    <h2 id="dependency-title">{{ dependency_block.title }}</h2>
+    <p id="dependency-description">{{ dependency_block.message }}</p>
+    <ul class="dependency-links" aria-label="أماكن ارتباط السجل">{% for reference in dependency_block.references %}<li>{{ reference }}</li>{% endfor %}</ul>
+    <p class="dependency-note"><strong>لم يتم تغيير الحالة أو حذف أي بيانات.</strong> راجع الارتباطات من صفحاتها أولًا. السجلات غير النشطة والارتباطات السابقة مشمولة بهذه الحماية.</p>
+    <div class="dependency-actions"><button class="button button-primary" type="button" data-dependency-close autofocus>فهمت</button></div>
+  </div>
+</dialog>
+{% endif %}

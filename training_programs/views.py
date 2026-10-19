@@ -1,3 +1,6 @@
+
+from core.dependencies import DependencyBlocked, ensure_allowed, blocked_context
+# MAKKEN LINKED RECORD PROTECTION v1
 import hashlib
 
 from django.contrib import messages
@@ -55,6 +58,7 @@ def _unchanged(item, payload, linked=None):
 
 
 def _pending(operation, item, values, selected, user):
+    ensure_allowed(item, operation, values["is_active"])
     linked = list(item.expense_items.all()) if item else []
     payload = {**values, "operation": operation, "id": item.pk if item else None, "version": item.version if item else None,
                "links": _fingerprint(linked), "selected": sorted(s.pk for s in selected), "selected_state": _fingerprint(selected)}
@@ -97,6 +101,7 @@ def _apply(payload):
         linked = [expense for expense in locked if expense.pk in current_ids]
         if item and not _unchanged(item, payload, linked):
             raise ProgramConflict(_stale())
+        ensure_allowed(item, operation, payload["is_active"])
         if operation in {"add", "edit"}:
             selected_set = set(selected_ids)
             selected = [expense for expense in locked if expense.pk in selected_set]
@@ -185,6 +190,9 @@ def index(request):
                     context.update(editing=True, editor_operation="edit", editor_form=TrainingProgramForm(instance_id=item.pk, initial=initial))
                 else:
                     context["error"], status = "البرنامج المطلوب غير موجود.", 404
+    except DependencyBlocked as exc:
+        context.update(blocked_context(exc))
+        status = 409
     except signing.BadSignature:
         context["error"], status = "انتهت صلاحية الطلب أو تغيّر محتواه. أعد فتح الصفحة وحاول مجددًا.", 400
     except ProgramConflict as exc:

@@ -1,3 +1,5 @@
+# MAKKEN DEPENDENCY TEST POLICY v1
+from core.dependencies import DependencyBlocked
 """Conversion is unavailable; previous records and private evidence remain valid."""
 from io import BytesIO
 from tempfile import TemporaryDirectory
@@ -68,7 +70,7 @@ class ConversionRemovalTests(TestCase):
         self.assertEqual(self.item.converted_partnership_id,partner.pk);self.assertEqual(self.item.converted_at,now)
         self.assertEqual(partner.development_state_id,'willingness');self.assertEqual(partner.development_state_at,now)
         self.assertEqual(history.entered_at,now);self.assertEqual(event.after,{'partnership':partner.pk})
-        with self.assertRaises(services.Conflict):services.row_action({'id':self.item.pk,'version':self.item.version,'operation':'delete'},self.user)
+        with self.assertRaises(DependencyBlocked):services.row_action({'id':self.item.pk,'version':self.item.version,'operation':'delete'},self.user)
         url=reverse('partnerships:attachment_download',args=[partner.pk,attachment.pk]);response=self.client.get(url)
         self.assertEqual(response.status_code,200);self.assertEqual(sum(map(len,response.streaming_content)),attachment.size)
         self.client.logout();self.assertEqual(self.client.get(url).status_code,302)

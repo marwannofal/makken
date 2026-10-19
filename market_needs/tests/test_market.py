@@ -1,3 +1,5 @@
+# MAKKEN DEPENDENCY TEST POLICY v1
+from core.dependencies import DependencyBlocked
 import json
 import uuid
 from datetime import timedelta
@@ -124,7 +126,7 @@ class NeedCardTests(MarketFixtures,TestCase):
     def test_historical_inactive_references_preserved_no_new_selection(self):
         need=self.create_need()
         for obj in [self.sector,self.spec,self.region,self.shape,self.expense,self.program]:
-            obj.is_active=False;obj.save()
+            obj.is_active=False;type(obj).objects.filter(pk=obj.pk).update(is_active=False)
         self.assertTrue(NeedForm(self.data(),instance=need).is_valid())
         self.assertFalse(NeedForm(self.data()).is_valid())
         # An inactive shape cannot be moved onto a different line.
@@ -148,7 +150,7 @@ class NeedCardTests(MarketFixtures,TestCase):
     def test_delete_protection_and_delete_history_retained(self):
         need=self.create_need();record=self.attach(need,self.organization());self.approve(need,record)
         need.refresh_from_db()
-        with self.assertRaises(services.Conflict):services.card_action(need.pk,need.version,'delete',self.user)
+        with self.assertRaises(DependencyBlocked):services.card_action(need.pk,need.version,'delete',self.user)
         empty=self.create_need();number=empty.number;services.card_action(empty.pk,empty.version,'delete',self.user)
         self.assertTrue(AuditEvent.objects.filter(need_number=number,action='حذف البطاقة',need__isnull=True).exists())
 
@@ -181,7 +183,7 @@ class MatchingTests(MarketFixtures,TestCase):
         need=self.create_need();org=self.organization()
         self.assertFalse(hasattr(org,'coverage_regions'))
         self.assertTrue(candidates(need).filter(pk=org.pk).exists())
-        need.regions.set([self.region]);self.region.is_active=False;self.region.save()
+        need.regions.set([self.region]);self.region.is_active=False;type(self.region).objects.filter(pk=self.region.pk).update(is_active=False)
         self.assertTrue(candidates(need).filter(pk=org.pk).exists())
         org.scope='global';org.save()
         self.assertTrue(candidates(need).filter(pk=org.pk).exists())
@@ -200,10 +202,10 @@ class MatchingTests(MarketFixtures,TestCase):
             self.assertFalse(candidates(need,{'states':['capability','willingness','care']}).filter(pk=org.pk).exists())
         for obj in [self.program,self.entity,self.sector,self.spec,self.shape,self.shape2]:
             with self.subTest(reference=type(obj).__name__):
-                obj.is_active=False;obj.save()
+                obj.is_active=False;type(obj).objects.filter(pk=obj.pk).update(is_active=False)
                 if obj in [self.shape,self.shape2]:
                     # One remaining required shape still yields a partial match.
-                    self.shape.is_active=False;self.shape.save();self.shape2.is_active=False;self.shape2.save()
+                    self.shape.is_active=False;type(self.shape).objects.filter(pk=self.shape.pk).update(is_active=False);self.shape2.is_active=False;type(self.shape2).objects.filter(pk=self.shape2.pk).update(is_active=False)
                 self.assertFalse(candidates(need).filter(pk=willing.pk).exists())
                 obj.is_active=True;obj.save()
                 self.shape.is_active=True;self.shape.save();self.shape2.is_active=True;self.shape2.save()
@@ -254,7 +256,7 @@ class MatchingTests(MarketFixtures,TestCase):
         with self.assertRaises(IntegrityError),transaction.atomic():Sponsorship.objects.create(need=need,partnership=org)
 
     def test_revalidation_after_results_change(self):
-        need=self.create_need();org=self.organization();self.assertTrue(candidates(need).exists());org.is_active=False;org.save()
+        need=self.create_need();org=self.organization();self.assertTrue(candidates(need).exists());org.is_active=False;type(org).objects.filter(pk=org.pk).update(is_active=False)
         with self.assertRaises(services.Conflict):services.add_candidates(need.pk,need.version,[org.pk],{},self.user)
         self.assertFalse(need.sponsorships.exists())
 
@@ -323,7 +325,7 @@ class FundingTests(MarketFixtures,TestCase):
         need=self.create_need();org=self.organization();row=self.attach(need,org)
         for value in ['', '0','-1','1.001','Infinity']:
             with self.subTest(value=value),self.assertRaises(services.InvalidForm):self.approve(need,row,value)
-        org.is_active=False;org.save()
+        org.is_active=False;type(org).objects.filter(pk=org.pk).update(is_active=False)
         with self.assertRaises(services.Conflict):self.approve(need,row)
 
     def test_optional_real_private_attachments_and_authenticated_download(self):

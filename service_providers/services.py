@@ -1,4 +1,7 @@
 """Transactional writes, reference validation, idempotency and immutable audit entries."""
+
+from core.dependencies import DependencyBlocked, ensure_allowed, blocked_context
+# MAKKEN LINKED RECORD PROTECTION v1
 import json
 from django.db import transaction
 from regions.models import Region
@@ -48,6 +51,7 @@ def save_provider(payload, user):
         form = ProviderForm(payload["data"], instance=item)
         if not form.is_valid():
             raise Conflict("تغيّرت بعض الاختيارات أو تكرر الاسم منذ المراجعة. أعد فتح النموذج وتحقق من البيانات.")
+        ensure_allowed(item, "edit", form.cleaned_data["is_active"] == "1")
         data, before = form.cleaned_data, snapshot(item)
         action = "edit" if item else "create"
         if not item:
@@ -74,10 +78,11 @@ def row_action(payload, user):
         item = ServiceProvider.objects.select_for_update().filter(pk=payload["id"]).first()
         if not item or item.version != payload["version"]:
             raise Conflict("تغيّر السجل أو نُفّذ الطلب مسبقًا. حدّث القائمة وحاول مجددًا.")
+        ensure_allowed(item, payload["operation"], not item.is_active if payload["operation"] == "toggle" else None)
         before = snapshot(item)
         if payload["operation"] == "delete":
             if item.converted_partnership_id:
-                raise Conflict("لا يمكن حذف مزود حُوّل إلى جهة في سجل الشراكات. يمكنك إيقاف سجل المزود مع الحفاظ على العلاقة والتاريخ.")
+                raise Conflict("لا يمكن حذف مزود مرتبط بسجل الشراكات أو إيقافه قبل معالجة الارتباط.")
             audit(item, "delete", user, before)
             item.delete()
         elif payload["operation"] == "toggle":

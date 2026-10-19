@@ -1,3 +1,4 @@
+# MAKKEN PAGINATION AND DEPENDENCY TEST COMPAT v2
 from unittest.mock import patch
 import time
 
@@ -278,12 +279,47 @@ class EntitiesTests(TestCase):
         self.assertEqual(Entity.objects.count(), 6)
 
     def test_existing_partnership_reference_and_name_preserved(self):
+        from uuid import uuid4
+        from django.urls import reverse
+        from entities.models import Entity
+        from entities import views
         from partnerships.models import Partnership
-        entity = Entity.objects.first()
-        item = Partnership.objects.create(name="جهة مرتبطة قبل إزالة الحقل", representative="ممثل", phone_country="SA", phone="+966501234567", email="existing@example.com", entity=entity, scope="local")
-        old_name = entity.name
-        response = self.preview("edit", entity.pk, name="اسم مزور", active="0")
-        self.assertEqual(self.confirm(response).status_code, 302)
-        entity.refresh_from_db(); item.refresh_from_db()
-        self.assertEqual(entity.name, old_name)
-        self.assertEqual(item.entity_id, entity.pk)
+
+        suffix = uuid4().hex[:8]
+        entity = Entity.objects.create(
+            name="كيان تاريخي " + suffix,
+            entity_type="government",
+            branch="",
+        )
+        partner = Partnership.objects.create(
+            name="جهة مرتبطة " + suffix,
+            representative="الممثل",
+            phone="+966501234567",
+            email="linked@example.com",
+            entity=entity,
+            scope="local",
+        )
+
+        before = (entity.name, entity.version, entity.is_active)
+        original_partner_name = partner.name
+
+        for operation in ["toggle", "delete"]:
+            response = self.client.post(
+                reverse("entities:index"),
+                {
+                    "action": "preview",
+                    "snapshot": views._snapshot(entity, operation, self.user),
+                },
+            )
+            self.assertEqual(response.status_code, 409)
+            self.assertContains(response, "سجل الشراكات", status_code=409)
+            self.assertIsNone(response.context.get("pending"))
+
+            entity.refresh_from_db()
+            partner.refresh_from_db()
+            self.assertEqual(
+                (entity.name, entity.version, entity.is_active),
+                before,
+            )
+            self.assertEqual(partner.entity_id, entity.pk)
+            self.assertEqual(partner.name, original_partner_name)

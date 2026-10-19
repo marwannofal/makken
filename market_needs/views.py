@@ -1,3 +1,6 @@
+
+from core.dependencies import DependencyBlocked, ensure_allowed, blocked_context
+# MAKKEN LINKED RECORD PROTECTION v1
 import json
 import uuid
 from decimal import Decimal
@@ -124,6 +127,9 @@ def editor(request, pk=None):
             saved = services.save_need(request.POST, request.user, pk, payload["version"], payload["nonce"])
             messages.success(request, "تم حفظ بطاقة حاجة السوق بنجاح.")
             return add_login_headers(redirect("market_needs:followup", pk=saved.pk))
+        except DependencyBlocked as exc:
+            context.update(blocked_context(exc))
+            status = 409
         except (services.Conflict, services.InvalidForm, signing.BadSignature, IntegrityError, ProtectedError, OperationalError) as exc:
             context["error"], status = failure(exc)
             if isinstance(exc, services.InvalidForm):
@@ -145,6 +151,9 @@ def index(request):
             services.card_action(payload["id"], payload["version"], payload["operation"], request.user)
             messages.success(request, "تم تحديث بطاقة الحاجة بنجاح.")
             return add_login_headers(redirect("market_needs:index"))
+        except DependencyBlocked as exc:
+            context.update(blocked_context(exc))
+            status = 409
         except (services.Conflict, signing.BadSignature, IntegrityError, ProtectedError, OperationalError) as exc:
             context["error"], status = failure(exc)
     q, active, state = request.GET.get("q", "").strip()[:200], request.GET.get("active", ""), request.GET.get("state", "")
@@ -167,6 +176,9 @@ def index(request):
             search |= Q(displayed_percent=float(value))
             if value == value.to_integral_value():
                 search |= Q(beneficiaries=int(value))
+        except DependencyBlocked as exc:
+            context.update(blocked_context(exc))
+            status = 409
         except forms.ValidationError:
             pass
         if "تحالف" in word:
