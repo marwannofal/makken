@@ -1,0 +1,19 @@
+{% extends "core/makken_base.html" %}{% load static %}
+{% block title %}{{ page_heading }} | مكّن{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'care_states/states.css' %}?v=20261015-1">
+<link rel="stylesheet" href="{% static 'partnerships/partnerships.css' %}?v=20261015-1">
+<link rel="stylesheet" href="{% static 'market_needs/market.css' %}?v=20261018-funding-details">
+<link rel="stylesheet" href="{% static 'service_providers/providers.css' %}?v=20261019-1">
+<script src="{% static 'service_providers/provider-selects.js' %}?v=20261019-picker-performance-1" defer></script>
+<script src="{% static 'market_needs/market.js' %}?v=20261018-funding-details" defer></script>
+<script src="{% static 'service_providers/providers.js' %}?v=20261019-1" defer></script>
+{% endblock %}
+{% block content %}
+<div data-provider-page="{% if active_page == 'service_provider_editor' %}editor{% else %}list{% endif %}">
+<section class="page-introduction partnership-intro"><div><p class="eyebrow">مكّن · مزودو خدمات التدريب</p><h1>{{ page_heading }}<span class="greeting-dot">.</span></h1><p class="page-description">بيانات المزودين ومناطقهم وتخصصاتهم، في مساحة واحدة.</p></div><div class="provider-page-actions">{% block page_actions %}{% endblock %}</div></section>
+{% if error %}<p class="feedback feedback-error" role="alert">{{ error }}</p>{% endif %}
+{% block provider_content %}{% endblock %}
+{% include "service_providers/_dialogs.html" %}
+</div>
+{% endblock %}

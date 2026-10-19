@@ -1,0 +1,11 @@
+{% load static %}
+<div class="sidebar-brand">
+  <a class="brand-link" href="{% url 'makken_home' %}" aria-label="مكّن — الصفحة الرئيسية">
+    <img src="{% static 'accounts/images/header-logo.svg' %}" alt="المؤسسة العامة للتدريب التقني والمهني" width="220" height="82">
+  </a>
+  {% if mobile %}
+    <button class="icon-button drawer-close" type="button" data-menu-close aria-label="إغلاق القائمة" autofocus>
+      <svg aria-hidden="true"><use href="#icon-close"></use></svg>
+    </button>
+  {% endif %}
+</div>

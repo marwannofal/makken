@@ -1,0 +1,8 @@
+<a class="user-profile profile-sidebar-link" href="{% url 'accounts:profile' %}" aria-label="الملف الشخصي — تعديل بيانات الحساب"{% if active_page == 'profile' %} aria-current="page"{% endif %}>
+  <span class="user-avatar" aria-hidden="true">{{ avatar_initial }}</span>
+  <div class="user-details">
+    <bdi class="user-name">{{ display_name }}</bdi>
+    <bdi class="user-email">{% if user.email %}{{ user.email }}{% else %}{{ user.get_username }}{% endif %}</bdi>
+  </div>
+  <span class="profile-sidebar-edit" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m16 4 4 4M4 20l5-1L20 8a2.8 2.8 0 0 0-4-4L5 15Z"/></svg></span>
+</a>

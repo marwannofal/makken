@@ -1,0 +1,12 @@
+{% url nav_url as destination %}
+<a
+  class="nav-link{% if active_page == nav_page and not nav_state or active_page == nav_page and request.GET.development_state == nav_state %} is-active{% endif %}"
+  href="{{ destination }}{% if nav_state %}?development_state={{ nav_state|urlencode }}{% endif %}"
+  {% if active_page == nav_page and not nav_state or active_page == nav_page and request.GET.development_state == nav_state %}aria-current="page"{% endif %}
+>
+  <svg aria-hidden="true"{% if not nav_use %} viewBox="0 0 24 24"{% endif %}>
+    {% if nav_use %}<use href="{{ nav_use }}"></use>{% else %}<path d="{{ nav_path }}"/>{% if nav_circle %}<circle cx="12" cy="10" r="2.5"/>{% endif %}{% endif %}
+  </svg>
+  <span>{{ nav_label }}</span>
+  <span class="nav-dot" aria-hidden="true"></span>
+</a>

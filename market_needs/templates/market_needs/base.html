@@ -6,6 +6,7 @@
 <link rel="stylesheet" href="{% static 'partnerships/development_column.css' %}?v=20261017-transition">
 <link rel="stylesheet" href="{% static 'market_needs/market.css' %}?v=20261018-funding-details">
 <script src="{% static 'market_needs/market.js' %}?v=20261018-funding-details" defer></script>
+{% include "market_needs/_expense_amount_assets.html" %}
 {% endblock %}
 {% block content %}
 <section class="page-introduction partnership-intro"><div><p class="eyebrow">مكّن · احتياجات السوق والرعاية</p><h1>{{ page_heading }}<span class="greeting-dot">.</span></h1><p class="page-description">من تسجيل الحاجة إلى مطابقة الجهات ومتابعة الدعم المعتمد.</p></div><div class="market-page-actions">{% block page_actions %}{% endblock %}</div></section>

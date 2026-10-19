@@ -99,3 +99,8 @@ handler403 = "core.error_pages.permission_denied"
 handler404 = "core.error_pages.page_not_found"
 handler500 = "core.error_pages.server_error"
 # END MAKKEN FRIENDLY ERRORS
+
+# BEGIN MAKKEN SERVICE PROVIDERS
+from django.urls import include as _providers_include, path as _providers_path
+urlpatterns = [_providers_path("service-providers/", _providers_include("service_providers.urls"))] + list(urlpatterns)
+# END MAKKEN SERVICE PROVIDERS

@@ -158,15 +158,26 @@ class RegionsTests(TestCase):
     def test_pagination_empty_state_and_escaping(self):
         Region.objects.all().delete()
         self.assertContains(self.client.get(self.url), "لا توجد مناطق بعد")
-        for i in range(16):
+        # MAKKEN pagination fixture follows configured page size
+        per_page = self.client.get(self.url).context["page_obj"].paginator.per_page
+        self.assertGreater(per_page, 0)
+        for i in range(per_page + 1):
             Region.objects.create(name=f"Region {i}")
-        self.assertEqual(len(self.client.get(self.url).context["rows"]), 10)
-        self.assertEqual(len(self.client.get(self.url, {"page": "2"}).context["rows"]), 1)
+        first = self.client.get(self.url)
+        second = self.client.get(self.url, {"page": "2"})
+        self.assertEqual(len(first.context["rows"]), per_page)
+        self.assertEqual(len(second.context["rows"]), 1)
+        self.assertEqual(first.context["page_obj"].paginator.num_pages, 2)
+        self.assertEqual(second.context["page_obj"].number, 2)
+        ids = [row["id"] for row in first.context["rows"] + second.context["rows"]]
+        self.assertEqual(len(set(ids)), per_page + 1)
+        self.assertSetEqual(set(ids), set(Region.objects.values_list("id", flat=True)))
         Region.objects.all().delete()
         Region.objects.create(name='<script>alert("x")</script>')
         response = self.client.get(self.url)
         self.assertNotContains(response, '<script>alert("x")</script>')
         self.assertContains(response, "&lt;script&gt;")
+
 
     def test_sidebar_preserves_care_states_and_hides_admin(self):
         self.user.is_staff = True

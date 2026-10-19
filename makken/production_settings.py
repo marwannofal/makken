@@ -63,3 +63,8 @@ if "core.error_pages.FriendlyErrorMiddleware" not in MIDDLEWARE:
 CSRF_FAILURE_VIEW = "core.error_pages.csrf_failure"
 MAKKEN_ERROR_ASSET_BASE = "/__makken_errors/assets/"
 # END MAKKEN FRIENDLY ERRORS
+
+# BEGIN MAKKEN SERVICE PROVIDERS
+if not any(_app == "service_providers" or _app.startswith("service_providers.") for _app in INSTALLED_APPS):
+    INSTALLED_APPS = [*INSTALLED_APPS, "service_providers.apps.ServiceProvidersConfig"]
+# END MAKKEN SERVICE PROVIDERS

@@ -1,0 +1,7 @@
+<form action="{% url 'accounts:logout' %}" method="post" class="logout-form">
+  {% csrf_token %}
+  <button class="logout-button" type="submit">
+    <svg aria-hidden="true"><use href="#icon-logout"></use></svg>
+    <span>تسجيل الخروج</span>
+  </button>
+</form>

@@ -1,0 +1,5 @@
+{% if active_page == 'care_states' or active_page == 'levels' or active_page == 'regions' or active_page == 'entities' or active_page == 'specializations' or active_page == 'sectors' or active_page == 'expense_items' or active_page == 'training_programs' or active_page == 'sponsorship_shapes' %}
+  {% include "core/partials/sidebar/_management_group.html" with management_active=True %}
+{% else %}
+  {% include "core/partials/sidebar/_management_group.html" with management_active=False %}
+{% endif %}
