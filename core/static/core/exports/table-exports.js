@@ -1,6 +1,15 @@
 (() => {
   'use strict';
   if (window.MakkenTableExports) return;
+  let rights = {xlsx: false, pdf: false};
+  try {
+    const config = document.getElementById('makken-table-export-access');
+    if (config) {
+      const values = JSON.parse(config.textContent);
+      rights = {xlsx: values.xlsx === true, pdf: values.pdf === true};
+    }
+  } catch (_) { /* Missing/invalid configuration never grants access. */ }
+  const formats = ['xlsx', 'pdf'].filter(format => rights[format]);
   const icons = {
     xlsx: '<path d="M14 2H5v20h14V7ZM14 2v6h5M8 12l5 6m0-6-5 6"/>',
     pdf: '<path d="M14 2H5v20h14V7ZM14 2v6h5M8 13h7m-7 4h5"/>',
@@ -38,14 +47,14 @@
     if (kind !== 'busy') close.focus({preventScroll: true});
   }
   function eligible(table) {
-    if (!table.tHead || table.closest('dialog,template') || table.hasAttribute('data-no-export')) return false;
+    if (!table.tHead || table.closest('dialog,template') || table.hasAttribute('data-no-export') || table.matches('[data-ac-matrix]')) return false;
     if (table.querySelector('tbody input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=submit]):not([type=button]):not([type=color]),tbody textarea,tbody select')) return false;
     // Unsaved editors start empty and populate their table using JavaScript.
     if (table.matches('.offerings-table,[data-expense-editor]') || table.querySelector('tbody[data-offerings-table],tbody[data-expense-lines],tbody[data-services-table],tbody[data-coverage-table]')) return false;
     return table.tHead.rows.length === 1;
   }
   async function download(button, table) {
-    if (busy) return;
+    if (busy || !rights[button.dataset.mkFormat]) return;
     const main = document.querySelector('#main-content') || document.querySelector('main');
     const tables = [...main.querySelectorAll('table')].filter(t => !t.closest('dialog,template'));
     const index = tables.indexOf(table);
@@ -95,7 +104,7 @@
   }
   function refresh() {
     const main = document.querySelector('#main-content') || document.querySelector('main');
-    if (!main) return;
+    if (!main || formats.length === 0) return;
     main.querySelectorAll('table').forEach(table => {
       if (table.dataset.mkExportReady || !eligible(table)) return;
       table.dataset.mkExportReady = '1';
@@ -105,7 +114,7 @@
       tools.setAttribute('aria-label', 'تصدير بيانات الجدول');
       const label = document.createElement('span');
       label.className = 'mk-export-label'; label.textContent = 'تصدير النتائج حسب الفلاتر'; tools.append(label);
-      ['xlsx', 'pdf'].forEach(format => {
+      formats.forEach(format => {
         const button = document.createElement('button');
         button.type = 'button'; button.className = 'mk-export-button'; button.dataset.mkFormat = format;
         button.innerHTML = svg(format);

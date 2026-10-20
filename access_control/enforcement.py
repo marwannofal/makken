@@ -126,7 +126,12 @@ def module_view(module):
                 if not policy.can(module):raise PermissionDenied
                 if request.method not in {'GET','HEAD'} and not any(policy.can(module,op) for op in DEFINITIONS[module].operations if op!='view'):
                     raise PermissionDenied
-                for operation in requested_operations(request,module,view,kwargs):
+                needed = requested_operations(request,module,view,kwargs)
+                # MAKKEN FORMAT EXPORT OPERATION CHECK
+                if request.method in {'GET', 'HEAD'} and '_mk_export' in request.GET:
+                    from .exports import export_operation
+                    needed = [*needed, export_operation(request.GET.get('_mk_export'))]
+                for operation in needed:
                     if not policy.can(module,operation):raise PermissionDenied
             except (PermissionDenied,signing.BadSignature,KeyError,ValueError,TypeError):
                 return denied(request)

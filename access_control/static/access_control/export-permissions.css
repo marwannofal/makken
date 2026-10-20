@@ -1,0 +1,20 @@
+/* Keep Arabic page names readable as format-specific columns are added. */
+.ac-workspace .ac-matrix {
+  min-width: 1320px;
+  table-layout: auto;
+}
+.ac-workspace .ac-matrix th:first-child {
+  width: 230px;
+  min-width: 220px;
+  white-space: normal;
+  overflow-wrap: normal;
+  word-break: normal;
+  line-height: 1.9;
+}
+.ac-workspace .ac-matrix thead th:not(:first-child),
+.ac-workspace .ac-matrix td {
+  min-width: 128px;
+  white-space: normal;
+  overflow-wrap: normal;
+  word-break: normal;
+}

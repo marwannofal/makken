@@ -69,4 +69,4 @@ def current_access(context):
     request=context.get('request');module=getattr(request.resolver_match.func,'_access_module',None) if request else None
     if not module:return {}
     policy=for_request(request)
-    return {op:policy.can(module,op) for op in ['view','create','edit','delete','change_status','export']}
+    return {op:policy.can(module,op) for op in ['view','create','edit','delete','change_status','export','export_xlsx','export_pdf']}

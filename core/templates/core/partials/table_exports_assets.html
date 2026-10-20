@@ -1,3 +1,5 @@
-{% load static %}
-<link rel="stylesheet" href="{% static 'core/exports/table-exports.css' %}?v=20261020-1">
-<script src="{% static 'core/exports/table-exports.js' %}?v=20261020-1" defer></script>
+{% load static export_tags %}
+{% table_export_access as table_export_rights %}
+{{ table_export_rights|json_script:"makken-table-export-access" }}
+<link rel="stylesheet" href="{% static 'core/exports/table-exports.css' %}?v=20261020-2">
+<script src="{% static 'core/exports/table-exports.js' %}?v=20261020-2" defer></script>

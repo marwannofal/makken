@@ -14,7 +14,9 @@ class Operation(models.TextChoices):
     EDIT = 'edit', 'تعديل'
     DELETE = 'delete', 'حذف'
     STATUS = 'change_status', 'تغيير الحالة'
-    EXPORT = 'export', 'تنزيل / تصدير'
+    EXPORT = 'export', 'تنزيل المرفقات'
+    EXPORT_XLSX = 'export_xlsx', 'تصدير Excel'
+    EXPORT_PDF = 'export_pdf', 'تصدير PDF'
 
 
 class Module(models.Model):

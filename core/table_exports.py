@@ -35,13 +35,18 @@ class TableExportMiddleware:
             return self.get_response(request)
         if request.method != 'GET':
             return self.error('التصدير متاح من صفحات العرض فقط.', 405)
+        if format not in {'xlsx', 'pdf'}:
+            return self.error('صيغة التصدير غير مدعومة.', 400)
+        if getattr(getattr(request, 'user', None), 'is_authenticated', False):
+            from access_control.exports import export_access
+            if not export_access(request).get(format, False):
+                label = 'Excel' if format == 'xlsx' else 'PDF'
+                return self.error('لا تملك صلاحية تصدير '+label+' لهذه الصفحة.', 403)
         response = self.get_response(self.clone(request))
         if response.status_code != 200:
             return response
         if not getattr(getattr(request, 'user', None), 'is_authenticated', False):
             return self.error('سجّل الدخول أولًا لتصدير البيانات.', 403)
-        if format not in {'xlsx', 'pdf'}:
-            return self.error('صيغة التصدير غير مدعومة.', 400)
         try:
             raw_index = request.GET.get('_mk_table', '0')
             if not raw_index.isdigit() or int(raw_index) > 100:

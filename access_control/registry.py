@@ -3,7 +3,7 @@
 A future module registers its route policy here and wraps its views with
 module_view. Unknown routes remain denied. Adding a role never needs code.
 """
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 CRUD = ('view', 'create', 'edit', 'delete', 'change_status')
 
@@ -31,6 +31,15 @@ MODULES = (
     ModuleDefinition('market_needs', 'بطاقات حاجة السوق ومتابعة الرعاية', 'market_needs:index', (*CRUD, 'export')),
     ModuleDefinition('service_providers', 'مزودو الخدمات', 'service_providers:index', CRUD),
 )
+# BEGIN MAKKEN FORMAT EXPORT RIGHTS v1
+TABLE_EXPORT_OPERATIONS = ('export_xlsx', 'export_pdf')
+MODULES = tuple(
+    replace(row, operations=tuple(dict.fromkeys((*row.operations, *TABLE_EXPORT_OPERATIONS))))
+    if row.key != 'dashboard' else row
+    for row in MODULES
+)
+# END MAKKEN FORMAT EXPORT RIGHTS v1
+
 DEFINITIONS = {row.key: row for row in MODULES}
 SETTINGS_MODULES = frozenset({'levels','regions','entities','specializations','sectors','expense_items','training_programs','sponsorship_shapes'})
 PUBLIC_ROUTES = frozenset({'accounts:login','accounts:login_slash','accounts:logout','accounts:logout_slash'})
