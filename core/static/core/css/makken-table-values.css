@@ -1,0 +1,330 @@
+/* MAKKEN TABLE VALUES v1 */
+html.mk-values-open {
+  overflow: hidden;
+}
+.mk-cell-values-more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 34px;
+  max-width: 100%;
+  padding: 5px 11px;
+  margin: 2px 0;
+  border: 1px solid #bee9e5;
+  border-radius: 9px;
+  background: #e9f8f6;
+  color: #107976;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.7;
+  cursor: pointer;
+  vertical-align: middle;
+  white-space: normal;
+}
+.mk-cell-values-more:hover {
+  background: #d8f2ef;
+  border-color: #24b3af;
+}
+.mk-cell-values-more svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.mk-cell-values-toggle {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+}
+.mk-cell-text-values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 7px;
+}
+.mk-cell-text-value {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 7px;
+  color: #326d69;
+  background: #edf8f6;
+  font-size: 11px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.mk-values-dialog:not([open]) {
+  display: none;
+}
+.mk-values-dialog {
+  position: fixed;
+  inset: 0;
+  width: min(640px, calc(100vw - 32px));
+  max-width: none;
+  max-height: calc(100svh - 32px);
+  margin: auto;
+  padding: 0;
+  overflow: auto;
+  border: 1px solid #e5efed;
+  border-radius: 22px;
+  color: #194b48;
+  background: #fff;
+  box-shadow: 0 24px 90px #0b403333;
+  font-family: inherit;
+  text-align: right;
+  overscroll-behavior: contain;
+}
+.mk-values-dialog::backdrop {
+  background: #123d3c66;
+  backdrop-filter: blur(4px);
+}
+.mk-values-body {
+  padding: 28px;
+  min-width: 0;
+}
+.mk-values-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.mk-values-symbol {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 15px;
+  background: #e6f7f2;
+  color: #148782;
+}
+.mk-values-symbol svg,
+.mk-values-close svg {
+  width: 23px;
+  height: 23px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.mk-values-close {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  padding: 8px;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  color: #6f8983;
+  background: transparent;
+  cursor: pointer;
+}
+.mk-values-close:hover {
+  color: #157d77;
+  background: #eff8f5;
+}
+.mk-values-eyebrow {
+  margin: 0 0 7px;
+  color: #6f9890;
+  font-size: 11px;
+  font-weight: 700;
+}
+.mk-values-title {
+  margin: 0 0 8px;
+  color: #194b48;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.mk-values-description {
+  margin: 0 0 20px;
+  color: #688880;
+  font-size: 13px;
+  line-height: 1.9;
+  overflow-wrap: anywhere;
+}
+.mk-values-search-label {
+  display: block;
+  margin: 0 0 8px;
+  color: #315f58;
+  font-size: 12px;
+  font-weight: 700;
+}
+.mk-values-search {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 46px;
+  border: 1px solid #d6e7e2;
+  border-radius: 11px;
+  padding: 10px 13px;
+  background: #fbfdfc;
+  color: #194b48;
+  font-family: inherit;
+  font-size: 13px;
+  text-align: right;
+  direction: rtl;
+}
+.mk-values-search::placeholder {
+  color: #829a94;
+  opacity: 1;
+  text-align: right;
+}
+.mk-values-search:focus {
+  border-color: #24b3af;
+  outline: 3px solid #24b3af22;
+  outline-offset: 1px;
+}
+.mk-values-count {
+  margin: 12px 0;
+  color: #66877e;
+  font-size: 12px;
+  line-height: 1.8;
+}
+.mk-values-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: start;
+  gap: 9px;
+  max-height: min(42svh, 350px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  margin: 0;
+  padding: 2px;
+  list-style: none;
+  scrollbar-width: thin;
+  scrollbar-color: #b5d8d1 transparent;
+}
+.mk-values-item {
+  display: block;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 8px 11px;
+  border: 1px solid #d2eae4;
+  border-radius: 9px;
+  background: #edf8f5;
+  color: #276e65;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.9;
+  overflow-wrap: anywhere;
+}
+.mk-values-item-inactive {
+  color: #697f78;
+  background: #f2f5f3;
+  border-color: #e1e8e4;
+}
+.mk-values-item a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.mk-values-dialog .mk-values-item[hidden],
+.mk-values-dialog .mk-values-empty[hidden] {
+  display: none !important;
+}
+.mk-values-empty {
+  padding: 18px;
+  border: 1px dashed #d6e7e0;
+  border-radius: 10px;
+  background: #fafdfb;
+  color: #6b887d;
+  font-size: 13px;
+  line-height: 1.9;
+  text-align: center;
+}
+.mk-values-footer {
+  margin-top: 22px;
+}
+.mk-values-done {
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 18px;
+  border: 1px solid #24b3af;
+  border-radius: 11px;
+  background: #24b3af;
+  color: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.mk-values-done:hover {
+  background: #1c9d99;
+  border-color: #1c9d99;
+}
+.mk-cell-values-more:focus-visible,
+.mk-values-close:focus-visible,
+.mk-values-done:focus-visible {
+  outline: 3px solid #087a75;
+  outline-offset: 3px;
+}
+@media screen {
+  .mk-cell-value-overflow {
+    display: none !important;
+  }
+}
+@media (max-width: 480px) {
+  .mk-values-dialog {
+    width: calc(100vw - 24px);
+    max-height: calc(100svh - 24px);
+    border-radius: 18px;
+  }
+  .mk-values-body {
+    padding: 20px 16px;
+  }
+  .mk-values-title {
+    font-size: 19px;
+  }
+  .mk-values-description {
+    font-size: 12px;
+  }
+  .mk-values-list {
+    gap: 7px;
+    max-height: 42svh;
+  }
+  .mk-values-item {
+    font-size: 11px;
+    padding: 7px 9px;
+  }
+  .mk-cell-values-more {
+    font-size: 11px;
+  }
+}
+@media print {
+  .mk-cell-values-more,
+  .mk-cell-values-toggle,
+  .mk-values-dialog {
+    display: none !important;
+  }
+}
+
+
+:root
+  .main-content
+  :is(
+    .level-action,
+    .region-action,
+    .entity-action,
+    .specialization-action,
+    .sector-action,
+    .expense-item-action,
+    .program-action,
+    .sponsorship-shape-action,
+    .row-action,
+    .edit-color
+  ),
+:root .main-content table :is(button, a.button),
+:root .main-content table .action-cell a {
+  font-size: 12px !important;
+  font-weight: 700 !important;
+}

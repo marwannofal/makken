@@ -1,5 +1,114 @@
-.dependency-dialog{direction:rtl;border:0;border-radius:22px;padding:0;width:min(520px,calc(100vw - 32px));max-height:calc(100dvh - 32px);overflow:auto;color:#234b4e;background:#fff;box-shadow:0 24px 90px rgb(19 66 68 / 20%);font-family:inherit;overflow-wrap:anywhere}
-.dependency-dialog::backdrop{background:rgb(17 45 48 / 48%);backdrop-filter:blur(4px)}
-.dependency-content{padding:28px}.dependency-heading{display:flex;align-items:center;justify-content:space-between;gap:16px}.dependency-heading .icon-button{flex-shrink:0}.dependency-icon{display:grid;place-items:center;width:52px;height:52px;border-radius:16px;background:#e6f7f6;color:#158b88}.dependency-dialog svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.dependency-eyebrow{font-size:12px;font-weight:700;color:#158b88;margin:20px 0 6px}.dependency-dialog h2{font-size:22px;line-height:1.7;margin:0 0 12px}.dependency-dialog p{line-height:1.9}.dependency-links{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:16px 0}.dependency-links li{background:#f1f8f7;border:1px solid #dcecea;border-radius:10px;padding:7px 12px;font-size:13px;font-weight:600}.dependency-note{background:#f6faf9;border-radius:12px;padding:14px;font-size:13px;color:#577477}.dependency-note strong{display:block;color:#234b4e}.dependency-actions{display:flex;justify-content:flex-end;margin-top:22px}.dependency-actions button{font-family:inherit;min-height:48px;cursor:pointer}.dependency-dialog :focus-visible{outline:3px solid #167d7a;outline-offset:3px}
-@media(max-width:480px){.dependency-content{padding:20px}.dependency-dialog h2{font-size:19px}.dependency-actions .button{width:100%}}
+.dependency-dialog {
+  direction: rtl;
+  border: 0;
+  border-radius: 22px;
+  padding: 0;
+  width: min(520px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  color: #234b4e;
+  background: #fff;
+  box-shadow: 0 24px 90px rgb(19 66 68 / 20%);
+  font-family: inherit;
+  overflow-wrap: anywhere;
+}
+.dependency-dialog::backdrop {
+  background: rgb(17 45 48 / 48%);
+  backdrop-filter: blur(4px);
+}
+.dependency-content {
+  padding: 28px;
+}
+.dependency-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.dependency-heading .icon-button {
+  flex-shrink: 0;
+}
+.dependency-icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: #e6f7f6;
+  color: #158b88;
+}
+.dependency-dialog svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.dependency-eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  color: #158b88;
+  margin: 20px 0 6px;
+}
+.dependency-dialog h2 {
+  font-size: 22px;
+  line-height: 1.7;
+  margin: 0 0 12px;
+}
+.dependency-dialog p {
+  line-height: 1.9;
+}
+.dependency-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 16px 0;
+}
+.dependency-links li {
+  background: #f1f8f7;
+  border: 1px solid #dcecea;
+  border-radius: 10px;
+  padding: 7px 12px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.dependency-note {
+  background: #f6faf9;
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 13px;
+  color: #577477;
+}
+.dependency-note strong {
+  display: block;
+  color: #234b4e;
+}
+.dependency-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 22px;
+}
+.dependency-actions button {
+  font-family: inherit;
+  min-height: 48px;
+  cursor: pointer;
+}
+.dependency-dialog :focus-visible {
+  outline: 3px solid #167d7a;
+  outline-offset: 3px;
+}
+@media (max-width: 480px) {
+  .dependency-content {
+    padding: 20px;
+  }
+  .dependency-dialog h2 {
+    font-size: 19px;
+  }
+  .dependency-actions .button {
+    width: 100%;
+  }
+}
