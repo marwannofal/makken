@@ -5,6 +5,9 @@ from expense_items.models import normalize_name, validate_name
 
 
 class TrainingProgram(models.Model):
+    # MAKKEN TECHNICAL DIPLOMA CATALOG v1
+    diploma_catalog = models.JSONField("بيانات دليل الدبلوم", null=True, blank=True, editable=False)
+
     class Category(models.TextChoices):
         INTERMEDIATE_DIPLOMA = "intermediate_diploma", "الدبلوم التدريبي (المتوسط)"
         ASSOCIATE_DIPLOMA = "associate_diploma", "الدبلوم التدريبي (المشارك)"
