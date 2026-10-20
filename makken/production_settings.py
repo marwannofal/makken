@@ -74,3 +74,9 @@ if not any(app == 'access_control' or app.startswith('access_control.') for app 
     INSTALLED_APPS = [*INSTALLED_APPS, 'access_control.apps.AccessControlConfig']
 if 'access_control.middleware.AccessBoundaryMiddleware' not in MIDDLEWARE:
     MIDDLEWARE = [*MIDDLEWARE, 'access_control.middleware.AccessBoundaryMiddleware']
+
+# BEGIN MAKKEN SHARED TABLE EXPORTS v1
+# Appended last so authentication and page access checks always run first.
+if "core.table_exports.TableExportMiddleware" not in MIDDLEWARE:
+    MIDDLEWARE = [*MIDDLEWARE, "core.table_exports.TableExportMiddleware"]
+# END MAKKEN SHARED TABLE EXPORTS v1

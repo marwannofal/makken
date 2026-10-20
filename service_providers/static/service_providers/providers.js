@@ -29,7 +29,7 @@
   $$('[data-provider-server]').forEach(target=>{target.removeAttribute('open');open(target);});
   if(page.dataset.providerPage==='editor')$$('[data-management-group]').forEach(group=>group.open=true);
   $$('[data-provider-row]').forEach(row=>row.addEventListener('click',event=>{if(!event.target.closest('a,button,form,input,select,label')&&!getSelection()?.toString())location.assign(row.dataset.url);}));
-  $$('[data-provider-final]').forEach(form=>form.addEventListener('submit',event=>{if(form.dataset.sent){event.preventDefault();return;}form.dataset.sent='1';$$('button[type=submit]',form).forEach(button=>{button.disabled=true;button.textContent='جارٍ الحفظ…';});}));
+  $$('[data-provider-final]').forEach(form=>form.addEventListener('submit',event=>{if(form.dataset.sent){event.preventDefault();return;}form.dataset.sent='1';$$('button[type=submit]',form).forEach(button=>{button.disabled=true;button.textContent='جار الحفظ…';});}));
 
   // Rebuilt option buttons must not be mistaken for an outside click.
   $$('.market-select').forEach(wrapper=>wrapper.addEventListener('click',event=>event.stopPropagation()));

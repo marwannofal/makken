@@ -30,7 +30,7 @@
     form.addEventListener("submit", () => {
       const button = form.querySelector("button");
       button.disabled = true;
-      button.querySelector("span").textContent = "جارٍ تسجيل الخروج…";
+      button.querySelector("span").textContent = "جار تسجيل الخروج…";
     });
   });
   window.addEventListener("pageshow", () => {

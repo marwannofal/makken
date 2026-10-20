@@ -56,7 +56,7 @@
     busy=value;dialog.setAttribute('aria-busy',String(value));
     form.querySelectorAll('button,input,select').forEach(control=>control.disabled=value);
     dialog.querySelectorAll('[data-dismiss-dialog]').forEach(control=>control.disabled=value);
-    submit.textContent=value?'جارٍ الرفع والحفظ…':'حفظ والتحويل إلى رغبة';
+    submit.textContent=value?'جار الرفع والحفظ…':'حفظ والتحويل إلى رغبة';
   }
   dialog.addEventListener('cancel',event=>{if(busy)event.preventDefault();});
   form.addEventListener('submit',event=>{
@@ -65,12 +65,12 @@
     error.textContent='';
     form.querySelectorAll('#agreement-errors,#attachments-errors').forEach(node=>node.replaceChildren());
     const body=new FormData(form); // Capture enabled file controls before locking them.
-    setBusy(true);list.querySelectorAll('.willingness-queue-info small').forEach((node,index)=>node.textContent=fileSize(files[index].size)+' · قيد الرفع');panel.hidden=false;progress.value=0;percentage.textContent='0%';status.textContent='جارٍ رفع المرفقات…';
+    setBusy(true);list.querySelectorAll('.willingness-queue-info small').forEach((node,index)=>node.textContent=fileSize(files[index].size)+' · قيد الرفع');panel.hidden=false;progress.value=0;percentage.textContent='0%';status.textContent='جار رفع المرفقات…';
     const xhr=new XMLHttpRequest();
     xhr.upload.addEventListener('progress',event=>{
       if(event.lengthComputable){const value=Math.floor(event.loaded/event.total*100);progress.value=value;percentage.textContent=value+'%';}
     });
-    xhr.upload.addEventListener('load',()=>{progress.value=100;percentage.textContent='100%';status.textContent='اكتمل إرسال الملفات — جارٍ التحقق والحفظ…';list.querySelectorAll('.willingness-queue-info small').forEach((node,index)=>node.textContent=fileSize(files[index].size)+' · قيد التحقق والحفظ');});
+    xhr.upload.addEventListener('load',()=>{progress.value=100;percentage.textContent='100%';status.textContent='اكتمل إرسال الملفات — جار التحقق والحفظ…';list.querySelectorAll('.willingness-queue-info small').forEach((node,index)=>node.textContent=fileSize(files[index].size)+' · قيد التحقق والحفظ');});
     function fail(message) {setBusy(false);status.textContent='لم يكتمل تأكيد الحفظ';error.textContent=message;}
     xhr.addEventListener('load',()=>{
       let result;

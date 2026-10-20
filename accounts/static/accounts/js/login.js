@@ -81,7 +81,7 @@
         toggle.setAttribute("aria-label", "إظهار كلمة المرور");
         submit.disabled = true;
         form.setAttribute("aria-busy", "true");
-        label.textContent = "جارٍ تسجيل الدخول…";
+        label.textContent = "جار تسجيل الدخول…";
         status.textContent = "يرجى الانتظار…";
     });
     const alert = document.querySelector("[data-form-alert]");

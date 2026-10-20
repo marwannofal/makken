@@ -58,7 +58,7 @@
   document.querySelectorAll("[data-confirm-form]").forEach(confirmForm => confirmForm.addEventListener("submit", () => {
     const button = confirmForm.querySelector("button[type=submit]");
     button.disabled = true;
-    button.textContent = "جارٍ التنفيذ…";
+    button.textContent = "جار التنفيذ…";
   }));
   window.addEventListener("pageshow", () => {
     const button = document.querySelector("[data-confirm-form] button[type=submit]");

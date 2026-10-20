@@ -21,7 +21,7 @@
     }
   }
   $$('form[data-ac-confirm]').forEach(form=>form.addEventListener('submit',event=>{
-    if(form.dataset.confirmed==='1'){$$('button[type=submit]',form).forEach(button=>{button.disabled=true;button.textContent='جارٍ الحفظ…';});return;}
+    if(form.dataset.confirmed==='1'){$$('button[type=submit]',form).forEach(button=>{button.disabled=true;button.textContent='جار الحفظ…';});return;}
     event.preventDefault();if(!form.reportValidity())return;
     pending=form;$('[data-ac-message]').textContent=form.dataset.acConfirm;show(dialog);
   }));

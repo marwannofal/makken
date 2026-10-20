@@ -13,6 +13,9 @@ RUN python -m pip install -r requirements.production.txt
 
 COPY --chown=app:app . /app
 
+# BEGIN MAKKEN PDF DEPENDENCIES v1
+RUN apt-get update && apt-get install -y --no-install-recommends libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0 && rm -rf /var/lib/apt/lists/*
+# END MAKKEN PDF DEPENDENCIES v1
 USER app
 
 ENTRYPOINT ["python", "/app/docker_production_bootstrap.py"]

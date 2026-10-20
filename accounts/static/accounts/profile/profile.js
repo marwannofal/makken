@@ -72,7 +72,7 @@
   }
   const confirm=document.getElementById('profile-confirmation');let pending=null;
   document.querySelectorAll('[data-profile-form]').forEach(form=>form.addEventListener('submit',event=>{
-    if(form.dataset.confirmed==='true'){const button=form.querySelector('button[type=submit]');button.disabled=true;button.textContent='جارٍ الحفظ…';return;}
+    if(form.dataset.confirmed==='true'){const button=form.querySelector('button[type=submit]');button.disabled=true;button.textContent='جار الحفظ…';return;}
     if(typeof confirm.showModal!=='function')return;
     event.preventDefault();if(!form.reportValidity())return;
     pending=form;

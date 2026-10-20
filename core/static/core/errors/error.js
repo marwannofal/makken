@@ -37,7 +37,7 @@
     if (remaining > 0 || navigating) return;
     navigating = true;
     button.disabled = true;
-    label.textContent = "جارٍ فتح الصفحة…";
+    label.textContent = "جار فتح الصفحة…";
     if (automatic) {
       try { sessionStorage.setItem(key, String(Date.now())); }
       catch (_) {

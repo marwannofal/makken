@@ -56,7 +56,7 @@
     confirmForm.addEventListener("submit", () => {
       const button = confirmForm.querySelector("button[type=submit]");
       button.disabled = true;
-      button.textContent = "جارٍ الحفظ…";
+      button.textContent = "جار الحفظ…";
     });
   });
   window.addEventListener("pageshow", () => {

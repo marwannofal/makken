@@ -27,7 +27,7 @@
     if (form.matches('[data-willingness-form]')) return;
     const button = $('button[type=submit]', form);
     button.disabled = true;
-    button.textContent = 'جارٍ التنفيذ…';
+    button.textContent = 'جار التنفيذ…';
   }));
   $$('[data-partnership-row]').forEach(row => row.addEventListener('click', event => {
     if (event.target.closest('a,button,input,select,textarea,label,form,[data-development-cell]') || getSelection()?.toString()) return;
