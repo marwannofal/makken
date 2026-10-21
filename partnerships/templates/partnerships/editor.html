@@ -13,7 +13,7 @@
 <noscript><div class="feedback feedback-info">فعّل JavaScript لإدارة بنود القطاعات واستخدام القوائم القابلة للبحث.</div></noscript>
 <form method="post" id="partnership-form" data-partnership-form>
 {% csrf_token %}<input type="hidden" name="action" value="preview"><input type="hidden" name="snapshot" value="{{ snapshot }}">{{ form.offerings }}
-<section class="partnership-card"><header class="card-heading"><div><p class="eyebrow">01 · معلومات الجهة</p><h2>البيانات الأساسية</h2></div><span class="subtle-badge">جميع الحقول مطلوبة</span></header>
+<section class="partnership-card"><header class="card-heading"><div><p class="eyebrow mk-numbered-section-title">01 · معلومات الجهة</p><h2>البيانات الأساسية</h2></div><span class="subtle-badge">جميع الحقول مطلوبة</span></header>
 {% if form.errors %}<div class="feedback feedback-error" role="alert">راجع الحقول الموضحة أدناه. لم تُحفظ البيانات بعد.{{ form.non_field_errors }}</div>{% endif %}
 <div class="partnership-form-grid">
 {% include "partnerships/_field.html" with field=form.name %}
@@ -27,7 +27,7 @@
 
 {% guarded_status 'partnerships' %}<fieldset class="partnership-field"><legend>حالة السجل <span class="required" aria-hidden="true">*</span></legend><div class="status-choices">{% for radio in form.is_active %}<label>{{ radio.tag }}<span>{{ radio.choice_label }}</span></label>{% endfor %}</div><div class="field-error" id="error-is_active" role="alert">{{ form.is_active.errors }}</div></fieldset>{% endguarded_status %}
 </div></section>
-<section class="partnership-card"><header class="card-heading"><div><p class="eyebrow">02 · إدارة أشكال الرعاية للجهة</p><h2>القطاعات والتخصصات المرتبطة</h2><p class="muted">أضف بنود الشراكة، ثم احفظ سجل الجهة كاملًا.</p></div><button type="button" class="button button-primary add-offering" data-add-offering>إضافة أشكال الرعاية للجهة</button></header>
+<section class="partnership-card"><header class="card-heading"><div><p class="eyebrow mk-numbered-section-title">02 · إدارة أشكال الرعاية للجهة</p><h2>القطاعات والتخصصات المرتبطة</h2><p class="muted">أضف بنود الشراكة، ثم احفظ سجل الجهة كاملًا.</p></div><button type="button" class="button button-primary add-offering" data-add-offering>إضافة أشكال الرعاية للجهة</button></header>
 <div id="error-offerings" class="field-error" role="alert">{{ form.offerings.errors }}<span data-offerings-error></span></div><div class="draft-notice" role="status">تعديلات البنود تُحفظ نهائيًا مع زر «حفظ الجهة» أدناه.</div>
 <p class="table-scroll-hint">اسحب الجدول أفقيًا لعرض جميع الأعمدة عند الحاجة.</p><div class="table-scroll"><table class="partnership-table offerings-table"><caption class="visually-hidden">بنود الشراكة المرتبطة بالجهة</caption><thead><tr><th scope="col">اسم القطاع</th><th scope="col">التخصصات المرتبطة</th><th scope="col">شكل الرعاية</th><th scope="col">حالة السجل</th><th scope="col">الإجراء</th></tr></thead><tbody data-offerings-table></tbody></table></div><p class="empty-state" data-offerings-empty>لم تُضف بنود شراكة بعد. أضف قطاعًا وتخصصاته وشكل الرعاية أولًا.</p></section>
 <div class="editor-actions"><button class="button button-primary" type="submit" data-save-partnership>حفظ الجهة</button><a class="button button-secondary" href="{% url 'partnerships:index' %}">إغلاق</a></div></form>
