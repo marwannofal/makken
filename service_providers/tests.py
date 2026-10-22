@@ -167,7 +167,12 @@ class ProviderTests(TestCase):
             def handle_starttag(self,tag,attrs):
                 if tag=='details' and 'nav-management' in dict(attrs).get('class',''):self.groups.append(dict(attrs))
         parsed=Details();parsed.feed(response.content.decode())
-        self.assertTrue(parsed.groups);self.assertTrue(all('open' not in group for group in parsed.groups))
+        provider_groups = [group for group in parsed.groups if 'data-service-providers-group' in group]
+        other_groups = [group for group in parsed.groups if 'data-service-providers-group' not in group]
+        self.assertTrue(provider_groups, 'The provider navigation group must exist.')
+        self.assertTrue(all('open' in group for group in provider_groups))
+        self.assertTrue(other_groups, 'Other navigation groups must still exist.')
+        self.assertTrue(all('open' not in group for group in other_groups))
         self.assertContains(response,reverse('service_providers:create'))
 
 
