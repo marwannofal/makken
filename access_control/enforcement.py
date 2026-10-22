@@ -53,6 +53,13 @@ def _details_permissions(module,item_id,data):
 
 
 def requested_operations(request,module,view,kwargs):
+    if module in {'approved_programs', 'provider_assignments'}:
+        if request.method in {'GET', 'HEAD'}:
+            return ['view']
+        if request.method != 'POST' or module != 'provider_assignments':
+            raise PermissionDenied
+        from market_needs.execution_views import mutation_permissions
+        return ['view', *mutation_permissions(request, kwargs.get('pk'))]
     name=request.resolver_match.url_name
     if request.method in {'GET','HEAD'}:
         if name in {'download','attachment_download'}:return ['view','export']

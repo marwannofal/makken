@@ -32,13 +32,14 @@ REFERENCES = {
                        ('market_needs.Need', 'sector_id', 'بطاقات حاجة السوق')],
     'expense_items.expenseitem': [('training_programs.ProgramExpenseItem', 'expense_item_id', 'برامج التدريب'),
                                  ('market_needs.ExpenseLine', 'expense_item_id', 'بنود بطاقات حاجة السوق')],
-    'training_programs.trainingprogram': [('market_needs.Need', 'program_id', 'بطاقات حاجة السوق')],
+    'training_programs.trainingprogram': [('market_needs.Need', 'program_id', 'بطاقات حاجة السوق'), ('service_providers.ServiceProvider', 'program_id', 'برامج مزودي الخدمات')],
     'sponsorship_shapes.sponsorshipshape': [('partnerships.PartnershipOffering', 'sponsorship_shape_id', 'بنود الشراكات'),
                                            ('market_needs.ExpenseLine', 'sponsorship_shape_id', 'بنود بطاقات حاجة السوق')],
     'partnerships.partnership': [('market_needs.Sponsorship', 'partnership_id', 'متابعة الرعاية'),
+                                ('market_needs.ExecutionEmployer', 'partnership_id', 'جهات توظيف البرامج'),
                                 ('service_providers.ServiceProvider', 'converted_partnership_id', 'مزودو الخدمات المرتبطون سابقًا')],
-    'market_needs.need': [('market_needs.Sponsorship', 'need_id', 'الجهات المرشحة ومتابعة الرعاية')],
-    'service_providers.serviceprovider': [],
+    'market_needs.need': [('market_needs.Sponsorship', 'need_id', 'الجهات المرشحة ومتابعة الرعاية'), ('market_needs.NeedExecution', 'need_id', 'تنفيذ البرامج')],
+    'service_providers.serviceprovider': [('market_needs.ExecutionProvider', 'provider_id', 'تنفيذ البرامج')],
 }
 
 

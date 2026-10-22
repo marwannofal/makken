@@ -1,0 +1,7 @@
+{% load access_tags %}
+{% allowed 'approved_programs' 'view' %}
+<a class="nav-link{% if active_page == 'approved_programs' %} is-active{% endif %}" href="{% url 'program_execution:index' %}"{% if active_page == 'approved_programs' %} aria-current="page"{% endif %}><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 3h16v18H4ZM8 8l2 2 5-5M8 15h8m-8 3h5"/></svg><span>البرامج المعتمدة وفقًا للتخصص</span><span class="nav-dot" aria-hidden="true"></span></a>
+{% endallowed %}
+{% allowed 'provider_assignments' 'view' %}
+<a class="nav-link{% if active_page == 'provider_assignments' %} is-active{% endif %}" href="{% url 'program_execution:assignments' %}"{% if active_page == 'provider_assignments' %} aria-current="page"{% endif %}><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m17-12v6m-3-3h6"/><circle cx="9" cy="7" r="4"/></svg><span>اختيار مزودي تنفيذ البرامج</span><span class="nav-dot" aria-hidden="true"></span></a>
+{% endallowed %}

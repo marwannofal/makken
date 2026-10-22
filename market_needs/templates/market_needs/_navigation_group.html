@@ -1,0 +1,15 @@
+{% load access_tags %}
+{% access_any 'market_needs' 'view' 'create' as show_market_navigation %}
+{% if show_market_navigation %}
+<details class="nav-management{% if active_page == 'market_needs' or active_page == 'market_need_editor' %} has-active-page{% endif %}" data-management-group data-market-needs-group{% if active_page == 'market_needs' or active_page == 'market_need_editor' %} open{% endif %}>
+  <summary class="nav-management-toggle">
+    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 4H5v17h14V4h-4M9 2h6v4H9ZM8 11h8m-8 4h8"/></svg>
+    <span>بطاقات السوق</span>
+    <svg class="management-chevron" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+  </summary>
+  <div class="nav-management-links">
+    {% include "market_needs/_navigation_editor.html" %}
+    {% include "market_needs/_navigation_list.html" %}
+  </div>
+</details>
+{% endif %}

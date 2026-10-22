@@ -46,6 +46,7 @@ class TableExportMiddleware:
         if response.status_code != 200:
             return response
         if not getattr(getattr(request, 'user', None), 'is_authenticated', False):
+            self.release_internal_response(response)
             return self.error('سجّل الدخول أولًا لتصدير البيانات.', 403)
         try:
             raw_index = request.GET.get('_mk_table', '0')
@@ -74,6 +75,26 @@ class TableExportMiddleware:
         except Exception:
             logger.exception('Makken export failed for path %s', request.path)
             return self.error('تعذّر تجهيز التقرير. أعد المحاولة، وإذا تكرر الخطأ تواصل مع مسؤول النظام.', 500)
+        finally:
+            self.release_internal_response(response)
+
+    @staticmethod
+    def release_internal_response(response):
+        """Release a synthetic page without ending its owning HTTP request.
+
+        Django 5.2 HttpResponse.close() also sends request_finished. Sending it
+        for an internal pagination response can close the outer request's
+        database connection, including an active MySQL transaction. The actual
+        response returned to the server retains its normal close lifecycle.
+        """
+        closers = list(response._resource_closers)
+        response._resource_closers.clear()
+        for closer in closers:
+            try:
+                closer()
+            except Exception:
+                pass  # Match Django's resource cleanup behavior.
+        response.closed = True
 
     @staticmethod
     def error(message, status):
@@ -132,12 +153,16 @@ class TableExportMiddleware:
             except ValueError:
                 current = 0
             if current != 1:
-                page = self.parse(self.get_response(self.clone(request, key, 1)))
-                first = page.table(index)
-                if first.headers != table.headers:
-                    raise ExportError('تغيّرت أعمدة الجدول أثناء التصدير.', 409)
-                table = first
-                _, links = pagination(table, request.path, request.GET)
+                first_response = self.get_response(self.clone(request, key, 1))
+                try:
+                    page = self.parse(first_response)
+                    first = page.table(index)
+                    if first.headers != table.headers:
+                        raise ExportError('تغيّرت أعمدة الجدول أثناء التصدير.', 409)
+                    table = first
+                    _, links = pagination(table, request.path, request.GET)
+                finally:
+                    self.release_internal_response(first_response)
             current = 1
             pages = 1
             while True:
@@ -161,7 +186,7 @@ class TableExportMiddleware:
                     table.rows.extend(other.rows)
                     within_size_limit()
                 finally:
-                    next_response.close()
+                    self.release_internal_response(next_response)
                 current = number
                 pages += 1
         if len(table.rows)>limit:

@@ -1,0 +1,15 @@
+{% load access_tags %}
+{% access_any 'service_providers' 'view' 'create' as show_provider_navigation %}
+{% if show_provider_navigation %}
+<details class="nav-management{% if active_page == 'service_providers' or active_page == 'service_provider_editor' %} has-active-page{% endif %}" data-management-group data-service-providers-group{% if active_page == 'service_providers' or active_page == 'service_provider_editor' %} open{% endif %}>
+  <summary class="nav-management-toggle">
+    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 21h18M5 21V6l7-3 7 3v15M9 9h1m4 0h1m-6 4h1m4 0h1M10 21v-5h4v5"/></svg>
+    <span>مزودو خدمات التدريب</span>
+    <svg class="management-chevron" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+  </summary>
+  <div class="nav-management-links">
+    {% include "service_providers/_navigation_editor.html" %}
+    {% include "service_providers/_navigation_list.html" %}
+  </div>
+</details>
+{% endif %}

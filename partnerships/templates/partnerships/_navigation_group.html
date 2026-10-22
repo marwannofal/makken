@@ -1,0 +1,16 @@
+{% load access_tags %}
+{% access_any 'partnerships' 'view' 'create' as show_partnership_navigation %}
+{% if show_partnership_navigation %}
+<details class="nav-management{% if active_page == 'partnerships' or active_page == 'partnership_editor' %} has-active-page{% endif %}" data-management-group data-partnerships-group{% if active_page == 'partnerships' or active_page == 'partnership_editor' %} open{% endif %}>
+  <summary class="nav-management-toggle">
+    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m20 0v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/><circle cx="9" cy="7" r="4"/></svg>
+    <span>الشراكات</span>
+    <svg class="management-chevron" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+  </summary>
+  <div class="nav-management-links">
+    {% include "partnerships/_navigation_editor.html" %}
+    {% include "partnerships/_navigation_capability.html" %}
+    {% include "partnerships/_navigation_willingness.html" %}
+  </div>
+</details>
+{% endif %}

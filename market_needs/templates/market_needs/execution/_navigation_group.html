@@ -1,0 +1,15 @@
+{% load access_tags %}
+{% access_can 'approved_programs' 'view' as show_approved_programs %}
+{% access_can 'provider_assignments' 'view' as show_provider_assignments %}
+{% if show_approved_programs or show_provider_assignments %}
+<details class="nav-management{% if active_page == 'approved_programs' or active_page == 'provider_assignments' %} has-active-page{% endif %}" data-management-group data-execution-group{% if active_page == 'approved_programs' or active_page == 'provider_assignments' %} open{% endif %}>
+  <summary class="nav-management-toggle">
+    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 3h16v18H4ZM8 8l2 2 5-5M8 15h8m-8 3h5"/></svg>
+    <span>تنفيذ البرامج</span>
+    <svg class="management-chevron" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+  </summary>
+  <div class="nav-management-links">
+    {% include "market_needs/execution/_navigation.html" %}
+  </div>
+</details>
+{% endif %}

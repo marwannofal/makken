@@ -9,6 +9,7 @@ from django.db import transaction
 from regions.models import Region
 from sectors.models import Sector
 from specializations.models import Specialization
+from training_programs.models import TrainingProgram
 from .forms import ProviderForm, coverage_data
 from .models import ServiceProvider, ProviderCoverage, ProviderAudit
 
@@ -20,7 +21,7 @@ class Conflict(Exception):
 def snapshot(item):
     if not item:
         return {}
-    return {"name": item.name, "representative": item.representative, "phone_country": item.phone_country, "phone": item.phone, "email": item.email, "provider_type": item.provider_type, "scope": item.scope, "is_active": item.is_active, "coverage": coverage_data(item), "partnership": item.converted_partnership_id, "converted_at": item.converted_at.isoformat() if item.converted_at else None, "version": item.version}
+    return {"program": item.program_id, "name": item.name, "representative": item.representative, "phone_country": item.phone_country, "phone": item.phone, "email": item.email, "provider_type": item.provider_type, "scope": item.scope, "is_active": item.is_active, "coverage": coverage_data(item), "partnership": item.converted_partnership_id, "converted_at": item.converted_at.isoformat() if item.converted_at else None, "version": item.version}
 
 
 def audit(item, action, user, before):
@@ -28,6 +29,8 @@ def audit(item, action, user, before):
 
 
 def lock_references(data):
+    if data.get("program"):
+        list(TrainingProgram.objects.select_for_update().filter(pk=data["program"]))
     rows = json.loads(data["coverage"]) if isinstance(data["coverage"], str) else data["coverage"]
     regions = sorted({r["region"] for r in rows})
     specs = sorted({s for r in rows for s in r["specializations"]})
@@ -64,6 +67,7 @@ def save_provider(payload, user):
         for key in ["name", "representative", "phone_country", "phone", "email", "provider_type", "scope"]:
             setattr(item, key, data[key])
         item.is_active = data["is_active"] == "1"
+        item.program_id = data.get("program")
         item.updated_by = user
         item.save()
         keep = []

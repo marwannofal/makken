@@ -1,0 +1,34 @@
+name: makken-execution-tests
+services:
+  mysql-execution-tests:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: execution_checks
+      MYSQL_ROOT_PASSWORD: execution-checks-disposable-only
+      MYSQL_ROOT_HOST: "%"
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci", "--innodb-buffer-pool-size=64M", "--max-connections=20", "--performance-schema=OFF"]
+    tmpfs:
+      - /var/lib/mysql:size=512m
+    mem_limit: 512m
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "--silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+    networks: [checks]
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+    entrypoint: ["python", "/app/manage.py"]
+    command: ["test", "market_needs", "service_providers", "access_control", "core", "--settings=market_needs.execution_mysql_checks_settings", "--noinput"]
+    environment:
+      MAKKEN_ISOLATED_EXECUTION_MYSQL_TESTS: "1"
+    depends_on:
+      mysql-execution-tests:
+        condition: service_healthy
+    networks: [checks]
+networks:
+  checks:
+    internal: true

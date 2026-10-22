@@ -11,6 +11,7 @@ class ProviderType(models.TextChoices):
 
 
 class ServiceProvider(models.Model):
+    program = models.ForeignKey("training_programs.TrainingProgram", null=True, blank=True, on_delete=models.PROTECT, related_name="service_providers", verbose_name="البرنامج التدريبي")
     name = models.CharField("اسم مزود الخدمة", max_length=200, validators=[validate_name])
     name_key = models.CharField(max_length=600, editable=False)
     representative = models.CharField("اسم الممثل عن مزود الخدمة", max_length=200, blank=True, validators=[validate_name])

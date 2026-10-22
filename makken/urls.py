@@ -108,3 +108,5 @@ urlpatterns = [_providers_path("service-providers/", _providers_include("service
 # MAKKEN RBAC INTEGRATION v1
 from django.urls import include as _access_include, path as _access_path
 urlpatterns = [_access_path('access-control/', _access_include('access_control.urls'))] + list(urlpatterns)
+
+urlpatterns = [path('execution/', include('market_needs.execution_urls'))] + urlpatterns

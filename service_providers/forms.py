@@ -2,12 +2,14 @@ import json
 import re
 import phonenumbers
 from django import forms
+from django.db.models import Q
 from accounts.profile_forms import COUNTRIES
 from entities.models import normalize_name, validate_name
 from regions.models import Region
 from specializations.models import Specialization
 from partnerships.models import Scope
 from .models import ServiceProvider, ProviderType
+from training_programs.models import TrainingProgram
 
 
 def phone_value(raw, country):
@@ -47,6 +49,7 @@ def coverage_data(item):
 
 
 class ProviderForm(forms.Form):
+    program = forms.TypedChoiceField(label="البرنامج التدريبي", coerce=int, empty_value=None)
     name = forms.CharField(label="اسم مزود الخدمة", max_length=200, validators=[validate_name])
     representative = forms.CharField(label="اسم الممثل عن مزود الخدمة", max_length=200, required=False, validators=[validate_name])
     phone_country = forms.ChoiceField(label="رمز الدولة", choices=COUNTRIES, initial="SA")
@@ -61,6 +64,13 @@ class ProviderForm(forms.Form):
         self.instance = instance
         self.previous = {row["region"]: set(row["specializations"]) for row in coverage_data(instance)}
         super().__init__(*args, **kwargs)
+        previous_program = instance.program_id if instance else None
+        self.fields["program"].choices = [("", "اختر البرنامج التدريبي"), *[
+            (p.pk, p.name + (" (محفوظ سابقًا)" if not p.is_active else ""))
+            for p in TrainingProgram.objects.filter(Q(is_active=True) | Q(pk=previous_program))
+        ]]
+        # Preserve legacy records with unknown program; never invent a backfill.
+        self.fields["program"].required = instance is None or bool(previous_program)
         setup_fields(self)
 
     def clean_name(self):
@@ -116,6 +126,11 @@ class ProviderForm(forms.Form):
 
     def clean(self):
         data = super().clean()
+        if self.instance and self.instance.execution_links.exists():
+            changed_coverage = "coverage" in data and data["coverage"] != coverage_data(self.instance)
+            changed_program = "program" in data and data["program"] != self.instance.program_id
+            if changed_coverage or changed_program:
+                raise forms.ValidationError("المزود مرتبط بتنفيذ برنامج؛ لا يمكن تغيير برنامجه أو مناطقه وتخصصاته حتى لا تتغير بيانات التنفيذ المحفوظة.")
         if data.get("phone") and data.get("phone_country"):
             try:
                 data["phone"] = phone_value(data["phone"], data["phone_country"])

@@ -36,6 +36,8 @@ class ProviderTests(TestCase):
         cls.sector=Sector.objects.create(name='قطاع مزودي التدريب')
         cls.spec=Specialization.objects.create(name='تخصص مزود أول',sector=cls.sector)
         cls.spec2=Specialization.objects.create(name='تخصص مزود ثان',sector=cls.sector)
+        from training_programs.models import TrainingProgram
+        cls.program=TrainingProgram.objects.create(name="برنامج مزودي الاختبار",category="qualifying_program")
         cls.shape=SponsorshipShape.objects.create(name='رعاية مزودي التدريب')
         cls.entity=Entity.objects.create(name='كيان مزود حكومي',entity_type='government',branch='')
         cls.private=Entity.objects.create(name='كيان مزود أهلي',entity_type='non_government',branch='private_large')
@@ -47,7 +49,7 @@ class ProviderTests(TestCase):
         setting=override_settings(MAKKEN_PRIVATE_UPLOAD_ROOT=self.folder.name);setting.enable();self.addCleanup(setting.disable)
 
     def data(self,**changes):
-        data={'name':'مزود تدريب تجريبي','representative':'ممثل الجهة','phone_country':'SA','phone':'0501234567','email':'provider@example.com','provider_type':'government','scope':'local','is_active':'1','coverage':json.dumps([{'region':self.region.pk,'specializations':[self.spec.pk,self.spec2.pk],'is_active':True},{'region':self.region2.pk,'specializations':[self.spec.pk],'is_active':False}])}
+        data={'program':str(self.program.pk),'name':'مزود تدريب تجريبي','representative':'ممثل الجهة','phone_country':'SA','phone':'0501234567','email':'provider@example.com','provider_type':'government','scope':'local','is_active':'1','coverage':json.dumps([{'region':self.region.pk,'specializations':[self.spec.pk,self.spec2.pk],'is_active':True},{'region':self.region2.pk,'specializations':[self.spec.pk],'is_active':False}])}
         data.update(changes);return data
 
     def create(self,**changes):

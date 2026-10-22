@@ -1,0 +1,6 @@
+{% extends "market_needs/base.html" %}
+{% load static %}
+{% block extra_head %}{{ block.super }}
+<link rel="stylesheet" href="{% static 'market_needs/execution.css' %}?v=20261021">
+<script src="{% static 'market_needs/execution.js' %}?v=20261021" defer></script>
+{% endblock %}

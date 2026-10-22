@@ -30,6 +30,8 @@ MODULES = (
     ModuleDefinition('partnerships', 'الشراكات', 'partnerships:index', (*CRUD, 'export')),
     ModuleDefinition('market_needs', 'بطاقات حاجة السوق ومتابعة الرعاية', 'market_needs:index', (*CRUD, 'export')),
     ModuleDefinition('service_providers', 'مزودو الخدمات', 'service_providers:index', CRUD),
+    ModuleDefinition('approved_programs', 'البرامج المعتمدة وفقًا للتخصص', 'program_execution:index', ('view',)),
+    ModuleDefinition('provider_assignments', 'اختيار مزودي تنفيذ البرامج', 'program_execution:assignments', ('view', 'create', 'edit', 'change_status')),
 )
 # BEGIN MAKKEN FORMAT EXPORT RIGHTS v1
 TABLE_EXPORT_OPERATIONS = ('export_xlsx', 'export_pdf')

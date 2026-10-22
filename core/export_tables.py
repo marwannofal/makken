@@ -215,6 +215,8 @@ def pagination(table, path, query):
                     continue
                 params = parse_qs(url.query, keep_blank_values=True)
                 for key, values in params.items():
+                    if nav.attrs.get('data-page-key') and key != nav.attrs['data-page-key']:
+                        continue
                     if re.fullmatch(r'(?:[a-zA-Z_]+_)?page', key) and len(values) == 1 and values[0].isdigit():
                         number = int(values[0])
                         if number > 0:

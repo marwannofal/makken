@@ -211,9 +211,14 @@ class ExportPermissionMigrationTests(TransactionTestCase):
     def test_upgrade_preserves_legacy_grants_and_overrides(self):
         before=[('access_control','0002_default_roles')]
         after=[('access_control','0003_table_export_permissions')]
+        full_state=MigrationExecutor(connection).loader.graph.leaf_nodes()
         try:
             MigrationExecutor(connection).migrate(before)
             state=MigrationExecutor(connection).loader.project_state(before).apps
+            # TransactionTestCase flushes data migrations; establish the historical fixture explicitly.
+            import importlib
+            with connection.schema_editor() as editor:
+                importlib.import_module('access_control.migrations.0002_default_roles').seed(state, editor)
             Group=state.get_model('auth','Group')
             Permission=state.get_model('auth','Permission')
             User=state.get_model('auth','User')
@@ -231,6 +236,6 @@ class ExportPermissionMigrationTests(TransactionTestCase):
             self.assertEqual(Override.objects.get(pk=rule.pk).effect,'deny')
             self.assertFalse(group.permissions.filter(codename__startswith='export_xlsx_').exists())
             self.assertFalse(Override.objects.filter(operation__in=['export_xlsx','export_pdf']).exists())
-            self.assertEqual(Permission.objects.filter(content_type__app_label='access_control',content_type__model='module',codename__startswith='export_xlsx_').count(),12)
+            self.assertEqual(Permission.objects.filter(content_type__app_label='access_control',content_type__model='module',codename__in=['export_xlsx_'+key for key in importlib.import_module('access_control.migrations.0003_table_export_permissions').MODULE_KEYS]).count(),12)
         finally:
-            MigrationExecutor(connection).migrate(after)
+            MigrationExecutor(connection).migrate(full_state)

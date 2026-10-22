@@ -29,7 +29,9 @@ class ProviderConcurrencyTests(TransactionTestCase):
         self.shape=SponsorshipShape.objects.create(name='شكل رعاية اختبار التزامن')
         self.entity=Entity.objects.create(name='كيان اختبار التزامن',entity_type='government',branch='')
         StateColor.objects.update_or_create(state='willingness',defaults={'color':'#24b3af'})
-        data={'name':'مزود اختبار التزامن','representative':'ممثل المزود','phone_country':'SA','phone':'0501234567','email':'parallel@example.com','provider_type':'government','scope':'local','is_active':'1','coverage':json.dumps([{'region':self.region.pk,'specializations':[self.spec.pk],'is_active':True}])}
+        from training_programs.models import TrainingProgram
+        program=TrainingProgram.objects.create(name='برنامج اختبار التزامن',category='qualifying_program')
+        data={'program':program.pk,'name':'مزود اختبار التزامن','representative':'ممثل المزود','phone_country':'SA','phone':'0501234567','email':'parallel@example.com','provider_type':'government','scope':'local','is_active':'1','coverage':json.dumps([{'region':self.region.pk,'specializations':[self.spec.pk],'is_active':True}])}
         self.item=save_provider({'id':None,'nonce':str(uuid.uuid4()),'data':data},self.user)
         self.folder=TemporaryDirectory();self.addCleanup(self.folder.cleanup)
         setting=override_settings(MAKKEN_PRIVATE_UPLOAD_ROOT=self.folder.name);setting.enable();self.addCleanup(setting.disable)
