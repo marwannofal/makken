@@ -89,7 +89,7 @@ def save_need(data, actor, pk=None, version=None, nonce=None):
             except (ValueError, TypeError):
                 ids = []
         list(model.objects.select_for_update().filter(pk__in=ids).order_by("pk"))
-    form = NeedForm(data, instance=need)
+    form = NeedForm(data, instance=need, actor=actor)
     if not form.is_valid():
         raise InvalidForm(form)
     clean = form.cleaned_data
@@ -158,7 +158,7 @@ def add_candidates(pk, version, ids, filters, actor):
     list(Partnership.objects.select_for_update().filter(pk__in=ids).order_by("pk"))
     from training_programs.models import TrainingProgram
     list(TrainingProgram.objects.select_for_update().filter(pk=need.program_id))
-    eligible = set(candidates(need, filters).filter(pk__in=ids).values_list("pk", flat=True))
+    eligible = set(candidates(need, filters, actor=actor).filter(pk__in=ids).values_list("pk", flat=True))
     if eligible != set(ids):
         raise Conflict("تغيّرت أهلية بعض الجهات أو أُضيفت مسبقًا. حدّث نتائج المطابقة قبل التأكيد.")
     for organization_id in sorted(ids):
@@ -198,7 +198,7 @@ def followup(pk, version, sponsorship_id, record_version, operation, data, files
             if operation == "approve":
                 from training_programs.models import TrainingProgram
                 list(TrainingProgram.objects.select_for_update().filter(pk=need.program_id))
-                if not eligible_for_approval(need, organization.pk):
+                if not eligible_for_approval(need, organization.pk, actor=actor):
                     raise Conflict("لم تعد الجهة متوافقة مع بيانات برنامج الحاجة، أو أصبحت غير نشطة، أو حالة تطورها غير معرّفة. راجع بياناتها قبل الاعتماد.")
                 if clean["amount"] > need.remaining:
                     raise Conflict("المساهمة تتجاوز المبلغ المتبقي. حدّث الصفحة وراجع إجمالي الدعم.")

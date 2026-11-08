@@ -1,0 +1,5 @@
+{% load access_tags %}
+{% region_writable item as item_region_writable %}
+{% if not item_region_writable %}
+<p class="feedback feedback-info" role="status"><strong>عرض فقط — سجل مشترك:</strong> يرتبط هذا السجل بمناطق أخرى خارج نطاقك. التعديل والحذف وتغيير الحالة يتطلب صلاحية على جميع مناطقه.</p>
+{% endif %}

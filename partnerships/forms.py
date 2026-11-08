@@ -9,6 +9,8 @@ from sectors.models import Sector
 from specializations.models import Specialization
 from sponsorship_shapes.models import SponsorshipShape
 from .models import Partnership, Scope
+from regions.models import Region
+from access_control.regions import RegionalPolicy, region_choices
 
 from .financial import MoneyField
 
@@ -23,6 +25,7 @@ def offering_data(item):
 
 
 class PartnershipForm(forms.Form):
+    administrative_regions = forms.ModelMultipleChoiceField(label="المناطق الإدارية للجهة",queryset=Region.objects.none(),required=False,widget=forms.SelectMultiple(attrs={'data-market-select':'','data-label':'المناطق الإدارية للجهة'}),help_text='تحدد صلاحيات الوصول فقط ولا تغيّر شروط مطابقة الرعاة. الجهة بلا مناطق لا تظهر للمستخدم المقيّد.')
     name = forms.CharField(label="اسم الجهة", max_length=200, validators=[validate_name])
     representative = forms.CharField(label="اسم الممثل عن الجهة", max_length=200, validators=[validate_name])
     phone_country = forms.ChoiceField(label="رمز الدولة", choices=COUNTRIES, initial="SA")
@@ -35,14 +38,19 @@ class PartnershipForm(forms.Form):
     is_active = forms.ChoiceField(label="حالة السجل", choices=[("1", "نشط"), ("0", "غير نشط")], widget=forms.RadioSelect, initial="1")
     offerings = forms.CharField(max_length=60000, widget=forms.HiddenInput, initial="[]")
 
-    def __init__(self, *args, instance=None, **kwargs):
+    def __init__(self, *args, instance=None, actor=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.instance = instance
+        previous_regions=list(instance.administrative_regions.values_list('pk',flat=True)) if instance else []
+        self.fields['administrative_regions'].queryset=region_choices(actor,previous_regions) if actor is not None else Region.objects.filter(Q(is_active=True)|Q(pk__in=previous_regions))
+        self.fields['administrative_regions'].required=actor is not None and not RegionalPolicy(actor).unrestricted
+        self.fields['administrative_regions'].label_from_instance=lambda region: region.name + (' (غير نشط — محفوظ سابقًا)' if not region.is_active else '')
         self.existing_rows = offering_data(instance)
         kind = self.data.get("entity_type") if self.is_bound else self.initial.get("entity_type", "")
         self.show_entity = kind == EntityType.NON_GOVERNMENT
         self.fields["entity"].required = self.show_entity
         self.fields["entity"].queryset = Entity.objects.filter(Q(is_active=True) | Q(pk=instance.entity_id if instance else None)).order_by("name")
+        self.fields['administrative_regions'].error_messages.update(invalid_list='اختر المناطق من القائمة.', invalid_pk_value='أحد معرّفات المناطق غير صحيح.')
         self.fields["entity"].label_from_instance = lambda e: e.name + (" (غير نشط)" if not e.is_active else "")
         for name, field in self.fields.items():
             if field.required:

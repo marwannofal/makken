@@ -49,9 +49,10 @@ def finish(request,template,context,status=200):
 
 
 def initial_user(target):
-    if not target:return {'page_scope':'selected','is_active':'1'}
+    if not target:return {'page_scope':'selected','region_scope':'all','is_active':'1'}
     access=UserAccess.objects.filter(user=target).first()
     values={'full_name':target.get_full_name() or target.get_username(),'username':target.get_username(),'email':target.email,'is_active':'1' if target.is_active else '0','roles':list(RoleProfile.objects.filter(group__user=target).values_list('pk',flat=True)),'page_scope':access.page_scope if access else 'selected','allowed_pages':list(access.allowed_pages.values_list('pk',flat=True)) if access else []}
+    values.update(region_scope=access.region_scope if access else 'all', allowed_regions=list(access.allowed_regions.values_list('pk',flat=True)) if access else [])
     for rule in PermissionOverride.objects.filter(user=target):values[f'override__{rule.module_id}__{rule.operation}']=rule.effect
     # Legacy direct Django grants stay visible and become explicit managed grants on save.
     codes=set(target.user_permissions.filter(content_type__app_label='access_control',content_type__model='module').values_list('codename',flat=True))
@@ -89,7 +90,7 @@ def role_catalog():
 def index(request):
     tab=request.GET.get('tab','users');tab=tab if tab in {'users','permissions','pages'} else 'users'
     context=base(request,tab);User=get_user_model();q=request.GET.get('q','').strip()[:200];status=request.GET.get('status','');role=request.GET.get('role','')
-    users=User._default_manager.prefetch_related(Prefetch('groups',queryset=Group.objects.select_related('makken_role')),'makken_access__allowed_pages','makken_overrides',Prefetch('user_permissions',queryset=Permission.objects.filter(content_type__app_label='access_control',content_type__model='module'))).order_by('-pk')
+    users=User._default_manager.prefetch_related(Prefetch('groups',queryset=Group.objects.select_related('makken_role')),'makken_access__allowed_pages','makken_access__allowed_regions','makken_overrides',Prefetch('user_permissions',queryset=Permission.objects.filter(content_type__app_label='access_control',content_type__model='module'))).order_by('-pk')
     for word in q.split()[:12]:
         condition=Q(username__icontains=word)|Q(email__icontains=word)|Q(first_name__icontains=word)|Q(last_name__icontains=word)|Q(groups__name__icontains=word)
         if word.isascii() and word.isdigit() and len(word)<19:condition|=Q(pk=int(word))

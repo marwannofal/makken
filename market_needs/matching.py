@@ -11,6 +11,7 @@ from partnerships.models import Partnership, PartnershipOffering
 from care_states.models import DevelopmentState
 from training_programs.models import TrainingProgram
 from .models import Sponsorship
+from access_control.regions import scoped
 
 
 def matching_offerings(need):
@@ -22,17 +23,17 @@ def matching_offerings(need):
     ).select_related("sector", "sponsorship_shape").distinct()
 
 
-def eligible_partnerships(need):
+def eligible_partnerships(need, actor=None):
     offers = matching_offerings(need).filter(partnership_id=OuterRef("pk"))
-    return Partnership.objects.filter(
+    return scoped(Partnership.objects.all(), actor).filter(
         Exists(offers), Exists(TrainingProgram.objects.filter(pk=need.program_id, is_active=True)),
         is_active=True, entity__is_active=True,
     )
 
 
-def candidates(need, filters=None, exclude_linked=True):
+def candidates(need, filters=None, exclude_linked=True, actor=None):
     filters = filters or {}
-    query = eligible_partnerships(need).filter(development_state_id__in=DevelopmentState.values)
+    query = eligible_partnerships(need, actor=actor).filter(development_state_id__in=DevelopmentState.values)
     if exclude_linked:
         query = query.exclude(pk__in=Sponsorship.objects.filter(need=need).values("partnership_id"))
     if filters.get("states"):
@@ -58,10 +59,10 @@ class Match:
         return len(self.lines) == self.line_count
 
 
-def eligible_for_approval(need, organization_id):
+def eligible_for_approval(need, organization_id, actor=None):
     # All existing development states are eligible. Actual approval advances
     # capability/willingness directly to care and preserves an existing care date.
-    return eligible_partnerships(need).filter(
+    return eligible_partnerships(need, actor=actor).filter(
         pk=organization_id, development_state_id__in=DevelopmentState.values,
     ).exists()
 

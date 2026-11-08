@@ -25,6 +25,7 @@ from specializations.models import Specialization
 from .forms import ProviderForm, coverage_data
 from .models import ServiceProvider, ProviderCoverage, ProviderType
 from . import services
+from access_control.regions import scoped, require_write
 
 SALT = "makken.service-providers.v1"
 AGE = 20 * 60
@@ -48,16 +49,16 @@ def base(request, title, active):
     return {"page_heading": title, "active_page": active, "display_name": name, "avatar_initial": name[:1]}
 
 
-def query():
-    return ServiceProvider.objects.select_related("created_by", "updated_by", "program").prefetch_related("program__expense_items", Prefetch("coverage", queryset=ProviderCoverage.objects.select_related("region").prefetch_related("specializations__sector")))
+def query(actor=None):
+    return scoped(ServiceProvider.objects.all(), actor).select_related("created_by", "updated_by", "program").prefetch_related("program__expense_items", Prefetch("coverage", queryset=ProviderCoverage.objects.select_related("region").prefetch_related("specializations__sector")))
 
 
-def catalog(item):
+def catalog(item, actor=None):
     old = coverage_data(item)
     region_ids = [r["region"] for r in old]
     spec_ids = {s for r in old for s in r["specializations"]}
     programs = TrainingProgram.objects.filter(Q(is_active=True) | Q(pk=item.program_id if item else None)).prefetch_related("expense_items")
-    return {"programs": [{"id": p.pk, "category": p.get_category_display(), "type": "تدريبي" if p.is_training else "تشغيلي", "expenses": [e.name for e in p.expense_items.all()]} for p in programs], "regions": list(Region.objects.filter(Q(is_active=True) | Q(pk__in=region_ids)).values("id", "name", "is_active")), "specializations": [{"id": s.pk, "name": s.name, "sector": s.sector.name if s.sector else "", "is_active": bool(s.is_active and s.sector and s.sector.is_active)} for s in Specialization.objects.filter(Q(is_active=True, sector__is_active=True) | Q(pk__in=spec_ids)).select_related("sector")], "original": old}
+    return {"programs": [{"id": p.pk, "category": p.get_category_display(), "type": "تدريبي" if p.is_training else "تشغيلي", "expenses": [e.name for e in p.expense_items.all()]} for p in programs], "regions": list(scoped(Region.objects.filter(Q(is_active=True) | Q(pk__in=region_ids)), actor).values("id", "name", "is_active")), "specializations": [{"id": s.pk, "name": s.name, "sector": s.sector.name if s.sector else "", "is_active": bool(s.is_active and s.sector and s.sector.is_active)} for s in Specialization.objects.filter(Q(is_active=True, sector__is_active=True) | Q(pk__in=spec_ids)).select_related("sector")], "original": old}
 
 
 def initial(item):
@@ -70,7 +71,7 @@ def list_context(request):
     context = base(request, "إدارة سجل مزودي خدمات التدريب", "service_providers")
     term = request.GET.get("q", "").strip()[:200]
     status = request.GET.get("status", "")
-    providers = query()
+    providers = query(request.user)
     if status in {"active", "inactive"}:
         providers = providers.filter(is_active=status == "active")
     if term:
@@ -109,7 +110,8 @@ def index(request):
                 operation = request.POST.get("operation")
                 if operation not in {"toggle", "delete"}:
                     raise signing.BadSignature
-                item = get_object_or_404(query(), pk=data["id"])
+                item = get_object_or_404(query(request.user), pk=data["id"])
+                require_write(request.user, item)
                 if item.version != data["version"]:
                     raise services.Conflict("تغيّر السجل. حدّث الصفحة قبل المتابعة.")
                 ensure_allowed(item, operation, not item.is_active if operation == "toggle" else None)
@@ -128,7 +130,7 @@ def index(request):
         if detail_id:
             if not detail_id.isdecimal():
                 raise Http404
-            context["detail"] = get_object_or_404(query(), pk=detail_id)
+            context["detail"] = get_object_or_404(query(request.user), pk=detail_id)
             context["detail_events"] = context["detail"].events.select_related("actor")[:30]
     except DependencyBlocked as exc:
         context.update(blocked_context(exc))
@@ -144,10 +146,10 @@ def index(request):
 @login_required(login_url="accounts:login")
 @require_http_methods(["GET", "POST"])
 def editor(request, pk=None):
-    item = get_object_or_404(query(), pk=pk) if pk else None
+    item = get_object_or_404(query(request.user), pk=pk) if pk else None
     context = base(request, "تعديل مزود خدمات التدريب" if item else "إضافة مزود خدمات التدريب", "service_provider_editor")
     editor_token = token({"operation": "editor", "id": pk, "version": item.version if item else None, "nonce": str(uuid.uuid4())}, request.user)
-    form, pending, status = ProviderForm(initial=initial(item), instance=item), None, 200
+    form, pending, status = ProviderForm(initial=initial(item), instance=item, actor=request.user), None, 200
     try:
         if request.method == "POST":
             if int(request.META.get("CONTENT_LENGTH") or 0) > 220000:
@@ -158,7 +160,7 @@ def editor(request, pk=None):
                 if data.get("id") != pk or item and data.get("version") != item.version:
                     raise services.Conflict("تغيّر سجل المزود. أعد فتحه قبل التعديل.")
                 editor_token = request.POST["snapshot"]
-                form = ProviderForm(request.POST, instance=item)
+                form = ProviderForm(request.POST, instance=item, actor=request.user)
                 if form.is_valid():
                     ensure_allowed(item, "edit", form.cleaned_data["is_active"] == "1")
                     values = {name: form.cleaned_data[name] for name in form.fields}
@@ -192,7 +194,7 @@ def editor(request, pk=None):
         status = 409
     except (ValueError, TypeError):
         drafts = []
-    context.update(item=item, form=form, pending=pending, snapshot=editor_token, catalog=catalog(item), drafts=drafts)
+    context.update(item=item, form=form, pending=pending, snapshot=editor_token, catalog=catalog(item, request.user), drafts=drafts)
     return add_login_headers(render(request, "service_providers/editor.html", context, status=status))
 
 

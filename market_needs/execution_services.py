@@ -6,6 +6,7 @@ from django.db import transaction
 from django.db.models import Sum, prefetch_related_objects
 from django.utils import timezone
 from access_control.policy import require
+from access_control.regions import execution_write
 from partnerships.models import Partnership, PartnershipOffering
 from regions.models import Region
 from sectors.models import Sector
@@ -31,14 +32,14 @@ def snapshot(execution):
             "تاريخ اكتمال التنفيذ": execution.completed_at.isoformat() if execution.completed_at else None}
 
 
-def validate_selection(need, status, provider_ids, employer_ids, old_providers=(), old_employers=()):
+def validate_selection(need, status, provider_ids, employer_ids, old_providers=(), old_employers=(), actor=None):
     if status not in ExecutionStatus.values:
         raise ExecutionConflict("اختر حالة تنفيذ صحيحة.")
     for ids in (provider_ids, employer_ids):
         if len(ids) > 200 or len(ids) != len(set(ids)) or any(type(i) is not int or i <= 0 for i in ids):
             raise ExecutionConflict("اختيارات الجهات غير صحيحة أو مكررة؛ الحد الأقصى 200 لكل قائمة.")
-    valid_providers = {p.pk: p for p in matching.providers(need).filter(pk__in=provider_ids)}
-    valid_employers = {p.pk: p for p in matching.employers(need).filter(pk__in=employer_ids)}
+    valid_providers = {p.pk: p for p in matching.providers(need, actor=actor).filter(pk__in=provider_ids)}
+    valid_employers = {p.pk: p for p in matching.employers(need, actor=actor).filter(pk__in=employer_ids)}
     invalid_p = set(provider_ids) - valid_providers.keys()
     invalid_e = set(employer_ids) - valid_employers.keys()
     # A new draft may preserve already saved historical references, clearly marked.
@@ -59,6 +60,7 @@ def validate_selection(need, status, provider_ids, employer_ids, old_providers=(
     return valid_providers, valid_employers
 
 
+@execution_write
 def save_execution(*, need_id, expected_version, expected_need_version, nonce, data, actor):
     require(actor, "provider_assignments", "view")
     status = data["status"]
@@ -104,7 +106,7 @@ def save_execution(*, need_id, expected_version, expected_need_version, nonce, d
         old_p = {row.provider_id: row for row in execution.provider_links.all()} if execution else {}
         old_e = {row.partnership_id: row for row in execution.employer_links.all()} if execution else {}
         prefetch_related_objects([need], "regions")
-        valid_p, valid_e = validate_selection(need, status, provider_ids, employer_ids, old_p, old_e)
+        valid_p, valid_e = validate_selection(need, status, provider_ids, employer_ids, old_p, old_e, actor=actor)
         before = snapshot(execution)
         if not execution:
             execution = NeedExecution(need=need, created_by=actor)

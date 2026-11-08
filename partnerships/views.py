@@ -35,6 +35,8 @@ from .financial import FinancialRange, amount_string, financial_search_clause, f
 from .development_filter import DevelopmentFilter
 from .willingness import WillingnessTransitionForm, save_supporting_files
 from .attachment_storage import delete_private_files
+from access_control.regions import scoped, require_write, regional_transaction
+from regions.models import Region
 
 SALT = "makken.partnerships.v2-no-geography"
 AGE = 20 * 60
@@ -66,10 +68,10 @@ def _base(request, title, active):
     return {"page_heading": title, "active_page": active, "display_name": name, "avatar_initial": name[:1]}
 
 
-def _query():
-    return Partnership.objects.select_related("entity", "development_state").prefetch_related(
+def _query(actor=None):
+    return scoped(Partnership.objects.all(), actor).select_related("entity", "development_state").prefetch_related(
         Prefetch("offerings", queryset=PartnershipOffering.objects.select_related("sector", "sponsorship_shape").prefetch_related("specializations")),
-        "development_history__state", "willingness_attachments")
+        "development_history__state", "willingness_attachments", "administrative_regions")
 
 
 def _history(item):
@@ -81,7 +83,7 @@ def _history(item):
 
 def _fingerprint(data, lock=False):
     rows = json.loads(data["offerings"])
-    selections = [(Entity, [int(data["entity"])]), (Sector, sorted({r["sector"] for r in rows})), (Specialization, sorted({s for r in rows for s in r["specializations"]})), (SponsorshipShape, sorted({r["shape"] for r in rows}))]
+    selections = [(Region, [int(r.pk) if hasattr(r, "pk") else int(r) for r in data.get("administrative_regions", [])]), (Entity, [int(data["entity"])]), (Sector, sorted({r["sector"] for r in rows})), (Specialization, sorted({s for r in rows for s in r["specializations"]})), (SponsorshipShape, sorted({r["shape"] for r in rows}))]
     values = []
     for model, ids in selections:
         query = model.objects.filter(pk__in=ids).order_by("pk")
@@ -95,13 +97,13 @@ def _fingerprint(data, lock=False):
 
 
 def _serialized(cleaned):
-    return {"name": cleaned["name"], "representative": cleaned["representative"], "phone_country": cleaned["phone_country"], "phone": cleaned["phone"], "email": cleaned["email"], "entity_type": cleaned["entity_type"], "entity": str(cleaned["entity"].pk), "scope": cleaned["scope"], "is_active": cleaned["is_active"], "offerings": json.dumps(cleaned["offerings"]), "financial_capacity": amount_string(cleaned["financial_capacity"])}
+    return {"administrative_regions": [region.pk for region in cleaned["administrative_regions"]], "name": cleaned["name"], "representative": cleaned["representative"], "phone_country": cleaned["phone_country"], "phone": cleaned["phone"], "email": cleaned["email"], "entity_type": cleaned["entity_type"], "entity": str(cleaned["entity"].pk), "scope": cleaned["scope"], "is_active": cleaned["is_active"], "offerings": json.dumps(cleaned["offerings"]), "financial_capacity": amount_string(cleaned["financial_capacity"])}
 
 
 def _initial(item):
     if not item:
         return {"phone_country": "SA", "is_active": "1", "offerings": "[]"}
-    return {"name": item.name, "representative": item.representative, "phone_country": item.phone_country, "phone": item.phone, "email": item.email, "entity_type": item.entity.entity_type, "entity": item.entity_id, "scope": item.scope, "is_active": "1" if item.is_active else "0", "offerings": json.dumps(offering_data(item)), "financial_capacity": amount_string(item.financial_capacity)}
+    return {"administrative_regions": list(item.administrative_regions.values_list("pk",flat=True)), "name": item.name, "representative": item.representative, "phone_country": item.phone_country, "phone": item.phone, "email": item.email, "entity_type": item.entity.entity_type, "entity": item.entity_id, "scope": item.scope, "is_active": "1" if item.is_active else "0", "offerings": json.dumps(offering_data(item)), "financial_capacity": amount_string(item.financial_capacity)}
 
 
 def _catalog(item):
@@ -127,11 +129,12 @@ def _save(payload, user):
         if not pk:
             repeated = Partnership.objects.filter(request_key=payload["nonce"]).first()
             if repeated:
+                require_write(user, repeated)
                 return repeated
         data = payload["data"]
         if _fingerprint(data, lock=True) != payload.get("catalog"):
             raise Conflict("تغيّرت بيانات أحد الكيانات أو القطاعات أو التخصصات أو أشكال الرعاية. راجع الاختيارات مجددًا.")
-        form = PartnershipForm(data, instance=item)
+        form = PartnershipForm(data, instance=item, actor=user)
         if not form.is_valid():
             raise Conflict("تعذّر الحفظ. راجع الاسم والبيانات المرتبطة؛ قد تكون تغيّرت منذ المراجعة.")
         clean = form.cleaned_data
@@ -147,6 +150,7 @@ def _save(payload, user):
         if not new:
             item.version += 1
         item.save()
+        item.administrative_regions.set(clean["administrative_regions"])
         if new:
             DevelopmentHistory.objects.create(partnership=item, state_id=DevelopmentState.CAPABILITY, entered_at=item.development_state_at)
         item.offerings.all().delete()
@@ -160,14 +164,14 @@ def _save(payload, user):
 @login_required(login_url="accounts:login")
 @require_http_methods(["GET", "POST"])
 def editor(request, pk=None):
-    item = get_object_or_404(_query(), pk=pk) if pk else None
+    item = get_object_or_404(_query(request.user), pk=pk) if pk else None
     context = _base(request, "تعديل جهة لسجل الشراكات المحتملة التي لها القدرة" if item else "إضافة جهة لسجل الشراكات المحتملة التي لها القدرة", "partnership_editor")
     status, pending = 200, None
     snapshot = _sign({"kind": "editor", "id": pk, "version": item.version if item else None, "nonce": str(uuid.uuid4())}, request.user)
-    form = PartnershipForm(initial=_initial(item), instance=item)
+    form = PartnershipForm(initial=_initial(item), instance=item, actor=request.user)
     try:
         if request.method == "POST":
-            if len(request.body) > 150000:
+            if int(request.META.get("CONTENT_LENGTH") or 0) > 150000:
                 raise signing.BadSignature
             action = request.POST.get("action")
             if action == "preview":
@@ -175,7 +179,7 @@ def editor(request, pk=None):
                 if original.get("id") != pk or (item and original.get("version") != item.version):
                     raise Conflict("تغيّر السجل منذ فتح النموذج. أعد فتح الصفحة قبل التعديل.")
                 snapshot = request.POST["snapshot"]
-                form = PartnershipForm(request.POST, instance=item)
+                form = PartnershipForm(request.POST, instance=item, actor=request.user)
                 if form.is_valid():
                     ensure_allowed(item, "edit", form.cleaned_data["is_active"] == "1")
                     data = _serialized(form.cleaned_data)
@@ -187,7 +191,7 @@ def editor(request, pk=None):
                 payload = _load(request.POST.get("token"), request.user, "save")
                 if payload.get("id") != pk:
                     raise signing.BadSignature
-                form = PartnershipForm(payload["data"], instance=item)
+                form = PartnershipForm(payload["data"], instance=item, actor=request.user)
                 saved = _save(payload, request.user)
                 messages.success(request, "تم حفظ بيانات الجهة بنجاح.")
                 return add_login_headers(redirect("partnerships:edit", pk=saved.pk))
@@ -253,10 +257,11 @@ def index(request):
             data = _load(request.POST.get("token"), request.user, "row" if action == "preview" else "row-confirm")
             if data.get("operation") not in {"delete", "toggle", "advance"}:
                 raise signing.BadSignature
-            with transaction.atomic():
+            with regional_transaction(request.user) as region_policy:
                 item = Partnership.objects.select_for_update().filter(pk=data.get("id")).first()
                 if not item or item.version != data.get("version"):
                     raise Conflict("تغيّر هذا السجل أو حُذف، أو تم تنفيذ الطلب مسبقًا. حدّث القائمة وحاول مجددًا.")
+                require_write(request.user, item, policy=region_policy)
                 ensure_allowed(item, data["operation"], not item.is_active if data["operation"] == "toggle" else None)
                 if data["operation"] == "advance":
                     if item.development_state_id != DevelopmentState.CAPABILITY:
@@ -319,7 +324,7 @@ def index(request):
     context["willingness_form"] = willingness_form
     q = request.GET.get("q", "").strip()[:200]
     active = request.GET.get("status", "")
-    query = _search(_query(), q)
+    query = _search(_query(request.user), q)
     if active in {"1", "0"}:
         query = query.filter(is_active=active == "1")
     development = DevelopmentFilter(request, query)
@@ -343,7 +348,7 @@ def index(request):
         value = request.GET["detail"]
         if not value.isascii() or not value.isdecimal() or len(value) > 18:
             raise Http404
-        detail = get_object_or_404(_query(), pk=int(value))
+        detail = get_object_or_404(_query(request.user), pk=int(value))
     params = {"q": q, "status": active, "page": page.number}
     # MAKKEN FINANCIAL QUERY PARAMS
     params.update(financial.params)

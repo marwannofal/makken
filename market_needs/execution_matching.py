@@ -4,12 +4,13 @@ from django.db.models.functions import Coalesce
 from partnerships.models import Partnership, PartnershipOffering
 from service_providers.models import ServiceProvider, ProviderCoverage
 from .models import Need, NeedStatus, Sponsorship, SponsorshipStatus
+from access_control.regions import scoped
 
 
-def approved_needs():
+def approved_needs(actor=None):
     money = DecimalField(max_digits=16, decimal_places=2)
     funding = Sponsorship.objects.filter(need_id=OuterRef("pk"), status=SponsorshipStatus.APPROVED).order_by().values("need_id").annotate(total=Sum("amount"))
-    return (Need.objects.select_related("sector", "specialization", "program", "execution")
+    return (scoped(Need.objects.all(), actor).select_related("sector", "specialization", "program", "execution")
             .prefetch_related("regions")
             .annotate(actual_support=Coalesce(Subquery(funding.values("total")[:1]), Value(0), output_field=money),
                       approved_count=Count("sponsorships", filter=Q(sponsorships__status=SponsorshipStatus.APPROVED), distinct=True))
@@ -25,10 +26,10 @@ def matching_coverage(need):
     ).select_related("region").distinct()
 
 
-def providers(need):
+def providers(need, actor=None):
     if not need.is_active or not need.program.is_active or not need.sector.is_active or not need.specialization.is_active:
         return ServiceProvider.objects.none()
-    return (ServiceProvider.objects.filter(is_active=True, program_id=need.program_id,
+    return (scoped(ServiceProvider.objects.all(), actor).filter(is_active=True, program_id=need.program_id,
                                           coverage__in=matching_coverage(need))
             .select_related("program")
             .prefetch_related(Prefetch("coverage", queryset=matching_coverage(need), to_attr="matched_coverage"))
@@ -44,11 +45,11 @@ def employment_offerings(need):
     ).select_related("sponsorship_shape").distinct()
 
 
-def employers(need):
+def employers(need, actor=None):
     if need.training_type != "تشغيلي" or not need.is_active or not need.program.is_active or not need.sector.is_active or not need.specialization.is_active:
         return Partnership.objects.none()
     # Product decision: no partnership geographic filtering; scope is not coverage.
-    return (Partnership.objects.filter(is_active=True, entity__is_active=True, offerings__in=employment_offerings(need))
+    return (scoped(Partnership.objects.all(), actor).filter(is_active=True, entity__is_active=True, offerings__in=employment_offerings(need))
             .select_related("entity", "development_state")
             .prefetch_related(Prefetch("offerings", queryset=employment_offerings(need), to_attr="matched_offerings"))
             .distinct().order_by("name", "pk"))

@@ -22,7 +22,9 @@ TITLES = {
 REFERENCES = {
     'levels.level': [('market_needs.Sponsorship', 'level_id', 'متابعة الرعاية')],
     'regions.region': [('market_needs.NeedRegion', 'region_id', 'بطاقات حاجة السوق'),
-                       ('service_providers.ProviderCoverage', 'region_id', 'مزودو الخدمات')],
+                       ('service_providers.ProviderCoverage', 'region_id', 'مزودو الخدمات'),
+                       ('partnerships.PartnershipRegion', 'region_id', 'المناطق الإدارية للشراكات'),
+                       ('access_control.UserRegion', 'region_id', 'نطاق مناطق المستخدمين')],
     'entities.entity': [('partnerships.Partnership', 'entity_id', 'سجل الشراكات')],
     'specializations.specialization': [('partnerships.OfferingSpecialization', 'specialization_id', 'بنود الشراكات'),
                                        ('market_needs.Need', 'specialization_id', 'بطاقات حاجة السوق'),

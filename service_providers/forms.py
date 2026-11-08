@@ -60,8 +60,9 @@ class ProviderForm(forms.Form):
     is_active = forms.ChoiceField(label="حالة السجل", choices=[("1", "نشط"), ("0", "غير نشط")], widget=forms.RadioSelect, initial="1")
     coverage = forms.CharField(max_length=60000, widget=forms.HiddenInput, initial="[]")
 
-    def __init__(self, *args, instance=None, **kwargs):
+    def __init__(self, *args, instance=None, actor=None, **kwargs):
         self.instance = instance
+        self.actor = actor
         self.previous = {row["region"]: set(row["specializations"]) for row in coverage_data(instance)}
         super().__init__(*args, **kwargs)
         previous_program = instance.program_id if instance else None
@@ -102,7 +103,8 @@ class ProviderForm(forms.Form):
             raise forms.ValidationError("تعذّر قراءة المناطق والتخصصات. أعد فتح النموذج.")
         if not isinstance(rows, list) or not 1 <= len(rows) <= 80:
             raise forms.ValidationError("أضف منطقة واحدة على الأقل، وبحد أقصى 80 منطقة.")
-        regions = {r.pk: r for r in Region.objects.all()}
+        from access_control.regions import scoped
+        regions = {r.pk: r for r in scoped(Region.objects.all(), self.actor)}
         specs = {s.pk: s for s in Specialization.objects.select_related("sector")}
         seen, cleaned = set(), []
         for row in rows:

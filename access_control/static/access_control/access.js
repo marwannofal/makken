@@ -41,6 +41,7 @@
       if(editor.elements.is_active.value==='0')return [false,'الحساب غير نشط'];
       if(editor.dataset.superuser==='1')return [true,'مدير النظام الأعلى'];
       if(scope==='selected'&&!pages.has(module))return [false,'خارج الصفحات المحددة'];
+      if(module==='regions'&&op==='create'&&editor.elements.region_scope?.value==='selected')return [false,'إضافة منطقة جديدة تتطلب نطاق جميع المناطق'];
       const field=editor.elements.namedItem('override__'+module+'__'+op),value=field?.value||'inherit';
       if(value==='deny')return [false,'منع صريح للمستخدم'];
       if(op!=='view'&&!decide(module,'view')[0])return [false,'صلاحية العرض مطلوبة'];
@@ -60,6 +61,8 @@
   }));
   $('[data-ac-clear]')?.addEventListener('click',()=>{const matrix=$('[data-ac-matrix]');$$('input[type=checkbox]',matrix).forEach(field=>field.checked=false);$$('select',matrix).forEach(field=>field.value='inherit');matrix.dispatchEvent(new Event('change',{bubbles:true}));preview();});
   $$('[name=page_scope]').forEach(field=>{const update=()=>{const section=$('[data-ac-pages]');if(section)section.hidden=field.value!=='selected';preview();};field.addEventListener('change',update);update();});
+  const regionScope=editor?.elements.region_scope;
+  if(regionScope){const update=()=>{const section=$('[data-ac-regions]');if(section)section.hidden=regionScope.value!=='selected';};regionScope.addEventListener('change',update);update();}
   editor?.addEventListener('change',preview);preview();
   document.addEventListener('invalid',event=>{const field=event.target;if(!field.closest('.ac-workspace')||!field.setCustomValidity||field.validity.customError)return;field.setCustomValidity(field.validity.valueMissing?'هذا الحقل مطلوب.':field.validity.typeMismatch?'أدخل قيمة صحيحة لهذا الحقل.':'راجع قيمة هذا الحقل.');},true);
   document.addEventListener('input',event=>{if(event.target.closest('.ac-workspace')&&event.target.setCustomValidity)event.target.setCustomValidity('');},true);

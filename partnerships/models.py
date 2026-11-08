@@ -23,6 +23,7 @@ class PreliminaryAgreementType(models.TextChoices):
 
 
 class Partnership(models.Model):
+    administrative_regions = models.ManyToManyField('regions.Region', through='PartnershipRegion', blank=True, related_name='administrative_partnerships', verbose_name='المناطق الإدارية للجهة')
     name = models.CharField("اسم الجهة", max_length=200, validators=[validate_name])
     name_key = models.CharField(max_length=600, editable=False)
     representative = models.CharField("اسم الممثل عن الجهة", max_length=200, validators=[validate_name])
@@ -56,6 +57,15 @@ class Partnership(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class PartnershipRegion(models.Model):
+    partnership = models.ForeignKey(Partnership, on_delete=models.CASCADE)
+    region = models.ForeignKey('regions.Region', on_delete=models.PROTECT)
+
+    class Meta:
+        default_permissions = ()
+        constraints = [models.UniqueConstraint(fields=['partnership', 'region'], name='partnership_admin_region_unique')]
 
 
 class PartnershipOffering(models.Model):

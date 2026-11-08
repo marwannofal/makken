@@ -16,6 +16,7 @@ from django.views.decorators.http import require_http_methods
 from accounts.security import add_login_headers
 from .forms import RegionForm
 from .models import Region
+from access_control.regions import scoped
 
 from core.settings_filters import apply as _makken_settings_apply, context as _makken_settings_context, redirect as _makken_settings_redirect
 
@@ -71,7 +72,7 @@ def index(request):
                 operation = snapshot["operation"]
                 item = None
                 if operation != "add":
-                    item = Region.objects.filter(pk=snapshot.get("id")).first()
+                    item = scoped(Region.objects.all(), request.user).filter(pk=snapshot.get("id")).first()
                     if item is None or item.version != snapshot.get("version"):
                         context["error"], status = _stale(), 409
                 if status == 200:
@@ -131,7 +132,7 @@ def index(request):
             if edit == "new":
                 context.update(editing=True, editor_operation="add")
             elif edit:
-                item = Region.objects.filter(pk=int(edit)).first() if edit.isascii() and edit.isdecimal() and len(edit) <= 18 else None
+                item = scoped(Region.objects.all(), request.user).filter(pk=int(edit)).first() if edit.isascii() and edit.isdecimal() and len(edit) <= 18 else None
                 if item:
                     context.update(editing=True, editor_operation="edit", editor_form=RegionForm(initial={"operation": "edit", "snapshot": _snapshot(item, "edit", request.user), "name": item.name, "is_active": "1" if item.is_active else "0"}))
                 else:
@@ -143,7 +144,7 @@ def index(request):
         context["error"], status = "انتهت صلاحية الطلب أو تغيّر محتواه. أعد فتح الصفحة وحاول مجددًا.", 400
     except (IntegrityError, ProtectedError, RestrictedError):
         context["error"], status = "تعذّر تنفيذ الطلب. الاسم مستخدم بالفعل أو المنطقة مرتبطة بسجلات أخرى. راجع القائمة وحاول مجددًا.", 409
-    page = Paginator(_makken_settings_apply(request, Region.objects.all()), 10).get_page(request.GET.get("page"))
+    page = Paginator(_makken_settings_apply(request, scoped(Region.objects.all(), request.user)), 10).get_page(request.GET.get("page"))
     rows = []
     for item in page:
         rows.append({"id": item.pk, "name": item.name, "is_active": item.is_active, "edit_snapshot": _snapshot(item, "edit", request.user), "toggle_snapshot": _snapshot(item, "toggle", request.user), "delete_snapshot": _snapshot(item, "delete", request.user)})

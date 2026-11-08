@@ -6,6 +6,7 @@
 {% block extra_head %}<link rel="stylesheet" href="{% static 'partnerships/single_specialization.css' %}?v=20261019-2"><link rel="stylesheet" href="{% static 'care_states/states.css' %}?v=20261015-1"><link rel="stylesheet" href="{% static 'partnerships/partnerships.css' %}?v=20261015-1"><script src="{% static 'partnerships/partnerships.js' %}?v=20261019-single-specialization" defer></script>{% include "partnerships/_financial_assets.html" %}
 
 {% include "partnerships/_editor_fields_assets.html" %}
+<link rel="stylesheet" href="{% static 'market_needs/market.css' %}"><script src="{% static 'market_needs/market.js' %}" defer></script>
 {% endblock %}
 {% block content %}
 <section class="page-introduction partnership-intro"><div><p class="eyebrow">الإدارة · الشراكات المحتملة</p><h1>{{ page_heading }}<span class="greeting-dot">.</span></h1><p class="page-description">بيانات واضحة للجهة، وروابط دقيقة لكل فرصة رعاية.</p></div><a class="button button-secondary" href="{% url 'partnerships:index' %}">العودة للسجل</a></section>
@@ -13,7 +14,7 @@
 <noscript><div class="feedback feedback-info">فعّل JavaScript لإدارة بنود القطاعات واستخدام القوائم القابلة للبحث.</div></noscript>
 <form method="post" id="partnership-form" data-partnership-form>
 {% csrf_token %}<input type="hidden" name="action" value="preview"><input type="hidden" name="snapshot" value="{{ snapshot }}">{{ form.offerings }}
-<section class="partnership-card"><header class="card-heading"><div><p class="eyebrow mk-numbered-section-title">01 · معلومات الجهة</p><h2>البيانات الأساسية</h2></div><span class="subtle-badge">جميع الحقول مطلوبة</span></header>
+<section class="partnership-card"><header class="card-heading"><div><p class="eyebrow mk-numbered-section-title">01 · معلومات الجهة</p><h2>البيانات الأساسية</h2></div><span class="subtle-badge">الحقول بعلامة * مطلوبة</span></header>
 {% if form.errors %}<div class="feedback feedback-error" role="alert">راجع الحقول الموضحة أدناه. لم تُحفظ البيانات بعد.{{ form.non_field_errors }}</div>{% endif %}
 <div class="partnership-form-grid">
 {% include "partnerships/_field.html" with field=form.name %}
@@ -24,6 +25,7 @@
 {% include "partnerships/_field.html" with field=form.entity_type %}
 {% include "partnerships/_editor_entity_field.html" %}
 {% include "partnerships/_field.html" with field=form.scope %}
+<div class="partnership-field"><label for="id_administrative_regions">{{ form.administrative_regions.label }}{% if form.administrative_regions.field.required %} <span class="required">*</span>{% endif %}</label>{{ form.administrative_regions }}<p class="field-help">{{ form.administrative_regions.help_text }}</p><div class="field-error" role="alert">{{ form.administrative_regions.errors }}</div></div>
 
 {% guarded_status 'partnerships' %}<fieldset class="partnership-field"><legend>حالة السجل <span class="required" aria-hidden="true">*</span></legend><div class="status-choices">{% for radio in form.is_active %}<label>{{ radio.tag }}<span>{{ radio.choice_label }}</span></label>{% endfor %}</div><div class="field-error" id="error-is_active" role="alert">{{ form.is_active.errors }}</div></fieldset>{% endguarded_status %}
 </div></section>

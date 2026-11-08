@@ -52,9 +52,11 @@ def save_provider(payload, user):
         if not payload.get("id"):
             repeated = ServiceProvider.objects.filter(request_key=payload["nonce"]).first()
             if repeated:
+                from access_control.regions import require_write
+                require_write(user, repeated)
                 return repeated
         lock_references(payload["data"])
-        form = ProviderForm(payload["data"], instance=item)
+        form = ProviderForm(payload["data"], instance=item, actor=user)
         if not form.is_valid():
             raise Conflict("تغيّرت بعض الاختيارات أو تكرر الاسم منذ المراجعة. أعد فتح النموذج وتحقق من البيانات.")
         ensure_allowed(item, "edit", form.cleaned_data["is_active"] == "1")

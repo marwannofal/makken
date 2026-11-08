@@ -16,12 +16,14 @@ class AccessPolicy:
         self.denials = set()
         self.allowed_pages = set()
         self.scope = PageScope.SELECTED
+        self.region_restricted = False
         if not self.active or self.superuser:
             return
         access = UserAccess.objects.filter(user_id=user.pk).first()
         if access is None:
             return  # Existing/unconfigured users start with no business access.
         self.scope = access.page_scope
+        self.region_restricted = access.region_scope == "selected"
         self.allowed_pages = set(access.allowed_pages.values_list('pk', flat=True))
         roles = RoleProfile.objects.filter(group__user=user).select_related('group').prefetch_related('allowed_pages', Prefetch('group__permissions', queryset=Permission.objects.filter(content_type__app_label='access_control', content_type__model='module')))
         self.role_names = []
@@ -57,6 +59,8 @@ class AccessPolicy:
             return True, 'مدير النظام الأعلى'
         if self.scope == PageScope.SELECTED and module not in self.allowed_pages:
             return False, 'خارج الصفحات المحددة للمستخدم'
+        if module == 'regions' and operation == 'create' and self.region_restricted:
+            return False, 'إضافة منطقة جديدة تتطلب نطاق جميع المناطق'
         key=(module, operation)
         if key in self.denials:
             return False, 'منع صريح للمستخدم'

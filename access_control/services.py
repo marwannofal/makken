@@ -27,6 +27,8 @@ def user_snapshot(user):
             'roles':sorted(group.name for group in groups if getattr(group,'makken_role',None) is not None),
             'page_scope':access.page_scope if access else PageScope.SELECTED,
             'pages':sorted(page.pk for page in access.allowed_pages.all()) if access else [],
+            'region_scope':access.region_scope if access else 'selected',
+            'regions':sorted(access.allowed_regions.values_list('pk',flat=True)) if access else [],
             'overrides':[{'module_id':rule.module_id,'operation':rule.operation,'effect':rule.effect} for rule in sorted(overrides,key=lambda r:(r.module_id,r.operation))],
             'direct_permissions':sorted(rule.codename for rule in direct)}
 
@@ -83,7 +85,8 @@ def save_user(actor,data,pk=None,expected=None):
     if new:target.set_password(values['new_password1'])
     target.save()
     access,_=UserAccess.objects.get_or_create(user=target)
-    access.page_scope=values['page_scope'];access.version+=1;access.save();access.allowed_pages.set(values['allowed_pages'])
+    access.page_scope=values['page_scope'];access.region_scope=values['region_scope'];access.version+=1;access.save();access.allowed_pages.set(values['allowed_pages'])
+    access.allowed_regions.set(values['allowed_regions'] if values['region_scope']=='selected' else [])
     # Preserve unrelated existing Django groups/permissions; only manage RBAC here.
     other=list(target.groups.filter(makken_role__isnull=True).values_list('pk',flat=True))
     target.groups.set(other+[r.group_id for r in values['roles']])

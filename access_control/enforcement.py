@@ -128,7 +128,10 @@ def module_view(module):
                 return redirect_to_login(request.get_full_path(),login_url='accounts:login')
             policy=for_request(request)
             if not policy.active:return denied(request)
-            if policy.superuser:return view(request,*args,**kwargs)
+            if policy.superuser:
+                from .regions import guard_request
+                guard_request(request, module, kwargs)
+                return view(request,*args,**kwargs)
             try:
                 if not policy.can(module):raise PermissionDenied
                 if request.method not in {'GET','HEAD'} and not any(policy.can(module,op) for op in DEFINITIONS[module].operations if op!='view'):
@@ -142,7 +145,18 @@ def module_view(module):
                     if not policy.can(module,operation):raise PermissionDenied
             except (PermissionDenied,signing.BadSignature,KeyError,ValueError,TypeError):
                 return denied(request)
-            return view(request,*args,**kwargs)
+            from .regions import guard_request, regional_transaction
+            try:
+                if request.method == 'POST':
+                    with regional_transaction(request.user) as region_policy:
+                        # Revocations apply to confirmations already open in a tab.
+                        require(region_policy.user, module, *needed)
+                        guard_request(request, module, kwargs)
+                        return view(request,*args,**kwargs)
+                guard_request(request, module, kwargs)
+                return view(request,*args,**kwargs)
+            except PermissionDenied as error:
+                return denied(request, str(error) or 'العملية خارج نطاق صلاحياتك.')
         wrapped._access_module=module
         return wrapped
     return decorate
@@ -185,7 +199,10 @@ def service_operation(module,operation):
                 if action not in {'notes','approve','reject','allocate'}:raise PermissionDenied
                 needed=['edit',*(['change_status'] if action in {'approve','reject'} else [])]
             else:raise PermissionDenied
-            require(user,module,'view',*needed)
-            return function(*args,**kwargs)
+            from .regions import regional_transaction, guard_service
+            with regional_transaction(user) as region_policy:
+                require(region_policy.user,module,'view',*needed)
+                guard_service(module, operation, values, region_policy)
+                return function(*args,**kwargs)
         return wrapped
     return decorate

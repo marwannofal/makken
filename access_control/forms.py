@@ -4,7 +4,8 @@ from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django.utils.translation import override
 from accounts.profile_forms import ProfilePasswordForm, normalize_name
-from .models import Module, RoleProfile, PageScope, Operation
+from .models import Module, RoleProfile, PageScope, RegionScope, Operation
+from regions.models import Region
 from .registry import DEFINITIONS
 
 
@@ -36,6 +37,8 @@ class AccessFields(ArabicForm):
 
 
 class UserForm(AccessFields):
+    region_scope=forms.ChoiceField(label='نطاق المناطق',choices=RegionScope.choices,initial=RegionScope.ALL,required=False)
+    allowed_regions=forms.ModelMultipleChoiceField(label='المناطق المسموح بها',queryset=Region.objects.none(),required=False,widget=forms.SelectMultiple(attrs={'data-market-select':'','data-label':'المناطق المسموح بها'}),help_text='اختر منطقة واحدة أو أكثر. هذا النطاق يقيّد الدور ولا يمنح صلاحيات إضافية.')
     full_name=forms.CharField(label='الاسم الكامل',max_length=300)
     username=forms.CharField(label='اسم المستخدم',max_length=150)
     email=forms.EmailField(label='البريد الإلكتروني',max_length=254,widget=forms.EmailInput(attrs={'dir':'ltr','autocomplete':'off'}))
@@ -47,6 +50,9 @@ class UserForm(AccessFields):
     def __init__(self,*args,target=None,**kwargs):
         self.target=target
         super().__init__(*args,**kwargs)
+        old_regions=list(target.makken_access.allowed_regions.values_list('pk',flat=True)) if target and hasattr(target,'makken_access') else []
+        self.fields['allowed_regions'].queryset=Region.objects.filter(Q(is_active=True)|Q(pk__in=old_regions))
+        self.fields['allowed_regions'].label_from_instance=lambda region: region.name + (' (غير نشط)' if not region.is_active else '')
         if target:
             self.fields.pop('new_password1');self.fields.pop('new_password2')
         for module in DEFINITIONS.values():
@@ -71,6 +77,15 @@ class UserForm(AccessFields):
 
     def clean(self):
         data=super().clean();User=get_user_model()
+        # Old integrations may omit these fields; preserve an existing restriction.
+        if 'region_scope' not in self.data:
+            access=getattr(self.target,'makken_access',None) if self.target else None
+            data['region_scope']=access.region_scope if access else RegionScope.ALL
+            data['allowed_regions']=access.allowed_regions.all() if access else Region.objects.none()
+        if not data.get('region_scope'):
+            self.add_error('region_scope','اختر نطاق المناطق.')
+        if data.get('region_scope')==RegionScope.SELECTED and not data.get('allowed_regions'):
+            self.add_error('allowed_regions','اختر منطقة واحدة على الأقل للنطاق المحدد.')
         query=User._default_manager.all()
         if self.target:query=query.exclude(pk=self.target.pk)
         for field in ['username','email']:

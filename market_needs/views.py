@@ -34,6 +34,7 @@ from .forms import NeedForm, MatchFilterForm, FollowupForm
 from .matching import candidates, explain, matching_offerings
 from .funding import expense_funding, development_timeline
 from . import services
+from access_control.regions import scoped, history as regional_history
 
 SALT = "makken.market-needs.v2-expense-allocations"
 AGE = 20 * 60
@@ -59,8 +60,8 @@ def base(request, heading, active="market_needs"):
     return {"page_heading": heading, "active_page": active, "display_name": name, "avatar_initial": name[:1]}
 
 
-def query():
-    return Need.objects.select_related("sector", "specialization", "program").prefetch_related("regions").annotate(approved_count=Count("sponsorships", filter=Q(sponsorships__status=SponsorshipStatus.APPROVED), distinct=True)).order_by("-pk")
+def query(actor=None):
+    return scoped(Need.objects.all(), actor).select_related("sector", "specialization", "program").prefetch_related("regions").annotate(approved_count=Count("sponsorships", filter=Q(sponsorships__status=SponsorshipStatus.APPROVED), distinct=True)).order_by("-pk")
 
 
 def funding_details(need):
@@ -71,8 +72,8 @@ def funding_details(need):
     need.allocated_percent = percentage(need.allocated_support, need.total_cost)
 
 
-def sponsorship_query(need):
-    return need.sponsorships.select_related("partnership__development_state", "partnership__entity", "updated_by", "level", "need").prefetch_related(
+def sponsorship_query(need, actor=None):
+    return scoped(need.sponsorships.all(), actor).select_related("partnership__development_state", "partnership__entity", "updated_by", "level", "need").prefetch_related(
         "attachments", "allocations__expense_line__expense_item", "partnership__development_history",
     )
 
@@ -116,17 +117,17 @@ def catalog(need):
 @login_required(login_url="accounts:login")
 @require_http_methods(["GET", "POST"])
 def editor(request, pk=None):
-    need = get_object_or_404(query(), pk=pk) if pk else None
+    need = get_object_or_404(query(request.user), pk=pk) if pk else None
     context = base(request, "إضافة / تعديل بطاقة حاجة السوق وفقًا للتخصص", "market_need_editor")
-    form = NeedForm(initial=initial(need), instance=need)
+    form = NeedForm(initial=initial(need), instance=need, actor=request.user)
     snapshot, status = token(request, need), 200
     if request.method == "POST":
         try:
-            if len(request.body) > 150000:
+            if int(request.META.get("CONTENT_LENGTH") or 0) > 150000:
                 raise signing.BadSignature
             payload = load_token(request, pk, {"save"})
             snapshot = request.POST["snapshot"]
-            form = NeedForm(request.POST, instance=need)
+            form = NeedForm(request.POST, instance=need, actor=request.user)
             saved = services.save_need(request.POST, request.user, pk, payload["version"], payload["nonce"])
             messages.success(request, "تم حفظ بطاقة حاجة السوق بنجاح.")
             return add_login_headers(redirect("market_needs:followup", pk=saved.pk))
@@ -161,7 +162,7 @@ def index(request):
         except (services.Conflict, signing.BadSignature, IntegrityError, ProtectedError, OperationalError) as exc:
             context["error"], status = failure(exc)
     q, active, state = request.GET.get("q", "").strip()[:200], request.GET.get("active", ""), request.GET.get("state", "")
-    items = query().alias(displayed_percent=Round(Cast("approved_support", FloatField()) * Value(100.0) / Cast("total_cost", FloatField()), 2))
+    items = query(request.user).alias(displayed_percent=Round(Cast("approved_support", FloatField()) * Value(100.0) / Cast("total_cost", FloatField()), 2))
     if active in {"1", "0"}:
         items = items.filter(is_active=active == "1")
     if state in NeedStatus.values:
@@ -200,9 +201,10 @@ def index(request):
     rows = [{"need": need, "toggle": token(request, need, "toggle"), "delete": token(request, need, "delete")} for need in page]
     detail = None
     if request.GET.get("detail", "").isascii() and request.GET.get("detail", "").isdigit():
-        detail = get_object_or_404(query().prefetch_related("expense_lines__expense_item", "expense_lines__sponsorship_shape", "sponsorships__partnership", "sponsorships__attachments"), pk=int(request.GET["detail"]))
+        detail = get_object_or_404(query(request.user).prefetch_related("expense_lines__expense_item", "expense_lines__sponsorship_shape", "sponsorships__partnership", "sponsorships__attachments"), pk=int(request.GET["detail"]))
+        detail.visible_sponsorships = sponsorship_query(detail, request.user)
         funding_details(detail)
-        context["history_page"] = Paginator(detail.events.select_related("actor"), 20).get_page(request.GET.get("history_page"))
+        context["history_page"] = Paginator(regional_history(detail.events, request.user).select_related("actor"), 20).get_page(request.GET.get("history_page"))
         context["history_query"] = urlencode({"q": q, "active": active, "state": state, "page": page.number, "detail": detail.pk})
     context.update(rows=rows, page_obj=page, q=q, selected_active=active, selected_state=state, state_choices=NeedStatus.choices,
                    detail=detail, filter_query=urlencode({"q": q, "active": active, "state": state}))
@@ -213,7 +215,7 @@ def index(request):
 @login_required(login_url="accounts:login")
 @require_http_methods(["GET", "POST"])
 def followup(request, pk):
-    need = get_object_or_404(query().prefetch_related("expense_lines__expense_item", "expense_lines__sponsorship_shape"), pk=pk)
+    need = get_object_or_404(query(request.user).prefetch_related("expense_lines__expense_item", "expense_lines__sponsorship_shape"), pk=pk)
     context, status = base(request, "البحث الذكي: محرك الرعاة المحتملون"), 200
     funding_details(need)
     filters = MatchFilterForm(request.GET)
@@ -223,8 +225,12 @@ def followup(request, pk):
     if request.method == "GET" and request.GET.get("operation") in {"notes", "approve", "reject", "allocate", "details"}:
         record_id = request.GET.get("record", "")
         if record_id.isascii() and record_id.isdigit():
-            selected_record = get_object_or_404(sponsorship_query(need), pk=int(record_id))
+            selected_record = get_object_or_404(sponsorship_query(need, request.user), pk=int(record_id))
             operation = request.GET["operation"]
+            if operation != "details":
+                from access_control.regions import require_write
+                require_write(request.user, need)
+                require_write(request.user, selected_record.partnership)
             followup_form = FollowupForm(initial={"notes": selected_record.notes}, operation=operation, need=need, record=selected_record)
             followup_snapshot = token(request, need, operation, selected_record)
             context["reopen_followup"] = operation != "details"
@@ -241,7 +247,7 @@ def followup(request, pk):
                     raise signing.BadSignature
                 services.add_candidates(pk, payload["version"], [int(v) for v in raw_ids], filters.cleaned_data, request.user)
             else:
-                selected_record = get_object_or_404(Sponsorship.objects.select_related("partnership"), need=need, pk=payload.get("record"))
+                selected_record = get_object_or_404(scoped(Sponsorship.objects.select_related("partnership"), request.user), need=need, pk=payload.get("record"))
                 services.followup(pk, payload["version"], payload["record"], payload["record_version"], operation, request.POST, request.FILES, request.user)
             messages.success(request, "تم حفظ المتابعة وتحديث حالة الدعم بنجاح.")
             destination = reverse("market_needs:followup", args=[pk])
@@ -259,10 +265,16 @@ def followup(request, pk):
     if not valid_filters:
         status = 400
     # Search is a read-only GET. It never creates candidates or advances states.
-    queryset = candidates(need, filters.cleaned_data) if valid_filters else candidates(need).none()
+    queryset = candidates(need, filters.cleaned_data, actor=request.user) if valid_filters else candidates(need, actor=request.user).none()
     page = Paginator(queryset, 10).get_page(request.GET.get("page"))
-    record_page = Paginator(sponsorship_query(need), 25).get_page(request.GET.get("followup_page"))
+    record_page = Paginator(sponsorship_query(need, request.user), 25).get_page(request.GET.get("followup_page"))
     rows = [{"record": row, "notes_token": token(request, need, "notes", row), "approve_token": token(request, need, "approve", row), "reject_token": token(request, need, "reject", row), "allocate_token": token(request, need, "allocate", row)} for row in record_page]
+    from partnerships.models import Partnership
+    from access_control.regions import can_write
+    editable_organizations = set(scoped(Partnership.objects.filter(pk__in=[row['record'].partnership_id for row in rows]), request.user, writable=True).values_list('pk',flat=True))
+    card_writable = can_write(request.user, need)
+    for row in rows:
+        row['record'].region_writable = card_writable and row['record'].partnership_id in editable_organizations
     shape_map = {}
     for organization_id, shape_id in matching_offerings(need).filter(partnership_id__in=[row["record"].partnership_id for row in rows]).values_list("partnership_id", "sponsorship_shape_id"):
         shape_map.setdefault(organization_id, set()).add(shape_id)
@@ -272,7 +284,7 @@ def followup(request, pk):
     params.pop("page", None)
     params.pop("record", None)
     params.pop("operation", None)
-    context["history_page"] = Paginator(need.events.select_related("actor"), 20).get_page(request.GET.get("history_page"))
+    context["history_page"] = Paginator(regional_history(need.events, request.user).select_related("actor"), 20).get_page(request.GET.get("history_page"))
     history_params = request.GET.copy()
     history_params.pop("history_page", None)
     context["history_query"] = history_params.urlencode()
@@ -292,7 +304,7 @@ def followup(request, pk):
 @login_required(login_url="accounts:login")
 @require_GET
 def download(request, pk, attachment_id):
-    attachment = get_object_or_404(SupportAttachment.objects.select_related("sponsorship"), pk=attachment_id, sponsorship__need_id=pk)
+    attachment = get_object_or_404(SupportAttachment.objects.select_related("sponsorship").filter(sponsorship_id__in=scoped(Sponsorship.objects.all(), request.user).values("pk")), pk=attachment_id, sponsorship__need_id=pk)
     try:
         source = attachment.file.open("rb")
     except (OSError, ValueError):

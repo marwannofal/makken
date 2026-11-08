@@ -8,6 +8,11 @@ class PageScope(models.TextChoices):
     SELECTED = 'selected', 'صفحات محددة فقط'
 
 
+class RegionScope(models.TextChoices):
+    ALL = 'all', 'جميع المناطق'
+    SELECTED = 'selected', 'مناطق محددة فقط'
+
+
 class Operation(models.TextChoices):
     VIEW = 'view', 'عرض'
     CREATE = 'create', 'إضافة'
@@ -56,12 +61,24 @@ class UserAccess(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='makken_access')
     page_scope = models.CharField(max_length=10, choices=PageScope.choices, default=PageScope.SELECTED)
     allowed_pages = models.ManyToManyField(Module, blank=True, related_name='users')
+    region_scope = models.CharField(max_length=10, choices=RegionScope.choices, default=RegionScope.ALL)
+    allowed_regions = models.ManyToManyField('regions.Region', through='UserRegion', blank=True, related_name='regional_users')
     version = models.PositiveBigIntegerField(default=1, editable=False)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         default_permissions = ()
-        constraints = [models.CheckConstraint(condition=models.Q(page_scope__in=PageScope.values), name='access_user_scope_valid')]
+        constraints = [models.CheckConstraint(condition=models.Q(page_scope__in=PageScope.values), name='access_user_scope_valid'),
+                       models.CheckConstraint(condition=models.Q(region_scope__in=RegionScope.values), name='access_user_regions_valid')]
+
+
+class UserRegion(models.Model):
+    access = models.ForeignKey(UserAccess, on_delete=models.CASCADE)
+    region = models.ForeignKey('regions.Region', on_delete=models.PROTECT)
+
+    class Meta:
+        default_permissions = ()
+        constraints = [models.UniqueConstraint(fields=['access', 'region'], name='access_user_region_unique')]
 
 
 class PermissionOverride(models.Model):

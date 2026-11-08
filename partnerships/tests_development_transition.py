@@ -65,6 +65,9 @@ class DevelopmentTransitionTests(TestCase):
         self.assertEqual(self.item.development_history.get(state_id='willingness').entered_at,entered)
         self.assertEqual(self.item.development_history.get(state_id='capability').entered_at,self.original)
         self.assertEqual(parse_qs(urlparse(response.url).query)['capacity_min'],['100'])
+        # Freezing django.utils.timezone.now also affects session expiry; the
+        # historical business timestamp must not expire the next test request.
+        self.client.force_login(self.user)
         detail = self.client.get('/partnerships/',{'detail':self.item.pk})
         self.assertContains(detail,'2026/10/17 10:15:45')
         self.assertEqual(next(s for s in detail.context['history'] if s['current'])['label'],'رغبة')

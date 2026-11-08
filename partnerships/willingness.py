@@ -108,7 +108,9 @@ def save_supporting_files(item, cleaned, user, saved_paths):
 @login_required(login_url='accounts:login')
 @require_GET
 def download_attachment(request, pk, attachment_id):
-    attachment = get_object_or_404(WillingnessAttachment, pk=attachment_id, partnership_id=pk)
+    from access_control.regions import scoped
+    from .models import Partnership
+    attachment = get_object_or_404(WillingnessAttachment.objects.filter(partnership_id__in=scoped(Partnership.objects.all(), request.user).values('pk')), pk=attachment_id, partnership_id=pk)
     try:
         source = attachment.file.open('rb')
     except (OSError, ValueError):

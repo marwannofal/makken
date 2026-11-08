@@ -47,7 +47,7 @@ class NeedForm(forms.Form):
     lines = forms.CharField(widget=forms.HiddenInput, max_length=60000, initial="[]")
     dependencies_confirmed = forms.BooleanField(required=False, widget=forms.HiddenInput)
 
-    def __init__(self, *args, instance=None, **kwargs):
+    def __init__(self, *args, instance=None, actor=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.instance = instance
         for field, model in [("sector", Sector), ("specialization", Specialization), ("program", TrainingProgram)]:
@@ -56,7 +56,9 @@ class NeedForm(forms.Form):
             self.fields[field].label_from_instance = lambda obj: obj.name + (" (غير نشط — محفوظ سابقًا)" if not obj.is_active else "")
             self.fields[field].empty_label = "اختر من القائمة"
         old_regions = list(instance.regions.values_list("pk", flat=True)) if instance else []
-        self.fields["regions"].queryset = Region.objects.filter(Q(is_active=True) | Q(pk__in=old_regions)).order_by("name")
+        from access_control.regions import region_choices
+        self.fields["regions"].queryset = region_choices(actor, old_regions).order_by("name") if actor is not None else Region.objects.filter(Q(is_active=True) | Q(pk__in=old_regions)).order_by("name")
+        self.fields["regions"].error_messages.update(invalid_list="اختر المناطق من القائمة.", invalid_pk_value="أحد معرّفات المناطق غير صحيح.")
         self.fields["regions"].label_from_instance = lambda obj: obj.name + (" (غير نشط — محفوظ سابقًا)" if not obj.is_active else "")
         for name, field in self.fields.items():
             field.error_messages["required"] = "هذا الحقل مطلوب."
