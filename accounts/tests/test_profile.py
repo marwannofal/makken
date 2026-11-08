@@ -40,7 +40,8 @@ class ProfileTests(TestCase):
         self.assertEqual(self.client.put(self.url).status_code,405)
         with CaptureQueriesContext(connection) as queries:response=self.page()
         self.assertEqual(response.status_code,200)
-        self.assertLessEqual(len(queries),6)
+        # Includes the RBAC lookup, regional audit lookup and session-save bookkeeping.
+        self.assertLessEqual(len(queries),8)
         self.assertFalse(UserProfile.objects.exists())
         self.assertIn('no-store',response['Cache-Control'])
         self.assertIn("script-src 'self'",response['Content-Security-Policy'])

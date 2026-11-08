@@ -1,7 +1,10 @@
 from django.urls import path
 from . import views
+from . import activity_views
 app_name='access_control'
 urlpatterns=[
+    path('activity/', activity_views.activity, name='activity'),
+    path('activity/<int:pk>/', activity_views.detail, name='activity_detail'),
     path('',views.index,name='index'),
     path('users/new/',views.user_editor,name='user_create'),
     path('users/<int:pk>/',views.user_editor,name='user_edit'),

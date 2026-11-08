@@ -22,7 +22,7 @@ def initialize():
         name=title;number=2
         while Group.objects.filter(name=name).exists():name=title+' '+str(number);number+=1
         role=RoleProfile.objects.create(group=Group.objects.create(name=name),system_key=key,description='دور افتراضي قابل لتخصيص الصفحات والصلاحيات.',page_scope=PageScope.ALL)
-        codes=[codename(module.key,operation) for module in MODULES for operation in module.operations if operation in operations]
+        codes=[codename(module.key,operation) for module in MODULES for operation in module.operations if operation in operations and module.key != 'user_activity']
         role.group.permissions.set(Permission.objects.filter(content_type=content,codename__in=codes))
     User=get_user_model()
     existing=set(UserAccess.objects.values_list('user_id',flat=True))

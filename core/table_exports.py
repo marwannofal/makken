@@ -45,6 +45,9 @@ class TableExportMiddleware:
         response = self.get_response(self.clone(request))
         if response.status_code != 200:
             return response
+        snapshot = response.get('X-Makken-Activity-Until', '')
+        if snapshot.isascii() and snapshot.isdigit() and len(snapshot) < 19:
+            request._activity_until = int(snapshot)
         if not getattr(getattr(request, 'user', None), 'is_authenticated', False):
             self.release_internal_response(response)
             return self.error('سجّل الدخول أولًا لتصدير البيانات.', 403)

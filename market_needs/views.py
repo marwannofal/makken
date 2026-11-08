@@ -309,4 +309,5 @@ def download(request, pk, attachment_id):
         source = attachment.file.open("rb")
     except (OSError, ValueError):
         raise Http404
+    request._activity_target = attachment.sponsorship
     return add_login_headers(FileResponse(source, as_attachment=True, filename=attachment.original_name, content_type=attachment.content_type))

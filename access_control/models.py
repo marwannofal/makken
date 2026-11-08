@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.db import models
+from django.utils import timezone
 
 
 class PageScope(models.TextChoices):
@@ -118,3 +119,72 @@ class SecurityAudit(models.Model):
         ordering = ['-created_at', '-pk']
         default_permissions = ()
         indexes = [models.Index(fields=['target_user', '-created_at'], name='access_user_history_idx'), models.Index(fields=['action', '-created_at'], name='access_action_time_idx')]
+
+
+class ActivityAction(models.TextChoices):
+    VIEW = 'view', 'مشاهدة'
+    CREATE = 'create', 'إضافة'
+    UPDATE = 'update', 'تعديل'
+    DELETE = 'delete', 'حذف'
+    STATUS = 'status', 'تغيير الحالة'
+    LOGIN = 'login', 'تسجيل الدخول'
+    LOGOUT = 'logout', 'تسجيل الخروج'
+    DOWNLOAD = 'download', 'تنزيل مرفق'
+    XLSX = 'export_xlsx', 'تصدير Excel'
+    PDF = 'export_pdf', 'تصدير PDF'
+    DENIED = 'denied', 'محاولة غير مسموحة'
+
+
+class UserActivity(models.Model):
+    """Append-only portal events; snapshots survive renamed/deleted source rows.
+
+    No CRUD routes or default Django edit/delete permissions are exposed.
+    This is an application audit trail, not a tamper-proof external ledger.
+    """
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
+    actor_key = models.PositiveBigIntegerField(null=True)
+    actor_name = models.CharField(max_length=200)
+    actor_username = models.CharField(max_length=150, blank=True)
+    module = models.SlugField(max_length=60)
+    action = models.CharField(max_length=20, choices=ActivityAction.choices)
+    description = models.CharField(max_length=200)
+    target_model = models.CharField(max_length=100, blank=True)
+    target_key = models.CharField(max_length=40, blank=True)
+    target_label = models.CharField(max_length=300, blank=True)
+    scope = models.CharField(max_length=10, choices=[('global', 'عام'), ('regional', 'مناطقي'), ('unknown', 'غير محدد')])
+    route = models.CharField(max_length=150, blank=True)
+    outcome = models.CharField(max_length=10, choices=[('success', 'ناجحة'), ('denied', 'مرفوضة')], default='success')
+    http_status = models.PositiveSmallIntegerField(null=True)
+    before = models.JSONField(default=dict)
+    after = models.JSONField(default=dict)
+    request_id = models.UUIDField(null=True)
+    source_key = models.CharField(max_length=180, unique=True, null=True)
+    created_at = models.DateTimeField(default=timezone.now, editable=False)
+
+    class Meta:
+        ordering = ['-created_at', '-pk']
+        default_permissions = ()
+        indexes = [
+            models.Index(fields=['-created_at', '-id'], name='activity_time_idx'),
+            models.Index(fields=['actor_key', '-created_at'], name='activity_actor_time_idx'),
+            models.Index(fields=['module', '-created_at'], name='activity_module_time_idx'),
+            models.Index(fields=['action', '-created_at'], name='activity_action_time_idx'),
+        ]
+        constraints = [
+            models.CheckConstraint(condition=models.Q(action__in=ActivityAction.values), name='activity_action_valid'),
+            models.CheckConstraint(condition=models.Q(scope__in=['global', 'regional', 'unknown']), name='activity_scope_valid'),
+            models.CheckConstraint(condition=models.Q(outcome__in=['success', 'denied']), name='activity_outcome_valid'),
+        ]
+
+
+class ActivityRegion(models.Model):
+    # Deliberately not a FK to Region: deleting/renaming a reference must never
+    # erase history or become blocked solely by the log.
+    event = models.ForeignKey(UserActivity, on_delete=models.CASCADE, related_name='region_snapshots')
+    region_key = models.PositiveBigIntegerField(db_index=True)
+    name = models.CharField(max_length=100)
+
+    class Meta:
+        default_permissions = ()
+        ordering = ['region_key']
+        constraints = [models.UniqueConstraint(fields=['event', 'region_key'], name='activity_event_region_unique')]

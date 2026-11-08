@@ -1,4 +1,4 @@
-{% extends "core/makken_base.html" %}{% load static %}
+{% extends "core/makken_base.html" %}{% load static access_tags %}
 {% block title %}إدارة المستخدمين والصلاحيات | مكّن{% endblock %}
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'access_control/export-permissions.css' %}?v=20261020-1">
@@ -8,15 +8,19 @@
 <link rel="stylesheet" href="{% static 'access_control/access.css' %}?v=20261019-filter-alignment-1">
 <script src="{% static 'market_needs/market.js' %}" defer></script>
 <script src="{% static 'access_control/access.js' %}?v=20261108-regions-1" defer></script>
+{% block access_head %}{% endblock %}
 {% endblock %}
 {% block content %}
-<section class="page-introduction"><div><p class="eyebrow">إدارة آمنة · مكّن</p><h1>إدارة المستخدمين والصلاحيات<span class="greeting-dot">.</span></h1><p class="page-description">التحكم في حسابات المستخدمين والأدوار وصلاحيات الوصول إلى صفحات النظام</p></div></section>
+<section class="page-introduction"><div><p class="eyebrow">إدارة آمنة · مكّن</p><h1>{% block access_heading %}إدارة المستخدمين والصلاحيات{% endblock %}<span class="greeting-dot">.</span></h1><p class="page-description">{% block access_description %}التحكم في حسابات المستخدمين والأدوار وصلاحيات الوصول إلى صفحات النظام{% endblock %}</p></div></section>
 <nav class="ac-tabs" aria-label="أقسام إدارة الوصول">
+{% if request.user.is_superuser %}
 <a href="{% url 'access_control:index' %}"{% if access_tab == 'users' %} aria-current="page"{% endif %}>المستخدمون</a>
 <a href="{% url 'access_control:roles' %}"{% if access_tab == 'roles' %} aria-current="page"{% endif %}>الأدوار</a>
 <a href="{% url 'access_control:index' %}?tab=permissions"{% if access_tab == 'permissions' %} aria-current="page"{% endif %}>الصلاحيات</a>
 <a href="{% url 'access_control:index' %}?tab=pages"{% if access_tab == 'pages' %} aria-current="page"{% endif %}>صلاحيات الصفحات</a>
 <a href="{% url 'access_control:logs' %}"{% if access_tab == 'logs' %} aria-current="page"{% endif %}>سجل النشاط</a>
+{% endif %}
+{% allowed 'user_activity' 'view' %}<a href="{% url 'access_control:activity' %}"{% if access_tab == 'activity' %} aria-current="page"{% endif %}>نشاط المستخدمين</a>{% endallowed %}
 </nav>
 {% if error %}<p class="feedback feedback-error" role="alert">{{ error }}</p>{% endif %}
 {% for message in messages %}<p class="feedback feedback-success" role="status">{{ message }}</p>{% endfor %}

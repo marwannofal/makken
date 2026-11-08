@@ -80,3 +80,9 @@ if 'access_control.middleware.AccessBoundaryMiddleware' not in MIDDLEWARE:
 if "core.table_exports.TableExportMiddleware" not in MIDDLEWARE:
     MIDDLEWARE = [*MIDDLEWARE, "core.table_exports.TableExportMiddleware"]
 # END MAKKEN SHARED TABLE EXPORTS v1
+
+# BEGIN MAKKEN USER ACTIVITY
+if 'access_control.activity_middleware.ActivityMiddleware' not in MIDDLEWARE:
+    MIDDLEWARE.insert(MIDDLEWARE.index('core.table_exports.TableExportMiddleware'),
+                      'access_control.activity_middleware.ActivityMiddleware')
+# END MAKKEN USER ACTIVITY

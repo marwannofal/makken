@@ -9,3 +9,5 @@ class AccessControlConfig(AppConfig):
     def ready(self):
         from .signals import connect
         connect()
+        from .activity_capture import connect as connect_activity
+        connect_activity()

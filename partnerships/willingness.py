@@ -115,5 +115,6 @@ def download_attachment(request, pk, attachment_id):
         source = attachment.file.open('rb')
     except (OSError, ValueError):
         raise Http404
+    request._activity_target = attachment.partnership
     response = FileResponse(source, as_attachment=True, filename=attachment.original_name, content_type=attachment.content_type)
     return add_login_headers(response)

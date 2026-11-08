@@ -83,6 +83,8 @@ def index(request):
                         context["error"] = "تغيّر اللون أو تم حفظ هذا التعديل مسبقًا. راجع اللون الحالي وحاول مجددًا."
                         status = 409
                     else:
+                        from access_control.activity_capture import queue, snapshot
+                        queue(item, snapshot(item), {})
                         updated = StateColor.objects.filter(state=item.state, version=item.version).update(color=validation.cleaned_data["color"], version=item.version + 1, updated_at=timezone.now())
                         if updated != 1:
                             context["error"] = "تغيّر اللون بواسطة مستخدم آخر. أعد المحاولة."
