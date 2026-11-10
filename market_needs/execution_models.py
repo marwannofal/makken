@@ -31,6 +31,7 @@ class NeedExecution(models.Model):
             models.CheckConstraint(condition=(models.Q(status="complete", completed_at__isnull=False) | (~models.Q(status="complete") & models.Q(completed_at__isnull=True))), name="mk_execution_completion_time"),
         ]
         indexes = [models.Index(fields=["status", "need"], name="mk_execution_status_idx")]
+        indexes += [models.Index(fields=['status','completed_at'],name='dash_execution_date_idx')]
 
 
 class ExecutionProvider(models.Model):

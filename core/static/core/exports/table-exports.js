@@ -53,20 +53,23 @@
     if (table.matches('.offerings-table,[data-expense-editor]') || table.querySelector('tbody[data-offerings-table],tbody[data-expense-lines],tbody[data-services-table],tbody[data-coverage-table]')) return false;
     return table.tHead.rows.length === 1;
   }
-  async function download(button, table) {
+  async function download(button, table, explicitUrl = null) {
     if (busy || !rights[button.dataset.mkFormat]) return;
     const main = document.querySelector('#main-content') || document.querySelector('main');
     const tables = [...main.querySelectorAll('table')].filter(t => !t.closest('dialog,template'));
     const index = tables.indexOf(table);
-    if (index < 0) return;
+    if (index < 0 && !explicitUrl) return;
+    const url = new URL(explicitUrl || window.location.href, window.location.href);
+    if (url.origin !== window.location.origin) return;
     trigger = button;
     busy = true;
     document.querySelectorAll('.mk-export-button[data-mk-format]').forEach(b => b.disabled = true);
     state('busy', 'جار تجهيز التقرير', 'نجهّز جميع نتائج الجدول وفق البحث والفلاتر الحالية، مع كامل التفاصيل. انتظر اكتمال التنزيل.');
-    const url = new URL(window.location.href);
     url.hash = '';
-    url.searchParams.set('_mk_export', button.dataset.mkFormat);
-    url.searchParams.set('_mk_table', String(index));
+    if (!explicitUrl) {
+      url.searchParams.set('_mk_export', button.dataset.mkFormat);
+      url.searchParams.set('_mk_table', String(index));
+    }
     controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 120000);
     try {
@@ -126,7 +129,7 @@
       anchor.before(tools);
     });
   }
-  window.MakkenTableExports = {refresh};
+  window.MakkenTableExports = {refresh, downloadUrl: (button, url) => download(button, null, url)};
   refresh();
   let queued = false;
   new MutationObserver(records => {

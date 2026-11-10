@@ -38,7 +38,6 @@ MODULES = (
 TABLE_EXPORT_OPERATIONS = ('export_xlsx', 'export_pdf')
 MODULES = tuple(
     replace(row, operations=tuple(dict.fromkeys((*row.operations, *TABLE_EXPORT_OPERATIONS))))
-    if row.key != 'dashboard' else row
     for row in MODULES
 )
 # END MAKKEN FORMAT EXPORT RIGHTS v1

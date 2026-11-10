@@ -53,6 +53,7 @@ class Need(models.Model):
     class Meta:
         ordering = ["-pk"]
         default_permissions = ()
+        indexes = [models.Index(fields=['created_at','id'],name='dash_need_created_idx')]
         constraints = [
             models.CheckConstraint(condition=models.Q(total_cost__gt=0), name="market_need_cost_positive"),
             models.CheckConstraint(condition=models.Q(requested_support__gt=0, requested_support__lte=models.F("total_cost")), name="market_need_requested_valid"),
@@ -142,6 +143,7 @@ class Sponsorship(models.Model):
     class Meta:
         ordering = ["pk"]
         default_permissions = ()
+        indexes = [models.Index(fields=['status','decided_at'],name='dash_support_date_idx')]
         constraints = [
             models.UniqueConstraint(fields=["need", "partnership"], name="market_need_sponsor_unique"),
             models.CheckConstraint(condition=(models.Q(status="approved", amount__gt=0) | models.Q(status__in=["new", "rejected"], amount=0)), name="market_sponsor_amount_status"),
