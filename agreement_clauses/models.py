@@ -56,6 +56,138 @@ class Agreement(models.Model):
         return f"{self.number} · {self.title}"
 
 
+class OptionKind(models.TextChoices):
+    ENTITY = "entity", "أنواع الجهات"
+    STATUS = "status", "حالات الاتفاقية"
+    PARTNERSHIP_TYPE = "partnership_type", "أنواع الشراكة"
+    CLASSIFICATION = "classification", "تصنيفات الاتفاقية"
+    DEPARTMENT = "department", "الإدارات والوحدات"
+    CITY = "city", "المدن السعودية"
+
+
+class DepartmentType(models.TextChoices):
+    UNIT = "unit", "وحدة من وحدات المؤسسة"
+    DEPARTMENT = "department", "إدارة من إدارات المؤسسة"
+
+
+class AgreementOption(models.Model):
+    kind = models.CharField("القائمة", max_length=20, choices=OptionKind.choices)
+    name = models.CharField("الاسم", max_length=160, validators=[validate_name])
+    department_type = models.CharField("نوع الإدارة", max_length=12, choices=DepartmentType.choices, blank=True)
+    is_active = models.BooleanField("نشط", default=True)
+    revision = models.PositiveIntegerField(default=1, editable=False)
+
+    class Meta:
+        ordering = ["name", "pk"]
+        default_permissions = ()
+        constraints = [
+            models.UniqueConstraint(fields=["kind", "name"], name="mk_agreement_option_unique"),
+            models.CheckConstraint(
+                condition=(models.Q(kind=OptionKind.DEPARTMENT, department_type__in=DepartmentType.values) |
+                           (~models.Q(kind=OptionKind.DEPARTMENT) & models.Q(department_type=""))),
+                name="mk_agreement_department_type",
+            ),
+        ]
+
+    def __str__(self):
+        return self.name
+
+
+class RenewalRule(models.TextChoices):
+    AUTOMATIC = "automatic", "تلقائي وفق الاتفاقية"
+    PRIOR_APPROVAL = "prior_approval", "يتطلب موافقة مسبقة"
+
+
+class AgreementDetails(models.Model):
+    agreement = models.OneToOneField(Agreement, on_delete=models.CASCADE, related_name="details")
+    entity_type = models.ForeignKey(AgreementOption, on_delete=models.PROTECT, related_name="+", null=True, blank=True, verbose_name="نوع الجهة")
+    status = models.ForeignKey(AgreementOption, on_delete=models.PROTECT, related_name="+", null=True, blank=True, verbose_name="حالة الاتفاقية")
+    partnership_type = models.ForeignKey(AgreementOption, on_delete=models.PROTECT, related_name="+", null=True, blank=True, verbose_name="نوع الشراكة")
+    classification = models.ForeignKey(AgreementOption, on_delete=models.PROTECT, related_name="+", null=True, blank=True, verbose_name="تصنيف الاتفاقية")
+    departments = models.ManyToManyField(AgreementOption, blank=True, related_name="+", verbose_name="الإدارات المعنية")
+    headquarters_city = models.ForeignKey(AgreementOption, on_delete=models.PROTECT, related_name="+", null=True, blank=True, verbose_name="مدينة مقر الجهة")
+    signing_city = models.ForeignKey(AgreementOption, on_delete=models.PROTECT, related_name="+", null=True, blank=True, verbose_name="مدينة التوقيع")
+    signing_region = models.ForeignKey("regions.Region", on_delete=models.PROTECT, related_name="+", null=True, blank=True, verbose_name="منطقة التوقيع")
+    responsible_employee = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="makken_responsible_agreements", null=True, blank=True, verbose_name="الموظف المسؤول عن الاتفاقية")
+    department_representative = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="makken_department_agreements", null=True, blank=True, verbose_name="ممثل الإدارة المعنية")
+    institution_signatory = models.CharField("الموقّع عن المؤسسة", max_length=160, blank=True)
+    institution_signatory_title = models.CharField("المنصب لدى المؤسسة", max_length=160, blank=True)
+    partner_signatory = models.CharField("الموقّع عن الجهة", max_length=160, blank=True)
+    partner_signatory_title = models.CharField("المنصب لدى الجهة", max_length=160, blank=True)
+    partner_phone = models.CharField("هاتف الجهة", max_length=32, blank=True)
+    partner_email = models.EmailField("البريد الإلكتروني للجهة", blank=True)
+    signed_on = models.DateField("تاريخ التوقيع", null=True, blank=True)
+    duration_months = models.PositiveSmallIntegerField("مدة الاتفاقية بالأشهر", null=True, blank=True,
+        validators=[MinValueValidator(1), MaxValueValidator(600)])
+    renewal_rule = models.CharField("نوع التجديد", max_length=16, choices=RenewalRule.choices, blank=True)
+    objective = models.TextField("هدف الشراكة", max_length=2000, blank=True)
+    announcement = models.TextField("خبر عن الشراكة", max_length=2000, blank=True)
+    audience = models.TextField("الفئات المستهدفة", max_length=2000, blank=True)
+    expected_results = models.TextField("النتائج المتوقعة", max_length=2000, blank=True)
+    updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name="+")
+    updated_at = models.DateTimeField(auto_now=True)
+    revision = models.PositiveIntegerField(default=1, editable=False)
+
+    class Meta:
+        default_permissions = ()
+        constraints = [models.CheckConstraint(
+            condition=(models.Q(signed_on__isnull=True, duration_months__isnull=True) |
+                       models.Q(signed_on__isnull=False, duration_months__isnull=False, duration_months__range=(1, 600))),
+            name="mk_agreement_term_pair",
+        )]
+
+    @property
+    def initial_expiry(self):
+        from .calendar import end_after_months
+        if self.signed_on and self.duration_months:
+            return end_after_months(self.signed_on, self.duration_months)
+
+
+class TeamSide(models.TextChoices):
+    INSTITUTION = "institution", "فريق المؤسسة"
+    PARTNER = "partner", "فريق الجهة"
+
+
+class TeamRole(models.TextChoices):
+    REPRESENTATIVE = "representative", "ممثل"
+    LEAD = "lead", "رئيس"
+    CONTACT = "contact", "ضابط اتصال"
+    MEMBER = "member", "عضو"
+
+
+class AgreementMember(models.Model):
+    agreement = models.ForeignKey(Agreement, on_delete=models.CASCADE, related_name="members")
+    side = models.CharField(max_length=12, choices=TeamSide.choices)
+    name = models.CharField("الاسم", max_length=160, validators=[validate_name])
+    organization = models.CharField("الجهة أو الإدارة", max_length=160)
+    role = models.CharField("الصفة", max_length=16, choices=TeamRole.choices)
+    phone = models.CharField("الهاتف", max_length=32, blank=True)
+    email = models.EmailField("البريد الإلكتروني", blank=True)
+
+    class Meta:
+        ordering = ["pk"]
+        default_permissions = ()
+
+
+class AgreementRenewal(models.Model):
+    agreement = models.ForeignKey(Agreement, on_delete=models.PROTECT, related_name="renewals")
+    starts_on = models.DateField("بداية التجديد")
+    expires_on = models.DateField("نهاية التجديد")
+    duration_months = models.PositiveSmallIntegerField("مدة التجديد بالأشهر", validators=[MinValueValidator(1), MaxValueValidator(600)])
+    rule = models.CharField("نوع التجديد", max_length=16, choices=RenewalRule.choices)
+    approval_reference = models.CharField("مرجع الموافقة المسبقة", max_length=160, blank=True)
+    recorded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name="+")
+    recorded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-starts_on", "-pk"]
+        default_permissions = ()
+        constraints = [
+            models.UniqueConstraint(fields=["agreement", "starts_on"], name="mk_agreement_renewal_unique"),
+            models.CheckConstraint(condition=models.Q(expires_on__gt=models.F("starts_on")), name="mk_agreement_renewal_order"),
+        ]
+
+
 class Responsibility(models.TextChoices):
     INSTITUTION = "institution", "المؤسسة"
     PARTNER = "partner", "الجهة"

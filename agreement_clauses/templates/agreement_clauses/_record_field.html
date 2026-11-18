@@ -1,0 +1,5 @@
+<div class="partnership-field">
+  {{ field.label_tag }}{{ field }}
+  {% if field.help_text %}<p class="field-help" id="{{ field.auto_id }}_helptext">{{ field.help_text }}</p>{% endif %}
+  {{ field.errors }}
+</div>

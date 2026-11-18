@@ -1,0 +1,69 @@
+<form method="post" data-market-confirm="هل تريد حفظ بيانات الاتفاقية والفريقين؟">
+  {% csrf_token %}
+  <input type="hidden" name="operation" value="save_details"><input type="hidden" name="snapshot" value="{{ save_token }}">
+  {% if form.errors %}<div class="feedback feedback-error" role="alert">راجع الحقول الموضحة أدناه. لم يُحفظ أي تعديل.{{ form.non_field_errors }}</div>{% endif %}
+  <section class="partnership-card agreement-card">
+    <header class="card-heading"><div><p class="eyebrow">سجل الاتفاقية</p><h2>التصنيف والتوقيع</h2></div></header>
+    <div class="agreement-grid">
+      {% include "agreement_clauses/_record_field.html" with field=form.entity_type only %}
+      {% include "agreement_clauses/_record_field.html" with field=form.status only %}
+      {% include "agreement_clauses/_record_field.html" with field=form.partnership_type only %}
+      {% include "agreement_clauses/_record_field.html" with field=form.classification only %}
+      {% include "agreement_clauses/_record_field.html" with field=form.signing_region only %}
+      {% include "agreement_clauses/_record_field.html" with field=form.signing_city only %}
+      {% include "agreement_clauses/_record_field.html" with field=form.headquarters_city only %}
+      {% include "agreement_clauses/_record_field.html" with field=form.departments only %}
+    </div>
+    <p class="field-help">منطقة التوقيع للتوثيق. الوصول إلى الاتفاقية يتبع المناطق الإدارية للشراكة.</p>
+    <div class="agreement-grid agreement-period" data-agreement-period>
+      {% include "agreement_clauses/_record_field.html" with field=form.signed_on only %}
+      {% include "agreement_clauses/_record_field.html" with field=form.duration_months only %}
+      {% include "agreement_clauses/_record_field.html" with field=form.renewal_rule only %}
+      <div class="partnership-field"><label for="agreement-expiry-preview">الانتهاء المحسوب للمدة الأصلية</label>
+        <output class="agreement-output" id="agreement-expiry-preview" for="id_signed_on id_duration_months" dir="ltr" data-expiry-preview>{{ form.expiry_preview|date:"Y-m-d"|default:"—" }}</output>
+      </div>
+    </div>
+    {% if form.signed_on.field.disabled %}<p class="field-help">لا يمكن تعديل تاريخ التوقيع أو المدة الأصلية بعد تسجيل أول تجديد.</p>{% endif %}
+  </section>
+  <section class="partnership-card agreement-card">
+    <header class="card-heading"><div><p class="eyebrow">الأطراف والمسؤوليات</p><h2>الموقّعون وجهات الاتصال</h2></div></header>
+    <div class="agreement-grid">
+      {% include "agreement_clauses/_record_field.html" with field=form.institution_signatory only %}
+      {% include "agreement_clauses/_record_field.html" with field=form.institution_signatory_title only %}
+      {% include "agreement_clauses/_record_field.html" with field=form.partner_signatory only %}
+      {% include "agreement_clauses/_record_field.html" with field=form.partner_signatory_title only %}
+      {% include "agreement_clauses/_record_field.html" with field=form.responsible_employee only %}
+      {% include "agreement_clauses/_record_field.html" with field=form.department_representative only %}
+      {% include "agreement_clauses/_record_field.html" with field=form.partner_phone only %}
+      {% include "agreement_clauses/_record_field.html" with field=form.partner_email only %}
+    </div>
+    <p class="field-help">اختيار موظف يوثّق دوره في الاتفاقية. يجب أن يملك صلاحية عرض الشراكة مسبقًا.</p>
+  </section>
+  {% for label, formset in team_forms %}
+  <section class="partnership-card agreement-card" data-agreement-team>
+    <header class="card-heading"><div><p class="eyebrow">فرق العمل</p><h2>{{ label }}</h2>
+      <p class="muted">اختر صفة العضو لتحديد الممثل أو الرئيس أو ضابط الاتصال.</p></div>
+      <button type="button" class="button button-secondary" data-add-member hidden>إضافة عضو</button>
+    </header>
+    {{ formset.non_form_errors }}{{ formset.management_form }}
+    <div data-team-members>
+      {% for member in formset %}{% include "agreement_clauses/_team_member_fields.html" %}{% endfor %}
+    </div>
+    <template data-empty-member>{% include "agreement_clauses/_team_member_fields.html" with member=formset.empty_form %}</template>
+    <p data-team-feedback class="field-help" role="status"></p>
+  </section>
+  {% endfor %}
+  <section class="partnership-card agreement-card">
+    <header class="card-heading"><div><p class="eyebrow">الأثر المتوقع</p><h2>هدف الشراكة والنتائج</h2></div></header>
+    <div class="agreement-grid">
+      {% include "agreement_clauses/_record_field.html" with field=form.objective only %}
+      {% include "agreement_clauses/_record_field.html" with field=form.announcement only %}
+      {% include "agreement_clauses/_record_field.html" with field=form.audience only %}
+      {% include "agreement_clauses/_record_field.html" with field=form.expected_results only %}
+    </div>
+  </section>
+  <div class="market-page-actions">
+    <button type="submit" class="button button-primary">حفظ بيانات الاتفاقية</button>
+    <a class="button button-secondary" href="{% url 'partnerships:agreement_details' partnership.pk agreement.pk %}">إلغاء</a>
+  </div>
+</form>

@@ -1,0 +1,30 @@
+.agreement-card { margin-block-end: 1.25rem; min-inline-size: 0; }
+.agreement-grid, .agreement-summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.agreement-grid > *, .agreement-summary > *, .agreement-card-row > * { min-inline-size: 0; }
+.agreement-grid .partnership-field select:not([multiple]) {
+  appearance: none; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23336e70' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat left 14px center;
+  padding-left: 40px; padding-right: 13px;
+}
+.agreement-period, .agreement-reference-nav { margin-block: 1rem; }
+.agreement-output { display: block; padding: .75rem; background: #e7f6f5; color: #165e60; border-radius: .75rem; min-block-size: 48px; }
+.agreement-summary { margin: 0; }
+.agreement-summary > div, .agreement-card-row, .agreement-member, .agreement-renew {
+  background: #f5faf9; border: 1px solid #d6e8e7; padding: .875rem; border-radius: .75rem;
+}
+.agreement-summary dt { color: #165e60; font-weight: 700; }
+.agreement-summary dd { margin: .35rem 0 0; overflow-wrap: anywhere; }
+.agreement-summary .agreement-highlight { background: #e7f6f5; }
+.agreement-prose dd { white-space: pre-wrap; }
+.agreement-member, .agreement-card-row, .agreement-renew { margin-block-end: .75rem; }
+.agreement-member { margin-inline: 0; }
+.agreement-member legend, .agreement-renew summary { padding-inline: .25rem; font-weight: 700; color: #165e60; }
+.agreement-renew summary { cursor: pointer; }
+.agreement-card-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; overflow-wrap: anywhere; }
+.agreement-card-row p { margin-block: .25rem 0; }
+.agreement-remove { display: flex; align-items: center; gap: .5rem; margin-block-start: .75rem; }
+.agreement-card .market-page-actions, .agreement-renew button { margin-block-start: 1rem; }
+.agreement-card-row .market-page-actions { margin: 0; }
+.agreement-card .errorlist { color: #a73536; padding-inline-start: 1rem; font-size: .875rem; }
+@media (max-width: 620px) {
+  .agreement-grid, .agreement-summary { grid-template-columns: minmax(0, 1fr); }
+}

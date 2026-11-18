@@ -15,6 +15,7 @@
     <p class="page-description">{{ partnership.name }}{% if agreement %} · <bdi>{{ agreement.number }}</bdi> · {{ agreement.title }}{% endif %}</p>
   </div>
   <div class="market-page-actions">
+    {% if agreement %}<a class="button button-primary" href="{% url 'partnerships:agreement_details' partnership.pk agreement.pk %}">بيانات الاتفاقية</a>{% endif %}
     {% if agreement %}<a class="button button-secondary" href="{% url 'partnerships:clauses' partnership.pk %}">اتفاقيات الشراكة</a>{% endif %}
     <a class="button button-secondary" href="{% url 'partnerships:index' %}?detail={{ partnership.pk }}">تفاصيل الشراكة</a>
   </div>
@@ -54,7 +55,8 @@
       <thead><tr><th scope="col">الاتفاقية</th><th scope="col">عدد البنود</th><th scope="col">نسبة الإنجاز</th><th scope="col">الإجراء</th></tr></thead>
       <tbody>{% for item in agreements %}
         <tr><th scope="row"><bdi>{{ item.number }}</bdi> · {{ item.title }}</th><td>{{ item.clause_count }}</td><td><bdi>{% include "agreement_clauses/_percent.html" with value=item.progress only %}</bdi></td>
-          <td><a class="button button-secondary" href="{% url 'partnerships:agreement' partnership.pk item.pk %}">عرض البنود</a></td></tr>
+          <td><a class="button button-secondary" href="{% url 'partnerships:agreement' partnership.pk item.pk %}">عرض البنود</a>
+          <a class="button button-secondary" href="{% url 'partnerships:agreement_details' partnership.pk item.pk %}">البيانات الداخلية</a></td></tr>
       {% empty %}<tr><td colspan="4">لا توجد اتفاقيات مرتبطة بعد.</td></tr>{% endfor %}</tbody>
     </table>
   </div>

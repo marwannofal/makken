@@ -1,0 +1,21 @@
+{% extends "core/makken_base.html" %}
+{% load static %}
+{% block title %}{{ page_heading }} | مكّن{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'care_states/states.css' %}">
+<link rel="stylesheet" href="{% static 'partnerships/partnerships.css' %}">
+<link rel="stylesheet" href="{% static 'market_needs/market.css' %}">
+<link rel="stylesheet" href="{% static 'agreement_clauses/record.css' %}?v=1">
+<script src="{% static 'market_needs/market.js' %}" defer></script>
+<script src="{% static 'agreement_clauses/record.js' %}?v=1" defer></script>
+{% endblock %}
+{% block content %}
+{% block record_content %}{% endblock %}
+<dialog id="market-confirm" class="partnership-dialog confirmation-dialog" aria-labelledby="market-confirm-title">
+  <div class="dialog-body">
+    <p class="eyebrow">مراجعة وتأكيد</p><h2 id="market-confirm-title">تأكيد العملية</h2>
+    <p class="dialog-description" data-confirm-text></p>
+    <div class="dialog-actions"><button class="button button-primary" type="button" data-confirm-yes>تأكيد</button><button class="button button-secondary" type="button" data-market-close autofocus>إلغاء</button></div>
+  </div>
+</dialog>
+{% endblock %}

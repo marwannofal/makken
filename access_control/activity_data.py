@@ -43,7 +43,9 @@ LABELS = {
     'is_employment': 'رعاية توظيف', 'expense_items': 'بنود الصرف',
     'agreement_clauses': 'بنود الاتفاقية', 'clause': 'بند الاتفاقية',
     'responsibility': 'المسؤولية', 'progress': 'نسبة الإنجاز', 'agreement_number': 'رقم الاتفاقية',
-    'agreement_title': 'عنوان الاتفاقية',
+    'agreement_title': 'عنوان الاتفاقية', 'agreement_signed_on': 'تاريخ توقيع الاتفاقية',
+    'agreement_expires_on': 'تاريخ انتهاء الاتفاقية', 'agreement_status': 'حالة الاتفاقية',
+    'agreement_responsible': 'الموظف المسؤول عن الاتفاقية', 'agreement_team_count': 'عدد أعضاء فريقي الاتفاقية',
     'attachment_count': 'عدد المرفقات', 'preliminary_agreement_type': 'نوع الاتفاق المبدئي',
 }
 VALUES = {'capability': 'قدرة', 'willingness': 'رغبة', 'care': 'رعاية',

@@ -1,0 +1,11 @@
+<fieldset class="agreement-member">
+  <legend>بيانات عضو الفريق</legend>
+  {{ member.non_field_errors }}
+  {% for hidden in member.hidden_fields %}{{ hidden }}{{ hidden.errors }}{% endfor %}
+  <div class="agreement-grid">
+    {% for field in member.visible_fields %}{% if field.name != 'DELETE' %}
+      {% include "agreement_clauses/_record_field.html" with field=field only %}
+    {% endif %}{% endfor %}
+  </div>
+  <label class="agreement-remove">{{ member.DELETE }} {{ member.DELETE.label }}</label>
+</fieldset>

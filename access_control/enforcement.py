@@ -61,6 +61,20 @@ def requested_operations(request,module,view,kwargs):
         from market_needs.execution_views import mutation_permissions
         return ['view', *mutation_permissions(request, kwargs.get('pk'))]
     name=request.resolver_match.url_name
+    if module == 'partnerships' and name == 'agreement_details':
+        if request.method in {'GET', 'HEAD'}:
+            return ['view', 'edit'] if request.GET.get('edit') == '1' else ['view']
+        if request.method == 'POST' and request.POST.get('operation') in {'save_details', 'renew'}:
+            return ['view', 'edit']
+        raise PermissionDenied
+    if module == 'agreement_clauses' and name == 'references':
+        if request.method in {'GET', 'HEAD'}:
+            edit = request.GET.get('edit')
+            return ['view', 'create' if edit == 'new' else 'edit'] if edit else ['view']
+        operation = {'add': 'create', 'edit': 'edit', 'toggle': 'change_status'}.get(request.POST.get('operation'))
+        if request.method == 'POST' and operation:
+            return ['view', operation]
+        raise PermissionDenied
     if module == 'partnerships' and name in {'clauses', 'agreement'}:
         if request.method in {'GET', 'HEAD'}:
             return ['view']
