@@ -19,6 +19,7 @@ from partnerships.willingness import safe_filename
 from partnerships.models import Partnership, DevelopmentHistory
 from care_states.models import DevelopmentState, StateColor
 from .forms import NeedForm, FollowupForm
+from agreement_clauses.program_links import LinkConflict, NeedClause, need_names, save_links
 from .matching import candidates, eligible_for_approval
 from .models import Need, ExpenseLine, Sponsorship, SponsorshipStatus, NeedStatus, AuditEvent, SupportAttachment, SponsorshipAllocation
 
@@ -41,6 +42,7 @@ def card_data(need):
             "sector": need.sector.name, "specialization": need.specialization.name,
             "program": need.program_name, "program_category": need.program_category, "training_type": need.training_type,
             "regions": "، ".join(need.regions.values_list("name", flat=True)),
+            "agreement_clauses": "، ".join(need_names(need)),
             "lines": "\n".join(f"{line.expense_item.name} / {line.sponsorship_shape.name}: {line.amount}" for line in need.expense_lines.select_related("expense_item", "sponsorship_shape"))}
 
 
@@ -121,6 +123,10 @@ def save_need(data, actor, pk=None, version=None, nonce=None):
     if not need.sponsorships.filter(status=SponsorshipStatus.APPROVED).exists():
         need.expense_lines.all().delete()
         ExpenseLine.objects.bulk_create([ExpenseLine(need=need, expense_item_id=line["expense"], sponsorship_shape_id=line["shape"], amount=line["amount"], position=i) for i, line in enumerate(clean["lines"])])
+    try:
+        save_links(need, clean["agreement_clauses"], NeedClause)
+    except LinkConflict as exc:
+        raise Conflict(str(exc)) from exc
     audit(need, actor, "إنشاء البطاقة" if new else "تعديل البطاقة", before, card_data(need))
     return need
 

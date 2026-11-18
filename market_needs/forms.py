@@ -16,6 +16,8 @@ from partnerships.models import Scope
 from partnerships.willingness import MultipleAttachmentInput
 from care_states.models import DevelopmentState
 from .attachments import validate_support_attachment
+from agreement_clauses.forms import ClausePicker
+from agreement_clauses.program_links import NeedClause, configure_picker
 
 
 class SARAmountField(MoneyField):
@@ -45,11 +47,13 @@ class NeedForm(forms.Form):
     is_active = forms.ChoiceField(label="حالة السجل", choices=[("1", "نشط"), ("0", "غير نشط")], initial="1")
     program = forms.ModelChoiceField(label="البرنامج التدريبي", queryset=TrainingProgram.objects.none())
     lines = forms.CharField(widget=forms.HiddenInput, max_length=60000, initial="[]")
+    agreement_clauses = ClausePicker(required=False)
     dependencies_confirmed = forms.BooleanField(required=False, widget=forms.HiddenInput)
 
     def __init__(self, *args, instance=None, actor=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.instance = instance
+        configure_picker(self, NeedClause, instance.pk if instance else None, "need_id")
         for field, model in [("sector", Sector), ("specialization", Specialization), ("program", TrainingProgram)]:
             old_id = getattr(instance, field + "_id", None)
             self.fields[field].queryset = model.objects.filter(Q(is_active=True) | Q(pk=old_id)).order_by("name")

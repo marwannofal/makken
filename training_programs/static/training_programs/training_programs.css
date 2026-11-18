@@ -5,15 +5,6 @@
   width: 18px;
   height: 18px;
 }
-.training_programs-table thead th:first-child {
-  width: 45%;
-}
-.training_programs-table thead th:nth-child(2) {
-  width: 25%;
-}
-.training_programs-table thead th:last-child {
-  width: 30%;
-}
 .program-name {
   display: block;
   overflow-wrap: anywhere;
@@ -76,6 +67,7 @@
   border: 1px solid transparent;
   border-radius: 9px;
   color: #167d76;
+  white-space: nowrap;
 }
 .program-action svg {
   width: 15px;
@@ -298,15 +290,6 @@
     width: 15px;
     height: 15px;
   }
-  .training_programs-table thead th:first-child {
-    width: 42%;
-  }
-  .training_programs-table thead th:nth-child(2) {
-    width: 30%;
-  }
-  .training_programs-table thead th:last-child {
-    width: 28%;
-  }
   .training_programs-table th,
   .training_programs-table td {
     padding: 14px 10px;
@@ -356,19 +339,28 @@
 }
 
 .training_programs-table {
+  --program-status-width: 7.5rem;
+  --program-actions-width: 12rem;
   table-layout: fixed;
 }
-.training_programs-table thead th:first-child {
-  width: 23%;
+.training_programs-table.states-table thead th {
+  width: auto;
 }
-.training_programs-table thead th:nth-child(2) {
-  width: 44%;
+.training_programs-table.states-table thead th.program-col-status {
+  width: var(--program-status-width);
 }
-.training_programs-table thead th:nth-child(3) {
-  width: 14%;
+.training_programs-table.states-table thead th.program-col-actions {
+  width: var(--program-actions-width);
 }
-.training_programs-table thead th:last-child {
-  width: 19%;
+.training_programs-table .program-col-status {
+  text-align: center;
+}
+/* Free columns divide the space left after the status and actions columns. */
+:root .main-content .training_programs-table thead th {
+  overflow-wrap: normal;
+}
+:root .main-content .training_programs-table thead :is(.program-col-status, .program-col-actions) {
+  white-space: nowrap;
 }
 .training_programs-table td,
 .training_programs-table th {
@@ -602,18 +594,6 @@
   .program-action > span {
     display: none;
   }
-  .training_programs-table thead th:first-child {
-    width: 24%;
-  }
-  .training_programs-table thead th:nth-child(2) {
-    width: 39%;
-  }
-  .training_programs-table thead th:nth-child(3) {
-    width: 18%;
-  }
-  .training_programs-table thead th:last-child {
-    width: 19%;
-  }
   .program-status {
     min-width: 0;
   }
@@ -720,25 +700,7 @@
   }
 }
 
-/* Six-column programs list and its mobile cards. */
-.training_programs-table thead th:first-child {
-  width: 18%;
-}
-.training_programs-table thead th:nth-child(2) {
-  width: 18%;
-}
-.training_programs-table thead th:nth-child(3) {
-  width: 22%;
-}
-.training_programs-table thead th:nth-child(4) {
-  width: 11%;
-}
-.training_programs-table thead th:nth-child(5) {
-  width: 13%;
-}
-.training_programs-table thead th:last-child {
-  width: 18%;
-}
+/* Training program rows and their mobile cards. */
 .training_programs-table th,
 .training_programs-table td {
   padding: 18px 10px;
@@ -825,6 +787,9 @@
   max-width: 420px;
 }
 @media (max-width: 1400px) {
+  .training_programs-table {
+    --program-actions-width: 8rem;
+  }
   .program-action > span {
     display: none;
   }

@@ -11,6 +11,7 @@
       ['[data-provider-program-category]', program?.category],
       ['[data-provider-program-type]', program?.type],
       ['[data-provider-program-expenses]', program?.expenses.join('، ')],
+      ['[data-provider-program-clauses]', program?.clauses?.join('، ')],
     ]) {
       const output = document.querySelector(selector);
       if (output) output.textContent = value || '—';

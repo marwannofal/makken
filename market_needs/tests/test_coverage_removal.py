@@ -11,12 +11,6 @@ from market_needs.tests.test_market import MarketFixtures
 
 class CoverageRemovalMigrationTests(MarketFixtures, TransactionTestCase):
     def setUp(self):
-        # Only the new removal migration is rolled back. Market data tables and
-        # all other migrations stay in place. This class must not use TestCase's
-        # enclosing transaction because MySQL DDL cannot be rolled back.
-        self.executor = MigrationExecutor(connection)
-        self.executor.migrate([("partnerships", "0004_coverage_regions")])
-        self.addCleanup(self.restore_latest_schema)
         self.setUpTestData()
         super().setUp()
 
@@ -25,6 +19,7 @@ class CoverageRemovalMigrationTests(MarketFixtures, TransactionTestCase):
         executor.migrate(executor.loader.graph.leaf_nodes())
 
     def test_forward_removal_keeps_partnerships_card_regions_funding_and_history(self):
+        # Seed with today's models while the schema still matches them.
         need = self.create_need()
         organization = self.organization()
         record = self.attach(need, organization)
@@ -34,15 +29,16 @@ class CoverageRemovalMigrationTests(MarketFixtures, TransactionTestCase):
             original_name="historical-evidence.pdf", size=123,
             content_type="application/pdf", uploaded_by=self.user,
         )
-        old_apps = self.executor.loader.project_state(
-            [("partnerships", "0004_coverage_regions")]
-        ).apps
-        old_partnership = old_apps.get_model("partnerships", "Partnership")
-        old_partnership.objects.get(pk=organization.pk).coverage_regions.add(self.region.pk)
         models = [Partnership, Need, Sponsorship, DevelopmentHistory, AuditEvent, SupportAttachment]
         snapshots = {model: list(model.objects.order_by("pk").values()) for model in models}
         region_ids = set(need.regions.values_list("pk", flat=True))
 
+        executor = MigrationExecutor(connection)
+        target = [("partnerships", "0004_coverage_regions")]
+        self.addCleanup(self.restore_latest_schema)
+        executor.migrate(target)
+        old_partnership = executor.loader.project_state(target).apps.get_model("partnerships", "Partnership")
+        old_partnership.objects.get(pk=organization.pk).coverage_regions.add(self.region.pk)
         self.restore_latest_schema()
 
         for model, before in snapshots.items():

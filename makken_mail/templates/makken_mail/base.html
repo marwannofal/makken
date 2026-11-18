@@ -1,0 +1,16 @@
+{% extends 'access_control/base.html' %}{% load static %}
+{% block title %}{% if access_tab == 'work' %}متابعة الأعمال{% else %}إشعارات البريد{% endif %} | مكّن{% endblock %}
+{% block access_heading %}{% if access_tab == 'work' %}متابعة الأعمال{% else %}إشعارات البريد الإلكتروني{% endif %}{% endblock %}
+{% block access_description %}{% if access_tab == 'work' %}إسناد العمل ومتابعة حالته وتقدّمه بين الموظف ومديره.{% else %}تحكم في أنواع الرسائل والمستلمين وإعدادات مزود البريد من مكان واحد.{% endif %}{% endblock %}
+{% block access_head %}<link rel="stylesheet" href="{% static 'makken_mail/mail.css' %}?v=20261118-rule-row"><script src="{% static 'makken_mail/mail.js' %}?v=1" defer></script>{% endblock %}
+{% block access_content %}
+{% if request.user.is_superuser and access_tab != 'work' %}
+<nav class="ac-tabs mail-nav" aria-label="إدارة البريد">
+<a href="{% url 'makken_mail:index' %}">الأنواع والمستلمون</a>
+<a href="{% url 'makken_mail:smtp' %}">إعدادات SMTP</a>
+<a href="{% url 'makken_mail:deliveries' %}">سجل الإرسال</a>
+<a href="{% url 'makken_mail:preview' %}" target="_blank" rel="noopener noreferrer">معاينة القالب</a>
+</nav>
+{% endif %}
+{% block mail_content %}{% endblock %}
+{% endblock %}

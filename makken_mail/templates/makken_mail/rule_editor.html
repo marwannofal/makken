@@ -1,0 +1,12 @@
+{% extends 'makken_mail/base.html' %}
+{% block mail_content %}<section class="partnership-card mail-card">
+<header class="card-heading"><div><p class="eyebrow">{{ event_type.category }}</p><h2>{{ event_type.label }}</h2></div></header>
+{% if event_type.assignment_only %}
+<p class="mail-caption">يُرسل التذكير قبل شهرين تقويميين من تاريخ الانتهاء إلى الموظف المسند إليه عمل مفتوح مرتبط مباشرة بالشراكة. يمكن تفعيل نسخة لمدير العمل. يجب أن يستطيع المستلم عرض الشراكة وألا يكون قد كتم التذكير. عند فوات الموعد، يُرسل التذكير للشراكات التي لم تنتهِ بعد.</p>
+{% else %}
+<p class="mail-caption">يمكن الجمع بين المستلمين التلقائيين والمستخدمين المختارين. كل شخص يستقبل نسخة واحدة للحدث، بشرط نشاط حسابه وإتاحة السجل له.</p>
+{% endif %}
+<form method="post" data-ac-confirm="حفظ إعدادات إرسال البريد لهذا الحدث؟">{% csrf_token %}
+{% include 'makken_mail/_form.html' with align_rule_fields=True %}
+<div class="mail-inline mail-actions"><button class="button button-primary" type="submit">حفظ القاعدة</button><a class="button button-secondary" href="{% url 'makken_mail:index' %}">رجوع</a></div>
+</form></section>{% endblock %}

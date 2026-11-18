@@ -47,7 +47,9 @@ class ActivityMiddleware:
             action, description = 'denied', 'محاولة وصول غير مسموحة'
             item = None
         elif request.method == 'GET' and response.status_code == 200:
-            action = getattr(request,'_dashboard_export_format',request.GET.get('_mk_export'))
+            action = getattr(request, '_dashboard_export_format', None)
+            if action is None and response.get('Content-Disposition', '').startswith('attachment'):
+                action = request.GET.get('_mk_export') if getattr(request, '_makken_table_export_success', False) else None
             action = 'export_' + action if action in {'xlsx','pdf'} else 'download' if match.url_name in {'download','attachment_download'} else 'view'
             description = {'view':'مشاهدة الصفحة', 'download':'تنزيل مرفق', 'export_xlsx':'تصدير Excel', 'export_pdf':'تصدير PDF'}[action]
             item = getattr(request, '_activity_target', None)

@@ -33,6 +33,8 @@ class Partnership(models.Model):
     financial_capacity = models.DecimalField("القدرة المالية", max_digits=14, decimal_places=2, null=True, blank=True, validators=[MinValueValidator(Decimal("0"))])
     entity = models.ForeignKey("entities.Entity", on_delete=models.PROTECT, related_name="partnerships", verbose_name="الكيان")
     scope = models.CharField("النطاق", max_length=8, choices=Scope.choices)
+    starts_on = models.DateField("تاريخ بداية الشراكة", null=True, blank=True)
+    ends_on = models.DateField("تاريخ نهاية الشراكة", null=True, blank=True)
     is_active = models.BooleanField("حالة السجل", default=True)
     development_state = models.ForeignKey("care_states.StateColor", default=DevelopmentState.CAPABILITY, on_delete=models.PROTECT, related_name="partnerships", editable=False)
     preliminary_agreement_type = models.CharField("نوع الاتفاق المبدئي", max_length=32, choices=PreliminaryAgreementType.choices, blank=True, default="", editable=False)
@@ -47,7 +49,15 @@ class Partnership(models.Model):
         ordering = ["-id"]
         default_permissions = ()
         constraints = [
-            models.UniqueConstraint(fields=["name_key"], name="mk_partnerships_name_uq"),models.CheckConstraint(condition=models.Q(preliminary_agreement_type__in=["", *PreliminaryAgreementType.values]), name="partnership_agreement_enum"), models.CheckConstraint(condition=models.Q(scope__in=Scope.values), name="partnership_scope_enum"), models.CheckConstraint(condition=models.Q(financial_capacity__isnull=True) | models.Q(financial_capacity__gte=0), name="partnership_financial_nonnegative")]
+            models.UniqueConstraint(fields=["name_key"], name="mk_partnerships_name_uq"),models.CheckConstraint(condition=models.Q(preliminary_agreement_type__in=["", *PreliminaryAgreementType.values]), name="partnership_agreement_enum"), models.CheckConstraint(condition=models.Q(scope__in=Scope.values), name="partnership_scope_enum"), models.CheckConstraint(condition=models.Q(financial_capacity__isnull=True) | models.Q(financial_capacity__gte=0), name="partnership_financial_nonnegative"),
+            models.CheckConstraint(
+                condition=(
+                    models.Q(starts_on__isnull=True, ends_on__isnull=True)
+                    | models.Q(starts_on__isnull=False, ends_on__isnull=False, ends_on__gte=models.F("starts_on"))
+                ),
+                name="partnership_term_dates_valid",
+            ),
+        ]
 
     def save(self, *args, **kwargs):
         self.name = normalize_name(self.name)

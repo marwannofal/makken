@@ -1,0 +1,11 @@
+[Unit]
+Description=Check Makken partnership expiry every hour
+
+[Timer]
+OnCalendar=hourly
+Persistent=true
+AccuracySec=1min
+Unit=makken-partnership-expiry.service
+
+[Install]
+WantedBy=timers.target

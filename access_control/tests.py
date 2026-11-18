@@ -53,7 +53,7 @@ class AccessTests(TestCase):
         self.assertEqual(before,(Group.objects.count(),RoleProfile.objects.count(),Permission.objects.count()))
         policy=AccessPolicy(self.editor)
         for module in MODULES:
-            self.assertEqual(policy.can(module.key), module.key not in {"approved_programs", "provider_assignments", "user_activity"})
+            self.assertEqual(policy.can(module.key), module.key not in {"approved_programs", "provider_assignments", "user_activity", "agreement_clauses"})
             self.assertFalse(policy.can(module.key,'delete'));self.assertFalse(policy.can(module.key,'change_status'))
         self.assertTrue(policy.can('regions','create'));self.assertTrue(policy.can('regions','edit'))
         self.assertFalse(AccessPolicy(self.empty).can('regions'))
@@ -63,7 +63,7 @@ class AccessTests(TestCase):
         for module in MODULES:
             with self.subTest(module=module.key):
                 response=self.client.get(reverse(module.route_name))
-                self.assertEqual(response.status_code,403 if module.key in {"approved_programs", "provider_assignments", "user_activity"} else 200)
+                self.assertEqual(response.status_code,403 if module.key in {"approved_programs", "provider_assignments", "user_activity", "agreement_clauses"} else 200)
                 self.assertNotContains(response,'href="'+reverse('access_control:index')+'"', status_code=response.status_code)
         response=self.client.get(reverse('regions:index'),{'q':self.region.name})
         self.assertNotContains(response,'data-add-region');self.assertNotContains(response,'data-edit-region')

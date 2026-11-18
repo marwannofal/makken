@@ -12,7 +12,7 @@ from accounts.security import add_login_headers
 from .policy import for_request, require, require_superuser
 from .registry import DEFINITIONS, SETTINGS_MODULES
 
-MODELS={'levels':'levels.Level','regions':'regions.Region','entities':'entities.Entity','specializations':'specializations.Specialization','sectors':'sectors.Sector','expense_items':'expense_items.ExpenseItem','training_programs':'training_programs.TrainingProgram','sponsorship_shapes':'sponsorship_shapes.SponsorshipShape','partnerships':'partnerships.Partnership','market_needs':'market_needs.Need','service_providers':'service_providers.ServiceProvider'}
+MODELS={'levels':'levels.Level','regions':'regions.Region','entities':'entities.Entity','specializations':'specializations.Specialization','sectors':'sectors.Sector','expense_items':'expense_items.ExpenseItem','agreement_clauses':'agreement_clauses.AgreementClause','training_programs':'training_programs.TrainingProgram','sponsorship_shapes':'sponsorship_shapes.SponsorshipShape','partnerships':'partnerships.Partnership','market_needs':'market_needs.Need','service_providers':'service_providers.ServiceProvider'}
 
 
 def denied(request, message='لا تملك صلاحية الوصول إلى هذه الصفحة أو تنفيذ هذه العملية.'):
@@ -61,6 +61,15 @@ def requested_operations(request,module,view,kwargs):
         from market_needs.execution_views import mutation_permissions
         return ['view', *mutation_permissions(request, kwargs.get('pk'))]
     name=request.resolver_match.url_name
+    if module == 'partnerships' and name in {'clauses', 'agreement'}:
+        if request.method in {'GET', 'HEAD'}:
+            return ['view']
+        operation = request.POST.get('operation')
+        needed = {'add_clauses': 'edit', 'update_clause': 'edit', 'remove_clause': 'delete',
+                  'create_agreement': 'create', 'rename_agreement': 'edit'}.get(operation)
+        if request.method != 'POST' or not needed:
+            raise PermissionDenied
+        return ['view', needed]
     if request.method in {'GET','HEAD'}:
         if name in {'download','attachment_download'}:return ['view','export']
         if name=='create':return ['view','create']

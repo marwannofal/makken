@@ -97,13 +97,16 @@ def _fingerprint(data, lock=False):
 
 
 def _serialized(cleaned):
-    return {"administrative_regions": [region.pk for region in cleaned["administrative_regions"]], "name": cleaned["name"], "representative": cleaned["representative"], "phone_country": cleaned["phone_country"], "phone": cleaned["phone"], "email": cleaned["email"], "entity_type": cleaned["entity_type"], "entity": str(cleaned["entity"].pk), "scope": cleaned["scope"], "is_active": cleaned["is_active"], "offerings": json.dumps(cleaned["offerings"]), "financial_capacity": amount_string(cleaned["financial_capacity"])}
+    return {"administrative_regions": [region.pk for region in cleaned["administrative_regions"]], "name": cleaned["name"], "representative": cleaned["representative"], "phone_country": cleaned["phone_country"], "phone": cleaned["phone"], "email": cleaned["email"], "entity_type": cleaned["entity_type"], "entity": str(cleaned["entity"].pk), "scope": cleaned["scope"], "is_active": cleaned["is_active"], "offerings": json.dumps(cleaned["offerings"]), "financial_capacity": amount_string(cleaned["financial_capacity"]),
+            "starts_on": cleaned["starts_on"].isoformat() if cleaned["starts_on"] else "",
+            "ends_on": cleaned["ends_on"].isoformat() if cleaned["ends_on"] else ""}
 
 
 def _initial(item):
     if not item:
         return {"phone_country": "SA", "is_active": "1", "offerings": "[]"}
-    return {"administrative_regions": list(item.administrative_regions.values_list("pk",flat=True)), "name": item.name, "representative": item.representative, "phone_country": item.phone_country, "phone": item.phone, "email": item.email, "entity_type": item.entity.entity_type, "entity": item.entity_id, "scope": item.scope, "is_active": "1" if item.is_active else "0", "offerings": json.dumps(offering_data(item)), "financial_capacity": amount_string(item.financial_capacity)}
+    return {"administrative_regions": list(item.administrative_regions.values_list("pk",flat=True)), "name": item.name, "representative": item.representative, "phone_country": item.phone_country, "phone": item.phone, "email": item.email, "entity_type": item.entity.entity_type, "entity": item.entity_id, "scope": item.scope, "is_active": "1" if item.is_active else "0", "offerings": json.dumps(offering_data(item)), "financial_capacity": amount_string(item.financial_capacity),
+            "starts_on": item.starts_on or "", "ends_on": item.ends_on or ""}
 
 
 def _catalog(item):
@@ -144,7 +147,7 @@ def _save(payload, user):
             if not StateColor.objects.filter(pk=DevelopmentState.CAPABILITY).exists():
                 raise Conflict("حالة قدرة غير موجودة. تأكد من تطبيق ترحيلات حالات تطور المنظمات للرعاية.")
             item = Partnership(request_key=payload["nonce"], created_by=user)
-        for field in ["name", "representative", "phone_country", "phone", "email", "entity", "scope", "financial_capacity"]:
+        for field in ["name", "representative", "phone_country", "phone", "email", "entity", "scope", "financial_capacity", "starts_on", "ends_on"]:
             setattr(item, field, clean[field])
         item.is_active = clean["is_active"] == "1"
         if not new:
@@ -184,7 +187,8 @@ def editor(request, pk=None):
                     ensure_allowed(item, "edit", form.cleaned_data["is_active"] == "1")
                     data = _serialized(form.cleaned_data)
                     token = _sign({**original, "kind": "save", "data": data, "catalog": _fingerprint(data)}, request.user)
-                    pending = {"title": "تأكيد تعديل الجهة" if item else "تأكيد إضافة الجهة", "name": data["name"], "token": token, "action": "save", "button": "تأكيد الحفظ", "financial_capacity": data["financial_capacity"]}
+                    pending = {"title": "تأكيد تعديل الجهة" if item else "تأكيد إضافة الجهة", "name": data["name"], "token": token, "action": "save", "button": "تأكيد الحفظ", "financial_capacity": data["financial_capacity"],
+                               "starts_on": form.cleaned_data["starts_on"], "ends_on": form.cleaned_data["ends_on"]}
                 else:
                     status = 400
             elif action == "confirm":
@@ -214,6 +218,9 @@ def editor(request, pk=None):
         status = 409
     except (ValueError, TypeError):
         drafts = []
+    if item:
+        from agreement_clauses.workflow import partnership_panel
+        context["clause_panel"] = partnership_panel(item)
     context.update(item=item, form=form, snapshot=snapshot, pending=pending, catalog=_catalog(item), drafts=drafts, history=_history(item))
     return add_login_headers(render(request, "partnerships/editor.html", context, status=status))
 
@@ -355,5 +362,8 @@ def index(request):
     params.update(development.params)
     context["financial_pagination_query"] = urlencode({key: value for key, value in params.items() if key != "page"})
     result_query = urlencode(params)
+    if detail:
+        from agreement_clauses.workflow import partnership_panel
+        context["clause_panel"] = partnership_panel(detail)
     context.update(rows=rows, page_obj=page, q=q, selected_status=active, pending=pending, detail=detail, history=_history(detail), result_query=result_query, list_url=reverse("partnerships:index") + "?" + result_query)
     return add_login_headers(render(request, "partnerships/index.html", context, status=status))

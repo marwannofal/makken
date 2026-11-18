@@ -2,6 +2,7 @@
 {% load access_tags %}{# MAKKEN ACCESS UI v1 #}
 {% load market_tags %}
 <div class="row-actions">
+{% if request.user.is_superuser %}<a class="row-action" href="{% url 'makken_mail:work_create' %}?model=market_needs.sponsorship&amp;record={{ row.record.pk }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 5H4v16h16V5h-5M8 3h8v4H8Zm1 12h6m-3-3v6"/></svg>إسناد متابعة</a>{% endif %}
 {% if row.record.status != 'rejected' and need.is_active %}
 {% allowed 'market_needs' 'edit' row.record %}<a class="row-action" href="?{{ filter_query }}&amp;record={{ row.record.pk }}&amp;operation=notes" data-followup-open data-operation="notes" data-snapshot="{{ row.notes_token }}" data-name="{{ row.record.partnership.name }}" data-notes="{{ row.record.notes }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m16 4 4 4M4 20l5-1L20 8a2.8 2.8 0 0 0-4-4L5 15Z"/></svg>تعديل الملاحظات</a>{% endallowed %}
 {% endif %}

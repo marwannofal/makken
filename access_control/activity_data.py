@@ -11,6 +11,7 @@ from .regions import RegionalPolicy
 LABELS = {
     'name': 'الاسم', 'title': 'حاجة السوق', 'representative': 'اسم الممثل',
     'is_active': 'حالة السجل', 'scope': 'النطاق', 'financial_capacity': 'القدرة المالية',
+    'starts_on': 'تاريخ بداية الشراكة', 'ends_on': 'تاريخ نهاية الشراكة',
     'entity': 'الكيان', 'entity_type': 'نوع الكيان', 'branch': 'فرع الكيان',
     'sector': 'القطاع', 'specialization': 'التخصص', 'regions': 'المناطق',
     'administrative_regions': 'المناطق الإدارية', 'coverage': 'تغطية المزود',
@@ -40,6 +41,9 @@ LABELS = {
     'overrides': 'استثناءات الصلاحيات', 'module_id': 'الصفحة', 'operation': 'العملية', 'effect': 'القرار',
     'entered_at': 'تاريخ الدخول إلى الحالة', 'development_state_at': 'تاريخ حالة التطور',
     'is_employment': 'رعاية توظيف', 'expense_items': 'بنود الصرف',
+    'agreement_clauses': 'بنود الاتفاقية', 'clause': 'بند الاتفاقية',
+    'responsibility': 'المسؤولية', 'progress': 'نسبة الإنجاز', 'agreement_number': 'رقم الاتفاقية',
+    'agreement_title': 'عنوان الاتفاقية',
     'attachment_count': 'عدد المرفقات', 'preliminary_agreement_type': 'نوع الاتفاق المبدئي',
 }
 VALUES = {'capability': 'قدرة', 'willingness': 'رغبة', 'care': 'رعاية',

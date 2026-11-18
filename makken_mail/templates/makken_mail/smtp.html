@@ -1,0 +1,41 @@
+{% extends 'makken_mail/base.html' %}{% load static %}
+{% block access_head %}{{ block.super }}<link rel="stylesheet" href="{% static 'makken_mail/smtp.css' %}?v=20261118-1">{% endblock %}
+{% block mail_content %}
+<section class="partnership-card mail-card">
+<header class="card-heading"><div><p class="eyebrow">01 · مزود البريد</p><h2>إعدادات SMTP</h2></div><span class="mail-pill{% if configured %} is-on{% endif %}">{% if configured %}الإعدادات مكتملة{% else %}بانتظار بيانات المزود{% endif %}</span></header>
+<p class="mail-caption">احفظ اسم الخادم العام والمنفذ والتشفير وعنوان المرسل كما يحددها المزود. أضف اسم المستخدم وكلمة المرور إذا تطلب الاتصال مصادقة. {% if has_password %}توجد كلمة مرور محفوظة؛ لا تُعرض في الصفحة.{% endif %}</p>
+<form method="post" class="mail-smtp-form" autocomplete="off" data-ac-confirm="حفظ إعدادات مزود البريد؟ عند تفعيل الإرسال ستُطبق القواعد المفعّلة.">{% csrf_token %}
+{% for field in form.hidden_fields %}{{ field }}{% for error in field.errors %}<p class="field-error" role="alert">{{ error }}</p>{% endfor %}{% endfor %}
+{% for error in form.non_field_errors %}<p class="feedback feedback-error" role="alert">{{ error }}</p>{% endfor %}
+<div class="mail-smtp-grid">
+  {% for field in form.visible_fields %}
+    {% with checkbox=field.field.widget.input_type %}
+    <div class="partnership-field ac-field mail-smtp-field mail-smtp-{{ field.name }}{% if checkbox == 'checkbox' %} mail-check{% endif %}">
+      {% if checkbox != 'checkbox' %}
+        <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span aria-hidden="true">*</span>{% endif %}</label>
+      {% endif %}
+      <div class="mail-smtp-control">
+        {% if checkbox == 'checkbox' %}<label for="{{ field.id_for_label }}">{{ field }} <span>{{ field.label }}</span></label>{% else %}{{ field }}{% endif %}
+      </div>
+      {% if field.help_text or field.errors %}
+      <div class="mail-smtp-message">
+        {% if field.help_text %}<p id="{{ field.auto_id }}_helptext" class="field-help">{{ field.help_text }}</p>{% endif %}
+        {% if field.errors %}<div class="field-error" role="alert">{{ field.errors }}</div>{% endif %}
+      </div>
+      {% endif %}
+    </div>
+    {% endwith %}
+  {% endfor %}
+</div>
+<div class="mail-inline mail-actions"><button type="submit" class="button button-primary">حفظ إعدادات SMTP</button></div>
+</form>
+</section>
+<section class="partnership-card mail-card">
+<header class="card-heading"><div><p class="eyebrow">02 · تحقق من الاتصال</p><h2>إرسال بريد اختبار</h2></div></header>
+<p class="mail-caption">تستخدم التجربة آخر إعدادات حفظتها. يمكنك اختبارها قبل تشغيل إرسال الإشعارات لجميع المستخدمين.</p>
+<form method="post" action="{% url 'makken_mail:smtp_test' %}" class="mail-inline" data-ac-confirm="إرسال رسالة اختبار واحدة إلى العنوان الذي أدخلته؟">{% csrf_token %}
+{% include 'access_control/_field.html' with field=test_form.recipient %}
+<button class="button button-primary" type="submit">إرسال رسالة اختبار</button>
+</form>
+</section>
+{% endblock %}

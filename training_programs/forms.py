@@ -1,5 +1,7 @@
 from django import forms
 from expense_items.models import ExpenseItem, normalize_name, validate_name
+from agreement_clauses.forms import ClausePicker
+from agreement_clauses.program_links import ProgramClause, configure_picker
 from .models import TrainingProgram
 
 
@@ -21,6 +23,7 @@ class TrainingProgramForm(forms.Form):
         error_messages={"required": "اختر بند صرف واحدًا على الأقل.", "invalid_choice": "أحد بنود الصرف لم يعد موجودًا. أعد فتح النموذج."},
         widget=forms.SelectMultiple(attrs={"id": "program-expense-items", "aria-describedby": "expenses-help expenses-error", "size": "6"}),
     )
+    agreement_clauses = ClausePicker(required=False)
     training_types = forms.ChoiceField(
         label="نوع التدريب للبرنامج", choices=TrainingProgram.TrainingType.choices,
         widget=forms.RadioSelect(attrs={"aria-describedby": "types-help types-error"}),
@@ -32,6 +35,7 @@ class TrainingProgramForm(forms.Form):
     def __init__(self, *args, instance_id=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.instance_id = instance_id
+        configure_picker(self, ProgramClause, instance_id, "program_id")
         # Shared catalogue: assignment to another program never hides an expense item.
         self.fields["expense_items"].queryset = ExpenseItem.objects.all().order_by("id")
         self.fields["expense_items"].label_from_instance = lambda item: item.name + (" (غير نشط)" if not item.is_active else "")

@@ -1,0 +1,8 @@
+<div>
+  <dt>تاريخ بداية الشراكة</dt>
+  <dd>{% if starts_on %}<time datetime="{{ starts_on|date:'Y-m-d' }}"><bdi dir="ltr">{{ starts_on|date:'Y-m-d' }}</bdi></time>{% else %}غير محدد{% endif %}</dd>
+</div>
+<div>
+  <dt>تاريخ نهاية الشراكة</dt>
+  <dd>{% if ends_on %}<time datetime="{{ ends_on|date:'Y-m-d' }}"><bdi dir="ltr">{{ ends_on|date:'Y-m-d' }}</bdi></time>{% else %}غير محدد{% endif %}</dd>
+</div>

@@ -1,0 +1,11 @@
+{% if clause_panel %}
+  <section class="partnership-card" aria-label="الاتفاقيات وبنود الشراكة">
+    <header class="card-heading"><div><h2>الاتفاقيات وبنود الشراكة</h2><p>تابع البنود المسندة ونسب الإنجاز لكل اتفاقية أو للشراكة مباشرة.</p></div></header>
+    <div class="dialog-actions">
+      <span class="subtle-badge">نسبة إنجاز الشراكة: <bdi>{% include "agreement_clauses/_percent.html" with value=clause_panel.overall only %}</bdi></span>
+      <span class="subtle-badge">الاتفاقيات: {{ clause_panel.agreement_count }}</span>
+      <span class="subtle-badge">البنود المباشرة: {{ clause_panel.assignment_count }}</span>
+      <a class="button button-secondary" href="{% url 'partnerships:clauses' clause_panel.partnership.pk %}">عرض الاتفاقيات والبنود</a>
+    </div>
+  </section>
+{% endif %}

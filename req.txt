@@ -7,3 +7,6 @@ phonenumberslite>=9.0.40,<10
 Pillow>=12.3,<13
 
 pypdf>=6.10,<7
+
+# Authenticated encryption for the optional SMTP credential.
+cryptography>=45,<48

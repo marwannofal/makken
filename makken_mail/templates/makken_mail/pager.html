@@ -1,0 +1,5 @@
+{% if entries.paginator.num_pages > 1 %}<nav class="mail-inline mail-pager" aria-label="صفحات النتائج">
+{% if entries.has_previous %}<a class="button button-secondary" href="?{{ paging }}&amp;page={{ entries.previous_page_number }}">السابق</a>{% endif %}
+<span>الصفحة {{ entries.number }} من {{ entries.paginator.num_pages }}</span>
+{% if entries.has_next %}<a class="button button-secondary" href="?{{ paging }}&amp;page={{ entries.next_page_number }}">التالي</a>{% endif %}
+</nav>{% endif %}

@@ -1,0 +1,11 @@
+{% for field in form.hidden_fields %}{{ field }}{% for error in field.errors %}<p class="field-error" role="alert">{{ error }}</p>{% endfor %}{% endfor %}
+{% for error in form.non_field_errors %}<p class="feedback feedback-error" role="alert">{{ error }}</p>{% endfor %}
+<div class="mail-grid{% if align_rule_fields %} mail-rule-grid{% endif %}">{% for field in form.visible_fields %}
+{% if field.field.widget.input_type == 'checkbox' %}<div class="mail-check"><label for="{{ field.id_for_label }}">{{ field }} <span>{{ field.label }}</span></label>{% for error in field.errors %}<p class="field-error" role="alert">{{ error }}</p>{% endfor %}</div>
+{% elif align_rule_fields %}
+<div class="partnership-field ac-field mail-rule-recipient">
+  {{ field.label_tag }}
+  <div class="mail-rule-control">{{ field }}{% for error in field.errors %}<p class="field-error" role="alert">{{ error }}</p>{% endfor %}</div>
+</div>
+{% else %}{% include 'access_control/_field.html' with field=field %}{% endif %}
+{% endfor %}</div>

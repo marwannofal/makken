@@ -27,6 +27,7 @@ from accounts.security import add_login_headers
 from specializations.models import Specialization
 from training_programs.models import TrainingProgram
 from expense_items.models import ExpenseItem
+from agreement_clauses.program_links import program_names
 from sponsorship_shapes.models import SponsorshipShape
 from care_states.models import StateColor, DevelopmentState
 from .models import Need, NeedStatus, Sponsorship, SponsorshipStatus, SupportAttachment
@@ -101,12 +102,12 @@ def initial(need):
 def catalog(need):
     old_expenses = list(need.expense_lines.values_list("expense_item_id", flat=True)) if need else []
     old_shapes = list(need.expense_lines.values_list("sponsorship_shape_id", flat=True)) if need else []
-    programs = TrainingProgram.objects.filter(Q(is_active=True) | Q(pk=need.program_id if need else None)).prefetch_related("expense_items")
+    programs = TrainingProgram.objects.filter(Q(is_active=True) | Q(pk=need.program_id if need else None)).prefetch_related("expense_items", "agreement_clause_links__clause")
     return {
         "specializations": list(Specialization.objects.filter(Q(is_active=True) | Q(pk=need.specialization_id if need else None)).values("id", "name", "sector_id", "is_active")),
         "expenses": list(ExpenseItem.objects.filter(Q(is_active=True) | Q(pk__in=old_expenses)).values("id", "name", "is_active")),
         "shapes": list(SponsorshipShape.objects.filter(Q(is_active=True) | Q(pk__in=old_shapes)).values("id", "name", "is_active")),
-        "programs": [{"id": p.pk, "name": p.name, "category": p.get_category_display(), "type": "تدريبي" if p.is_training else "تشغيلي", "expenses": [e.pk for e in p.expense_items.all() if e.is_active]} for p in programs],
+        "programs": [{"id": p.pk, "name": p.name, "category": p.get_category_display(), "type": "تدريبي" if p.is_training else "تشغيلي", "expenses": [e.pk for e in p.expense_items.all() if e.is_active], "clauses": program_names(p)} for p in programs],
         "original_program": need.program_id if need else None, "original_sector": need.sector_id if need else None,
         "old_expenses": old_expenses,
         "funded_program_snapshot": {"category": need.program_category, "type": need.training_type} if need and need.approved_support else None,

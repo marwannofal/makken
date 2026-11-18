@@ -14,7 +14,8 @@ CONFIG = {
     "specializations": {"text": ["name", "sector__name"]},
     "sectors": {"text": ["name", "specializations__name"]},
     "expense_items": {"text": ["name"]},
-    "training_programs": {"text": ["name", "expense_items__name"], "choices": ["category"], "booleans": {"تدريبي": {"is_training": True}, "تشغيلي": {"is_operational": True}}},
+    "agreement_clauses": {"text": ["name"]},
+    "training_programs": {"text": ["name", "expense_items__name", "agreement_clause_links__clause__name"], "choices": ["category"], "booleans": {"تدريبي": {"is_training": True}, "تشغيلي": {"is_operational": True}}},
     "sponsorship_shapes": {"text": ["name", "description"], "booleans": {"نعم": {"is_employment": True}, "لا": {"is_employment": False}, "توظيف": {"is_employment": True}, "غير توظيف": {"is_employment": False}}},
 }
 STATUS_TERMS = {"نشط": True, "غير نشط": False, "فعال": True, "غير فعال": False, "active": True, "inactive": False}

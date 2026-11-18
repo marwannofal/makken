@@ -20,6 +20,7 @@ from django.views.decorators.http import require_http_methods
 from accounts.security import add_login_headers
 from partnerships.models import Scope
 from training_programs.models import TrainingProgram
+from agreement_clauses.program_links import program_names
 from regions.models import Region
 from specializations.models import Specialization
 from .forms import ProviderForm, coverage_data
@@ -50,15 +51,15 @@ def base(request, title, active):
 
 
 def query(actor=None):
-    return scoped(ServiceProvider.objects.all(), actor).select_related("created_by", "updated_by", "program").prefetch_related("program__expense_items", Prefetch("coverage", queryset=ProviderCoverage.objects.select_related("region").prefetch_related("specializations__sector")))
+    return scoped(ServiceProvider.objects.all(), actor).select_related("created_by", "updated_by", "program").prefetch_related("program__expense_items", "program__agreement_clause_links__clause", Prefetch("coverage", queryset=ProviderCoverage.objects.select_related("region").prefetch_related("specializations__sector")))
 
 
 def catalog(item, actor=None):
     old = coverage_data(item)
     region_ids = [r["region"] for r in old]
     spec_ids = {s for r in old for s in r["specializations"]}
-    programs = TrainingProgram.objects.filter(Q(is_active=True) | Q(pk=item.program_id if item else None)).prefetch_related("expense_items")
-    return {"programs": [{"id": p.pk, "category": p.get_category_display(), "type": "تدريبي" if p.is_training else "تشغيلي", "expenses": [e.name for e in p.expense_items.all()]} for p in programs], "regions": list(scoped(Region.objects.filter(Q(is_active=True) | Q(pk__in=region_ids)), actor).values("id", "name", "is_active")), "specializations": [{"id": s.pk, "name": s.name, "sector": s.sector.name if s.sector else "", "is_active": bool(s.is_active and s.sector and s.sector.is_active)} for s in Specialization.objects.filter(Q(is_active=True, sector__is_active=True) | Q(pk__in=spec_ids)).select_related("sector")], "original": old}
+    programs = TrainingProgram.objects.filter(Q(is_active=True) | Q(pk=item.program_id if item else None)).prefetch_related("expense_items", "agreement_clause_links__clause")
+    return {"programs": [{"id": p.pk, "category": p.get_category_display(), "type": "تدريبي" if p.is_training else "تشغيلي", "expenses": [e.name for e in p.expense_items.all()], "clauses": program_names(p)} for p in programs], "regions": list(scoped(Region.objects.filter(Q(is_active=True) | Q(pk__in=region_ids)), actor).values("id", "name", "is_active")), "specializations": [{"id": s.pk, "name": s.name, "sector": s.sector.name if s.sector else "", "is_active": bool(s.is_active and s.sector and s.sector.is_active)} for s in Specialization.objects.filter(Q(is_active=True, sector__is_active=True) | Q(pk__in=spec_ids)).select_related("sector")], "original": old}
 
 
 def initial(item):

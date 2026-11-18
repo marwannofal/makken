@@ -3,9 +3,10 @@
 # MAKKEN DEPENDENCY TEST POLICY v1
 from regions.models import Region
 import json
+from datetime import date
 
 from django.contrib.auth import get_user_model
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.db.models.deletion import ProtectedError
 from django.test import Client, TestCase
 from care_states.models import StateColor
@@ -66,6 +67,66 @@ class PartnershipTests(TestCase):
         self.client.post('/partnerships/new/', {'action':'confirm','token':token})
         self.assertEqual(Partnership.objects.count(),1)
         self.assertEqual(DevelopmentHistory.objects.count(),1)
+
+    def test_partnership_dates_are_reviewed_saved_and_shown(self):
+        item, _ = self.save(starts_on="2026-11-18", ends_on="2026-11-18")
+        self.assertEqual((item.starts_on, item.ends_on), (date(2026, 11, 18),) * 2)
+
+        edit = f"/partnerships/{item.pk}/edit/"
+        preview = self.preview(edit, starts_on="2026-11-18", ends_on="2027-02-12")
+        self.assertContains(preview, '<time datetime="2027-02-12">')
+        item.refresh_from_db()
+        self.assertEqual(item.ends_on, date(2026, 11, 18))
+
+        with self.captureOnCommitCallbacks(execute=True):
+            response = self.client.post(edit, {"action": "confirm", "token": preview.context["pending"]["token"]})
+        self.assertEqual(response.status_code, 302)
+        item.refresh_from_db()
+        self.assertEqual(item.ends_on, date(2027, 2, 12))
+        from access_control.models import UserActivity
+        event = UserActivity.objects.get(action="update", target_model="partnerships.partnership", target_key=str(item.pk))
+        self.assertEqual(event.before["ends_on"], "2026-11-18")
+        self.assertEqual(event.after["ends_on"], "2027-02-12")
+        self.assertContains(self.client.get(f"/partnerships/?detail={item.pk}"), '<time datetime="2027-02-12">')
+
+    def test_invalid_partnership_dates_cannot_reach_confirmation(self):
+        for start, end, invalid in (
+            ("2026-11-18", "2026-11-17", "ends_on"),
+            ("2026-11-18", "", "ends_on"),
+            ("", "2026-11-18", "starts_on"),
+            ("2026-02-30", "2026-11-18", "starts_on"),
+        ):
+            with self.subTest(start=start, end=end):
+                response = self.preview(starts_on=start, ends_on=end)
+                self.assertEqual(response.status_code, 400)
+                self.assertIn(invalid, response.context["form"].errors)
+                self.assertIsNone(response.context["pending"])
+        self.assertFalse(Partnership.objects.exists())
+
+    def test_undated_records_are_supported_and_only_explicit_blank_clears_dates(self):
+        item, _ = self.save()
+        self.assertIsNone(item.starts_on)
+        self.assertIsNone(item.ends_on)
+        item.starts_on = item.ends_on = date(2026, 11, 18)
+        item.save()
+        edit = f"/partnerships/{item.pk}/edit/"
+        for changes, expected in (({}, date(2026, 11, 18)), ({"starts_on": "", "ends_on": ""}, None)):
+            preview = self.preview(edit, **changes)
+            response = self.client.post(edit, {"action": "confirm", "token": preview.context["pending"]["token"]})
+            self.assertEqual(response.status_code, 302)
+            item.refresh_from_db()
+            self.assertEqual((item.starts_on, item.ends_on), (expected, expected))
+
+    def test_database_rejects_inconsistent_partnership_dates(self):
+        item, _ = self.save()
+        for start, end in (
+            (date(2026, 11, 18), date(2026, 11, 17)),
+            (date(2026, 11, 18), None),
+            (None, date(2026, 11, 18)),
+        ):
+            with self.subTest(start=start, end=end):
+                with self.assertRaises(IntegrityError), transaction.atomic():
+                    Partnership.objects.filter(pk=item.pk).update(starts_on=start, ends_on=end)
 
     def test_mobile_validation(self):
         for value in ['12','abcdefgh','0111234567','+962791234567','0501234567 ext 12']:

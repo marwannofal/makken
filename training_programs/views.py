@@ -16,6 +16,8 @@ from django.views.decorators.http import require_http_methods
 
 from accounts.security import add_login_headers
 from expense_items.models import ExpenseItem
+from agreement_clauses.models import AgreementClause
+from agreement_clauses.program_links import LinkConflict, ProgramClause, save_links
 from .forms import TrainingProgramForm
 from .models import TrainingProgram
 
@@ -59,17 +61,19 @@ def _unchanged(item, payload, linked=None):
             and _fingerprint(item.expense_items.all() if linked is None else linked) == payload.get("links"))
 
 
-def _pending(operation, item, values, selected, user):
+def _pending(operation, item, values, selected, user, clauses=None):
     ensure_allowed(item, operation, values["is_active"])
     linked = list(item.expense_items.all()) if item else []
-    payload = {**values, "operation": operation, "id": item.pk if item else None, "version": item.version if item else None,
+    previous_clauses = [link.clause for link in item.agreement_clause_links.select_related("clause").order_by("clause_id")] if item else []
+    clauses = previous_clauses if clauses is None else clauses
+    payload = {**values, "clauses": sorted(clause.pk for clause in clauses), "clause_state": _fingerprint(clauses), "operation": operation, "id": item.pk if item else None, "version": item.version if item else None,
                "links": _fingerprint(linked), "selected": sorted(s.pk for s in selected), "selected_state": _fingerprint(selected)}
     titles = {"add": "تأكيد إضافة البرنامج", "edit": "تأكيد تعديل البرنامج", "delete": "تأكيد حذف البرنامج", "toggle": "تأكيد تغيير حالة البرنامج"}
     buttons = {"add": "تأكيد الإضافة", "edit": "تأكيد التعديل", "delete": "نعم، حذف البرنامج", "toggle": "تأكيد التغيير"}
     return {**payload, "old": {**_values(item), "category_label": item.get_category_display(), "type_labels": item.training_type_labels} if item else None,
             "category_label": TrainingProgram.Category(values["category"]).label,
             "type_labels": [TrainingProgram.TrainingType(value).label for value in values["training_types"]],
-            "expense_items": selected, "old_expense_items": linked, "title": titles[operation], "button": buttons[operation],
+            "expense_items": selected, "old_expense_items": linked, "agreement_clauses": clauses, "old_agreement_clauses": previous_clauses, "title": titles[operation], "button": buttons[operation],
             "token": _sign(payload, user, CONFIRM_SALT)}
 
 
@@ -90,6 +94,9 @@ def _apply(payload):
             or len(set(types)) != len(types) or not isinstance(selected_ids, list)
             or any(type(pk) is not int or pk < 1 for pk in selected_ids) or len(set(selected_ids)) != len(selected_ids)):
         raise signing.BadSignature("Invalid confirmation")
+    clause_ids = payload.get("clauses")
+    if not isinstance(clause_ids, list) or len(clause_ids) > 100 or any(type(pk) is not int or pk < 1 for pk in clause_ids) or len(set(clause_ids)) != len(clause_ids):
+        raise signing.BadSignature("Invalid clause confirmation")
     with transaction.atomic():
         item = None
         current_ids = set()
@@ -109,7 +116,10 @@ def _apply(payload):
             selected = [expense for expense in locked if expense.pk in selected_set]
             if len(selected) != len(selected_ids) or _fingerprint(selected) != payload.get("selected_state"):
                 raise ProgramConflict("تغيّرت بيانات أحد بنود الصرف أو حُذف منذ المراجعة. لم يُحفظ أي تغيير. أعد فتح النموذج.")
-            form = TrainingProgramForm({"operation": operation, "snapshot": "validated", "name": payload["name"],
+            selected_clauses = list(AgreementClause.objects.select_for_update().filter(pk__in=clause_ids).order_by("pk"))
+            if _fingerprint(selected_clauses) != payload.get("clause_state"):
+                raise ProgramConflict("تغيّر أحد بنود الاتفاقية منذ المراجعة. أعد فتح النموذج.")
+            form = TrainingProgramForm({"agreement_clause_picker": "1", "agreement_clauses": clause_ids, "operation": operation, "snapshot": "validated", "name": payload["name"],
                                         "category": payload["category"], "training_types": types[0], "expense_items": selected_ids,
                                         "is_active": "1" if payload["is_active"] else "0"}, instance_id=item.pk if item else None)
             if not form.is_valid():
@@ -124,6 +134,7 @@ def _apply(payload):
             item.is_active = payload["is_active"]
             item.save()
             item.expense_items.set(selected_ids)
+            save_links(item, form.cleaned_data["agreement_clauses"], ProgramClause)
         elif operation == "toggle":
             item.is_active = payload["is_active"]
             item.version += 1
@@ -161,10 +172,12 @@ def index(request):
                         values = {key: form.cleaned_data[key] for key in ["name", "category", "training_types"]}
                         values["is_active"] = form.cleaned_data["is_active"] == "1"
                         selected = list(form.cleaned_data["expense_items"])
-                        if item and values == _values(item) and set(s.pk for s in selected) == set(s.pk for s in item.expense_items.all()):
+                        clauses = list(form.cleaned_data["agreement_clauses"])
+                        if (item and values == _values(item) and {s.pk for s in selected} == {s.pk for s in item.expense_items.all()}
+                                and {x.pk for x in clauses} == set(item.agreement_clause_links.values_list("clause_id", flat=True))):
                             context["notice"] = "لم يتم إجراء أي تغييرات على البرنامج."
                         else:
-                            context["pending"] = _pending(operation, item, values, selected, request.user)
+                            context["pending"] = _pending(operation, item, values, selected, request.user, clauses)
                     else:
                         context.update(editor_form=form, editing=True, editor_operation=operation)
                         status = 400
@@ -198,15 +211,16 @@ def index(request):
         status = 409
     except signing.BadSignature:
         context["error"], status = "انتهت صلاحية الطلب أو تغيّر محتواه. أعد فتح الصفحة وحاول مجددًا.", 400
-    except ProgramConflict as exc:
+    except (ProgramConflict, LinkConflict) as exc:
         context["error"], status = str(exc), 409
     except (IntegrityError, ProtectedError, RestrictedError):
         context["error"], status = "تعذّر تنفيذ الطلب. الاسم مستخدم بالفعل أو تغيّرت البيانات. لم يُحفظ أي تغيير.", 409
-    page = Paginator(_makken_settings_apply(request, TrainingProgram.objects.prefetch_related("expense_items").all()), 10).get_page(request.GET.get("page"))
+    page = Paginator(_makken_settings_apply(request, TrainingProgram.objects.prefetch_related("expense_items", "agreement_clause_links__clause").all()), 10).get_page(request.GET.get("page"))
     rows = []
     for item in page:
         rows.append({"id": item.pk, "name": item.name, "is_active": item.is_active, "category_label": item.get_category_display(),
                      "type_labels": item.training_type_labels, "expense_items": list(item.expense_items.all()),
+                     "agreement_clauses": [link.clause for link in item.agreement_clause_links.all()],
                      "toggle_snapshot": _snapshot(item, "toggle", request.user), "delete_snapshot": _snapshot(item, "delete", request.user)})
     context.update(rows=rows, page_obj=page)
     # MAKKEN SETTINGS FILTER CONTEXT

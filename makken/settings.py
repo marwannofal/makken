@@ -235,3 +235,8 @@ if 'access_control.activity_middleware.ActivityMiddleware' not in MIDDLEWARE:
     MIDDLEWARE.insert(MIDDLEWARE.index('core.table_exports.TableExportMiddleware'),
                       'access_control.activity_middleware.ActivityMiddleware')
 # END MAKKEN USER ACTIVITY
+
+# Email is opt-in. Production SMTP credentials are entered by a superadmin.
+INSTALLED_APPS = [*INSTALLED_APPS, 'makken_mail', 'agreement_clauses']
+MAKKEN_MAIL_BASE_URL = os.environ.get('MAKKEN_MAIL_BASE_URL', 'https://makken.menatech.edu.jo')
+MAKKEN_MAIL_ENCRYPTION_KEY = os.environ.get('MAKKEN_MAIL_ENCRYPTION_KEY', '')

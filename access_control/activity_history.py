@@ -55,7 +55,7 @@ def infer_action(description, before, after):
     return 'update'
 
 
-def import_event(source, context=None):
+def import_event(source, context=None, live=False):
     from .activity_capture import emit, regions_for
     from .models import UserActivity
     key = f'history:{source._meta.label_lower}:{source.pk}'
@@ -82,7 +82,7 @@ def import_event(source, context=None):
         target_model = 'auth.user' if source.target_user_id else 'access_control.roleprofile'
         target_label, module = source.target_name, 'access_control'
     regions = region_evidence(source.before, source.after)
-    if context and target is not None:
+    if (context or live) and target is not None:
         regions.update(regions_for(target))
         if label == 'market_needs.auditevent' and source.sponsorship_id:
             regions.update(regions_for(source.sponsorship.partnership))
@@ -93,7 +93,7 @@ def import_event(source, context=None):
             for link in execution.employer_links.select_related('partnership'):
                 regions.update(regions_for(link.partnership))
     scope = 'global' if module == 'access_control' else 'regional' if regions else 'unknown'
-    if context is None and label == 'market_needs.auditevent' and (source.sponsorship_id or module == 'provider_assignments'):
+    if context is None and not live and label == 'market_needs.auditevent' and (source.sponsorship_id or module == 'provider_assignments'):
         # Old evidence did not retain every counterparty's administrative
         # regions. Current assignments are not proof of their historic scope.
         scope = 'unknown'
@@ -101,6 +101,8 @@ def import_event(source, context=None):
     for name in ('email','phone'):
         if isinstance(source.before,dict) and isinstance(source.after,dict) and source.before.get(name) != source.after.get(name):
             after[name+'_changed'] = True
+    if live and label == 'access_control.securityaudit' and description == 'تعديل المستخدم والصلاحيات' and source.before == source.after:
+        live = False
     identity = {}
     if getattr(source,'actor_name',''):
         identity = {'actor_name':source.actor_name, 'actor_username':source.actor_name if actor else ''}
@@ -109,7 +111,8 @@ def import_event(source, context=None):
         description=clean_text(description, 200), target_model=target_model,
         target_key=target_key, target_label=clean_text(str(target) if context and target else target_label, 300),
         before=before, after=after, regions=regions,
-        scope=scope, context=context, source_key=key, created_at=source.created_at)
+        scope=scope, context=context, live=live,
+        sponsorship_id=getattr(source, 'sponsorship_id', None), source_key=key, created_at=source.created_at)
 
 
 def import_history():

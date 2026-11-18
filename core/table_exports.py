@@ -69,6 +69,7 @@ class TableExportMiddleware:
             result = HttpResponse(payload, content_type=mime)
             filename = 'مكّن - '+table.title[:70]+' - '+datetime.now().strftime('%Y%m%d-%H%M')+'.'+format
             result['Content-Disposition'] = content_disposition_header(True, filename)
+            request._makken_table_export_success = True
             result['Content-Length'] = str(len(payload))
             result['X-Content-Type-Options'] = 'nosniff'
             patch_cache_control(result, private=True, no_store=True, no_cache=True, max_age=0)

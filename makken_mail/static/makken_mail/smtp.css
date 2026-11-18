@@ -1,0 +1,45 @@
+.mail-smtp-form { container: smtp / inline-size; }
+.mail-smtp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+  gap: 12px;
+}
+.mail-smtp-grid > .mail-smtp-field { min-width: 0; margin: 0; }
+.mail-smtp-control { min-width: 0; display: grid; }
+.mail-smtp-control > :is(input, select) { width: 100%; min-width: 0; min-height: 48px; }
+.mail-smtp-control > label {
+  min-height: 48px;
+  padding: 6px 8px;
+  gap: 6px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.mail-smtp-control input[type="checkbox"] { flex: 0 0 16px; width: 16px; height: 16px; min-height: 0; margin: 0; padding: 0; }
+.mail-smtp-message { overflow-wrap: anywhere; }
+.mail-smtp-message .errorlist { padding: 0; list-style: none; }
+
+@supports (grid-template-rows: subgrid) {
+  .mail-smtp-grid > .mail-smtp-field {
+    display: grid;
+    grid-row: span 3;
+    grid-template-rows: subgrid;
+    row-gap: 0;
+  }
+  .mail-smtp-control { grid-row: 2; }
+  .mail-smtp-message { grid-row: 3; }
+}
+
+@container smtp (min-width: 1008px) {
+  .mail-smtp-grid {
+    grid-template-columns: minmax(111px, 1.15fr) 72px minmax(101px, .95fr)
+      minmax(105px, 1fr) minmax(105px, 1fr) minmax(110px, .9fr)
+      minmax(128px, 1.25fr) minmax(95px, .8fr) minmax(110px, .9fr);
+    column-gap: 8px;
+  }
+  .mail-smtp-grid select {
+    padding-inline: 8px 26px;
+    font-size: 13px;
+    background-position: left 8px center;
+  }
+  .mail-smtp-grid .mail-smtp-host input { padding-inline: 8px; font-size: 13px; }
+}

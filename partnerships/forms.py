@@ -18,6 +18,16 @@ from .financial import MoneyField
 COUNTRIES = [(code, f"{code} +{phonenumbers.country_code_for_region(code)}") for code in sorted(phonenumbers.SUPPORTED_REGIONS - {"IL"})]
 
 
+def term_date_field(label):
+    return forms.DateField(
+        label=label,
+        required=False,
+        input_formats=["%Y-%m-%d"],
+        widget=forms.DateInput(format="%Y-%m-%d", attrs={"type": "date", "dir": "ltr"}),
+        error_messages={"invalid": "أدخل تاريخًا صحيحًا."},
+    )
+
+
 def offering_data(item):
     if not item:
         return []
@@ -35,6 +45,8 @@ class PartnershipForm(forms.Form):
     entity_type = forms.ChoiceField(label="نوع الكيان", choices=[("", "اختر نوع الكيان"), *EntityType.choices])
     entity = forms.ModelChoiceField(label="الكيان", queryset=Entity.objects.none(), empty_label="اختر الكيان")
     scope = forms.ChoiceField(label="النطاق", choices=[("", "اختر النطاق"), *Scope.choices])
+    starts_on = term_date_field("تاريخ بداية الشراكة")
+    ends_on = term_date_field("تاريخ نهاية الشراكة")
     is_active = forms.ChoiceField(label="حالة السجل", choices=[("1", "نشط"), ("0", "غير نشط")], widget=forms.RadioSelect, initial="1")
     offerings = forms.CharField(max_length=60000, widget=forms.HiddenInput, initial="[]")
 
@@ -120,6 +132,18 @@ class PartnershipForm(forms.Form):
 
     def clean(self):
         data = super().clean()
+        if self.instance and not any(self.add_prefix(name) in self.data for name in ("starts_on", "ends_on")):
+            # An editor opened before the update may still submit a form without dates.
+            data["starts_on"], data["ends_on"] = self.instance.starts_on, self.instance.ends_on
+        if "starts_on" in data and "ends_on" in data:
+            start, end = data["starts_on"], data["ends_on"]
+            if start and not end:
+                self.add_error("ends_on", "أدخل تاريخ نهاية الشراكة عند تحديد تاريخ البداية.")
+            elif end and not start:
+                self.add_error("starts_on", "أدخل تاريخ بداية الشراكة عند تحديد تاريخ النهاية.")
+            elif start and end < start:
+                self.add_error("ends_on", "لا يمكن أن يسبق تاريخ نهاية الشراكة تاريخ بدايتها.")
+
         entity, kind = data.get("entity"), data.get("entity_type")
         if kind == EntityType.GOVERNMENT and not entity and "entity" not in self.errors:
             # The hidden field still needs a valid FK; retain a legacy government

@@ -1,0 +1,12 @@
+[Unit]
+Description=Queue Makken partnership expiry reminders
+After=docker.service
+Requires=docker.service
+ConditionPathExists=/var/www/html/makken/compose.production.yaml
+
+[Service]
+Type=oneshot
+WorkingDirectory=/var/www/html/makken
+ExecStart=/usr/bin/env docker compose --env-file .env.production -f compose.production.yaml exec -T web python manage.py queue_partnership_expiry_reminders
+TimeoutStartSec=150
+UMask=0077

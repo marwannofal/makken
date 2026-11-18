@@ -20,6 +20,7 @@ current = ContextVar('makken_activity', default=None)
 MODELS = {
     'levels.level': 'levels', 'regions.region': 'regions', 'entities.entity': 'entities',
     'specializations.specialization': 'specializations', 'sectors.sector': 'sectors',
+    'agreement_clauses.agreementclause': 'agreement_clauses',
     'expense_items.expenseitem': 'expense_items', 'training_programs.trainingprogram': 'training_programs',
     'sponsorship_shapes.sponsorshipshape': 'sponsorship_shapes', 'care_states.statecolor': 'care_states',
     'partnerships.partnership': 'partnerships', 'service_providers.serviceprovider': 'service_providers',
@@ -27,7 +28,7 @@ MODELS = {
     'market_needs.needexecution': 'provider_assignments', 'auth.user': 'accounts',
     'accounts.userprofile': 'accounts',
 }
-FIELDS = {'name', 'title', 'representative', 'is_active', 'scope', 'financial_capacity', 'entity', 'entity_type',
+FIELDS = {'name', 'title', 'representative', 'is_active', 'scope', 'financial_capacity', 'starts_on', 'ends_on', 'entity', 'entity_type',
           'branch', 'sector', 'specialization', 'description', 'color', 'development_state',
           'program', 'category', 'is_training', 'is_operational', 'training_type', 'provider_type',
           'beneficiaries', 'duration', 'duration_unit', 'source', 'observed_on', 'total_cost',
@@ -101,6 +102,7 @@ def snapshot(item):
         result['specializations'] = list(item.specializations.values_list('name', flat=True))
     if label == 'training_programs.trainingprogram':
         result['expense_items'] = list(item.expense_items.values_list('name', flat=True))
+        result['agreement_clauses'] = list(item.agreement_clause_links.order_by('clause_id').values_list('clause__name', flat=True))
     return sanitize(result)
 
 
@@ -123,7 +125,7 @@ def actor_data(actor):
             'actor_username': clean_text(actor.get_username(), 150)}
 
 
-def emit(*, actor=None, regions=None, scope=None, context=None, **values):
+def emit(*, actor=None, regions=None, scope=None, context=None, live=None, sponsorship_id=None, **values):
     from .models import UserActivity, ActivityRegion
     regions = regions or {}
     identity = actor_data(actor)
@@ -150,6 +152,9 @@ def emit(*, actor=None, regions=None, scope=None, context=None, **values):
             event = UserActivity.objects.create(**values)
         ActivityRegion.objects.bulk_create([ActivityRegion(event=event, region_key=pk,
             name=clean_text(name, 100)) for pk, name in sorted(regions.items())])
+        if live is True or (live is None and context is not None):
+            from makken_mail.events import consume_activity
+            transaction.on_commit(lambda: consume_activity(event.pk, sponsorship_id), robust=True)
     return event
 
 
@@ -247,7 +252,7 @@ def authenticated(sender, request, user, **kwargs):
     ctx = current.get()
     transaction.on_commit(lambda: emit(actor=user, module='accounts', action=action,
         description='تسجيل الدخول' if action == 'login' else 'تسجيل الخروج',
-        regions=regions_for(user), context=ctx), robust=True)
+        regions=regions_for(user), context=ctx, live=True), robust=True)
 
 
 def login(sender, request, user, **kwargs):
@@ -273,7 +278,7 @@ def source_saved(sender, instance, raw=False, using='default', **kwargs):
         elif instance.target_user_id:
             cover('auth.user', instance.target_user_id)
     from .activity_history import import_event
-    transaction.on_commit(lambda: import_event(instance, context=ctx), using=using, robust=True)
+    transaction.on_commit(lambda: import_event(instance, context=ctx, live=True), using=using, robust=True)
 
 
 def connect():

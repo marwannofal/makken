@@ -1,0 +1,10 @@
+{{ title }} | منصة مكّن
+
+مرحبًا {{ recipient_name }}،
+{{ description }}
+{% for label,value in details %}{{ label }}: {{ value }}
+{% endfor %}{% if link %}
+فتح منصة مكّن: {{ link }}
+{% endif %}
+رسالة آلية من منصة مكّن. لا تُرسل كلمات المرور عبر البريد.
+المؤسسة العامة للتدريب التقني والمهني

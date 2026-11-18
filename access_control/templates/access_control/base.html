@@ -19,11 +19,12 @@
 <a href="{% url 'access_control:index' %}?tab=permissions"{% if access_tab == 'permissions' %} aria-current="page"{% endif %}>الصلاحيات</a>
 <a href="{% url 'access_control:index' %}?tab=pages"{% if access_tab == 'pages' %} aria-current="page"{% endif %}>صلاحيات الصفحات</a>
 <a href="{% url 'access_control:logs' %}"{% if access_tab == 'logs' %} aria-current="page"{% endif %}>سجل النشاط</a>
+<a href="{% url 'makken_mail:index' %}"{% if access_tab == 'mail' %} aria-current="page"{% endif %}>إشعارات البريد</a>
 {% endif %}
 {% allowed 'user_activity' 'view' %}<a href="{% url 'access_control:activity' %}"{% if access_tab == 'activity' %} aria-current="page"{% endif %}>نشاط المستخدمين</a>{% endallowed %}
 </nav>
 {% if error %}<p class="feedback feedback-error" role="alert">{{ error }}</p>{% endif %}
-{% for message in messages %}<p class="feedback feedback-success" role="status">{{ message }}</p>{% endfor %}
+{% for message in messages %}<p class="feedback {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}feedback-error{% else %}feedback-success{% endif %}" role="status">{{ message }}</p>{% endfor %}
 <div class="ac-workspace">{% block access_content %}{% endblock %}</div>
 <dialog class="partnership-dialog confirmation-dialog" id="ac-confirm" aria-labelledby="ac-confirm-title"><div class="dialog-body"><div class="dialog-top"><span class="dialog-symbol"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3 3 7v5c0 5 9 9 9 9s9-4 9-9V7Z"/><path d="m8 12 3 3 5-6"/></svg></span><button type="button" class="icon-button" data-ac-close aria-label="إغلاق"><svg aria-hidden="true"><use href="#icon-close"/></svg></button></div><p class="eyebrow">مراجعة قبل التنفيذ</p><h2 id="ac-confirm-title">تأكيد العملية</h2><p data-ac-message class="dialog-description"></p><div class="dialog-actions"><button type="button" class="button button-primary" data-ac-yes>تأكيد</button><button type="button" class="button button-secondary" data-ac-close autofocus>إلغاء</button></div></div></dialog>
 <dialog class="partnership-dialog confirmation-dialog" id="ac-feedback" aria-labelledby="ac-feedback-title"><div class="dialog-body"><h2 id="ac-feedback-title">تنبيه</h2><p data-ac-feedback-message role="alert"></p><div class="dialog-actions"><button type="button" class="button button-primary" data-ac-close>فهمت</button></div></div></dialog>

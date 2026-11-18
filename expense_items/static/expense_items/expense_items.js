@@ -16,7 +16,7 @@
     form.elements.namedItem("snapshot").value = link.dataset.snapshot;
     form.elements.namedItem("name").value = edit ? link.dataset.name : "";
     form.elements.namedItem("is_active").value = edit ? link.dataset.active : "1";
-    form.querySelector("[data-editor-title]").textContent = edit ? "تعديل بند الصرف" : "إضافة بند صرف جديد";
+    form.querySelector("[data-editor-title]").textContent = edit ? (editor.dataset.editTitle || "تعديل بند الصرف") : (editor.dataset.addTitle || "إضافة بند صرف جديد");
     form.querySelector("#name-error").textContent = "";
     form.elements.namedItem("name").setCustomValidity("");
     open(editor);

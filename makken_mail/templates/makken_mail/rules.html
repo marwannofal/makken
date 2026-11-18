@@ -1,0 +1,32 @@
+{% extends 'makken_mail/base.html' %}
+{% block mail_content %}
+<div class="mail-notice" role="status">
+<strong>{% if configured and sending_enabled %}إرسال البريد مفعّل{% elif configured %}إعدادات SMTP محفوظة؛ الإرسال العام متوقف{% else %}الإرسال متوقف حتى إعداد مزود SMTP{% endif %}</strong>
+<span>تفعيل النوع يحدد متى يُرسل البريد. اختيار المستلم لا يمنحه صلاحية الاطلاع على السجل.</span>
+<a class="button button-secondary" href="{% url 'makken_mail:smtp' %}">إعدادات المزود</a>
+</div>
+<section class="partnership-card mail-card">
+<header class="card-heading"><div><p class="eyebrow">01 · تفضيلات المستخدمين</p><h2>اختر مستلمًا</h2></div></header>
+<form method="get" action="{% url 'makken_mail:recipient' %}" class="mail-inline">
+<div class="partnership-field"><label for="mail-person">المستخدم</label><select id="mail-person" name="person" data-market-select data-label="اختر المستخدم" required><option value="">اختر المستخدم</option>{% for person in users %}<option value="{{ person.pk }}">{{ person.get_full_name|default:person.get_username }} · {{ person.get_username }}</option>{% endfor %}</select></div>
+<button class="button button-primary" type="submit">إدارة إشعاراته</button>
+</form>
+</section>
+<section class="partnership-card mail-card">
+<header class="card-heading"><div><p class="eyebrow">02 · دليل الأحداث</p><h2>أنواع البريد وقواعد التوجيه</h2></div><span class="subtle-badge">عدد السجلات: {{ rules.paginator.count }}</span></header>
+<form class="mail-inline" method="get">
+<div class="partnership-field"><label for="mail-query">البحث</label><input id="mail-query" name="q" value="{{ q }}" maxlength="100" placeholder="ابحث عن نوع إشعار"></div>
+<div class="partnership-field"><label for="mail-category">القسم</label><select id="mail-category" name="category"><option value="">جميع الأقسام</option>{% for c in categories %}<option{% if category == c %} selected{% endif %}>{{ c }}</option>{% endfor %}</select></div>
+<button class="button button-primary" type="submit">بحث</button><a class="button button-secondary" href="{% url 'makken_mail:index' %}">مسح</a>
+</form>
+<div class="table-scroll" tabindex="0"><table class="partnership-table" data-no-export>
+<thead><tr><th>النوع</th><th>الحالة</th><th>التوجيه التلقائي</th><th>مستلمون إضافيون</th><th>الإجراء</th></tr></thead>
+<tbody>{% for rule in rules %}<tr><th scope="row">{{ rule.label }}</th>
+<td><span class="mail-pill{% if rule.enabled %} is-on{% endif %}">{% if rule.enabled %}مفعّل{% else %}متوقف{% endif %}</span></td>
+<td>{% if rule.to_actor %}المنفّذ · {% endif %}{% if rule.to_subject %}صاحب الحساب · {% endif %}{% if rule.to_employee %}الموظف · {% endif %}{% if rule.to_manager %}المدير{% endif %}{% if not rule.to_actor and not rule.to_subject and not rule.to_employee and not rule.to_manager %}—{% endif %}</td>
+<td>{{ rule.total }}</td><td><a class="button button-secondary mail-action" href="{% url 'makken_mail:rule' rule.code %}">تعديل</a></td>
+</tr>{% empty %}<tr><td colspan="5">لا توجد أنواع مطابقة.</td></tr>{% endfor %}</tbody>
+</table></div>
+{% include 'makken_mail/pager.html' with entries=rules %}
+</section>
+{% endblock %}

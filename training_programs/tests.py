@@ -346,7 +346,7 @@ class TrainingProgramsTests(TestCase):
         self.assertEqual(empty.context["page_obj"].paginator.count, 0)
         self.assertEqual(len(empty.context["rows"]), 0)
 
-    def test_table_has_all_six_columns_with_values_under_matching_headers(self):
+    def test_table_has_all_seven_columns_with_values_under_matching_headers(self):
         from html.parser import HTMLParser
 
         item = self.create(types=["operational"])
@@ -375,16 +375,17 @@ class TrainingProgramsTests(TestCase):
 
         parser = RowParser()
         parser.feed(self.client.get(self.url).content.decode())
-        self.assertEqual(len(parser.cells), 6)
+        self.assertEqual(len(parser.cells), 7)
+        self.assertEqual(parser.cells[3], "—")
         self.assertEqual(parser.cells[0], item.name)
         self.assertEqual(parser.cells[1], "الدبلوم التدريبي (المتوسط)")
         for expense in item.expense_items.all():
             self.assertIn(expense.name, parser.cells[2])
-        self.assertNotIn("تدريبي", parser.cells[3])
-        self.assertIn("تشغيلي", parser.cells[3])
-        self.assertEqual(parser.cells[4], "نشط")
-        self.assertIn("تعديل", parser.cells[5])
-        self.assertIn("حذف", parser.cells[5])
+        self.assertNotIn("تدريبي", parser.cells[4])
+        self.assertIn("تشغيلي", parser.cells[4])
+        self.assertEqual(parser.cells[5], "نشط")
+        self.assertIn("تعديل", parser.cells[6])
+        self.assertIn("حذف", parser.cells[6])
 
     def test_single_type_radio_and_forged_double_choice_rejected(self):
         from .forms import TrainingProgramForm
