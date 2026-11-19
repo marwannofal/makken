@@ -49,3 +49,12 @@
   .mail-inline > .partnership-field,.mail-inline .button { flex-basis: 100%; }
   .mail-card .card-heading { align-items: flex-start; flex-wrap: wrap; gap: 10px; }
 }
+
+.mail-inline > .partnership-field { display: flex; flex-direction: column; gap: 6px; }
+.mail-inline > .partnership-field > label { margin: 0; }
+.mail-inline input,
+.mail-inline select,
+.mail-inline .search-select-trigger,
+.mail-inline .button { height: 46px; min-height: 46px; box-sizing: border-box; margin: 0; }
+.mail-inline .search-select .selected-summary:empty,
+.mail-inline .search-select .field-error:empty { display: none; margin: 0; }
