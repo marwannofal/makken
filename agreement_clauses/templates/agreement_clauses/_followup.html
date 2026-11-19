@@ -1,0 +1,77 @@
+{% load tz %}
+<section class="partnership-card clause-card" id="agreement-updates">
+  <header class="card-heading">
+    <div><p class="eyebrow">الملاحظات والشواهد</p><h2>سجل المتابعة</h2>
+      <p class="muted">أضف تحديثًا عامًا أو اربطه ببند محدد. يظهر اسم من أضافه وتاريخ تسجيله.</p></div>
+    <span class="subtle-badge">عدد التحديثات: {{ entries_page.paginator.count }}</span>
+  </header>
+  {% if followup_form %}
+  <form method="post" enctype="multipart/form-data" class="followup-entry-form" data-market-confirm="هل تريد حفظ تحديث المتابعة والمرفقات؟">
+    {% csrf_token %}
+    <input type="hidden" name="operation" value="add_followup"><input type="hidden" name="snapshot" value="{{ followup_token }}">
+    {% if followup_form.non_field_errors %}<div class="feedback feedback-error" role="alert">{{ followup_form.non_field_errors }}</div>{% endif %}
+    <div class="followup-entry-fields">
+      {% include "agreement_clauses/_record_field.html" with field=followup_form.clause only %}
+      <div class="partnership-field">{{ followup_form.files.label_tag }}{{ followup_form.files }}
+        <p class="field-help">PDF أو PNG أو JPG، حتى 5 ملفات و10 ميغابايت لكل ملف.</p>{{ followup_form.files.errors }}</div>
+    </div>
+    {% include "agreement_clauses/_record_field.html" with field=followup_form.note only %}
+    <button class="button button-primary" type="submit">حفظ تحديث المتابعة</button>
+  </form>
+  {% endif %}
+  <div class="followup-timeline">
+    {% for entry in entries_page %}
+    <article class="followup-update">
+      <header>
+        <div><h3>{{ entry.clause_name|default:"متابعة عامة للاتفاقية" }}</h3>
+          <p class="muted">{% if entry.created_by %}{{ entry.created_by.get_full_name|default:entry.created_by.get_username }}{% else %}المستخدم غير متاح{% endif %}</p></div>
+        {% timezone "Asia/Riyadh" %}<time class="muted" datetime="{{ entry.created_at|date:'c' }}" dir="ltr">{{ entry.created_at|date:"Y/m/d H:i" }}</time>{% endtimezone %}
+      </header>
+      {% if entry.note %}<p class="followup-note">{{ entry.note }}</p>{% endif %}
+      {% if entry.evidence.all %}
+      <ul class="followup-files" aria-label="الشواهد">
+        {% for attachment in entry.evidence.all %}
+        <li>
+          <span><bdi>{{ attachment.original_name }}</bdi><small>{{ attachment.size|filesizeformat }}</small></span>
+          {% if can_download_evidence %}
+          <a class="button button-secondary" href="{% url 'partnerships:agreement_evidence_download' partnership.pk agreement.pk attachment.pk %}" aria-label="تنزيل {{ attachment.original_name }}">تنزيل</a>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </article>
+    {% empty %}
+      <p class="feedback feedback-info">لا توجد تحديثات متابعة حتى الآن.</p>
+    {% endfor %}
+  </div>
+  {% if entries_page.has_other_pages %}
+  <nav class="market-page-actions followup-pagination" aria-label="صفحات سجل المتابعة">
+    {% if entries_page.has_previous %}<a class="button button-secondary" href="?updates={{ entries_page.previous_page_number }}#agreement-updates">السابق</a>{% endif %}
+    <span class="subtle-badge">صفحة {{ entries_page.number }} من {{ entries_page.paginator.num_pages }}</span>
+    {% if entries_page.has_next %}<a class="button button-secondary" href="?updates={{ entries_page.next_page_number }}#agreement-updates">التالي</a>{% endif %}
+  </nav>
+  {% endif %}
+</section>
+<div id="agreement-teams">
+  <section class="partnership-card clause-card">
+    <header class="card-heading">
+      <div><p class="eyebrow">الأطراف والمسؤوليات</p><h2>فرق العمل وضباط الاتصال</h2>
+        <p class="muted">تعديل بيانات الفريق هنا يُحدّث سجل الاتفاقية نفسه.</p></div>
+      {% if can_edit_followup and not editing_teams %}<a class="button button-primary" href="?edit_team=1#agreement-teams">تعديل فرق العمل</a>{% endif %}
+    </header>
+  </section>
+  {% if editing_teams %}
+  <form method="post" data-market-confirm="هل تريد حفظ الفريقين وضباط الاتصال؟">
+    {% csrf_token %}
+    <input type="hidden" name="operation" value="save_followup_teams"><input type="hidden" name="snapshot" value="{{ teams_token }}">
+    {% include "agreement_clauses/_team_forms.html" %}
+    <div class="market-page-actions">
+      <button class="button button-primary" type="submit">حفظ الفريقين</button>
+      <a class="button button-secondary" href="{% url 'partnerships:agreement' partnership.pk agreement.pk %}#agreement-teams">إلغاء التعديل</a>
+    </div>
+  </form>
+  {% else %}
+    {% include "agreement_clauses/_team_list.html" %}
+  {% endif %}
+</div>

@@ -1,4 +1,5 @@
 from django.urls import path
+from agreement_clauses.followup import download_evidence
 from agreement_clauses.records import agreement_details
 from agreement_clauses.workflow import workflow
 from . import views
@@ -11,4 +12,6 @@ urlpatterns += [
     path("<int:pk>/clauses/", workflow, name="clauses"),
     path("<int:pk>/agreements/<int:agreement_id>/", workflow, name="agreement"),
     path("<int:pk>/agreements/<int:agreement_id>/details/", agreement_details, name="agreement_details"),
+    path("<int:pk>/agreements/<int:agreement_id>/evidence/<int:attachment_id>/download/",
+         download_evidence, name="agreement_evidence_download"),
 ]

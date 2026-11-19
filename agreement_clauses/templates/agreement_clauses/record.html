@@ -5,7 +5,7 @@
     <p class="page-description"><bdi>{{ agreement.number }}</bdi> · {{ agreement.title }} · {{ partnership.name }}</p>
   </div>
   <div class="market-page-actions">
-    <a class="button button-secondary" href="{% url 'partnerships:agreement' partnership.pk agreement.pk %}">بنود الاتفاقية</a>
+    <a class="button button-secondary" href="{% url 'partnerships:agreement' partnership.pk agreement.pk %}">بطاقة متابعة الاتفاقية</a>
     {% if can_edit and not editing %}<a class="button button-primary" href="?edit=1">تعديل بيانات الاتفاقية</a>{% endif %}
   </div>
 </section>

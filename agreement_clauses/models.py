@@ -5,6 +5,9 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from expense_items.models import normalize_name, validate_name
+from partnerships.attachment_storage import willingness_storage
+
+from .evidence_storage import evidence_path
 
 
 class AgreementClause(models.Model):
@@ -232,6 +235,41 @@ class NeedClause(models.Model):
     class Meta:
         default_permissions = ()
         constraints = [models.UniqueConstraint(fields=["need", "clause"], name="mk_clause_need_uq")]
+
+
+class AgreementFollowupState(models.Model):
+    agreement = models.OneToOneField(Agreement, on_delete=models.CASCADE, related_name="followup_state")
+    updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name="+")
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        default_permissions = ()
+
+
+class AgreementFollowupEntry(models.Model):
+    agreement = models.ForeignKey(Agreement, on_delete=models.CASCADE, related_name="followup_entries")
+    request_key = models.UUIDField(unique=True, editable=False)
+    note = models.TextField("الملاحظة", max_length=2500, blank=True)
+    clause = models.ForeignKey(ClauseAssignment, on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
+    clause_name = models.CharField(max_length=200, blank=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name="+")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-pk"]
+        default_permissions = ()
+
+
+class AgreementEvidence(models.Model):
+    entry = models.ForeignKey(AgreementFollowupEntry, on_delete=models.CASCADE, related_name="evidence")
+    file = models.FileField(storage=willingness_storage, upload_to=evidence_path, max_length=240)
+    original_name = models.CharField(max_length=240)
+    size = models.PositiveBigIntegerField()
+    content_type = models.CharField(max_length=80)
+
+    class Meta:
+        ordering = ["pk"]
+        default_permissions = ()
 
 
 def mean_progress(total, count):

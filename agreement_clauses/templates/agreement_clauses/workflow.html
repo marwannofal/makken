@@ -1,5 +1,6 @@
 {% extends "core/makken_base.html" %}
 {% load static access_tags %}
+{% load tz %}
 {% block title %}{{ page_heading }} | مكّن{% endblock %}
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'care_states/states.css' %}">
@@ -8,6 +9,11 @@
 <link rel="stylesheet" href="{% static 'agreement_clauses/workflow.css' %}">
 <script src="{% static 'market_needs/market.js' %}" defer></script>
 <script src="{% static 'agreement_clauses/workflow.js' %}" defer></script>
+{% if agreement %}
+<link rel="stylesheet" href="{% static 'agreement_clauses/record.css' %}?v=1">
+<link rel="stylesheet" href="{% static 'agreement_clauses/followup.css' %}">
+<script src="{% static 'agreement_clauses/record.js' %}?v=1" defer></script>
+{% endif %}
 {% endblock %}
 {% block content %}
 <section class="page-introduction partnership-intro">
@@ -24,10 +30,24 @@
 {% if error %}<p class="feedback feedback-error" role="alert">{{ error }}</p>{% endif %}
 {% for message in messages %}<p class="feedback feedback-success" role="status">{{ message }}</p>{% endfor %}
 {% if not partnership.is_active %}<p class="feedback feedback-info">الشراكة غير نشطة. الاتفاقيات والبنود متاحة للعرض فقط.</p>{% endif %}
+{% if agreement %}
+<nav class="market-page-actions followup-nav" aria-label="أقسام بطاقة المتابعة">
+  <a class="button button-secondary" href="#agreement-clauses">البنود والإنجاز</a>
+  <a class="button button-secondary" href="#agreement-updates">الملاحظات والشواهد</a>
+  <a class="button button-secondary" href="#agreement-teams">فرق العمل وضباط الاتصال</a>
+</nav>
+{% endif %}
 <section class="partnership-card clause-card">
   <header class="card-heading"><div><p class="eyebrow">متابعة الإنجاز</p><h2>{% if agreement %}إجمالي إنجاز الاتفاقية{% else %}إجمالي إنجاز الشراكة{% endif %}</h2>
     <p>{% if agreement %}متوسط نسب البنود المسندة إلى هذه الاتفاقية.{% else %}متوسط نسب البنود المباشرة وبنود جميع اتفاقيات هذه الشراكة. لكل بند الوزن نفسه.{% endif %}</p>
   </div><span class="subtle-badge"><bdi>{% if agreement %}{% include "agreement_clauses/_percent.html" with value=progress only %}{% else %}{% include "agreement_clauses/_percent.html" with value=overall only %}{% endif %}</bdi></span></header>
+  {% if agreement %}
+  <dl class="followup-meta">
+    <div><dt>الموظف المسؤول</dt><dd>{% if details.responsible_employee %}{{ details.responsible_employee.get_full_name|default:details.responsible_employee.get_username }}{% else %}غير محدد{% endif %}</dd></div>
+    <div><dt>آخر تحديث (توقيت الرياض)</dt><dd>{% timezone "Asia/Riyadh" %}<time datetime="{{ followup_updated_at|date:'c' }}" dir="ltr">{{ followup_updated_at|date:"Y/m/d H:i" }}</time>{% endtimezone %}</dd></div>
+    <div><dt>حدّثه</dt><dd>{% if followup_updated_by %}{{ followup_updated_by.get_full_name|default:followup_updated_by.get_username }}{% else %}غير متاح{% endif %}</dd></div>
+  </dl>
+  {% endif %}
   {% if agreement and partnership.is_active %}
     {% allowed 'partnerships' 'edit' partnership %}
       <form class="clause-inline" method="post" data-market-confirm="هل تريد حفظ عنوان الاتفاقية؟">{% csrf_token %}
@@ -55,14 +75,14 @@
       <thead><tr><th scope="col">الاتفاقية</th><th scope="col">عدد البنود</th><th scope="col">نسبة الإنجاز</th><th scope="col">الإجراء</th></tr></thead>
       <tbody>{% for item in agreements %}
         <tr><th scope="row"><bdi>{{ item.number }}</bdi> · {{ item.title }}</th><td>{{ item.clause_count }}</td><td><bdi>{% include "agreement_clauses/_percent.html" with value=item.progress only %}</bdi></td>
-          <td><a class="button button-secondary" href="{% url 'partnerships:agreement' partnership.pk item.pk %}">عرض البنود</a>
+          <td><a class="button button-secondary" href="{% url 'partnerships:agreement' partnership.pk item.pk %}">بطاقة المتابعة</a>
           <a class="button button-secondary" href="{% url 'partnerships:agreement_details' partnership.pk item.pk %}">البيانات الداخلية</a></td></tr>
       {% empty %}<tr><td colspan="4">لا توجد اتفاقيات مرتبطة بعد.</td></tr>{% endfor %}</tbody>
     </table>
   </div>
 </section>
 {% endif %}
-<section class="partnership-card clause-card">
+<section class="partnership-card clause-card" id="agreement-clauses">
   <header class="card-heading"><div><p class="eyebrow">المسؤوليات والمتابعة</p><h2>{% if agreement %}بنود الاتفاقية{% else %}بنود الشراكة المباشرة{% endif %}</h2>
     <p>اختر بندًا أو أكثر من الدليل. يمكنك تعديل المسؤولية ونسبة الإنجاز لكل بند على حدة.</p></div>
     <span class="subtle-badge">عدد البنود: {{ rows|length }}</span></header>
@@ -112,6 +132,7 @@
     {% endallowed %}
   {% endif %}
 </section>
+{% if agreement %}{% include "agreement_clauses/_followup.html" %}{% endif %}
 <dialog id="market-confirm" class="partnership-dialog confirmation-dialog" aria-labelledby="market-confirm-title">
   <div class="dialog-body">
     <p class="eyebrow">مراجعة وتأكيد</p><h2 id="market-confirm-title">تأكيد العملية</h2>

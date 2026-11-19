@@ -39,20 +39,7 @@
     </div>
     <p class="field-help">اختيار موظف يوثّق دوره في الاتفاقية. يجب أن يملك صلاحية عرض الشراكة مسبقًا.</p>
   </section>
-  {% for label, formset in team_forms %}
-  <section class="partnership-card agreement-card" data-agreement-team>
-    <header class="card-heading"><div><p class="eyebrow">فرق العمل</p><h2>{{ label }}</h2>
-      <p class="muted">اختر صفة العضو لتحديد الممثل أو الرئيس أو ضابط الاتصال.</p></div>
-      <button type="button" class="button button-secondary" data-add-member hidden>إضافة عضو</button>
-    </header>
-    {{ formset.non_form_errors }}{{ formset.management_form }}
-    <div data-team-members>
-      {% for member in formset %}{% include "agreement_clauses/_team_member_fields.html" %}{% endfor %}
-    </div>
-    <template data-empty-member>{% include "agreement_clauses/_team_member_fields.html" with member=formset.empty_form %}</template>
-    <p data-team-feedback class="field-help" role="status"></p>
-  </section>
-  {% endfor %}
+{% include "agreement_clauses/_team_forms.html" %}
   <section class="partnership-card agreement-card">
     <header class="card-heading"><div><p class="eyebrow">الأثر المتوقع</p><h2>هدف الشراكة والنتائج</h2></div></header>
     <div class="agreement-grid">

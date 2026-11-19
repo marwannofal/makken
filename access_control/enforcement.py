@@ -81,11 +81,13 @@ def requested_operations(request,module,view,kwargs):
         operation = request.POST.get('operation')
         needed = {'add_clauses': 'edit', 'update_clause': 'edit', 'remove_clause': 'delete',
                   'create_agreement': 'create', 'rename_agreement': 'edit'}.get(operation)
+        if name == 'agreement' and operation in {'add_followup', 'save_followup_teams'}:
+            needed = 'edit'
         if request.method != 'POST' or not needed:
             raise PermissionDenied
         return ['view', needed]
     if request.method in {'GET','HEAD'}:
-        if name in {'download','attachment_download'}:return ['view','export']
+        if name in {'download','attachment_download','agreement_evidence_download'}:return ['view','export']
         if name=='create':return ['view','create']
         if name=='edit':return ['view','edit']
         if name=='followup':

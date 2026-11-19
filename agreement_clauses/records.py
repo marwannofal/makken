@@ -13,7 +13,7 @@ from partnerships.models import Partnership
 
 from .models import Agreement, AgreementDetails, AgreementRenewal, TeamSide
 from .record_forms import DetailsForm, RenewalForm, TeamForms, name_of
-from .workflow import WorkflowConflict, audit, token, validate_token
+from .workflow import WorkflowConflict, audit, token, touch_followup, validate_token
 
 
 def details_for(agreement):
@@ -76,6 +76,7 @@ def save_details(request, partnership_id, agreement_id):
             details.revision += 1
             details.updated_by = policy.user
             details.save(update_fields=['revision', 'updated_by', 'updated_at'])
+            touch_followup(agreement, policy.user)
             audit(policy.user, partnership, 'تسجيل تجديد الاتفاقية', before, audit_record(agreement, details))
             return 'تم تسجيل التجديد.', None, None
 
@@ -95,6 +96,7 @@ def save_details(request, partnership_id, agreement_id):
         form.save_m2m()
         for _, team in teams:
             team.save()
+        touch_followup(agreement, policy.user)
         audit(policy.user, partnership, 'تحديث بيانات الاتفاقية', before, audit_record(agreement, profile))
         return 'تم حفظ بيانات الاتفاقية والفريقين.', None, None
 

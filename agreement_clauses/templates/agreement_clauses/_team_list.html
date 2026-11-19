@@ -1,0 +1,11 @@
+{% for label, members in teams %}
+<section class="partnership-card agreement-card">
+  <header class="card-heading"><div><p class="eyebrow">فرق العمل</p><h2>{{ label }}</h2></div></header>
+  {% for member in members %}
+    <div class="agreement-card-row">
+      <div><strong>{{ member.name }}</strong><p class="muted">{{ member.organization }} · {{ member.get_role_display }}</p></div>
+      <div><bdi>{{ member.phone|default:"—" }}</bdi>{% if member.email %}<br><bdi>{{ member.email }}</bdi>{% endif %}</div>
+    </div>
+  {% empty %}<p class="muted">لم يُسجّل أي عضو في هذا الفريق بعد.</p>{% endfor %}
+</section>
+{% endfor %}

@@ -3,6 +3,7 @@ from django.core import signing
 from django.db import IntegrityError, transaction
 from django.db.models import Count, Q, Sum
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
 from access_control.activity_capture import emit, regions_for
@@ -12,7 +13,7 @@ from access_control.regions import regional_transaction, require_write, scoped
 from accounts.security import add_login_headers
 from partnerships.models import Partnership
 from .forms import AgreementTitleForm, AssignForm, ProgressForm
-from .models import Agreement, AgreementClause, ClauseAssignment, mean_progress
+from .models import Agreement, AgreementClause, AgreementFollowupState, ClauseAssignment, mean_progress
 
 SALT = "makken.agreement-clauses.workflow.v1"
 OPERATIONS = {"create_agreement": "create", "rename_agreement": "edit", "add_clauses": "edit",
@@ -74,6 +75,11 @@ def audit(actor, partnership, text, before=None, after=None, progress=False):
          regions=regions, scope="regional" if regions else "unknown", live=progress)
 
 
+def touch_followup(agreement, actor):
+    if agreement:
+        AgreementFollowupState.objects.update_or_create(agreement=agreement, defaults={'updated_by': actor})
+
+
 def agree_title(partnership, agreement, title):
     existing = Agreement.objects.filter(partnership=partnership, title__iexact=title)
     if agreement:
@@ -112,6 +118,7 @@ def change(actor, partnership_id, agreement_id, post):
                 old = agreement.title
                 agreement.title = title
                 agreement.save(update_fields=["title"])
+                touch_followup(agreement, actor)
                 audit(actor, partnership, "تعديل عنوان اتفاقية", {"agreement_title": old}, {"agreement_title": title, "agreement_number": agreement.number})
             else:
                 agreement = Agreement.objects.create(partnership=partnership, title=title, created_by=actor)
@@ -136,6 +143,7 @@ def change(actor, partnership_id, agreement_id, post):
             responsibility = bound.cleaned_data["responsibility"]
             children.bulk_create([ClauseAssignment(clause=clause, agreement=agreement,
                 partnership=None if agreement else partnership, responsibility=responsibility, updated_by=actor) for clause in selected])
+            touch_followup(agreement, actor)
             audit(actor, partnership, "إسناد بنود الاتفاقية", after={"agreement_clauses": [clause.name for clause in selected]})
             return agreement, "تم إسناد البنود."
 
@@ -147,6 +155,7 @@ def change(actor, partnership_id, agreement_id, post):
         before = snapshot(row)
         if operation == "remove_clause":
             row.delete()
+            touch_followup(agreement, actor)
             audit(actor, partnership, "إزالة إسناد بند", before=before)
             return agreement, "تمت إزالة ارتباط البند. البند الأصلي ما زال موجودًا في الدليل."
 
@@ -160,6 +169,7 @@ def change(actor, partnership_id, agreement_id, post):
         row.version += 1
         row.updated_by = actor
         row.save()
+        touch_followup(agreement, actor)
         audit(actor, partnership, "تحديث إنجاز بند الاتفاقية", before, snapshot(row),
               progress=before["progress"] != row.progress)
         return agreement, "تم حفظ مسؤولية البند ونسبة إنجازه."
@@ -170,12 +180,26 @@ def change(actor, partnership_id, agreement_id, post):
 def workflow(request, pk, agreement_id=None):
     partnership = get_object_or_404(scoped(Partnership.objects.all(), request.user), pk=pk)
     agreement = get_object_or_404(partnership.agreements, pk=agreement_id) if agreement_id else None
-    status, error, invalid = 200, "", None
+    from .followup import FOLLOWUP_OPERATIONS, InvalidFollowup, change_followup, followup_context
+
+    status, error, invalid, followup_errors = 200, "", None, {}
     if request.method == "POST":
+        operation = request.POST.get("operation")
         try:
-            agreement, message = change(request.user, pk, agreement_id, request.POST)
+            if operation in FOLLOWUP_OPERATIONS:
+                agreement, message = change_followup(request, pk, agreement_id)
+                anchor = "#agreement-teams" if operation == "save_followup_teams" else "#agreement-updates"
+                destination = reverse("partnerships:agreement", args=[pk, agreement.pk]) + anchor
+            else:
+                agreement, message = change(request.user, pk, agreement_id, request.POST)
+                destination = (reverse("partnerships:agreement", args=[pk, agreement.pk]) if agreement else
+                               reverse("partnerships:clauses", args=[pk]))
             messages.success(request, message)
-            return add_login_headers(redirect("partnerships:agreement", pk=pk, agreement_id=agreement.pk) if agreement else redirect("partnerships:clauses", pk=pk))
+            return add_login_headers(redirect(destination))
+        except InvalidFollowup as exc:
+            followup_errors, status = exc.context, 400
+        except OSError:
+            error, status = "تعذّر حفظ المرفقات. حاول مجددًا أو تواصل مع الدعم.", 503
         except InvalidInput as exc:
             invalid, status = exc.form, 400
         except signing.BadSignature:
@@ -193,7 +217,7 @@ def workflow(request, pk, agreement_id=None):
     agreements = partnership.agreements.annotate(clause_count=Count("clause_assignments"), clause_total=Sum("clause_assignments__progress")) if not agreement else []
     for item in agreements:
         item.progress = mean_progress(item.clause_total, item.clause_count)
-    heading = "بنود الاتفاقية" if agreement else "الاتفاقيات وبنود الشراكة"
+    heading = "بطاقة متابعة الاتفاقية" if agreement else "الاتفاقيات وبنود الشراكة"
     name = request.user.get_short_name() or request.user.get_username()
     context = {"page_heading": heading, "display_name": name, "avatar_initial": name[:1], "active_page": "partnerships",
                "partnership": partnership, "agreement": agreement, "rows": rows, "agreements": agreements,
@@ -203,4 +227,6 @@ def workflow(request, pk, agreement_id=None):
                "assign_form": form_for(AssignForm(assigned=[row.clause_id for row in children])),
                "title_token": token(request.user, partnership, agreement, kind="title", title=agreement.title if agreement else ""),
                "add_token": token(request.user, partnership, agreement, kind="add"), "error": error}
+    if agreement:
+        context.update(followup_context(request, partnership, agreement, children, **followup_errors))
     return add_login_headers(render(request, "agreement_clauses/workflow.html", context, status=status))
