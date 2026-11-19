@@ -39,7 +39,9 @@
   font-weight: 700;
   line-height: 1.85;
   white-space: normal;
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
 }
 
 :root .main-content .states-card-header p,
