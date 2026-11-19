@@ -190,7 +190,7 @@ class AccessTests(TestCase):
         self.assertFalse(target.is_superuser);self.assertFalse(target.is_staff)
         self.assertTrue(AccessPolicy(target).can('regions'));self.assertFalse(AccessPolicy(target).can('entities'))
         log=SecurityAudit.objects.get(target_user=target);serialized=json.dumps([log.before,log.after]);self.assertNotIn(data['new_password1'],serialized);self.assertNotIn('snapshot',serialized);self.assertNotIn(target.password,serialized)
-        self.client.logout();self.assertTrue(self.client.login(username='new-user',password=data['new_password1']))
+        self.client.logout();self.assertEqual(self.client.post('/login',{'username':'new-user','password':data['new_password1']}).status_code,302)
         self.assertEqual(self.client.get(reverse('regions:index')).status_code,200)
         self.assertEqual(self.client.get(reverse('entities:index')).status_code,403)
         self.assertEqual(self.client.post(url,data).status_code,403)

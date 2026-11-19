@@ -36,7 +36,7 @@ class LoginTests(TestCase):
     def test_username_login(self):
         response = self.post()
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, "/")
+        self.assertEqual(response.url, "/access-control/no-access/")
         self.assertEqual(int(self.client.session[SESSION_KEY]), self.user.pk)
 
     @override_settings(PASSWORD_HASHERS=["django.contrib.auth.hashers.PBKDF2PasswordHasher"])
@@ -60,13 +60,18 @@ class LoginTests(TestCase):
         self.User.objects.create_superuser(
             username="admin", email="admin@example.com", password=self.password
         )
-        for path in ("/login", "/admin/login/"):
-            self.client.logout()
-            response = self.client.post(path, {
-                "username": "admin", "password": self.password, "next": "/admin/",
-            })
-            self.assertEqual(response.status_code, 302)
-            self.assertEqual(response.url, "/admin/")
+        self.client.logout()
+        response = self.client.post("/login", {
+            "username": "admin", "password": self.password, "next": "/admin/",
+        })
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, "/admin/")
+        self.client.logout()
+        admin_gate = self.client.post("/admin/login/", {
+            "username": "admin", "password": self.password, "next": "/admin/",
+        })
+        self.assertEqual(admin_gate.status_code, 302)
+        self.assertEqual(admin_gate.url, "/login?next=/admin/login/")
 
     def test_inactive_user_is_denied_with_generic_error(self):
         self.user.is_active = False
@@ -133,7 +138,7 @@ class LoginTests(TestCase):
         client = Client(enforce_csrf_checks=True)
         bad = client.post("/login", {"username": "marwan", "password": self.password})
         self.assertEqual(bad.status_code, 403)
-        self.assertContains(bad, "تعذّر التحقق من أمان الطلب.", status_code=403)
+        self.assertContains(bad, "انتهت صلاحية النموذج", status_code=403)
         client.get("/login")
         token = client.cookies["csrftoken"].value
         response = client.post("/login", {
@@ -154,17 +159,18 @@ class LoginTests(TestCase):
         for target in ("https://evil.example/", "//evil.example/", "javascript:alert(1)"):
             self.client.logout()
             response = self.post(next=target)
-            self.assertEqual(response.url, "/")
+            self.assertEqual(response.url, "/access-control/no-access/")
 
     def test_same_host_next_url_allowed(self):
-        response = self.post(next="/admin/")
+        self.User.objects.create_superuser("super-next", "super-next@example.com", self.password)
+        response = self.post("super-next", next="/admin/")
         self.assertEqual(response.url, "/admin/")
 
     def test_https_login_rejects_http_next(self):
         response = self.client.post("/login", {
             "username": "marwan", "password": self.password, "next": "http://testserver/admin/",
         }, secure=True)
-        self.assertEqual(response.url, "/")
+        self.assertEqual(response.url, "/access-control/no-access/")
 
     def test_escaping_identifier_in_html(self):
         response = self.post('"><script>alert(1)</script>', password="wrong")
@@ -221,7 +227,7 @@ class LoginTests(TestCase):
         client = Client(enforce_csrf_checks=True)
         client.force_login(self.user, backend="accounts.backends.EmailOrUsernameBackend")
         self.assertEqual(client.post("/logout").status_code, 403)
-        client.get("/login")
+        client.get("/access-control/no-access/")
         response = client.post("/logout", {
             "csrfmiddlewaretoken": client.cookies["csrftoken"].value,
         })
@@ -235,12 +241,12 @@ class LoginTests(TestCase):
 
     def test_authenticated_login_form_remains_available(self):
         self.post()
-        self.assertEqual(self.client.get("/login").status_code, 200)
+        self.assertEqual(self.client.get("/login").status_code, 302)
 
     def test_authenticated_session_expires_on_browser_close(self):
         self.post()
         self.assertTrue(self.client.session.get_expire_at_browser_close())
-        self.assertEqual(self.client.session.get_expiry_age(), 3600)
+        self.assertEqual(self.client.session.get_expiry_age(), 60 * 60 * 24 * 14)
 
     @override_settings(SESSION_COOKIE_SECURE=True, CSRF_COOKIE_SECURE=True)
     def test_https_cookie_flags(self):
