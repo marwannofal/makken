@@ -1,0 +1,120 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>تسجيل راعٍ جديد | مكّن</title>
+  <link rel="stylesheet" href="{% static 'partnerships/sponsor_requests.css' %}?v=20261119-1">
+</head>
+<body class="pub-body">
+  <main class="pub-shell">
+    <header class="pub-header">
+      <div class="pub-brand">
+        <span class="pub-badge">منصة مكّن</span>
+        <h1>طلب تسجيل راعٍ خارجي<span class="pub-dot">.</span></h1>
+        <p>قدّم بيانات جهتك للانضمام إلى رعاة برامج المؤسسة العامة للتدريب التقني والمهني. ستتم مراجعة الطلب من الفريق المختص قبل اعتماده وإدراجه في سجل الشراكات.</p>
+      </div>
+      <a class="pub-back-link" href="{% url 'accounts:login' %}">العودة لتسجيل الدخول</a>
+    </header>
+
+    <section class="pub-card" aria-labelledby="pub-form-title">
+      <h2 id="pub-form-title">بيانات الجهة وممثل التواصل</h2>
+
+      {% if form.non_field_errors %}
+      <div class="pub-alert pub-alert-error" role="alert">
+        {% for err in form.non_field_errors %}<p>{{ err }}</p>{% endfor %}
+      </div>
+      {% endif %}
+
+      <form method="post" action="{% url 'partnerships:public_sponsor_register' %}" class="pub-form" novalidate>
+        {% csrf_token %}
+        <div class="pub-hp" aria-hidden="true">{{ form.website }}</div>
+
+        <div class="pub-grid">
+          <div class="pub-field">
+            <label for="{{ form.name.id_for_label }}">{{ form.name.label }} <span class="req">*</span></label>
+            {{ form.name }}
+            {% for err in form.name.errors %}<span class="pub-err">{{ err }}</span>{% endfor %}
+          </div>
+
+          <div class="pub-field">
+            <label for="{{ form.representative.id_for_label }}">{{ form.representative.label }} <span class="req">*</span></label>
+            {{ form.representative }}
+            {% for err in form.representative.errors %}<span class="pub-err">{{ err }}</span>{% endfor %}
+          </div>
+
+          <div class="pub-field">
+            <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }} <span class="req">*</span></label>
+            {{ form.phone }}
+            {% for err in form.phone.errors %}<span class="pub-err">{{ err }}</span>{% endfor %}
+          </div>
+
+          <div class="pub-field">
+            <label for="{{ form.email.id_for_label }}">{{ form.email.label }} <span class="req">*</span></label>
+            {{ form.email }}
+            {% for err in form.email.errors %}<span class="pub-err">{{ err }}</span>{% endfor %}
+          </div>
+
+          <div class="pub-field">
+            <label for="{{ form.entity.id_for_label }}">{{ form.entity.label }} <span class="req">*</span></label>
+            {{ form.entity }}
+            {% for err in form.entity.errors %}<span class="pub-err">{{ err }}</span>{% endfor %}
+          </div>
+
+          <div class="pub-field">
+            <label for="{{ form.scope.id_for_label }}">{{ form.scope.label }} <span class="req">*</span></label>
+            {{ form.scope }}
+            {% for err in form.scope.errors %}<span class="pub-err">{{ err }}</span>{% endfor %}
+          </div>
+
+          <div class="pub-field">
+            <label for="{{ form.sector.id_for_label }}">{{ form.sector.label }}</label>
+            {{ form.sector }}
+            {% for err in form.sector.errors %}<span class="pub-err">{{ err }}</span>{% endfor %}
+          </div>
+
+          <div class="pub-field">
+            <label for="{{ form.sponsorship_shape.id_for_label }}">{{ form.sponsorship_shape.label }}</label>
+            {{ form.sponsorship_shape }}
+            {% for err in form.sponsorship_shape.errors %}<span class="pub-err">{{ err }}</span>{% endfor %}
+          </div>
+
+          <div class="pub-field">
+            <label for="{{ form.financial_capacity.id_for_label }}">{{ form.financial_capacity.label }}</label>
+            {{ form.financial_capacity }}
+            {% for err in form.financial_capacity.errors %}<span class="pub-err">{{ err }}</span>{% endfor %}
+          </div>
+        </div>
+
+        <fieldset class="pub-regions">
+          <legend>{{ form.administrative_regions.label }} <small>(مطلوب للشراكة المحلية)</small></legend>
+          <div class="pub-region-grid">
+            {% for checkbox in form.administrative_regions %}
+            <label class="pub-region-item">{{ checkbox.tag }}<span>{{ checkbox.choice_label }}</span></label>
+            {% empty %}
+            <p class="pub-muted">لا توجد مناطق متاحة حاليًا.</p>
+            {% endfor %}
+          </div>
+          {% for err in form.administrative_regions.errors %}<span class="pub-err">{{ err }}</span>{% endfor %}
+        </fieldset>
+
+        <div class="pub-field pub-wide">
+          <label for="{{ form.notes.id_for_label }}">{{ form.notes.label }}</label>
+          {{ form.notes }}
+          {% for err in form.notes.errors %}<span class="pub-err">{{ err }}</span>{% endfor %}
+        </div>
+
+        <div class="pub-actions">
+          <button type="submit" class="pub-btn-primary">إرسال طلب التسجيل</button>
+          <a href="{% url 'accounts:login' %}" class="pub-btn-secondary">إلغاء</a>
+        </div>
+      </form>
+    </section>
+
+    <footer class="pub-footer">
+      <p>جميع الحقوق محفوظة لـ © المؤسسة العامة للتدريب التقني والمهني، 2026</p>
+    </footer>
+  </main>
+</body>
+</html>

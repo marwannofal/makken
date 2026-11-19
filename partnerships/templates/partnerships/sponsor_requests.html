@@ -1,0 +1,117 @@
+{% extends "core/makken_base.html" %}
+{% load access_tags static %}
+{% block title %}طلبات الرعاة الخارجيين | مكّن{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'care_states/states.css' %}?v=20261015-1">
+<link rel="stylesheet" href="{% static 'partnerships/partnerships.css' %}?v=20261015-1">
+<link rel="stylesheet" href="{% static 'partnerships/sponsor_requests.css' %}?v=20261119-1">
+{% endblock %}
+{% block content %}
+<section class="page-introduction partnership-intro">
+  <div>
+    <p class="eyebrow">الشراكات · بوابة التسجيل الخارجي</p>
+    <h1>طلبات الرعاة الخارجيين<span class="greeting-dot">.</span></h1>
+    <p class="page-description">مراجعة طلبات التسجيل الواردة من الرعاة الخارجيين؛ لا يدخل أي طلب إلى سجل الشراكات الرئيسي إلا بعد اعتماده.</p>
+  </div>
+  <div class="sr-head-actions">
+    <a class="button button-secondary" href="{% url 'partnerships:public_sponsor_register' %}" target="_blank" rel="noopener noreferrer">فتح نموذج التسجيل العام</a>
+  </div>
+</section>
+
+{% for message in messages %}<p class="feedback feedback-success" role="status">{{ message }}</p>{% endfor %}
+
+<section class="sr-kpis" aria-label="ملخص طلبات الرعاة">
+  <div class="sr-kpi">
+    <span>إجمالي الطلبات</span>
+    <strong><bdi>{{ counts.total }}</bdi></strong>
+  </div>
+  <div class="sr-kpi is-new">
+    <span>طلبات جديدة (بانتظار المراجعة)</span>
+    <strong><bdi>{{ counts.new }}</bdi></strong>
+  </div>
+  <div class="sr-kpi is-approved">
+    <span>طلبات معتمدة</span>
+    <strong><bdi>{{ counts.approved }}</bdi></strong>
+  </div>
+  <div class="sr-kpi is-rejected">
+    <span>طلبات مرفوضة</span>
+    <strong><bdi>{{ counts.rejected }}</bdi></strong>
+  </div>
+</section>
+
+<section class="partnership-card sr-card">
+  <header class="card-heading">
+    <div>
+      <p class="eyebrow">قائمة الانتظار</p>
+      <h2>سجل طلبات تسجيل الرعاة</h2>
+    </div>
+    <span class="subtle-badge">{% include "core/partials/record_count.html" with record_count=rows|length only %}</span>
+  </header>
+
+  <form method="get" action="{% url 'partnerships:sponsor_requests' %}" class="sr-filters" role="search">
+    <div class="partnership-field sr-search">
+      <label for="sr-q">البحث</label>
+      <input type="search" name="q" id="sr-q" value="{{ q }}" maxlength="120" placeholder="اسم الجهة، الممثل، البريد، أو رقم الطلب">
+    </div>
+    <div class="partnership-field">
+      <label for="sr-status">حالة الطلب</label>
+      <select name="status" id="sr-status">
+        <option value="">جميع الحالات</option>
+        {% for code, label in statuses %}
+        <option value="{{ code }}"{% if selected_status == code %} selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="sr-filter-actions">
+      <button class="button button-primary" type="submit">بحث</button>
+      <a class="button button-secondary" href="{% url 'partnerships:sponsor_requests' %}">مسح</a>
+    </div>
+  </form>
+
+  <div class="table-scroll" tabindex="0">
+    <table class="partnership-table sr-table">
+      <caption class="visually-hidden">طلبات تسجيل الرعاة الخارجيين</caption>
+      <thead>
+        <tr>
+          <th scope="col">رقم الطلب</th>
+          <th scope="col">اسم الجهة</th>
+          <th scope="col">الممثل والتواصل</th>
+          <th scope="col">الكيان والنطاق</th>
+          <th scope="col">المناطق</th>
+          <th scope="col">حالة الطلب</th>
+          <th scope="col">تاريخ التقديم</th>
+          <th scope="col">الإجراء</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr>
+          <td><bdi>{{ row.reference_code }}</bdi></td>
+          <th scope="row">
+            <a class="sr-link" href="{% url 'partnerships:sponsor_request_review' row.pk %}">{{ row.name }}</a>
+            {% if row.created_partnership %}<small>مرتبط بشراكة معتمدة</small>{% endif %}
+          </th>
+          <td>
+            {{ row.representative }}
+            <small><bdi>{{ row.phone }}</bdi> · <bdi>{{ row.email }}</bdi></small>
+          </td>
+          <td>{{ row.entity.name }}<small>{{ row.get_scope_display }}</small></td>
+          <td>{% for reg in row.administrative_regions.all %}{{ reg.name }}{% if not forloop.last %}، {% endif %}{% empty %}—{% endfor %}</td>
+          <td><span class="sr-pill is-{{ row.status }}">{{ row.get_status_display }}</span></td>
+          <td><bdi>{{ row.created_at|date:"Y-m-d H:i" }}</bdi></td>
+          <td>
+            <a class="button button-secondary" href="{% url 'partnerships:sponsor_request_review' row.pk %}">
+              {% if row.status == 'new' and can_decide %}مراجعة واتخاذ قرار{% else %}عرض التفاصيل{% endif %}
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="8">لا توجد طلبات مطابقة ضمن نطاقك.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

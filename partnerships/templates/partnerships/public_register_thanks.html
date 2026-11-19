@@ -1,0 +1,29 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>تم استلام الطلب | مكّن</title>
+  <link rel="stylesheet" href="{% static 'partnerships/sponsor_requests.css' %}?v=20261119-1">
+</head>
+<body class="pub-body">
+  <main class="pub-shell pub-thanks-shell">
+    <section class="pub-card pub-thanks-card">
+      <div class="pub-check" aria-hidden="true">✓</div>
+      <h1>تم استلام طلب التسجيل بنجاح</h1>
+      <p>شكرًا لتواصلكم{% if sponsor_name %} ({{ sponsor_name }}){% endif %}. تم تسجيل طلبكم بحالة <strong>جديد</strong> وسيقوم الفريق المختص بمراجعته قبل اعتماده وإدراجه في سجل الشراكات.</p>
+      {% if reference_code %}
+      <div class="pub-ref">
+        <span>الرقم المرجعي للطلب</span>
+        <strong><bdi>{{ reference_code }}</bdi></strong>
+      </div>
+      {% endif %}
+      <div class="pub-actions pub-actions-center">
+        <a href="{% url 'partnerships:public_sponsor_register' %}" class="pub-btn-secondary">تقديم طلب آخر</a>
+        <a href="{% url 'accounts:login' %}" class="pub-btn-primary">العودة لتسجيل الدخول</a>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

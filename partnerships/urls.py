@@ -5,6 +5,12 @@ from agreement_clauses.records import agreement_details
 from agreement_clauses.workflow import workflow
 from . import views
 from .achievement import partnership_achievement_report
+from .sponsor_requests import (
+    public_sponsor_register,
+    public_sponsor_thanks,
+    sponsor_request_queue,
+    sponsor_request_review,
+)
 from .willingness import download_attachment
 
 app_name = "partnerships"
@@ -13,6 +19,10 @@ urlpatterns = [path("<int:pk>/willingness/attachments/<int:attachment_id>/downlo
 urlpatterns += [
     path("agreements/inquiries/", agreement_inquiries, name="agreement_inquiries"),
     path("reports/achievement/", partnership_achievement_report, name="achievement_report"),
+    path("register/", public_sponsor_register, name="public_sponsor_register"),
+    path("register/submitted/", public_sponsor_thanks, name="public_sponsor_thanks"),
+    path("requests/", sponsor_request_queue, name="sponsor_requests"),
+    path("requests/<int:request_id>/", sponsor_request_review, name="sponsor_request_review"),
     path("<int:pk>/clauses/", workflow, name="clauses"),
     path("<int:pk>/agreements/<int:agreement_id>/", workflow, name="agreement"),
     path("<int:pk>/agreements/<int:agreement_id>/details/", agreement_details, name="agreement_details"),

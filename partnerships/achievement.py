@@ -85,16 +85,20 @@ def _bulk_progress(partnership_ids):
         totals[owner] = totals.get(owner, 0) + (prog or 0)
         counts[owner] = counts.get(owner, 0) + 1
     return {
-        pid: (mean_progress(totals.get(pid, 0), counts.get(pid, 0)), counts.get(pid, 0))
+        pid: (
+            Decimal('0.00') if (val := mean_progress(totals.get(pid, 0), counts.get(pid, 0))) is None else val,
+            counts.get(pid, 0),
+        )
         for pid in partnership_ids
     }
 
 
 def _decimal_mean(values):
-    if not values:
+    clean = [v for v in values if v is not None]
+    if not clean:
         return Decimal('0.00')
-    total = sum(values, Decimal('0'))
-    return (total / Decimal(len(values))).quantize(Decimal('0.01'))
+    total = sum(clean, Decimal('0'))
+    return (total / Decimal(len(clean))).quantize(Decimal('0.01'))
 
 
 def build_achievement_report(actor, params):
