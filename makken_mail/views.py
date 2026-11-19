@@ -292,9 +292,21 @@ def work_index(request):
     params = request.GET.copy()
     params.pop('page', None)
     can_create = request.user.is_superuser or policy.can('work_assignments', 'create')
+    can_stats = request.user.is_superuser or policy.can('work_assignments', 'view')
     return page(request, 'work_list', section='work', rows=Paginator(query, 20).get_page(request.GET.get('page')),
                 q=term, selected=status, statuses=WorkStatus.choices, paging=params.urlencode(),
-                can_create_work=can_create)
+                can_create_work=can_create, can_view_stats=can_stats)
+
+
+@module_view('work_assignments')
+@require_GET
+def work_stats(request):
+    from access_control.policy import AccessPolicy
+    from .stats import build_work_stats
+    policy = AccessPolicy(request.user)
+    stats = build_work_stats(request.user, request.GET)
+    can_create = request.user.is_superuser or policy.can('work_assignments', 'create')
+    return page(request, 'work_stats', section='work', stats=stats, can_create_work=can_create)
 
 
 @module_view('work_assignments')

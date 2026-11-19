@@ -1,0 +1,129 @@
+{% extends 'makken_mail/base.html' %}
+{% block title %}إحصائيات المهام | مكّن{% endblock %}
+{% block mail_content %}<section class="partnership-card mail-card">
+<header class="card-heading">
+  <div>
+    <p class="eyebrow">تقارير المهام</p>
+    <h2>إحصائيات المهام حسب الموظف</h2>
+    <p class="muted">عدد المهام المسندة لكل موظف وحالات الإنجاز خلال الفترة الزمنية المحددة ضمن نطاقك.</p>
+  </div>
+  <div class="work-stats-actions">
+    <a class="button button-secondary" href="{% url 'makken_mail:work_index' %}">سجل الأعمال</a>
+    {% if can_create_work %}<a class="button button-primary" href="{% url 'makken_mail:work_create' %}">إسناد عمل جديد</a>{% endif %}
+  </div>
+</header>
+
+<form method="get" class="mail-inline">
+  <div class="partnership-field">
+    <label for="stats-from">من تاريخ</label>
+    <input type="date" name="date_from" id="stats-from" value="{{ stats.date_from }}">
+  </div>
+  <div class="partnership-field">
+    <label for="stats-to">إلى تاريخ</label>
+    <input type="date" name="date_to" id="stats-to" value="{{ stats.date_to }}">
+  </div>
+  {% if stats.regions %}
+  <div class="partnership-field">
+    <label for="stats-region">المنطقة</label>
+    <select name="region" id="stats-region">
+      <option value="">جميع المناطق المتاحة</option>
+      {% for region in stats.regions %}
+      <option value="{{ region.pk }}"{% if stats.selected_region == region.pk %} selected{% endif %}>{{ region.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  {% endif %}
+  <div class="partnership-field">
+    <label for="stats-q">البحث بالموظف</label>
+    <input type="search" name="q" id="stats-q" value="{{ stats.q }}" maxlength="120" placeholder="الاسم أو اسم المستخدم">
+  </div>
+  <div class="work-stats-check">
+    <label><input type="checkbox" name="show_empty" value="1"{% if stats.show_empty %} checked{% endif %}><span>تضمين الموظفين بدون مهام</span></label>
+  </div>
+  <button class="button button-primary" type="submit">عرض التقرير</button>
+  <a class="button button-secondary" href="{% url 'makken_mail:work_stats' %}">مسح</a>
+</form>
+
+{% if stats.errors %}
+<div class="mail-error" role="alert">
+  {% for err in stats.errors %}<p>{{ err }}</p>{% endfor %}
+</div>
+{% endif %}
+
+<div class="work-stats-kpis" aria-label="ملخص إحصائيات المهام">
+  <div class="work-kpi">
+    <span>إجمالي المهام في الفترة</span>
+    <strong><bdi>{{ stats.totals.distinct_tasks }}</bdi></strong>
+    <small>مهام فريدة ضمن نطاقك</small>
+  </div>
+  <div class="work-kpi">
+    <span>إجمالي الإسنادات للموظفين</span>
+    <strong><bdi>{{ stats.totals.total_assignments }}</bdi></strong>
+    <small>موزّعة على <bdi>{{ stats.totals.employee_count }}</bdi> موظف</small>
+  </div>
+  <div class="work-kpi is-complete">
+    <span>الإسنادات المكتملة</span>
+    <strong><bdi>{{ stats.totals.complete }}</bdi></strong>
+    <small>نسبة الإكمال <bdi>{{ stats.totals.completion_rate }}%</bdi> · متوسط الإنجاز <bdi>{{ stats.totals.avg_progress }}%</bdi></small>
+  </div>
+  <div class="work-kpi{% if stats.totals.overdue %} is-warn{% endif %}">
+    <span>الإسنادات المتأخرة</span>
+    <strong><bdi>{{ stats.totals.overdue }}</bdi></strong>
+    <small>مهام مفتوحة تجاوزت تاريخ الاستحقاق</small>
+  </div>
+</div>
+
+<div class="table-scroll" tabindex="0">
+  <table class="partnership-table work-stats-table">
+    <caption class="visually-hidden">إحصائيات المهام حسب الموظف</caption>
+    <thead>
+      <tr>
+        <th scope="col">الموظف</th>
+        <th scope="col">الإدارة / الوحدة</th>
+        <th scope="col">المناطق</th>
+        <th scope="col">إجمالي المهام</th>
+        <th scope="col">جديدة</th>
+        <th scope="col">قيد العمل</th>
+        <th scope="col">مكتملة</th>
+        <th scope="col">ملغاة</th>
+        <th scope="col">متأخرة</th>
+        <th scope="col">متوسط الإنجاز</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in stats.rows %}
+      <tr>
+        <th scope="row">{{ row.display_name }}<small><bdi>{{ row.username }}</bdi></small></th>
+        <td>{{ row.department }}</td>
+        <td>{{ row.regions_label }}</td>
+        <td><strong><bdi>{{ row.total }}</bdi></strong></td>
+        <td><bdi>{{ row.new }}</bdi></td>
+        <td><bdi>{{ row.running }}</bdi></td>
+        <td><span class="mail-pill{% if row.complete %} is-on{% endif %}"><bdi>{{ row.complete }}</bdi></span></td>
+        <td><bdi>{{ row.cancelled }}</bdi></td>
+        <td><span class="mail-pill{% if row.overdue %} is-warn{% endif %}"><bdi>{{ row.overdue }}</bdi></span></td>
+        <td><bdi>{{ row.avg_progress }}%</bdi></td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="10">لا توجد مهام مطابقة للفترة والمعايير المحددة ضمن نطاقك.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    {% if stats.rows %}
+    <tfoot>
+      <tr>
+        <th scope="row" colspan="3">الإجمالي</th>
+        <td><strong><bdi>{{ stats.totals.total_assignments }}</bdi></strong></td>
+        <td><strong><bdi>{{ stats.totals.new }}</bdi></strong></td>
+        <td><strong><bdi>{{ stats.totals.running }}</bdi></strong></td>
+        <td><strong><bdi>{{ stats.totals.complete }}</bdi></strong></td>
+        <td><strong><bdi>{{ stats.totals.cancelled }}</bdi></strong></td>
+        <td><strong><bdi>{{ stats.totals.overdue }}</bdi></strong></td>
+        <td><strong><bdi>{{ stats.totals.avg_progress }}%</bdi></strong></td>
+      </tr>
+    </tfoot>
+    {% endif %}
+  </table>
+</div>
+</section>{% endblock %}

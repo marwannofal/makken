@@ -13,6 +13,7 @@ urlpatterns = [
     path('notifications/deliveries/', views.deliveries, name='deliveries'),
     path('my-work/', views.work_index, name='work_index'),
     path('my-work/new/', views.work_editor, name='work_create'),
+    path('my-work/stats/', views.work_stats, name='work_stats'),
     path('my-work/targets/', views.target_options, name='work_targets'),
     path('my-work/<int:pk>/', views.work_detail, name='work_detail'),
     path('my-work/<int:pk>/edit/', views.work_editor, name='work_edit'),

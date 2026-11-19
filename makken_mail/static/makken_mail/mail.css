@@ -58,3 +58,24 @@
 .mail-inline .button { height: 46px; min-height: 46px; box-sizing: border-box; margin: 0; }
 .mail-inline .search-select .selected-summary:empty,
 .mail-inline .search-select .field-error:empty { display: none; margin: 0; }
+
+.work-stats-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.work-stats-check { display: flex; align-items: center; min-height: 46px; }
+.work-stats-check label { display: inline-flex; align-items: center; gap: 8px; min-height: 46px; padding: 0 12px; border: 1px solid #dcece9; border-radius: 10px; background: #f2f9f8; font-size: 13px; font-weight: 700; color: #245759; cursor: pointer; margin: 0; }
+.work-stats-check input[type=checkbox] { width: 17px; height: 17px; min-height: 17px; accent-color: #24b3af; margin: 0; }
+.mail-error { margin-bottom: 16px; padding: 12px 16px; border: 1px solid #f0c2c6; border-radius: 12px; background: #fff2f3; color: #9c2d3a; font-size: 13px; font-weight: 700; }
+.mail-error p { margin: 0; line-height: 1.8; }
+.work-stats-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 18px; }
+.work-kpi { padding: 16px 14px; border: 1px solid #dcebe6; border-radius: 14px; background: #f8fbfa; min-width: 0; }
+.work-kpi > span { display: block; font-size: 12px; font-weight: 700; color: #567774; margin-bottom: 6px; }
+.work-kpi strong { display: block; font-size: 24px; line-height: 1.4; color: #195e5c; font-variant-numeric: tabular-nums; }
+.work-kpi small { display: block; font-size: 11px; color: #6c8784; margin-top: 4px; line-height: 1.7; }
+.work-kpi.is-complete { background: #effaf5; border-color: #cdebd9; }
+.work-kpi.is-complete strong { color: #167349; }
+.work-kpi.is-warn { background: #fff5f5; border-color: #f3d2d5; }
+.work-kpi.is-warn strong { color: #a53441; }
+.mail-pill.is-warn { background: #ffeded; color: #a53441; }
+.work-stats-table th[scope=row] small { display: block; font-size: 11px; font-weight: 500; color: #6e8885; margin-top: 2px; }
+.work-stats-table tfoot th, .work-stats-table tfoot td { background: #f0f9f7; border-top: 2px solid #cfe7e3; }
+@media (max-width: 1000px) { .work-stats-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .work-stats-kpis { grid-template-columns: 1fr; } }
