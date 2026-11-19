@@ -49,10 +49,11 @@ def finish(request,template,context,status=200):
 
 
 def initial_user(target):
-    if not target:return {'page_scope':'selected','region_scope':'all','is_active':'1'}
+    if not target:return {'page_scope':'selected','region_scope':'all','is_active':'1','must_change_password':'1','send_welcome_email':'1'}
     access=UserAccess.objects.filter(user=target).first()
+    profile=getattr(target,'makken_profile',None)
     values={'full_name':target.get_full_name() or target.get_username(),'username':target.get_username(),'email':target.email,'is_active':'1' if target.is_active else '0','roles':list(RoleProfile.objects.filter(group__user=target).values_list('pk',flat=True)),'page_scope':access.page_scope if access else 'selected','allowed_pages':list(access.allowed_pages.values_list('pk',flat=True)) if access else []}
-    values.update(region_scope=access.region_scope if access else 'all', allowed_regions=list(access.allowed_regions.values_list('pk',flat=True)) if access else [])
+    values.update(region_scope=access.region_scope if access else 'all', allowed_regions=list(access.allowed_regions.values_list('pk',flat=True)) if access else [], city=profile.city_id if profile else None, department=profile.department_id if profile else None, must_change_password='1' if (profile and profile.must_change_password) else '0')
     for rule in PermissionOverride.objects.filter(user=target):values[f'override__{rule.module_id}__{rule.operation}']=rule.effect
     # Legacy direct Django grants stay visible and become explicit managed grants on save.
     codes=set(target.user_permissions.filter(content_type__app_label='access_control',content_type__model='module').values_list('codename',flat=True))
@@ -90,7 +91,7 @@ def role_catalog():
 def index(request):
     tab=request.GET.get('tab','users');tab=tab if tab in {'users','permissions','pages'} else 'users'
     context=base(request,tab);User=get_user_model();q=request.GET.get('q','').strip()[:200];status=request.GET.get('status','');role=request.GET.get('role','')
-    users=User._default_manager.prefetch_related(Prefetch('groups',queryset=Group.objects.select_related('makken_role')),'makken_access__allowed_pages','makken_access__allowed_regions','makken_overrides',Prefetch('user_permissions',queryset=Permission.objects.filter(content_type__app_label='access_control',content_type__model='module'))).order_by('-pk')
+    users=User._default_manager.select_related('makken_profile__city','makken_profile__department').prefetch_related(Prefetch('groups',queryset=Group.objects.select_related('makken_role')),'makken_access__allowed_pages','makken_access__allowed_regions','makken_overrides',Prefetch('user_permissions',queryset=Permission.objects.filter(content_type__app_label='access_control',content_type__model='module'))).order_by('-pk')
     for word in q.split()[:12]:
         condition=Q(username__icontains=word)|Q(email__icontains=word)|Q(first_name__icontains=word)|Q(last_name__icontains=word)|Q(groups__name__icontains=word)
         if word.isascii() and word.isdigit() and len(word)<19:condition|=Q(pk=int(word))
@@ -98,7 +99,15 @@ def index(request):
     if status in {'1','0'}:users=users.filter(is_active=status=='1')
     if numeric_id(role) is not None:users=users.filter(groups__makken_role__pk=numeric_id(role))
     page=Paginator(users,15).get_page(request.GET.get('page'))
-    rows=[{'user':u,'roles':[g.name for g in u.groups.all()],'status_token':token(request,'user','status',u),'scope':getattr(getattr(u,'makken_access',None),'get_page_scope_display',lambda:'غير مهيأ')()} for u in page]
+    from agreement_clauses.models import AgreementDetails
+    page_users=list(page)
+    user_ids=[u.pk for u in page_users]
+    agr_counts={uid:0 for uid in user_ids}
+    if user_ids:
+        for resp_id,rep_id in AgreementDetails.objects.filter(Q(responsible_employee_id__in=user_ids)|Q(department_representative_id__in=user_ids)).values_list('responsible_employee_id','department_representative_id'):
+            if resp_id in agr_counts:agr_counts[resp_id]+=1
+            if rep_id in agr_counts and rep_id!=resp_id:agr_counts[rep_id]+=1
+    rows=[{'user':u,'profile':getattr(u,'makken_profile',None),'agreement_count':agr_counts.get(u.pk,0),'roles':[g.name for g in u.groups.all()],'status_token':token(request,'user','status',u),'scope':getattr(getattr(u,'makken_access',None),'get_page_scope_display',lambda:'غير مهيأ')()} for u in page_users]
     context.update(rows=rows,page_obj=page,q=q,selected_status=status,selected_role=role,roles=RoleProfile.objects.select_related('group'),total_users=User.objects.count(),active_users=User.objects.filter(is_active=True).count(),inactive_users=User.objects.filter(is_active=False).count(),role_count=RoleProfile.objects.count())
     return finish(request,'users.html',context)
 
@@ -116,13 +125,22 @@ def user_editor(request,pk=None):
         try:
             payload=load(request,'user','save',pk)
             saved=services.save_user(request.user,request.POST,pk,payload['fingerprint'])
-            messages.success(request,'تم حفظ الحساب والأدوار والصلاحيات بنجاح. تسري الصلاحيات في الطلب التالي.')
+            mail_status=getattr(saved,'_welcome_mail_status',None)
+            if mail_status=='sent':
+                messages.success(request,'تم حفظ الحساب وإرسال بيانات الدخول إلى بريد الموظف بنجاح.')
+            elif mail_status=='smtp_disabled':
+                messages.success(request,'تم حفظ الحساب بنجاح. لم يُرسل البريد الترحيبي لأن إعدادات SMTP غير مفعّلة.')
+            elif mail_status=='failed':
+                messages.success(request,'تم حفظ الحساب بنجاح، لكن تعذّر إرسال البريد الترحيبي عبر خادم البريد.')
+            else:
+                messages.success(request,'تم حفظ الحساب والأدوار والصلاحيات بنجاح. تسري الصلاحيات في الطلب التالي.')
             return redirect('access_control:user_edit',pk=saved.pk)
         except services.InvalidForm as error:form=error.form;status=400
         except signing.BadSignature:context['error']='انتهت صلاحية النموذج. أعد تحميل الصفحة قبل الحفظ.';status=409
         except services.Conflict as error:context['error']=str(error);status=409
         except (IntegrityError,OperationalError):context['error']='تعارضت البيانات مع تحديث آخر أو اسم/بريد مستخدم. لم يُحفظ تغيير جزئي.';status=409
-    context.update(target_user=target,form=form,matrix_rows=matrix(form,target),operations=Operation.choices,role_catalog=role_catalog(),status_token=token(request,'user','status',target) if target else None)
+    from .employee_agreements import employee_agreements_summary
+    context.update(target_user=target,form=form,matrix_rows=matrix(form,target),operations=Operation.choices,role_catalog=role_catalog(),status_token=token(request,'user','status',target) if target else None,employee_agreements=employee_agreements_summary(target) if target else [])
     return finish(request,'user_editor.html',context,status)
 
 

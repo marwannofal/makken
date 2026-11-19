@@ -113,6 +113,7 @@ def profile(request):
                             else:
                                 user.set_password(form.cleaned_data['new_password1'])
                                 user.save(update_fields=['password'])
+                                info.must_change_password = False
                                 text = 'تم تغيير كلمة المرور بنجاح. بقيت هذه الجلسة نشطة، وستُسجّل الجلسات الأخرى خروجها عند طلبها التالي.'
                             info.version += 1
                             reset_failures(info)
@@ -156,7 +157,7 @@ def profile(request):
                 if name in form.fields:
                     form.fields[name].widget.attrs['aria-invalid'] = 'true'
     name = user.get_short_name() or user.get_username()
-    response = render(request, 'accounts/profile/index.html', {'page_heading': 'الملف الشخصي', 'active_page': 'profile', 'display_name': name, 'avatar_initial': name[:1], 'profile_user': user, 'detail_form': detail_form, 'password_form': password_form, 'profile_feedback': feedback, 'profile_locked_until': info.password_locked_until if info.password_locked_until and info.password_locked_until > timezone.now() else None, 'password_minimum': minimum_password_length(), 'country_catalog': [{'id': code, 'dial': '+' + str(phonenumbers.country_code_for_region(code))} for code, _ in COUNTRIES]}, status=status)
+    response = render(request, 'accounts/profile/index.html', {'page_heading': 'الملف الشخصي', 'active_page': 'profile', 'display_name': name, 'avatar_initial': name[:1], 'profile_user': user, 'detail_form': detail_form, 'password_form': password_form, 'profile_feedback': feedback, 'must_change_password': bool(info.must_change_password), 'profile_locked_until': info.password_locked_until if info.password_locked_until and info.password_locked_until > timezone.now() else None, 'password_minimum': minimum_password_length(), 'country_catalog': [{'id': code, 'dial': '+' + str(phonenumbers.country_code_for_region(code))} for code, _ in COUNTRIES]}, status=status)
     if remaining:
         response['Retry-After'] = str(remaining)
     return add_login_headers(response)

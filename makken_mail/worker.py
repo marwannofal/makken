@@ -64,6 +64,21 @@ def build_context(delivery, item):
         if number:
             details.append(('الاتفاقية', safe_label(number)))
         path = reverse('partnerships:clauses', args=[item.pk])
+    elif code == 'account.regions_assigned':
+        description = 'تم تعيين أو تحديث نطاق المناطق المسموح لك بها في منصة مكّن.'
+        subject = delivery.subject_user
+        access = getattr(subject, 'makken_access', None) if subject else None
+        if access and access.region_scope == 'selected':
+            names = list(access.allowed_regions.order_by('name').values_list('name', flat=True))
+            region_text = '، '.join(names) if names else 'لم تُحدد مناطق'
+        else:
+            region_text = 'جميع المناطق'
+        if subject:
+            details.append(('الحساب', safe_label(subject.get_username())))
+        details.append(('المناطق المعينة', safe_label(region_text)))
+        if delivery.actor:
+            details.append(('منفّذ الإجراء', safe_label(delivery.actor.get_full_name() or delivery.actor.get_username())))
+        path = reverse('accounts:login')
     elif code.startswith('account.') or event.module in {'accounts', 'access_control'}:
         description = 'تم تسجيل هذا الإجراء في منصة مكّن.'
         if code == 'account.created' and recipient.pk == delivery.subject_user_id:

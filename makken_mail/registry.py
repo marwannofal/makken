@@ -24,6 +24,7 @@ ACCOUNT_EVENTS = {
     'account.password': EventType('تغيير أو إعادة ضبط كلمة المرور', 'الحسابات', ('actor', 'subject')),
     'account.profile': EventType('تحديث الملف الشخصي', 'الحسابات', ('actor',)),
     'account.deleted': EventType('حذف حساب مستخدم', 'الحسابات', ('actor',)),
+    'account.regions_assigned': EventType('تعيين أو تحديث نطاق المناطق للموظف', 'الحسابات', ('subject',)),
 }
 WORK_EVENTS = {
     'work.created': EventType('إسناد عمل جديد', 'إسناد الأعمال', ('employee', 'manager'), True),

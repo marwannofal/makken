@@ -20,6 +20,7 @@ class InvalidForm(Exception):
 
 def user_snapshot(user):
     access=getattr(user,'makken_access',None)
+    profile=getattr(user,'makken_profile',None)
     groups=list(user.groups.all()) if 'groups' in getattr(user,'_prefetched_objects_cache',{}) else list(user.groups.select_related('makken_role'))
     overrides=list(user.makken_overrides.all())
     direct=list(user.user_permissions.all()) if 'user_permissions' in getattr(user,'_prefetched_objects_cache',{}) else list(user.user_permissions.filter(content_type__app_label='access_control',content_type__model='module'))
@@ -29,6 +30,9 @@ def user_snapshot(user):
             'pages':sorted(page.pk for page in access.allowed_pages.all()) if access else [],
             'region_scope':access.region_scope if access else 'selected',
             'regions':sorted(access.allowed_regions.values_list('pk',flat=True)) if access else [],
+            'city_id':profile.city_id if profile else None,
+            'department_id':profile.department_id if profile else None,
+            'must_change_password':bool(profile.must_change_password) if profile else False,
             'overrides':[{'module_id':rule.module_id,'operation':rule.operation,'effect':rule.effect} for rule in sorted(overrides,key=lambda r:(r.module_id,r.operation))],
             'direct_permissions':sorted(rule.codename for rule in direct)}
 
@@ -100,8 +104,30 @@ def save_user(actor,data,pk=None,expected=None):
     PermissionOverride.objects.bulk_create(rules)
     target.user_permissions.remove(*target.user_permissions.filter(content_type__app_label='access_control',content_type__model='module'))
     profile,_=UserProfile.objects.get_or_create(user=target)
-    profile.email_key=email_key(target.email);profile.version+=1;profile.save(update_fields=['email_key','version','updated_at'])
-    audit(actor,'إنشاء مستخدم' if new else 'تعديل المستخدم والصلاحيات',target,before,user_snapshot(target))
+    profile.city=values.get('city')
+    profile.department=values.get('department')
+    profile.must_change_password=(values.get('must_change_password')=='1')
+    profile.email_key=email_key(target.email);profile.version+=1
+    profile.save(update_fields=['city','department','must_change_password','email_key','version','updated_at'])
+    target._state.fields_cache.pop('makken_profile',None)
+    after=user_snapshot(target)
+    audit(actor,'إنشاء مستخدم' if new else 'تعديل المستخدم والصلاحيات',target,before,after)
+    regions_changed=(new and (after['region_scope']=='selected' and bool(after['regions']))) or (not new and (before.get('region_scope')!=after['region_scope'] or before.get('regions')!=after['regions']))
+    if regions_changed:
+        from .employee_agreements import enqueue_regional_assignment_email
+        actor_id,target_id,ver=actor.pk,target.pk,access.version
+        transaction.on_commit(lambda: enqueue_regional_assignment_email(actor_id,target_id,ver))
+    if new and values.get('send_welcome_email')=='1' and target.email:
+        from .employee_agreements import send_welcome_credentials_email
+        raw_password=values['new_password1']
+        force_change=profile.must_change_password
+        if values['region_scope']=='selected':
+            region_names='، '.join(r.name for r in values['allowed_regions'])
+        else:
+            region_names='جميع المناطق'
+        def _deliver_welcome():
+            target._welcome_mail_status=send_welcome_credentials_email(target,raw_password,must_change_password=force_change,region_summary=region_names)
+        transaction.on_commit(_deliver_welcome)
     return target
 
 

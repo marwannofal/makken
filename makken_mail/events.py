@@ -41,6 +41,8 @@ def can_receive(user, rule, actor_id=None, subject_id=None, work=None, event=Non
         return False
     if rule.code.startswith('work.'):
         return bool(work and can_read_work(user, work))
+    if rule.code == 'account.regions_assigned':
+        return True
     if event is None:
         return False
     if rule.code.startswith('account.') or event.module in {'accounts', 'access_control'}:

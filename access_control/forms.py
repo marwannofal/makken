@@ -6,6 +6,7 @@ from django.utils.translation import override
 from accounts.profile_forms import ProfilePasswordForm, normalize_name
 from .models import Module, RoleProfile, PageScope, RegionScope, Operation
 from regions.models import Region
+from agreement_clauses.models import AgreementOption, OptionKind
 from .registry import DEFINITIONS
 
 
@@ -43,6 +44,10 @@ class UserForm(AccessFields):
     username=forms.CharField(label='اسم المستخدم',max_length=150)
     email=forms.EmailField(label='البريد الإلكتروني',max_length=254,widget=forms.EmailInput(attrs={'dir':'ltr','autocomplete':'off'}))
     is_active=forms.ChoiceField(label='حالة الحساب',choices=[('1','نشط'),('0','غير نشط')],initial='1')
+    city=forms.ModelChoiceField(label='المدينة',queryset=AgreementOption.objects.none(),required=False,empty_label='غير محددة',widget=forms.Select(attrs={'data-market-select':'','data-label':'المدينة'}))
+    department=forms.ModelChoiceField(label='الإدارة أو الوحدة',queryset=AgreementOption.objects.none(),required=False,empty_label='غير محددة',widget=forms.Select(attrs={'data-market-select':'','data-label':'الإدارة أو الوحدة'}))
+    must_change_password=forms.ChoiceField(label='إلزام تغيير كلمة المرور عند أول دخول',choices=[('1','مفعل — يجب تغيير كلمة المرور عند أول دخول'),('0','معطّل — لا يُطلب تغيير كلمة المرور')],initial='1',required=False)
+    send_welcome_email=forms.ChoiceField(label='إرسال بيانات الدخول بالبريد الإلكتروني',choices=[('1','نعم — إرسال بيانات الدخول إلى بريد الموظف'),('0','لا — بدون إرسال بريد ترحيبي')],initial='1',required=False)
     roles=forms.ModelMultipleChoiceField(label='الأدوار',queryset=RoleProfile.objects.select_related('group'),required=False,widget=forms.SelectMultiple(attrs={'data-market-select':'','data-label':'الأدوار'}))
     new_password1=forms.CharField(label='كلمة المرور',strip=False,max_length=128,widget=forms.PasswordInput(attrs={'autocomplete':'new-password'}))
     new_password2=forms.CharField(label='تأكيد كلمة المرور',strip=False,max_length=128,widget=forms.PasswordInput(attrs={'autocomplete':'new-password'}))
@@ -53,8 +58,14 @@ class UserForm(AccessFields):
         old_regions=list(target.makken_access.allowed_regions.values_list('pk',flat=True)) if target and hasattr(target,'makken_access') else []
         self.fields['allowed_regions'].queryset=Region.objects.filter(Q(is_active=True)|Q(pk__in=old_regions))
         self.fields['allowed_regions'].label_from_instance=lambda region: region.name + (' (غير نشط)' if not region.is_active else '')
+        profile=getattr(target,'makken_profile',None) if target else None
+        city_id=profile.city_id if profile else None
+        dept_id=profile.department_id if profile else None
+        self.fields['city'].queryset=AgreementOption.objects.filter(kind=OptionKind.CITY).filter(Q(is_active=True)|Q(pk=city_id)).order_by('name','pk')
+        self.fields['department'].queryset=AgreementOption.objects.filter(kind=OptionKind.DEPARTMENT).filter(Q(is_active=True)|Q(pk=dept_id)).order_by('name','pk')
+        self.fields['department'].label_from_instance=lambda opt: f'{opt.name} · {opt.get_department_type_display()}' + ('' if opt.is_active else ' (غير نشط)')
         if target:
-            self.fields.pop('new_password1');self.fields.pop('new_password2')
+            self.fields.pop('new_password1');self.fields.pop('new_password2');self.fields.pop('send_welcome_email',None)
         for module in DEFINITIONS.values():
             for operation in module.operations:
                 self.fields[f'override__{module.key}__{operation}']=forms.ChoiceField(label=Operation(operation).label,choices=[('inherit','من الأدوار'),('grant','منح مباشر'),('deny','منع صريح')],initial='inherit',required=False,error_messages={'invalid_choice':'اختر منحًا مباشرًا أو منعًا صريحًا أو الاعتماد على الأدوار.'},widget=forms.Select(attrs={'class':'ac-control ac-override'}))
@@ -82,6 +93,17 @@ class UserForm(AccessFields):
             access=getattr(self.target,'makken_access',None) if self.target else None
             data['region_scope']=access.region_scope if access else RegionScope.ALL
             data['allowed_regions']=access.allowed_regions.all() if access else Region.objects.none()
+        profile=getattr(self.target,'makken_profile',None) if self.target else None
+        if 'city' not in self.data and profile:
+            data['city']=profile.city
+        if 'department' not in self.data and profile:
+            data['department']=profile.department
+        if 'must_change_password' not in self.data:
+            data['must_change_password']='1' if (profile and profile.must_change_password) else '0'
+        elif data.get('must_change_password') not in ('1','0'):
+            data['must_change_password']='1' if not self.target else ('1' if (profile and profile.must_change_password) else '0')
+        if not self.target and 'send_welcome_email' not in self.data:
+            data['send_welcome_email']='0'
         if not data.get('region_scope'):
             self.add_error('region_scope','اختر نطاق المناطق.')
         if data.get('region_scope')==RegionScope.SELECTED and not data.get('allowed_regions'):

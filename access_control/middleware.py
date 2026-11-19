@@ -15,6 +15,14 @@ class AccessBoundaryMiddleware(MiddlewareMixin):
             return redirect_to_login(request.get_full_path(),login_url='accounts:login')
         policy=for_request(request)
         if not policy.active:return denied(request,'هذا الحساب غير نشط.')
+        if route not in {'accounts:profile','accounts:logout','accounts:logout_slash','site_favicon'}:
+            from accounts.models import UserProfile
+            if UserProfile.objects.filter(user_id=request.user.pk,must_change_password=True).exists():
+                if request.headers.get('X-Requested-With')=='XMLHttpRequest' or 'application/json' in request.headers.get('Accept',''):
+                    from django.http import JsonResponse
+                    from django.urls import reverse
+                    return JsonResponse({'error':'يجب تغيير كلمة المرور قبل متابعة استخدام المنصة.','redirect':reverse('accounts:profile')},status=403)
+                return redirect('accounts:profile')
         if route in SELF_ROUTES:return None
         if request.resolver_match.namespace=='admin' or getattr(view_func,'_access_superuser',False):
             return None if policy.superuser else denied(request,'هذه الصفحة متاحة لمدير النظام الأعلى فقط.')

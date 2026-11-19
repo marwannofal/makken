@@ -629,3 +629,35 @@
     flex-direction: column;
   }
 }
+
+.profile-password-toast {
+  position: sticky;
+  top: 1rem;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-block-end: 1.25rem;
+  padding: 1rem 1.25rem;
+  border-radius: .9rem;
+  border: 1px solid #f0b429;
+  border-inline-start: 5px solid #d97706;
+  background: #fffbeb;
+  color: #78350f;
+  box-shadow: 0 10px 24px rgba(120, 53, 15, .14);
+}
+.profile-password-toast svg {
+  inline-size: 26px;
+  block-size: 26px;
+  flex-shrink: 0;
+  stroke: #d97706;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.profile-password-toast > div { flex: 1 1 16rem; min-inline-size: 0; }
+.profile-password-toast strong { display: block; margin-block-end: .2rem; font-size: .98rem; color: #78350f; }
+.profile-password-toast p { margin: 0; font-size: .88rem; color: #92400e; }
