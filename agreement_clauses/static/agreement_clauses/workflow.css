@@ -10,3 +10,12 @@
 @media (max-width: 480px) {
   .clause-inline > button { width: 100%; }
 }
+
+.clause-inline .partnership-field { display: flex; flex-direction: column; gap: 6px; margin: 0; }
+.clause-inline .partnership-field > label { margin: 0; }
+.clause-inline input:not([type=hidden]),
+.clause-inline select,
+.clause-inline .search-select-trigger,
+.clause-inline > .button { height: 48px; min-height: 48px; box-sizing: border-box; margin: 0; }
+.clause-inline .search-select .selected-summary:empty,
+.clause-inline .search-select .field-error:empty { display: none; margin: 0; }
