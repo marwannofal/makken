@@ -1,11 +1,11 @@
 {% extends 'makken_mail/base.html' %}
 {% block mail_content %}<section class="partnership-card mail-card">
-<header class="card-heading"><h2>{% if work %}تعديل الإسناد{% else %}إسناد عمل جديد{% endif %}</h2></header>
-<p class="mail-caption">اختر موظفًا ومديرًا مختلفين. إذا ربطت العمل بسجل، يجب أن يملك كلاهما صلاحية عرض ذلك السجل.</p>
-<form method="post" data-ac-confirm="حفظ هذا الإسناد؟ يمكن أن يُرسل بريد للمسؤول والمدير حسب القواعد المفعّلة." data-target-search="{% url 'makken_mail:work_targets' %}">{% csrf_token %}
+<header class="card-heading"><h2>{% if work %}تعديل وإعادة إسناد العمل{% else %}إسناد عمل جديد{% endif %}</h2></header>
+<p class="mail-caption">اختر موظفًا واحدًا أو أكثر ومديرًا مختلفًا عنهم. عند ربط العمل باتفاقية أو سجل، يجب أن يملك جميع الأطراف صلاحية عرض السجل ونطاقه.</p>
+<form method="post" data-ac-confirm="حفظ هذا الإسناد؟ يمكن أن يُرسل بريد للموظفين المسند إليهم والمدير حسب القواعد المفعّلة." data-target-search="{% url 'makken_mail:work_targets' %}">{% csrf_token %}
 {% include 'makken_mail/_form.html' %}
 <div class="mail-inline mail-target" data-target-panel hidden>
-<div class="partnership-field"><label for="target-term">البحث عن السجل المرتبط</label><input id="target-term" type="search" maxlength="100" placeholder="البحث بالاسم أو الرقم"></div>
+<div class="partnership-field"><label for="target-term">البحث عن السجل المرتبط</label><input id="target-term" type="search" maxlength="100" placeholder="البحث بالاسم أو الرقم أو AGR-000001"></div>
 <div class="partnership-field"><label for="target-results">نتائج السجلات</label><select id="target-results"><option value="">اختر نتيجة</option></select></div>
 <button type="button" class="button button-secondary" data-target-run>بحث في السجلات</button>
 <p class="mail-caption" data-target-message role="status"></p></div>

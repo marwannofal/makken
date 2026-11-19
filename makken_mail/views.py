@@ -17,14 +17,14 @@ from django.views.decorators.debug import sensitive_post_parameters, sensitive_v
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from access_control.activity_capture import emit
-from access_control.enforcement import denied, superuser_view
+from access_control.enforcement import denied, module_view, superuser_view
 from access_control.policy import require_superuser
 from accounts.security import add_login_headers
 from .forms import ProgressForm, RuleForm, SMTPForm, TestEmailForm, UserPreferenceForm, WorkForm
 from .models import Delivery, DeliveryStatus, EventRule, RecipientMute, SMTPConfig, WorkAssignment, WorkStatus
 from .registry import CATALOG
 from .smtp import REASONS, SendFailure, encrypt, message_link, ready, send
-from .targets import WORK_TARGETS, can_read_work, record, record_label
+from .targets import WORK_TARGETS, can_manage_work, can_read_work, is_assignee, record, record_label
 from .work import WorkConflict, WorkInvalid, change_progress, save_work
 
 User = get_user_model()
@@ -256,23 +256,33 @@ def deliveries(request):
 
 
 @login_required(login_url='accounts:login')
-@require_GET
 def work_index(request):
-    query = WorkAssignment.objects.select_related('employee', 'manager')
+    if request.method not in {'GET', 'HEAD'}:
+        return denied(request)
+    from access_control.policy import AccessPolicy
+    policy = AccessPolicy(request.user)
+    query = WorkAssignment.objects.select_related('employee', 'manager').prefetch_related('assignees')
     if not request.user.is_superuser:
-        query = query.filter(Q(employee=request.user) | Q(manager=request.user))
+        participates = Q(employee=request.user) | Q(assignees=request.user) | Q(manager=request.user)
+        if policy.can('work_assignments', 'create') or policy.can('work_assignments', 'edit'):
+            participates |= Q(created_by=request.user)
+        query = query.filter(participates)
         # Check authoritative object scope without loading the full task list.
         from django.apps import apps
         from django.db.models import Subquery
-        from access_control.policy import AccessPolicy
         from access_control.regions import scoped
-        policy = AccessPolicy(request.user)
+        from partnerships.models import Partnership
         visible = Q(target_model='')
         for model, spec in WORK_TARGETS.items():
             if policy.can(spec.module):
-                ids = scoped(apps.get_model(model)._base_manager.all(), request.user).order_by().values('pk')
+                if model == 'agreement_clauses.agreement':
+                    from agreement_clauses.models import Agreement
+                    p_ids = scoped(Partnership._base_manager.all(), request.user).order_by().values('pk')
+                    ids = Agreement._base_manager.filter(partnership_id__in=Subquery(p_ids)).order_by().values('pk')
+                else:
+                    ids = scoped(apps.get_model(model)._base_manager.all(), request.user).order_by().values('pk')
                 visible |= Q(target_model=model, target_key__in=Subquery(ids))
-        query = query.filter(visible)
+        query = query.filter(visible).distinct()
     status = request.GET.get('status', '')
     if status in WorkStatus.values:
         query = query.filter(status=status)
@@ -281,50 +291,76 @@ def work_index(request):
         query = query.filter(title__icontains=term)
     params = request.GET.copy()
     params.pop('page', None)
+    can_create = request.user.is_superuser or policy.can('work_assignments', 'create')
     return page(request, 'work_list', section='work', rows=Paginator(query, 20).get_page(request.GET.get('page')),
-                q=term, selected=status, statuses=WorkStatus.choices, paging=params.urlencode())
+                q=term, selected=status, statuses=WorkStatus.choices, paging=params.urlencode(),
+                can_create_work=can_create)
 
 
-@superuser_view
+@module_view('work_assignments')
 @require_http_methods(['GET', 'POST'])
 def work_editor(request, pk=None):
-    work = get_object_or_404(WorkAssignment, pk=pk) if pk else None
+    work = get_object_or_404(WorkAssignment.objects.prefetch_related('assignees'), pk=pk) if pk else None
+    if work and not can_manage_work(request.user, work):
+        return denied(request, 'لا تملك صلاحية تعديل أو إعادة إسناد هذا العمل.')
+    assignee_ids = list(work.assignees.values_list('pk', flat=True)) if work else []
+    if work and not assignee_ids and work.employee_id:
+        assignee_ids = [work.employee_id]
     initial = ({key: getattr(work, key) for key in ('title', 'instructions', 'due_on', 'target_model', 'target_key', 'revision')}
-               | {'employee': work.employee_id, 'manager': work.manager_id}) if work else {}
+               | {'employee': work.employee_id, 'assignees': assignee_ids, 'manager': work.manager_id}) if work else {}
     if not work and request.GET.get('model') in WORK_TARGETS:
         initial.update(target_model=request.GET['model'], target_key=request.GET.get('record', '')[:19])
     status = 200
-    form = WorkForm(initial=initial)
+    form = WorkForm(initial=initial, actor=request.user)
     if request.method == 'POST':
         try:
             work = save_work(request.user, request.POST, pk)
         except WorkInvalid as exc:
             form, status = exc.form, 400
         except WorkConflict as exc:
-            form, status = WorkForm(request.POST, initial=initial), 409
+            form, status = WorkForm(request.POST, initial=initial, actor=request.user), 409
             form.add_error(None, str(exc))
+        except PermissionDenied as exc:
+            return denied(request, str(exc) or 'لا تملك صلاحية تنفيذ هذه العملية.')
         else:
             messages.success(request, 'تم حفظ إسناد العمل.')
             return redirect('makken_mail:work_detail', pk=work.pk)
     return page(request, 'work_editor', section='work', work=work, form=form, status=status)
 
 
-@superuser_view
+@module_view('work_assignments')
 @require_GET
 def target_options(request):
     from django.apps import apps
+    from access_control.policy import AccessPolicy
+    from access_control.regions import scoped
+    policy = AccessPolicy(request.user)
+    if not (request.user.is_superuser or policy.can('work_assignments', 'create') or policy.can('work_assignments', 'edit')):
+        return denied(request)
     model = request.GET.get('model')
-    if model not in WORK_TARGETS:
+    spec = WORK_TARGETS.get(model)
+    if not spec or (not request.user.is_superuser and not policy.can(spec.module)):
         return add_login_headers(JsonResponse({'results': []}))
-    query = apps.get_model(model)._base_manager.all()
-    if model in {'market_needs.sponsorship', 'market_needs.needexecution'}:
-        query = query.select_related('need')
-        if model == 'market_needs.sponsorship':
-            query = query.select_related('partnership')
+    if model == 'agreement_clauses.agreement':
+        from agreement_clauses.models import Agreement
+        from partnerships.models import Partnership
+        visible_partners = scoped(Partnership._base_manager.all(), request.user)
+        query = Agreement._base_manager.filter(partnership_id__in=visible_partners.values('pk')).select_related('partnership')
+    else:
+        query = scoped(apps.get_model(model)._base_manager.all(), request.user)
+        if model in {'market_needs.sponsorship', 'market_needs.needexecution'}:
+            query = query.select_related('need')
+            if model == 'market_needs.sponsorship':
+                query = query.select_related('partnership')
     term = request.GET.get('q', '').strip()[:100]
     if term:
+        agr_num = term.upper().removeprefix('AGR-').lstrip('0') if model == 'agreement_clauses.agreement' and term.upper().startswith('AGR-') else ''
         if term.isascii() and term.isdigit() and len(term) < 19:
             query = query.filter(pk=int(term))
+        elif agr_num and agr_num.isascii() and agr_num.isdigit():
+            query = query.filter(pk=int(agr_num))
+        elif model == 'agreement_clauses.agreement':
+            query = query.filter(Q(title__icontains=term) | Q(partnership__name__icontains=term))
         else:
             field = {'market_needs.sponsorship': 'partnership__name', 'market_needs.needexecution': 'need__title',
                      'market_needs.need': 'title'}.get(model, 'name')
@@ -336,17 +372,19 @@ def target_options(request):
 @login_required(login_url='accounts:login')
 @require_http_methods(['GET', 'POST'])
 def work_detail(request, pk):
-    work = get_object_or_404(WorkAssignment.objects.select_related('employee', 'manager'), pk=pk)
+    work = get_object_or_404(WorkAssignment.objects.select_related('employee', 'manager').prefetch_related('assignees'), pk=pk)
     if not can_read_work(request.user, work):
         raise Http404
-    allowed = (request.user.is_superuser or request.user.pk == work.employee_id) and work.status not in {WorkStatus.COMPLETE, WorkStatus.CANCELLED}
+    open_work = work.status not in {WorkStatus.COMPLETE, WorkStatus.CANCELLED}
+    allowed = (request.user.is_superuser or is_assignee(request.user, work)) and open_work
+    can_reassign = can_manage_work(request.user, work) and open_work
     form, status = None, 200
     if allowed:
         form = ProgressForm(administrator=request.user.is_superuser, initial={
             'status': work.status, 'progress': work.progress, 'revision': work.revision})
     if request.method == 'POST':
         if not allowed:
-            return denied(request, 'هذه العملية متاحة للموظف المسؤول ومدير النظام فقط.')
+            return denied(request, 'هذه العملية متاحة للموظف المسند إليه العمل ومدير النظام فقط.')
         try:
             change_progress(request.user, pk, request.POST)
         except WorkInvalid as exc:
@@ -366,5 +404,6 @@ def work_detail(request, pk):
         row.status_label = dict(WorkStatus.choices).get(row.snapshot.get('status', ''), '')
     item = record(work.target_model, work.target_key)
     from .targets import record_path
-    return page(request, 'work_detail', section='work', work=work, form=form, status=status, history=history,
+    assignees = list(work.assignees.all()) or ([work.employee] if work.employee_id else [])
+    return page(request, 'work_detail', section='work', work=work, assignees=assignees, can_reassign=can_reassign, form=form, status=status, history=history,
                 linked=record_label(item), linked_url=record_path(item, WORK_TARGETS[work.target_model].module) if item else '')

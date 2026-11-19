@@ -58,6 +58,7 @@ class WorkAssignment(models.Model):
     target_model = models.CharField(max_length=55, blank=True, default='')
     target_key = models.PositiveBigIntegerField(null=True, blank=True)
     employee = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='makken_assigned_work')
+    assignees = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, related_name='makken_work_assignments', verbose_name='الموظفون المسند إليهم')
     manager = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='makken_managed_work')
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='+')
     status = models.CharField(max_length=12, choices=WorkStatus.choices, default=WorkStatus.NEW)

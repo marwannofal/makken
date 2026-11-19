@@ -61,6 +61,14 @@ def requested_operations(request,module,view,kwargs):
         from market_needs.execution_views import mutation_permissions
         return ['view', *mutation_permissions(request, kwargs.get('pk'))]
     name=request.resolver_match.url_name
+    if module == 'work_assignments':
+        if name == 'work_create':
+            return ['view', 'create']
+        if name == 'work_edit':
+            return ['view', 'edit']
+        if name == 'work_targets' and request.method in {'GET', 'HEAD'}:
+            return ['view']
+        raise PermissionDenied
     if module == 'partnerships' and name == 'agreement_inquiries':
         if request.method in {'GET', 'HEAD'}:
             return ['view']

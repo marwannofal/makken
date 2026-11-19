@@ -133,7 +133,14 @@ class WorkForm(ArabicForm):
     revision = forms.IntegerField(widget=forms.HiddenInput(), required=False, min_value=1)
     title = forms.CharField(label='عنوان العمل', max_length=160)
     instructions = forms.CharField(label='تفاصيل العمل', max_length=3000, required=False, widget=forms.Textarea(attrs={'rows': 4}))
-    employee = PersonField(label='الموظف المسؤول', queryset=User.objects.none(), widget=forms.Select(attrs=SELECT))
+    assignees = PeopleField(
+        label='الموظفون المسند إليهم',
+        queryset=User.objects.none(),
+        required=False,
+        widget=forms.SelectMultiple(attrs={**SELECT, 'data-label': 'الموظفون المسند إليهم'}),
+        help_text='يمكنك إسناد العمل لموظف واحد أو عدة موظفين.',
+    )
+    employee = PersonField(label='الموظف المسؤول', queryset=User.objects.none(), required=False, widget=forms.HiddenInput())
     manager = PersonField(label='مدير العمل', queryset=User.objects.none(), widget=forms.Select(attrs=SELECT))
     due_on = forms.DateField(label='تاريخ الاستحقاق', required=False, widget=forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'))
     target_model = forms.ChoiceField(label='ارتباط العمل', choices=[('', 'مهمة مستقلة'), *((k, v.label) for k, v in WORK_TARGETS.items())],
@@ -142,15 +149,47 @@ class WorkForm(ArabicForm):
                                    widget=forms.NumberInput(attrs={'data-target-key': '', 'inputmode': 'numeric'}),
                                    help_text='اكتب الرقم أو ابحث عن السجل أدناه. اتركه فارغًا للمهمة المستقلة.')
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, actor=None, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['employee'].queryset = self.fields['manager'].queryset = active_users()
+        self.actor = actor
+        users = active_users()
+        if actor and not actor.is_superuser:
+            from django.db.models import Q
+            from access_control.models import RegionScope
+            from access_control.policy import AccessPolicy
+            from access_control.regions import RegionalPolicy
+            reg = RegionalPolicy(actor)
+            if not reg.unrestricted:
+                users = users.filter(
+                    Q(is_superuser=True)
+                    | Q(makken_access__region_scope=RegionScope.ALL)
+                    | Q(makken_access__allowed_regions__in=reg.ids)
+                ).distinct()
+            policy = AccessPolicy(actor)
+            self.fields['target_model'].choices = [
+                ('', 'مهمة مستقلة'),
+                *((k, v.label) for k, v in WORK_TARGETS.items() if policy.can(v.module)),
+            ]
+        self.fields['assignees'].queryset = users
+        self.fields['employee'].queryset = users
+        self.fields['manager'].queryset = users
 
     def clean(self):
         data = super().clean()
-        employee, manager = data.get('employee'), data.get('manager')
-        if employee and employee == manager:
-            self.add_error('manager', 'اختر مديرًا مختلفًا عن الموظف.')
+        selected = list(data.get('assignees') or [])
+        legacy_emp = data.get('employee')
+        if not selected and legacy_emp:
+            selected = [legacy_emp]
+        if not selected:
+            self.add_error('assignees', 'اختر موظفًا واحدًا على الأقل لإسناد العمل.')
+        else:
+            data['assignees'] = selected
+            data['employee'] = selected[0]
+
+        manager = data.get('manager')
+        if manager and any(person.pk == manager.pk for person in selected):
+            self.add_error('manager', 'اختر مديرًا مختلفًا عن الموظفين المسند إليهم.')
+
         model, pk = data.get('target_model'), data.get('target_key')
         if bool(model) != bool(pk):
             self.add_error('target_key', 'اختر نوع السجل ورقمه معًا أو اتركهما للمهمة المستقلة.')
@@ -159,11 +198,15 @@ class WorkForm(ArabicForm):
             if item is None:
                 self.add_error('target_key', 'السجل غير متاح.')
             else:
-                for field, person in [('employee', employee), ('manager', manager)]:
-                    if person and not can_read_record(person, item):
-                        self.add_error(field, 'المستخدم لا يملك صلاحية عرض السجل المرتبط ونطاقه.')
+                if self.actor and not self.actor.is_superuser and not can_read_record(self.actor, item):
+                    self.add_error('target_key', 'السجل خارج نطاق صلاحياتك أو مناطقك.')
+                for person in selected:
+                    if not can_read_record(person, item):
+                        self.add_error('assignees', 'أحد الموظفين المختارين لا يملك صلاحية عرض السجل المرتبط ونطاقه.')
+                        break
+                if manager and not can_read_record(manager, item):
+                    self.add_error('manager', 'مدير العمل لا يملك صلاحية عرض السجل المرتبط ونطاقه.')
         return data
-
 
 class ProgressForm(ArabicForm):
     revision = forms.IntegerField(widget=forms.HiddenInput(), min_value=1)

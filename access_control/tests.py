@@ -53,7 +53,7 @@ class AccessTests(TestCase):
         self.assertEqual(before,(Group.objects.count(),RoleProfile.objects.count(),Permission.objects.count()))
         policy=AccessPolicy(self.editor)
         for module in MODULES:
-            self.assertEqual(policy.can(module.key), module.key not in {"approved_programs", "provider_assignments", "user_activity", "agreement_clauses"})
+            self.assertEqual(policy.can(module.key), module.key not in {"approved_programs", "provider_assignments", "user_activity", "agreement_clauses", "work_assignments"})
             self.assertFalse(policy.can(module.key,'delete'));self.assertFalse(policy.can(module.key,'change_status'))
         self.assertTrue(policy.can('regions','create'));self.assertTrue(policy.can('regions','edit'))
         self.assertFalse(AccessPolicy(self.empty).can('regions'))

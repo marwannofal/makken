@@ -8,7 +8,7 @@ from django.db.models import Q
 from access_control.policy import AccessPolicy
 from .models import Delivery, EventRule, RecipientMute, SMTPConfig, WorkAssignment
 from .registry import CATALOG, activity_code
-from .targets import SCOPED_MODELS, audit_scope, can_read_record, can_read_work, record
+from .targets import SCOPED_MODELS, audit_scope, can_read_record, can_read_work, is_assignee, record
 
 User = get_user_model()
 
@@ -34,7 +34,7 @@ def can_receive(user, rule, actor_id=None, subject_id=None, work=None, event=Non
         routed = (
             (rule.to_actor and user.pk == actor_id) or
             (rule.to_subject and user.pk == subject_id) or
-            (work and rule.to_employee and user.pk == work.employee_id) or
+            (work and rule.to_employee and is_assignee(user, work)) or
             (work and rule.to_manager and user.pk == work.manager_id)
         )
     if not routed or RecipientMute.objects.filter(rule=rule, user=user).exists():
@@ -74,6 +74,7 @@ def enqueue(code, source, *, actor_id=None, subject_id=None, event=None, item=No
     for work in assigned:
         if rule.to_employee:
             ids.add(work.employee_id)
+            ids.update(work.assignees.values_list('pk', flat=True))
         if rule.to_manager:
             ids.add(work.manager_id)
     if not ids:
@@ -82,7 +83,7 @@ def enqueue(code, source, *, actor_id=None, subject_id=None, event=None, item=No
     for user in User.objects.filter(pk__in=ids, is_active=True).order_by('pk').iterator(chunk_size=200):
         # A fixed subscriber receives one message even if they are also the
         # actor, account subject, employee or manager.
-        candidates = [w for w in assigned if user.pk in (w.employee_id, w.manager_id)]
+        candidates = [w for w in assigned if user.pk == w.manager_id or is_assignee(user, w)]
         if history:
             candidates = [history.assignment]
         for work in [*candidates, None]:
