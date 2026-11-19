@@ -69,7 +69,7 @@ def requested_operations(request,module,view,kwargs):
         if name in {'work_targets', 'work_stats'} and request.method in {'GET', 'HEAD'}:
             return ['view']
         raise PermissionDenied
-    if module == 'partnerships' and name == 'agreement_inquiries':
+    if module == 'partnerships' and name in {'agreement_inquiries', 'achievement_report'}:
         if request.method in {'GET', 'HEAD'}:
             return ['view']
         raise PermissionDenied

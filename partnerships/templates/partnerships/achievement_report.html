@@ -1,0 +1,244 @@
+{% extends "core/makken_base.html" %}
+{% load access_tags static %}
+{% block title %}تقرير إنجاز الشراكات | مكّن{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'care_states/states.css' %}?v=20261015-1">
+<link rel="stylesheet" href="{% static 'partnerships/partnerships.css' %}?v=20261015-1">
+<link rel="stylesheet" href="{% static 'partnerships/achievement_report.css' %}?v=20261119-1">
+{% endblock %}
+{% block content %}
+<section class="page-introduction partnership-intro">
+  <div>
+    <p class="eyebrow">الشراكات · تقارير الإنجاز</p>
+    <h1>تقرير إنجاز الشراكات<span class="greeting-dot">.</span></h1>
+    <p class="page-description">متابعة نسب إنجاز الشراكات واتفاقياتها وفق السنة، المنطقة، القطاع، النشاط، والحالة ضمن نطاقك.</p>
+  </div>
+</section>
+
+{% if report.errors %}
+<div class="feedback feedback-error" role="alert">
+  {% for err in report.errors %}<p>{{ err }}</p>{% endfor %}
+</div>
+{% endif %}
+
+<section class="partnership-card ach-card" aria-labelledby="ach-filters-heading">
+  <header class="card-heading">
+    <div>
+      <p class="eyebrow">معايير التقرير</p>
+      <h2 id="ach-filters-heading">تصفية وتجميع إنجاز الشراكات</h2>
+    </div>
+  </header>
+
+  <form method="get" action="{% url 'partnerships:achievement_report' %}" class="ach-filters" role="search">
+    <div class="partnership-field">
+      <label for="ach-year">السنة</label>
+      <select name="year" id="ach-year">
+        <option value="">جميع السنوات</option>
+        {% for yr in report.years %}
+        <option value="{{ yr }}"{% if report.selected_year == yr %} selected{% endif %}>{{ yr }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="partnership-field">
+      <label for="ach-region">المنطقة</label>
+      <select name="region" id="ach-region">
+        <option value="">جميع المناطق المتاحة</option>
+        {% for reg in report.regions %}
+        <option value="{{ reg.pk }}"{% if report.selected_region == reg.pk %} selected{% endif %}>{{ reg.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="partnership-field">
+      <label for="ach-sector">القطاع</label>
+      <select name="sector" id="ach-sector">
+        <option value="">جميع القطاعات</option>
+        {% for sec in report.sectors %}
+        <option value="{{ sec.pk }}"{% if report.selected_sector == sec.pk %} selected{% endif %}>{{ sec.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="partnership-field">
+      <label for="ach-activity">النشاط / التخصص</label>
+      <select name="activity" id="ach-activity">
+        <option value="">جميع الأنشطة</option>
+        {% for act in report.activities %}
+        <option value="{{ act.pk }}"{% if report.selected_activity == act.pk %} selected{% endif %}>{{ act.name }} ({{ act.sector.name }})</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="partnership-field">
+      <label for="ach-status">الحالة</label>
+      <select name="status" id="ach-status">
+        <option value="">جميع الحالات</option>
+        <optgroup label="حالة السجل">
+          <option value="active"{% if report.selected_status == 'active' %} selected{% endif %}>نشطة</option>
+          <option value="inactive"{% if report.selected_status == 'inactive' %} selected{% endif %}>غير نشطة</option>
+        </optgroup>
+        <optgroup label="مرحلة التطوير">
+          {% for token, label in report.development_states %}
+          <option value="{{ token }}"{% if report.selected_status == token %} selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </optgroup>
+        {% if report.agreement_statuses %}
+        <optgroup label="حالة الاتفاقية">
+          {% for token, label in report.agreement_statuses %}
+          <option value="{{ token }}"{% if report.selected_status == token %} selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </optgroup>
+        {% endif %}
+      </select>
+    </div>
+
+    <div class="partnership-field">
+      <label for="ach-group">تجميع الملخص</label>
+      <select name="group_by" id="ach-group">
+        {% for key, label in report.group_choices %}
+        <option value="{{ key }}"{% if report.group_by == key %} selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="partnership-field ach-search">
+      <label for="ach-q">البحث باسم الشراكة</label>
+      <input type="search" name="q" id="ach-q" value="{{ report.q }}" maxlength="120" placeholder="اسم الجهة أو الممثل">
+    </div>
+
+    <div class="ach-actions">
+      <button class="button button-primary" type="submit">عرض التقرير</button>
+      <a class="button button-secondary" href="{% url 'partnerships:achievement_report' %}">مسح</a>
+    </div>
+  </form>
+</section>
+
+<section class="ach-kpis" aria-label="ملخص إنجاز الشراكات">
+  <div class="ach-kpi">
+    <span>إجمالي الشراكات</span>
+    <strong><bdi>{{ report.totals.partnership_count }}</bdi></strong>
+    <small>نشطة: <bdi>{{ report.totals.active_count }}</bdi></small>
+  </div>
+  <div class="ach-kpi">
+    <span>إجمالي الاتفاقيات</span>
+    <strong><bdi>{{ report.totals.agreement_count }}</bdi></strong>
+    <small>إجمالي البنود المسندة: <bdi>{{ report.totals.clause_count }}</bdi></small>
+  </div>
+  <div class="ach-kpi is-accent">
+    <span>متوسط نسبة الإنجاز</span>
+    <strong><bdi>{{ report.totals.avg_progress }}%</bdi></strong>
+    <progress max="100" value="{{ report.totals.avg_progress }}"></progress>
+  </div>
+  <div class="ach-kpi is-complete">
+    <span>الشراكات المكتملة (100%)</span>
+    <strong><bdi>{{ report.totals.completed_count }}</bdi></strong>
+    <small>قيد التنفيذ: <bdi>{{ report.totals.in_progress_count }}</bdi></small>
+  </div>
+</section>
+
+<section class="partnership-card ach-card" aria-labelledby="ach-summary-heading">
+  <header class="card-heading">
+    <div>
+      <p class="eyebrow">التجميع التحليلي</p>
+      <h2 id="ach-summary-heading">ملخص إنجاز الشراكات {{ report.group_label }}</h2>
+    </div>
+    <span class="subtle-badge">عدد المجموعات: <bdi>{{ report.groups|length }}</bdi></span>
+  </header>
+
+  <div class="table-scroll" tabindex="0">
+    <table class="partnership-table ach-table">
+      <caption class="visually-hidden">ملخص إنجاز الشراكات {{ report.group_label }}</caption>
+      <thead>
+        <tr>
+          <th scope="col">{{ report.group_column_header }}</th>
+          <th scope="col">عدد الشراكات</th>
+          <th scope="col">الشراكات النشطة</th>
+          <th scope="col">عدد الاتفاقيات</th>
+          <th scope="col">المكتملة (100%)</th>
+          <th scope="col">متوسط الإنجاز</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for grp in report.groups %}
+        <tr>
+          <th scope="row">{{ grp.label }}</th>
+          <td><strong><bdi>{{ grp.partnership_count }}</bdi></strong></td>
+          <td><bdi>{{ grp.active_count }}</bdi></td>
+          <td><bdi>{{ grp.agreement_count }}</bdi></td>
+          <td><bdi>{{ grp.completed_count }}</bdi></td>
+          <td><span class="ach-pct"><bdi>{{ grp.avg_progress }}%</bdi></span></td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6">لا توجد شراكات مطابقة لمعايير التقرير ضمن نطاقك.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="partnership-card ach-card" aria-labelledby="ach-detail-heading">
+  <header class="card-heading">
+    <div>
+      <p class="eyebrow">السجل التفصيلي</p>
+      <h2 id="ach-detail-heading">تفاصيل إنجاز الشراكات</h2>
+    </div>
+    <span class="subtle-badge">{% include "core/partials/record_count.html" with record_count=report.rows|length only %}</span>
+  </header>
+
+  <div class="table-scroll" tabindex="0">
+    <table class="partnership-table ach-detail-table">
+      <caption class="visually-hidden">تفاصيل إنجاز الشراكات</caption>
+      <thead>
+        <tr>
+          <th scope="col">الشراكة</th>
+          <th scope="col">السنة</th>
+          <th scope="col">المناطق</th>
+          <th scope="col">القطاعات</th>
+          <th scope="col">الأنشطة / التخصصات</th>
+          <th scope="col">الحالة</th>
+          <th scope="col">الاتفاقيات</th>
+          <th scope="col">البنود</th>
+          <th scope="col">نسبة الإنجاز</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in report.rows %}
+        <tr>
+          <th scope="row">
+            <a class="ach-link" href="{% url 'partnerships:clauses' row.pk %}">{{ row.name }}</a>
+          </th>
+          <td><bdi>{{ row.year_label }}</bdi></td>
+          <td>{{ row.regions_label }}</td>
+          <td>{{ row.sectors_label }}</td>
+          <td>{{ row.activities_label }}</td>
+          <td>
+            <span class="ach-status{% if row.is_active %} is-active{% endif %}">{{ row.status_label }}</span>
+            {% if row.agreement_statuses_label != '—' %}<small>{{ row.agreement_statuses_label }}</small>{% endif %}
+          </td>
+          <td><bdi>{{ row.agreement_count }}</bdi></td>
+          <td><bdi>{{ row.clause_count }}</bdi></td>
+          <td><span class="ach-pct{% if row.progress >= 100 %} is-full{% endif %}"><bdi>{{ row.progress }}%</bdi></span></td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="9">لا توجد شراكات مطابقة لمعايير التقرير ضمن نطاقك.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      {% if report.rows %}
+      <tfoot>
+        <tr>
+          <th scope="row" colspan="6">الإجمالي / المتوسط العام</th>
+          <td><strong><bdi>{{ report.totals.agreement_count }}</bdi></strong></td>
+          <td><strong><bdi>{{ report.totals.clause_count }}</bdi></strong></td>
+          <td><strong><bdi>{{ report.totals.avg_progress }}%</bdi></strong></td>
+        </tr>
+      </tfoot>
+      {% endif %}
+    </table>
+  </div>
+</section>
+{% endblock %}

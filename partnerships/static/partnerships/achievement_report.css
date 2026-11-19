@@ -1,0 +1,131 @@
+/* US-08 Partnership Achievement Report styles (Makken RTL design language). */
+.ach-card { margin-bottom: 20px; }
+.ach-filters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  align-items: end;
+}
+.ach-filters .partnership-field {
+  margin: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ach-filters .partnership-field > label { margin: 0; }
+.ach-filters select,
+.ach-filters input {
+  height: 46px;
+  min-height: 46px;
+  box-sizing: border-box;
+  width: 100%;
+}
+.ach-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.ach-actions .button {
+  height: 46px;
+  min-height: 46px;
+  box-sizing: border-box;
+}
+.ach-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.ach-kpi {
+  padding: 18px 16px;
+  border: 1px solid #dcebe6;
+  border-radius: 16px;
+  background: #ffffff;
+  min-width: 0;
+}
+.ach-kpi > span {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: #567774;
+  margin-bottom: 6px;
+}
+.ach-kpi strong {
+  display: block;
+  font-size: 26px;
+  line-height: 1.4;
+  color: #195e5c;
+  font-variant-numeric: tabular-nums;
+}
+.ach-kpi small {
+  display: block;
+  font-size: 12px;
+  color: #6b8683;
+  margin-top: 4px;
+}
+.ach-kpi.is-accent {
+  background: #eff9f8;
+  border-color: #c8eae6;
+}
+.ach-kpi.is-complete {
+  background: #effaf5;
+  border-color: #cdebd9;
+}
+.ach-kpi.is-complete strong { color: #167349; }
+.ach-kpi progress {
+  width: 100%;
+  height: 8px;
+  margin-top: 8px;
+  accent-color: #24b3af;
+}
+.ach-link {
+  color: #157774;
+  font-weight: 700;
+  text-decoration: none;
+}
+.ach-link:hover { text-decoration: underline; }
+.ach-status {
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  background: #edf3f2;
+  color: #4b696b;
+}
+.ach-status.is-active {
+  background: #e6f7f5;
+  color: #137470;
+}
+.ach-pct {
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-weight: 700;
+  background: #eef6f5;
+  color: #195e5c;
+  font-variant-numeric: tabular-nums;
+}
+.ach-pct.is-full {
+  background: #e1f6ed;
+  color: #167349;
+}
+.ach-detail-table tfoot th,
+.ach-detail-table tfoot td {
+  background: #f0f9f7;
+  border-top: 2px solid #cfe7e3;
+}
+@media (max-width: 1100px) {
+  .ach-filters,
+  .ach-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  .ach-filters,
+  .ach-kpis {
+    grid-template-columns: 1fr;
+  }
+}
