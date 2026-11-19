@@ -1,0 +1,293 @@
+{% extends "core/makken_base.html" %}
+{% load access_tags static %}
+{% block title %}الاستعلامات | مكّن{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'care_states/states.css' %}?v=20261015-1">
+<link rel="stylesheet" href="{% static 'partnerships/partnerships.css' %}?v=20261015-1">
+<link rel="stylesheet" href="{% static 'market_needs/market.css' %}">
+<link rel="stylesheet" href="{% static 'agreement_clauses/record.css' %}?v=1">
+<link rel="stylesheet" href="{% static 'agreement_clauses/inquiries.css' %}?v=1">
+<script src="{% static 'market_needs/market.js' %}" defer></script>
+{% endblock %}
+{% block content %}
+<section class="page-introduction partnership-intro">
+  <div>
+    <p class="eyebrow">الشراكات · الاستعلامات</p>
+    <h1>الاستعلامات عن الاتفاقيات<span class="greeting-dot">.</span></h1>
+    <p class="page-description">ابحث في الاتفاقيات وفق السنة، المنطقة، الموقّع، الإدارة المعنية، فريق العمل، ضابط الاتصال، الموظف، أو نطاق نسبة الإنجاز.</p>
+  </div>
+</section>
+
+{% if filter_error %}
+<div class="feedback feedback-error" role="alert">تعذّر تنفيذ الاستعلام. راجع القيم المدخلة في معايير البحث ثم حاول مجددًا.</div>
+{% endif %}
+
+<section class="partnership-card inquiry-card" aria-labelledby="inquiry-filters-heading">
+  <header class="card-heading">
+    <div>
+      <h2 id="inquiry-filters-heading">معايير البحث والتصفية</h2>
+      <p class="muted">تُطبّق جميع المعايير المحددة معًا (تقاطع الشروط) ضمن نطاق المناطق المسموح لك بها.</p>
+    </div>
+  </header>
+
+  <form method="get" action="{% url 'partnerships:agreement_inquiries' %}" class="inquiry-form" role="search" novalidate>
+    <div class="inquiry-grid">
+      <div class="inquiry-field">
+        <label for="{{ form.year.id_for_label }}">{{ form.year.label }}</label>
+        {{ form.year }}
+        {{ form.year.errors }}
+      </div>
+
+      <div class="inquiry-field">
+        <label for="{{ form.region.id_for_label }}">{{ form.region.label }}</label>
+        {{ form.region }}
+        {{ form.region.errors }}
+      </div>
+
+      <div class="inquiry-field">
+        <label for="{{ form.signatory.id_for_label }}">{{ form.signatory.label }}</label>
+        {{ form.signatory }}
+        {{ form.signatory.errors }}
+      </div>
+
+      <div class="inquiry-field">
+        <label for="{{ form.department.id_for_label }}">{{ form.department.label }}</label>
+        {{ form.department }}
+        {{ form.department.errors }}
+      </div>
+
+      <div class="inquiry-field">
+        <label for="{{ form.team.id_for_label }}">{{ form.team.label }}</label>
+        {{ form.team }}
+        {{ form.team.errors }}
+      </div>
+
+      <div class="inquiry-field">
+        <label for="{{ form.contact.id_for_label }}">{{ form.contact.label }}</label>
+        {{ form.contact }}
+        {{ form.contact.errors }}
+      </div>
+
+      <div class="inquiry-field">
+        <label for="{{ form.employee.id_for_label }}">{{ form.employee.label }}</label>
+        {{ form.employee }}
+        {{ form.employee.errors }}
+      </div>
+
+      <fieldset class="inquiry-range-group">
+        <legend>نسبة إنجاز الاتفاقية (%)</legend>
+        <div class="inquiry-field">
+          <label for="{{ form.progress_min.id_for_label }}">من (%)</label>
+          {{ form.progress_min }}
+          {{ form.progress_min.errors }}
+        </div>
+        <div class="inquiry-field">
+          <label for="{{ form.progress_max.id_for_label }}">إلى (%)</label>
+          {{ form.progress_max }}
+          {{ form.progress_max.errors }}
+        </div>
+      </fieldset>
+    </div>
+
+    <datalist id="agreement-inquiry-years">
+      {% for year_value in available_years %}<option value="{{ year_value }}"></option>{% endfor %}
+    </datalist>
+
+    <div class="inquiry-actions">
+      <button class="button button-primary" type="submit">بحث</button>
+      <a class="button button-secondary" href="{% url 'partnerships:agreement_inquiries' %}">إعادة تعيين الفلاتر</a>
+      {% if filter_active and not filter_error %}
+      <p class="inquiry-summary" role="status">نتائج الاستعلام المطابقة: <strong>{{ page_obj.paginator.count }}</strong></p>
+      {% endif %}
+    </div>
+  </form>
+</section>
+
+<section class="partnership-card register-card" aria-labelledby="inquiry-results-heading">
+  <header class="card-heading">
+    <div>
+      <h2 id="inquiry-results-heading">نتائج الاستعلام</h2>
+      <p class="muted">تُعرض الاتفاقيات المصرح لك بالاطلاع عليها مرتّبة من الأحدث إلى الأقدم.</p>
+    </div>
+    <span class="subtle-badge">{% include "core/partials/record_count.html" with record_count=page_obj.paginator.count only %}</span>
+  </header>
+
+  <p class="table-scroll-hint">اسحب الجدول أفقيًا لعرض جميع الأعمدة عند الحاجة.</p>
+  <div class="table-scroll">
+    <table class="partnership-table register-table inquiry-table">
+      <caption class="visually-hidden">نتائج الاستعلام عن الاتفاقيات</caption>
+      <thead>
+        <tr>
+          <th scope="col">الاتفاقية والجهة</th>
+          <th scope="col">السنة والمنطقة</th>
+          <th scope="col">الموقّعون</th>
+          <th scope="col">الإدارات والموظفون</th>
+          <th scope="col">فريق العمل وضباط الاتصال</th>
+          <th scope="col">نسبة الإنجاز</th>
+          <th scope="col">الإجراء</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr>
+          <th scope="row" class="inquiry-title-cell">
+            <span class="inquiry-number"><bdi>{{ row.agreement.number }}</bdi></span>
+            <div>
+              {% if can_open_agreement %}
+              <a class="record-link" href="{% url 'partnerships:agreement' row.partnership.pk row.agreement.pk %}"><bdi>{{ row.agreement.title }}</bdi></a>
+              {% else %}
+              <bdi>{{ row.agreement.title }}</bdi>
+              {% endif %}
+            </div>
+            <div class="inquiry-muted"><bdi>{{ row.partnership.name }}</bdi></div>
+            {% if row.details and row.details.status %}
+            <div class="inquiry-tags"><span class="inquiry-tag">{{ row.details.status.name }}</span></div>
+            {% endif %}
+          </th>
+
+          <td>
+            <div class="inquiry-meta-list">
+              <div class="inquiry-meta-item">
+                <strong>سنة التوقيع:</strong>
+                {% if row.details and row.details.signed_on %}
+                <bdi dir="ltr">{{ row.details.signed_on|date:"Y" }}</bdi>
+                <span class="inquiry-muted">(<bdi dir="ltr">{{ row.details.signed_on|date:"Y-m-d" }}</bdi>)</span>
+                {% else %}
+                <span class="inquiry-muted">غير محدد</span>
+                {% endif %}
+              </div>
+              <div class="inquiry-meta-item">
+                <strong>المناطق الإدارية:</strong>
+                {% if row.regions %}
+                <div class="inquiry-tags">
+                  {% for region in row.regions %}<span class="inquiry-tag">{{ region.name }}</span>{% endfor %}
+                </div>
+                {% else %}
+                <span class="inquiry-muted">غير محددة</span>
+                {% endif %}
+              </div>
+              {% if row.details and row.details.signing_region %}
+              <div class="inquiry-meta-item">
+                <strong>منطقة التوقيع:</strong> {{ row.details.signing_region.name }}
+              </div>
+              {% endif %}
+            </div>
+          </td>
+
+          <td>
+            <div class="inquiry-meta-list">
+              {% if row.details and row.details.institution_signatory %}
+              <div class="inquiry-meta-item"><strong>عن المؤسسة:</strong> <bdi>{{ row.details.institution_signatory }}</bdi></div>
+              {% endif %}
+              {% if row.details and row.details.partner_signatory %}
+              <div class="inquiry-meta-item"><strong>عن الجهة:</strong> <bdi>{{ row.details.partner_signatory }}</bdi></div>
+              {% endif %}
+              {% if not row.details or not row.details.institution_signatory and not row.details.partner_signatory %}
+              <span class="inquiry-muted">غير مسجّل</span>
+              {% endif %}
+            </div>
+          </td>
+
+          <td>
+            <div class="inquiry-meta-list">
+              {% if row.departments %}
+              <div class="inquiry-tags">
+                {% for dept in row.departments %}<span class="inquiry-tag">{{ dept.name }}</span>{% endfor %}
+              </div>
+              {% endif %}
+              {% if row.responsible_name %}
+              <div class="inquiry-meta-item"><strong>الموظف المسؤول:</strong> <bdi>{{ row.responsible_name }}</bdi></div>
+              {% endif %}
+              {% if row.representative_name %}
+              <div class="inquiry-meta-item"><strong>ممثل الإدارة:</strong> <bdi>{{ row.representative_name }}</bdi></div>
+              {% endif %}
+              {% if not row.departments and not row.responsible_name and not row.representative_name %}
+              <span class="inquiry-muted">غير محدد</span>
+              {% endif %}
+            </div>
+          </td>
+
+          <td>
+            <div class="inquiry-meta-list">
+              {% if row.contacts %}
+              <div class="inquiry-meta-item">
+                <strong>ضباط الاتصال:</strong>
+                <div class="inquiry-tags">
+                  {% for contact in row.contacts %}
+                  <span class="inquiry-tag inquiry-tag-contact"><bdi>{{ contact.name }}</bdi>{% if contact.phone %} · <bdi dir="ltr">{{ contact.phone }}</bdi>{% endif %}</span>
+                  {% endfor %}
+                </div>
+              </div>
+              {% endif %}
+              {% if row.team_count %}
+              <div class="inquiry-meta-item">
+                <strong>أعضاء الفريق:</strong> {{ row.team_count }}
+                <div class="inquiry-muted">
+                  {% for member in row.members|slice:":3" %}<bdi>{{ member.name }}</bdi>{% if not forloop.last %}، {% endif %}{% endfor %}{% if row.team_count > 3 %}…{% endif %}
+                </div>
+              </div>
+              {% else %}
+              <span class="inquiry-muted">لا يوجد فريق مسجّل</span>
+              {% endif %}
+            </div>
+          </td>
+
+          <td>
+            <div class="inquiry-progress-box">
+              <span class="inquiry-progress-value">{% include "agreement_clauses/_percent.html" with value=row.progress only %}</span>
+              {% if row.progress is not None %}
+              <div class="inquiry-progress-bar" aria-hidden="true"><span style="inline-size: {{ row.progress|floatformat:'-2u' }}%"></span></div>
+              <span class="inquiry-muted">{{ row.clause_count }} بند</span>
+              {% else %}
+              <span class="inquiry-muted">لا توجد بنود</span>
+              {% endif %}
+            </div>
+          </td>
+
+          <td>
+            {% if can_open_agreement %}
+            <div class="inquiry-row-links">
+              <a class="row-action" href="{% url 'partnerships:agreement' row.partnership.pk row.agreement.pk %}">بطاقة المتابعة</a>
+              <a class="row-action" href="{% url 'partnerships:agreement_details' row.partnership.pk row.agreement.pk %}">بيانات الاتفاقية</a>
+            </div>
+            {% else %}
+            <span class="inquiry-muted">—</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7">
+            <div class="empty-state">
+              {% if filter_error %}
+              <strong>تعذّر عرض النتائج بسبب قيم غير صالحة</strong>
+              <p>صحّح الحقول المظلّلة أعلاه أو أعد تعيين الفلاتر للعرض من جديد.</p>
+              {% elif filter_active %}
+              <strong>لا توجد اتفاقيات مطابقة لمعايير الاستعلام</strong>
+              <p>جرّب تعديل المعايير أو إعادة تعيين الفلاتر لتوسيع نطاق البحث.</p>
+              {% else %}
+              <strong>لا توجد اتفاقيات متاحة للعرض حاليًا</strong>
+              <p>ستظهر هنا الاتفاقيات المسجّلة ضمن نطاق المناطق المسموح لك بها.</p>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <footer class="table-footer">
+    <span>{% if page_obj.paginator.count %}عرض {{ page_obj.start_index }}–{{ page_obj.end_index }} من {{ page_obj.paginator.count }}{% else %}لا توجد نتائج{% endif %}</span>
+    <nav class="pagination" aria-label="صفحات نتائج الاستعلام">
+      {% if page_obj.has_previous %}
+      <a class="button button-secondary" href="?{% if pagination_query %}{{ pagination_query }}&amp;{% endif %}page={{ page_obj.previous_page_number }}">السابق</a>
+      {% endif %}
+      <span>{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}
+      <a class="button button-secondary" href="?{% if pagination_query %}{{ pagination_query }}&amp;{% endif %}page={{ page_obj.next_page_number }}">التالي</a>
+      {% endif %}
+    </nav>
+  </footer>
+</section>
+{% endblock %}
