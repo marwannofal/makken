@@ -91,12 +91,15 @@ def queue_due_reminders(now=None):
                 continue
             # MySQL's unique constraint on (source, recipient_key) also
             # protects against two scheduler invocations running concurrently.
-            _, created = Delivery.objects.get_or_create(
+            delivery, created = Delivery.objects.get_or_create(
                 source=source, recipient_key=user.pk,
                 defaults={
                     'rule': rule, 'recipient': user, 'email_digest': email_digest(user.email),
                     'record_model': PARTNERSHIP_MODEL, 'record_key': partnership.pk,
                 },
             )
+            if created:
+                from .tasks import dispatch_delivery
+                dispatch_delivery(delivery.pk)
             queued += int(created)
     return queued

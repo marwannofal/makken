@@ -89,13 +89,16 @@ def enqueue(code, source, *, actor_id=None, subject_id=None, event=None, item=No
         for work in [*candidates, None]:
             if not can_receive(user, rule, actor_id, subject_id, work, event, item):
                 continue
-            _, created = Delivery.objects.get_or_create(source=source, recipient_key=user.pk, defaults={
+            delivery, created = Delivery.objects.get_or_create(source=source, recipient_key=user.pk, defaults={
                 'rule': rule, 'recipient': user, 'email_digest': email_digest(user.email),
                 'actor_id': actor_id, 'subject_user_id': subject_id, 'activity': event,
                 'record_model': item._meta.label_lower if item else '',
                 'record_key': item.pk if item and isinstance(item.pk, int) else None,
                 'work': work, 'work_history': history,
             })
+            if created:
+                from .tasks import dispatch_delivery
+                dispatch_delivery(delivery.pk)
             queued += int(created)
             break
     return queued

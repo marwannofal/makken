@@ -25,10 +25,30 @@ services:
         max-size: "10m"
         max-file: "3"
 
+  rabbitmq:
+    image: rabbitmq:3-alpine
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-makken}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-makken_mq_internal}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
   web:
     build:
       context: .
       dockerfile: Dockerfile.production
+    image: makken-prod-web:latest
     restart: unless-stopped
     environment:
       DJANGO_SETTINGS_MODULE: makken.production_settings
@@ -37,8 +57,12 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE:?Required}
       MYSQL_USER: ${MYSQL_USER:?Required}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Required}
+      RABBITMQ_USER: ${RABBITMQ_USER:-makken}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-makken_mq_internal}
     depends_on:
       db:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
     ports:
       - "127.0.0.1:18000:8000"
@@ -62,5 +86,42 @@ services:
         max-size: "10m"
         max-file: "3"
 
+  celery_worker:
+    image: makken-prod-web:latest
+    restart: unless-stopped
+    entrypoint: []
+    command:
+      - celery
+      - -A
+      - makken
+      - worker
+      - --loglevel=info
+      - --concurrency=2
+      - --beat
+      - --schedule=/tmp/celerybeat-schedule
+    environment:
+      DJANGO_SETTINGS_MODULE: makken.production_settings
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?Required}
+      DJANGO_HTTPS: ${DJANGO_HTTPS:-0}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:?Required}
+      MYSQL_USER: ${MYSQL_USER:?Required}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Required}
+      RABBITMQ_USER: ${RABBITMQ_USER:-makken}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-makken_mq_internal}
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    volumes:
+      - /var/lib/makken/private_uploads:/app/private_uploads
+      - ./staticfiles:/app/staticfiles
+      - ./media:/app/media
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
 volumes:
   mysql_data:
+  rabbitmq_data:

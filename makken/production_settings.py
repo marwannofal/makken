@@ -86,3 +86,23 @@ if 'access_control.activity_middleware.ActivityMiddleware' not in MIDDLEWARE:
     MIDDLEWARE.insert(MIDDLEWARE.index('core.table_exports.TableExportMiddleware'),
                       'access_control.activity_middleware.ActivityMiddleware')
 # END MAKKEN USER ACTIVITY
+
+# BEGIN MAKKEN RABBITMQ CELERY MAIL v1
+CELERY_BROKER_URL = os.environ.get(
+    "CELERY_BROKER_URL",
+    f"amqp://{os.environ.get('RABBITMQ_USER', 'makken')}:{os.environ.get('RABBITMQ_PASSWORD', 'makken_mq_internal')}@rabbitmq:5672//",
+)
+CELERY_RESULT_BACKEND = None
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_TIMEZONE = "Asia/Riyadh"
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+CELERY_TASK_ACKS_LATE = True
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1
+CELERY_BEAT_SCHEDULE = {
+    "makken-mail-retry-sweep": {
+        "task": "makken_mail.tasks.deliver_pending_mail",
+        "schedule": 60.0,
+    },
+}
+# END MAKKEN RABBITMQ CELERY MAIL v1

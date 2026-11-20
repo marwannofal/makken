@@ -3,3 +3,5 @@ gunicorn==26.2.0
 mysqlclient>=2.2.1,<3
 # Arabic RTL PDF exports
 WeasyPrint==68.0
+# Async RabbitMQ email worker
+celery>=5.4,<6
