@@ -54,7 +54,7 @@
   form.querySelector('#willingness-agreement').addEventListener('change',()=>form.querySelector('#agreement-errors').replaceChildren());
   function setBusy(value) {
     busy=value;dialog.setAttribute('aria-busy',String(value));
-    form.querySelectorAll('button,input,select').forEach(control=>control.disabled=value);
+    form.querySelectorAll('button,input,select,textarea').forEach(control=>control.disabled=value);
     dialog.querySelectorAll('[data-dismiss-dialog]').forEach(control=>control.disabled=value);
     submit.textContent=value?'جار الرفع والحفظ…':'حفظ والتحويل إلى رغبة';
   }
@@ -63,8 +63,8 @@
     event.preventDefault();
     if(busy || !form.reportValidity())return;
     error.textContent='';
-    form.querySelectorAll('#agreement-errors,#attachments-errors').forEach(node=>node.replaceChildren());
-    const body=new FormData(form); // Capture enabled file controls before locking them.
+    form.querySelectorAll('#agreement-errors,#attachments-errors,#clauses-errors,#work-title-errors,#work-assignees-errors,#work-manager-errors,#work-due_on-errors,#work-instructions-errors').forEach(node=>node.replaceChildren());
+    const body=new FormData(form);
     setBusy(true);list.querySelectorAll('.willingness-queue-info small').forEach((node,index)=>node.textContent=fileSize(files[index].size)+' · قيد الرفع');panel.hidden=false;progress.value=0;percentage.textContent='0%';status.textContent='جار رفع المرفقات…';
     const xhr=new XMLHttpRequest();
     xhr.upload.addEventListener('progress',event=>{
@@ -82,8 +82,19 @@
         progress.value=100;percentage.textContent='100%';
         location.assign(result.redirect);return;
       }
+      const fieldMap = {
+        agreement_type: '#agreement-errors',
+        attachments: '#attachments-errors',
+        clauses: '#clauses-errors',
+        'work-title': '#work-title-errors',
+        'work-assignees': '#work-assignees-errors',
+        'work-manager': '#work-manager-errors',
+        'work-due_on': '#work-due_on-errors',
+        'work-instructions': '#work-instructions-errors',
+      };
       for(const [field,items] of Object.entries(result.errors||{})){
-        const node=form.querySelector(field==='agreement_type'?'#agreement-errors':field==='attachments'?'#attachments-errors':'[data-upload-error]');
+        const selector = fieldMap[field] || '[data-upload-error]';
+        const node=form.querySelector(selector);
         if(node)node.textContent=items.map(item=>item.message).join(' ');
       }
       fail(result.error||'تعذّر حفظ التحويل. راجع البيانات وحاول مرة أخرى.');

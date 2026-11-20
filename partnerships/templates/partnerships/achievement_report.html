@@ -208,7 +208,7 @@
         {% for row in report.rows %}
         <tr>
           <th scope="row">
-            <a class="ach-link" href="{% url 'partnerships:clauses' row.pk %}">{{ row.name }}</a>
+            <a class="ach-link" href="{% url 'partnerships:edit' row.pk %}">{{ row.name }}</a>
           </th>
           <td><bdi>{{ row.year_label }}</bdi></td>
           <td>{{ row.regions_label }}</td>

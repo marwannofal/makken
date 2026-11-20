@@ -7,12 +7,38 @@ from care_states.models import DevelopmentState
 from entities.models import normalize_name, validate_name
 
 from decimal import Decimal
-from django.core.validators import MinValueValidator, RegexValidator
+from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
 
 
 class Scope(models.TextChoices):
     LOCAL = "local", "محلي"
     GLOBAL = "global", "عالمي"
+
+
+class PartnershipType(models.Model):
+    name = models.CharField("نوع الشراكة", max_length=200, validators=[validate_name])
+    name_key = models.CharField(max_length=600, editable=False)
+    is_active = models.BooleanField("نشط", default=True)
+    revision = models.PositiveIntegerField(default=1, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["id"]
+        default_permissions = ()
+        constraints = [
+            models.UniqueConstraint(fields=["name_key"], name="mk_partnership_types_name_uq"),
+        ]
+
+    def save(self, *args, **kwargs):
+        self.name = normalize_name(self.name)
+        self.name_key = self.name.casefold()
+        if kwargs.get("update_fields") is not None and "name" in kwargs["update_fields"]:
+            kwargs["update_fields"] = {*kwargs["update_fields"], "name_key"}
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
 
 
 class PreliminaryAgreementType(models.TextChoices):
@@ -21,6 +47,23 @@ class PreliminaryAgreementType(models.TextChoices):
     SERVICE_CONTRACT = "service_contract", "عقد خدمة"
     SOCIAL = "social", "اجتماعية"
     OTHER = "other", "أخرى"
+
+
+
+class RenewalRule(models.TextChoices):
+    AUTOMATIC = "automatic", "تلقائي"
+    PRIOR_APPROVAL = "prior_approval", "موافقة مسبقة"
+
+
+class TeamSide(models.TextChoices):
+    INSTITUTION = "institution", "فريق عمل المؤسسة"
+    PARTNER = "partner", "فريق عمل الجهة"
+
+
+class TeamMemberRole(models.TextChoices):
+    REPRESENTATIVE = "representative", "ممثل"
+    LEAD = "lead", "رئيس"
+    CONTACT = "contact", "ضابط اتصال"
 
 
 class Partnership(models.Model):
@@ -40,7 +83,27 @@ class Partnership(models.Model):
     is_active = models.BooleanField("حالة السجل", default=True)
     development_state = models.ForeignKey("care_states.StateColor", default=DevelopmentState.CAPABILITY, on_delete=models.PROTECT, related_name="partnerships", editable=False)
     preliminary_agreement_type = models.CharField("نوع الاتفاق المبدئي", max_length=32, choices=PreliminaryAgreementType.choices, blank=True, default="", editable=False)
+    partnership_type = models.ForeignKey("partnerships.PartnershipType", on_delete=models.PROTECT, null=True, blank=True, related_name="partnerships", verbose_name="نوع الشراكة")
+    signing_region = models.ForeignKey("regions.Region", on_delete=models.PROTECT, null=True, blank=True, related_name="signed_partnerships", verbose_name="منطقة التوقيع")
+    signing_city = models.CharField("مدينة التوقيع", max_length=120, blank=True, default="")
     development_state_at = models.DateTimeField(default=timezone.now, editable=False)
+    agreement_number = models.CharField("رقم الاتفاقية", max_length=24, unique=True, null=True, blank=True, editable=False)
+    institution_signatory = models.CharField("اسم موقّع الشراكة من طرف المؤسسة", max_length=160, blank=True, default="")
+    institution_signatory_title = models.CharField("صفته الاعتبارية (المؤسسة)", max_length=160, blank=True, default="")
+    partner_signatory = models.CharField("اسم موقّع الشراكة من طرف الجهة", max_length=160, blank=True, default="")
+    partner_signatory_title = models.CharField("صفته الاعتبارية (الجهة)", max_length=160, blank=True, default="")
+    partner_rep_email = models.EmailField("البريد الإلكتروني لممثل الجهة", max_length=254, blank=True, default="")
+    partner_rep_phone = models.CharField("رقم الجوال لممثل الجهة", max_length=32, blank=True, default="")
+    institution_rep_name = models.CharField("اسم ممثل المؤسسة", max_length=160, blank=True, default="")
+    institution_rep_email = models.EmailField("البريد الإلكتروني لممثل المؤسسة", max_length=254, blank=True, default="")
+    institution_rep_phone = models.CharField("رقم الجوال لممثل المؤسسة", max_length=32, blank=True, default="")
+    signed_on = models.DateField("تاريخ التوقيع (بداية الشراكة)", null=True, blank=True)
+    duration_months = models.PositiveSmallIntegerField("مدة الاتفاقية (بالأشهر)", null=True, blank=True, validators=[MinValueValidator(1), MaxValueValidator(600)])
+    renewal_rule = models.CharField("نوع التجديد", max_length=16, choices=RenewalRule.choices, blank=True, default="")
+    objective = models.TextField("هدف الشراكة", max_length=2000, blank=True, default="")
+    announcement = models.TextField("خبر عن الشراكة", max_length=2000, blank=True, default="")
+    audience = models.TextField("الفئات المستهدفة", max_length=2000, blank=True, default="")
+    expected_results = models.TextField("النتائج المتوقعة", max_length=2000, blank=True, default="")
     version = models.PositiveBigIntegerField(default=1, editable=False)
     request_key = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, editable=False, related_name="created_partnerships")
@@ -66,6 +129,18 @@ class Partnership(models.Model):
         self.name_key = self.name.casefold()
         self.representative = normalize_name(self.representative)
         super().save(*args, **kwargs)
+
+    @property
+    def calculated_expiry(self):
+        if self.signed_on and self.duration_months:
+            from agreement_clauses.calendar import end_after_months
+            return end_after_months(self.signed_on, self.duration_months)
+        return None
+
+    def ensure_agreement_number(self):
+        if not self.agreement_number and self.pk:
+            self.agreement_number = f"AGR-{self.pk:06d}"
+            Partnership.objects.filter(pk=self.pk, agreement_number__isnull=True).update(agreement_number=self.agreement_number)
 
     def __str__(self):
         return self.name
@@ -193,3 +268,20 @@ class SponsorRegistrationRequest(models.Model):
 
     def __str__(self):
         return f"{self.reference_code} · {self.name}"
+
+class PartnershipTeamMember(models.Model):
+    partnership = models.ForeignKey(Partnership, on_delete=models.CASCADE, related_name="team_members")
+    side = models.CharField("الفريق", max_length=12, choices=TeamSide.choices)
+    name = models.CharField("الاسم", max_length=160, validators=[validate_name])
+    phone = models.CharField("الهاتف", max_length=32, blank=True, default="")
+    email = models.EmailField("البريد الإلكتروني", max_length=254, blank=True, default="")
+    organization = models.CharField("الجهة أو الإدارة", max_length=160, blank=True, default="")
+    role = models.CharField("الصفة", max_length=16, choices=TeamMemberRole.choices)
+
+    class Meta:
+        ordering = ["pk"]
+        default_permissions = ()
+
+    def __str__(self):
+        return f"{self.name} ({self.get_role_display()})"
+

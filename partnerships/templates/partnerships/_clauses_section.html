@@ -1,0 +1,36 @@
+<div data-clause-builder data-clause-catalog="clause-catalog-data" data-allow-progress="{% if allow_progress %}1{% else %}0{% endif %}">
+  <input type="hidden" name="clauses_json" value="{{ clauses_json|default:'[]' }}" data-clauses-input>
+  <div class="clause-picker-row">
+    <div class="partnership-field">
+      <label for="clause-picker-{{ section_id|default:'main' }}">بند الاتفاقية <span class="required" aria-hidden="true">*</span></label>
+      <select id="clause-picker-{{ section_id|default:'main' }}" data-clause-select>
+        <option value="">اختر بند الاتفاقية</option>
+      </select>
+    </div>
+    <div class="partnership-field">
+      <label for="clause-resp-{{ section_id|default:'main' }}">المسؤولية <span class="required" aria-hidden="true">*</span></label>
+      <select id="clause-resp-{{ section_id|default:'main' }}" data-responsibility-select>
+        <option value="">اختر المسؤولية</option>
+      </select>
+    </div>
+    <div>
+      <button type="button" class="button button-secondary" data-add-clause-row>+ إضافة بند</button>
+    </div>
+  </div>
+  <div class="field-error" id="clauses-errors" data-clauses-error role="alert">{{ clauses_error }}</div>
+  <div class="table-scroll">
+    <table class="partnership-table" data-no-export>
+      <caption class="visually-hidden">بنود الاتفاقية المرتبطة بالشراكة</caption>
+      <thead>
+        <tr>
+          <th scope="col">بند الاتفاقية</th>
+          <th scope="col">المسؤولية</th>
+          {% if allow_progress %}<th scope="col">نسبة الإنجاز (%)</th>{% endif %}
+          <th scope="col">الإجراء</th>
+        </tr>
+      </thead>
+      <tbody data-clauses-tbody></tbody>
+    </table>
+  </div>
+  <p class="empty-state" data-clauses-empty>لم تُضف بنود اتفاقية بعد. اختر بندًا وحدّد المسؤولية ثم اضغط «إضافة بند».</p>
+</div>

@@ -102,7 +102,9 @@ def change(actor, partnership_id, agreement_id, post):
         if not partnership.is_active:
             raise WorkflowConflict("يجب تفعيل الشراكة أولًا لتعديل الاتفاقيات أو البنود.")
 
-        if operation in {"create_agreement", "rename_agreement"}:
+        if operation == "create_agreement":
+            raise PermissionDenied("تم إلغاء إنشاء الاتفاقيات المنفصلة؛ تُدار البنود مباشرة عبر الشراكة.")
+        if operation == "rename_agreement":
             if (operation == "rename_agreement") != bool(agreement) or state.get("kind") != "title":
                 raise signing.BadSignature
             if agreement and state.get("title") != agreement.title:

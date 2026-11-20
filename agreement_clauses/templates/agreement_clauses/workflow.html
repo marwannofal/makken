@@ -58,30 +58,6 @@
     {% endallowed %}
   {% endif %}
 </section>
-{% if not agreement %}
-<section class="partnership-card clause-card">
-  <header class="card-heading"><div><p class="eyebrow">الاتفاقيات المرتبطة</p><h2>اتفاقيات الشراكة</h2></div></header>
-  {% if partnership.is_active %}
-    {% allowed 'partnerships' 'create' partnership %}
-      <form class="clause-inline" method="post" data-market-confirm="هل تريد إضافة اتفاقية لهذه الشراكة؟">{% csrf_token %}
-        <input type="hidden" name="operation" value="create_agreement"><input type="hidden" name="snapshot" value="{{ title_token }}">
-        <div class="partnership-field">{{ title_form.title.label_tag }}{{ title_form.title }}{{ title_form.title.errors }}</div>
-        <button class="button button-primary" type="submit">إضافة اتفاقية</button>
-      </form>
-    {% endallowed %}
-  {% endif %}
-  <div class="table-scroll" tabindex="0" aria-label="جدول اتفاقيات الشراكة">
-    <table class="partnership-table"><caption class="visually-hidden">اتفاقيات الشراكة</caption>
-      <thead><tr><th scope="col">الاتفاقية</th><th scope="col">عدد البنود</th><th scope="col">نسبة الإنجاز</th><th scope="col">الإجراء</th></tr></thead>
-      <tbody>{% for item in agreements %}
-        <tr><th scope="row"><bdi>{{ item.number }}</bdi> · {{ item.title }}</th><td>{{ item.clause_count }}</td><td><bdi>{% include "agreement_clauses/_percent.html" with value=item.progress only %}</bdi></td>
-          <td><a class="button button-secondary" href="{% url 'partnerships:agreement' partnership.pk item.pk %}">بطاقة المتابعة</a>
-          <a class="button button-secondary" href="{% url 'partnerships:agreement_details' partnership.pk item.pk %}">البيانات الداخلية</a></td></tr>
-      {% empty %}<tr><td colspan="4">لا توجد اتفاقيات مرتبطة بعد.</td></tr>{% endfor %}</tbody>
-    </table>
-  </div>
-</section>
-{% endif %}
 <section class="partnership-card clause-card" id="agreement-clauses">
   <header class="card-heading"><div><p class="eyebrow">المسؤوليات والمتابعة</p><h2>{% if agreement %}بنود الاتفاقية{% else %}بنود الشراكة المباشرة{% endif %}</h2>
     <p>اختر بندًا أو أكثر من الدليل. يمكنك تعديل المسؤولية ونسبة الإنجاز لكل بند على حدة.</p></div>

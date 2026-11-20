@@ -85,7 +85,7 @@ def requested_operations(request,module,view,kwargs):
         if request.method == 'POST' and request.POST.get('operation') in {'save_details', 'renew'}:
             return ['view', 'edit']
         raise PermissionDenied
-    if (module == 'agreement_classifications' and name == 'classifications') or (module == 'departments' and name == 'departments'):
+    if (module == 'agreement_classifications' and name == 'classifications') or (module == 'departments' and name == 'departments') or (module == 'partnership_types' and name == 'partnership_types'):
         if request.method in {'GET', 'HEAD'}:
             edit = request.GET.get('edit')
             return ['view', 'create' if edit == 'new' else 'edit'] if edit else ['view']
@@ -138,6 +138,9 @@ def requested_operations(request,module,view,kwargs):
     if module=='care_states':return ['view','edit']
     if module=='partnerships':
         action=post.get('action')
+        if name == 'create_willingness' and action == 'create_willingness':
+            implementation._load(post.get('snapshot'), request.user, 'editor')
+            return ['view', 'create', *_status_permission(module, None, post.get('is_active'), True), *_details_permissions(module, None, post)]
         if action not in {'preview','confirm'}:raise PermissionDenied
         if name in {'create','create_willingness','edit'}:
             is_create = name in {'create','create_willingness'}

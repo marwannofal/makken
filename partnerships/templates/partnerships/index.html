@@ -3,7 +3,7 @@
 
 {% load static partnership_states %}
 {% block title %}{{ page_heading }} | مكّن{% endblock %}
-{% block extra_head %}<link rel="stylesheet" href="{% static 'partnerships/willingness_upload.css' %}?v=20261017-1"><link rel="stylesheet" href="{% static 'care_states/states.css' %}?v=20261015-1"><link rel="stylesheet" href="{% static 'partnerships/partnerships.css' %}?v=20261015-1"><script src="{% static 'partnerships/partnerships.js' %}?v=20261017-uploads" defer></script>{% include "partnerships/_financial_assets.html" %}{% include "partnerships/_development_filter_assets.html" %}<script src="{% static 'partnerships/willingness_upload.js' %}?v=20261017-1" defer></script><link rel="stylesheet" href="{% static 'partnerships/development_column.css' %}?v=20261017-transition">
+{% block extra_head %}<link rel="stylesheet" href="{% static 'partnerships/willingness_upload.css' %}?v=20261017-1"><link rel="stylesheet" href="{% static 'care_states/states.css' %}?v=20261015-1"><link rel="stylesheet" href="{% static 'partnerships/partnerships.css' %}?v=20261015-1"><script src="{% static 'partnerships/partnerships.js' %}?v=20261017-uploads" defer></script>{% include "partnerships/_financial_assets.html" %}{% include "partnerships/_development_filter_assets.html" %}<script src="{% static 'partnerships/willingness_upload.js' %}?v=20261120-1" defer></script><link rel="stylesheet" href="{% static 'partnerships/development_column.css' %}?v=20261017-transition"><link rel="stylesheet" href="{% static 'partnerships/willingness_clauses.css' %}?v=20261120-3"><script src="{% static 'partnerships/willingness_clauses.js' %}?v=20261120-2" defer></script><link rel="stylesheet" href="{% static 'market_needs/market.css' %}"><script src="{% static 'market_needs/market.js' %}" defer></script>
 
 {% endblock %}
 {% block content %}
@@ -20,5 +20,6 @@
 <h3>المناطق الإدارية للجهة</h3><p>{% for region in detail.administrative_regions.all %}<span class="tag">{{ region.name }}</span>{% empty %}لم تُحدد بعد؛ لا تظهر الجهة للمستخدم المقيّد بمناطق.{% endfor %}</p>{% include "access_control/_regional_notice.html" with item=detail %}
 {% include "partnerships/_willingness_attachments.html" %}{% include "partnerships/_history.html" %}
 {% include "agreement_clauses/_partnership_panel.html" %}<div class="dialog-actions">{% allowed 'partnerships' 'edit' detail %}<a class="button button-primary" href="{% url 'partnerships:edit' detail.pk %}">تعديل بيانات الجهة</a>{% endallowed %}<a class="button button-secondary" href="{{ list_url }}">إغلاق</a></div></div></dialog>{% endif %}
+{{ clause_catalog_data|json_script:"clause-catalog-data" }}
 {% include "partnerships/_dialogs.html" %}
 {% endblock %}

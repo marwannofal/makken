@@ -111,5 +111,7 @@ urlpatterns = [_access_path('access-control/', _access_include('access_control.u
 
 urlpatterns = [path('execution/', include('market_needs.execution_urls'))] + urlpatterns
 
+from partnerships.partnership_types import partnership_types_index as _partnership_types_view
 urlpatterns = [path('', include('makken_mail.urls')),
-               path('settings/agreement-clauses/', include('agreement_clauses.urls'))] + urlpatterns
+               path('settings/agreement-clauses/', include('agreement_clauses.urls')),
+               path('settings/partnership-types/', _partnership_types_view, name='partnership_types')] + urlpatterns

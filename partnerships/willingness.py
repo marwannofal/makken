@@ -14,7 +14,7 @@ from PIL import Image
 from pypdf import PdfReader
 from accounts.security import add_login_headers
 from .attachment_storage import willingness_storage
-from .models import PreliminaryAgreementType, WillingnessAttachment
+from .models import PartnershipType, PreliminaryAgreementType, WillingnessAttachment
 
 MAX_FILE_SIZE = 100 * 1024 * 1024
 MAX_FILES = 20
@@ -87,9 +87,37 @@ class MultipleAttachmentField(forms.FileField):
         return cleaned
 
 
+LEGACY_TYPE_BY_NAME = {
+    'مذكرة تفاهم': PreliminaryAgreementType.MOU,
+    'تعاون': PreliminaryAgreementType.COOPERATION,
+    'عقد خدمة': PreliminaryAgreementType.SERVICE_CONTRACT,
+    'اجتماعية': PreliminaryAgreementType.SOCIAL,
+}
+LEGACY_NAME_BY_CODE = {v: k for k, v in LEGACY_TYPE_BY_NAME.items()}
+
+
+class PartnershipTypeField(forms.ModelChoiceField):
+    def to_python(self, value):
+        if isinstance(value, str) and value in LEGACY_NAME_BY_CODE:
+            obj = self.queryset.filter(name=LEGACY_NAME_BY_CODE[value]).first()
+            if obj is not None:
+                return obj
+        return super().to_python(value)
+
+
 class WillingnessTransitionForm(forms.Form):
-    agreement_type = forms.ChoiceField(label='نوع الاتفاق المبدئي', choices=[('', 'اختر نوع الاتفاق المبدئي'), *PreliminaryAgreementType.choices], error_messages={'required':'اختر نوع الاتفاق المبدئي.', 'invalid_choice':'اختر نوعًا صحيحًا من القائمة.'}, widget=forms.Select(attrs={'id':'willingness-agreement','required':True,'aria-describedby':'agreement-errors'}))
-    attachments = MultipleAttachmentField(label='المرفقات الداعمة', widget=MultipleAttachmentInput(attrs={'id':'willingness-files','accept':'.pdf,.png,.jpg,.jpeg','required':True,'aria-describedby':'willingness-upload-help attachments-errors'}))
+    agreement_type = PartnershipTypeField(
+        label='نوع الشراكة',
+        queryset=PartnershipType.objects.none(),
+        empty_label='اختر نوع الشراكة',
+        error_messages={'required': 'اختر نوع الشراكة.', 'invalid_choice': 'اختر نوعًا صحيحًا من القائمة.'},
+        widget=forms.Select(attrs={'id': 'willingness-agreement', 'required': True, 'aria-describedby': 'agreement-errors'}),
+    )
+    attachments = MultipleAttachmentField(label='المرفقات الداعمة', widget=MultipleAttachmentInput(attrs={'id': 'willingness-files', 'accept': '.pdf,.png,.jpg,.jpeg', 'required': True, 'aria-describedby': 'willingness-upload-help attachments-errors'}))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['agreement_type'].queryset = PartnershipType.objects.filter(is_active=True).order_by('id')
 
 
 def save_supporting_files(item, cleaned, user, saved_paths):
@@ -101,7 +129,12 @@ def save_supporting_files(item, cleaned, user, saved_paths):
         if actual != name:
             saved_paths.append(actual)
         WillingnessAttachment.objects.create(partnership=item, file=actual, original_name=safe_filename(upload.name), size=upload.size, content_type=upload.verified_content_type, uploaded_by=user)
-    item.preliminary_agreement_type = cleaned['agreement_type']
+    selected_type = cleaned['agreement_type']
+    if isinstance(selected_type, PartnershipType):
+        item.partnership_type = selected_type
+        item.preliminary_agreement_type = LEGACY_TYPE_BY_NAME.get(selected_type.name, PreliminaryAgreementType.OTHER)
+    else:
+        item.preliminary_agreement_type = selected_type if selected_type in PreliminaryAgreementType.values else PreliminaryAgreementType.OTHER
 
 
 @module_view('partnerships')
