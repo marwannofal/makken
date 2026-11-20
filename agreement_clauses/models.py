@@ -276,3 +276,27 @@ def mean_progress(total, count):
     if not count:
         return None
     return (Decimal(total) / count).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+
+class AgreementClassification(models.Model):
+    name = models.CharField("تصنيف الاتفاقية", max_length=200, validators=[validate_name])
+    name_key = models.CharField(max_length=600, editable=False)
+    is_active = models.BooleanField("نشط", default=True)
+    revision = models.PositiveIntegerField(default=1, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["id"]
+        default_permissions = ()
+        constraints = [
+            models.UniqueConstraint(fields=["name_key"], name="mk_agreement_classifications_name_uq"),
+        ]
+
+    def save(self, *args, **kwargs):
+        self.name = normalize_name(self.name)
+        self.name_key = self.name.casefold()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name

@@ -5,19 +5,24 @@
 <span>تفعيل النوع يحدد متى يُرسل البريد. اختيار المستلم لا يمنحه صلاحية الاطلاع على السجل.</span>
 <a class="button button-secondary" href="{% url 'makken_mail:smtp' %}">إعدادات المزود</a>
 </div>
-<section class="partnership-card mail-card">
-<header class="card-heading"><div><p class="eyebrow">01 · تفضيلات المستخدمين</p><h2>اختر مستلمًا</h2></div></header>
+<div class="mail-subtabs" role="tablist" aria-label="أقسام إدارة التنبيهات" data-mail-tabs>
+<button type="button" role="tab" id="mail-tab-btn-user" aria-controls="mail-panel-user" aria-selected="{% if active_tab != 'rules' %}true{% else %}false{% endif %}" class="mail-subtab{% if active_tab != 'rules' %} is-active{% endif %}" data-mail-tab="user">إدارة التنبيهات لمستخدم معين</button>
+<button type="button" role="tab" id="mail-tab-btn-rules" aria-controls="mail-panel-rules" aria-selected="{% if active_tab == 'rules' %}true{% else %}false{% endif %}" class="mail-subtab{% if active_tab == 'rules' %} is-active{% endif %}" data-mail-tab="rules">إدارة التنبيهات للمستخدمين حسب نوع الإجراء <span class="mail-subtab-count"><bdi>{{ rules.paginator.count }}</bdi></span></button>
+</div>
+<section id="mail-panel-user" role="tabpanel" aria-labelledby="mail-tab-btn-user" data-mail-panel="user" class="partnership-card mail-card"{% if active_tab == 'rules' %} hidden{% endif %}>
+<header class="card-heading"><div><p class="eyebrow">01 · تفضيلات المستخدمين</p><h2>إدارة التنبيهات لمستخدم معين</h2></div></header>
 <form method="get" action="{% url 'makken_mail:recipient' %}" class="mail-inline">
 <div class="partnership-field"><label for="mail-person">المستخدم</label><select id="mail-person" name="person" data-market-select data-label="اختر المستخدم" required><option value="">اختر المستخدم</option>{% for person in users %}<option value="{{ person.pk }}">{{ person.get_full_name|default:person.get_username }} · {{ person.get_username }}</option>{% endfor %}</select></div>
 <button class="button button-primary" type="submit">إدارة إشعاراته</button>
 </form>
 </section>
-<section class="partnership-card mail-card">
-<header class="card-heading"><div><p class="eyebrow">02 · دليل الأحداث</p><h2>أنواع البريد وقواعد التوجيه</h2></div><span class="subtle-badge">عدد السجلات: {{ rules.paginator.count }}</span></header>
+<section id="mail-panel-rules" role="tabpanel" aria-labelledby="mail-tab-btn-rules" data-mail-panel="rules" class="partnership-card mail-card"{% if active_tab != 'rules' %} hidden{% endif %}>
+<header class="card-heading"><div><p class="eyebrow">02 · دليل الأحداث</p><h2>إدارة التنبيهات للمستخدمين حسب نوع الإجراء</h2></div><span class="subtle-badge">عدد السجلات: {{ rules.paginator.count }}</span></header>
 <form class="mail-inline" method="get">
+<input type="hidden" name="tab" value="rules">
 <div class="partnership-field"><label for="mail-query">البحث</label><input id="mail-query" name="q" value="{{ q }}" maxlength="100" placeholder="ابحث عن نوع إشعار"></div>
 <div class="partnership-field"><label for="mail-category">القسم</label><select id="mail-category" name="category"><option value="">جميع الأقسام</option>{% for c in categories %}<option{% if category == c %} selected{% endif %}>{{ c }}</option>{% endfor %}</select></div>
-<button class="button button-primary" type="submit">بحث</button><a class="button button-secondary" href="{% url 'makken_mail:index' %}">مسح</a>
+<button class="button button-primary" type="submit">بحث</button><a class="button button-secondary" href="{% url 'makken_mail:index' %}?tab=rules">مسح</a>
 </form>
 <div class="table-scroll" tabindex="0"><table class="partnership-table" data-no-export>
 <thead><tr><th>النوع</th><th>الحالة</th><th>التوجيه التلقائي</th><th>مستلمون إضافيون</th><th>الإجراء</th></tr></thead>

@@ -49,3 +49,27 @@
   run.addEventListener('click', search);
   term.addEventListener('keydown', event => { if (event.key === 'Enter') { event.preventDefault(); search(); } });
 })();
+
+(() => {
+  'use strict';
+  const bar = document.querySelector('[data-mail-tabs]');
+  if (!bar) return;
+  const buttons = Array.from(bar.querySelectorAll('[data-mail-tab]'));
+  const panels = Array.from(document.querySelectorAll('[data-mail-panel]'));
+  const activate = (name, pushUrl) => {
+    buttons.forEach(btn => {
+      const on = btn.dataset.mailTab === name;
+      btn.classList.toggle('is-active', on);
+      btn.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    panels.forEach(panel => {
+      panel.hidden = panel.dataset.mailPanel !== name;
+    });
+    if (pushUrl && window.history && window.history.replaceState) {
+      const url = new URL(window.location.href);
+      url.searchParams.set('tab', name);
+      window.history.replaceState(null, '', url.toString());
+    }
+  };
+  buttons.forEach(btn => btn.addEventListener('click', () => activate(btn.dataset.mailTab, true)));
+})();

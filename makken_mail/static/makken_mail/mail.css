@@ -79,3 +79,42 @@
 .work-stats-table tfoot th, .work-stats-table tfoot td { background: #f0f9f7; border-top: 2px solid #cfe7e3; }
 @media (max-width: 1000px) { .work-stats-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 560px) { .work-stats-kpis { grid-template-columns: 1fr; } }
+
+.mail-subtabs { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+.mail-subtab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 18px;
+  border: 1px solid #d5e8e5;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #255a5c;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.mail-subtab:hover { border-color: #24b3af; color: #167a77; }
+.mail-subtab.is-active {
+  background: #24b3af;
+  border-color: #24b3af;
+  color: #ffffff;
+}
+.mail-subtab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  background: #edf7f6;
+  color: #176e6b;
+}
+.mail-subtab.is-active .mail-subtab-count {
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+}
+.mail-card[hidden] { display: none !important; }

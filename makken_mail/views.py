@@ -61,9 +61,18 @@ def index(request):
     params = request.GET.copy()
     params.pop('page', None)
     smtp = SMTPConfig.objects.filter(pk=1).first()
+    req_tab = request.GET.get('tab', '')
+    if req_tab in {'user', 'rules'}:
+        active_tab = req_tab
+    elif query or category or request.GET.get('page'):
+        active_tab = 'rules'
+    else:
+        active_tab = 'user'
+    if active_tab == 'rules':
+        params['tab'] = 'rules'
     return page(request, 'rules', rules=paginated, users=users, q=query, category=category,
                 categories=sorted(set(v.category for v in CATALOG.values())), configured=ready(smtp),
-                sending_enabled=bool(smtp and smtp.enabled), paging=params.urlencode())
+                sending_enabled=bool(smtp and smtp.enabled), paging=params.urlencode(), active_tab=active_tab)
 
 
 @superuser_view
@@ -377,7 +386,15 @@ def target_options(request):
             field = {'market_needs.sponsorship': 'partnership__name', 'market_needs.needexecution': 'need__title',
                      'market_needs.need': 'title'}.get(model, 'name')
             query = query.filter(**{field + '__icontains': term})
-    return add_login_headers(JsonResponse({'results': [{'id': str(row.pk), 'label': record_label(row)}
+    def _option_label(row):
+        parts = [f'#{row.pk}', record_label(row)]
+        dt = getattr(row, 'starts_on', None) or getattr(row, 'created_at', None) or getattr(row, 'updated_at', None)
+        if dt:
+            d = timezone.localtime(dt).date() if hasattr(dt, 'hour') else dt
+            parts.append(d.strftime('%Y-%m-%d'))
+        return ' · '.join(parts)
+
+    return add_login_headers(JsonResponse({'results': [{'id': str(row.pk), 'label': _option_label(row)}
                                                       for row in query.order_by('-pk')[:40]]}))
 
 

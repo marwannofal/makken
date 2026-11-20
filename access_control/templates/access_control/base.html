@@ -12,7 +12,7 @@
 {% endblock %}
 {% block content %}
 <section class="page-introduction"><div><p class="eyebrow">إدارة آمنة · مكّن</p><h1>{% block access_heading %}إدارة المستخدمين والصلاحيات{% endblock %}<span class="greeting-dot">.</span></h1><p class="page-description">{% block access_description %}التحكم في حسابات المستخدمين والأدوار وصلاحيات الوصول إلى صفحات النظام{% endblock %}</p></div></section>
-<nav class="ac-tabs" aria-label="أقسام إدارة الوصول">
+{% if access_tab != 'work' %}<nav class="ac-tabs" aria-label="أقسام إدارة الوصول">
 {% if request.user.is_superuser %}
 <a href="{% url 'access_control:index' %}"{% if access_tab == 'users' %} aria-current="page"{% endif %}>المستخدمون</a>
 <a href="{% url 'access_control:roles' %}"{% if access_tab == 'roles' %} aria-current="page"{% endif %}>الأدوار</a>
@@ -22,10 +22,10 @@
 <a href="{% url 'makken_mail:index' %}"{% if access_tab == 'mail' %} aria-current="page"{% endif %}>إشعارات البريد</a>
 {% endif %}
 {% allowed 'user_activity' 'view' %}<a href="{% url 'access_control:activity' %}"{% if access_tab == 'activity' %} aria-current="page"{% endif %}>نشاط المستخدمين</a>{% endallowed %}
-</nav>
+</nav>{% endif %}
 {% if error %}<p class="feedback feedback-error" role="alert">{{ error }}</p>{% endif %}
 {% for message in messages %}<p class="feedback {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}feedback-error{% else %}feedback-success{% endif %}" role="status">{{ message }}</p>{% endfor %}
 <div class="ac-workspace">{% block access_content %}{% endblock %}</div>
 <dialog class="partnership-dialog confirmation-dialog" id="ac-confirm" aria-labelledby="ac-confirm-title"><div class="dialog-body"><div class="dialog-top"><span class="dialog-symbol"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3 3 7v5c0 5 9 9 9 9s9-4 9-9V7Z"/><path d="m8 12 3 3 5-6"/></svg></span><button type="button" class="icon-button" data-ac-close aria-label="إغلاق"><svg aria-hidden="true"><use href="#icon-close"/></svg></button></div><p class="eyebrow">مراجعة قبل التنفيذ</p><h2 id="ac-confirm-title">تأكيد العملية</h2><p data-ac-message class="dialog-description"></p><div class="dialog-actions"><button type="button" class="button button-primary" data-ac-yes>تأكيد</button><button type="button" class="button button-secondary" data-ac-close autofocus>إلغاء</button></div></div></dialog>
-<dialog class="partnership-dialog confirmation-dialog" id="ac-feedback" aria-labelledby="ac-feedback-title"><div class="dialog-body"><h2 id="ac-feedback-title">تنبيه</h2><p data-ac-feedback-message role="alert"></p><div class="dialog-actions"><button type="button" class="button button-primary" data-ac-close>فهمت</button></div></div></dialog>
+<dialog class="partnership-dialog confirmation-dialog" id="ac-feedback" aria-labelledby="ac-feedback-title"><div class="dialog-body"><h2 id="ac-feedback-title">تنبيه</h2><p data-ac-feedback-message role="alert"></p><div class="dialog-actions"><button type="button" class="button button-primary" data-ac-close>موافق</button></div></div></dialog>
 {% endblock %}

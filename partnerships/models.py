@@ -7,7 +7,7 @@ from care_states.models import DevelopmentState
 from entities.models import normalize_name, validate_name
 
 from decimal import Decimal
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, RegexValidator
 
 
 class Scope(models.TextChoices):
@@ -16,10 +16,11 @@ class Scope(models.TextChoices):
 
 
 class PreliminaryAgreementType(models.TextChoices):
-    OFFICIAL_LETTER = "official_letter", "خطاب رسمي"
-    SIGNED_MEMO = "signed_memo", "مذكرة موقعة"
-    SIGNED_MEETING_MINUTES = "signed_meeting_minutes", "محضر اجتماع موقع"
-    AGREEMENT_OR_MOU = "agreement_or_mou", "اتفاقية أو مذكرة تفاهم"
+    MOU = "mou", "مذكرة تفاهم"
+    COOPERATION = "cooperation", "تعاون"
+    SERVICE_CONTRACT = "service_contract", "عقد خدمة"
+    SOCIAL = "social", "اجتماعية"
+    OTHER = "other", "أخرى"
 
 
 class Partnership(models.Model):
@@ -33,6 +34,7 @@ class Partnership(models.Model):
     financial_capacity = models.DecimalField("القدرة المالية", max_digits=14, decimal_places=2, null=True, blank=True, validators=[MinValueValidator(Decimal("0"))])
     entity = models.ForeignKey("entities.Entity", on_delete=models.PROTECT, related_name="partnerships", verbose_name="الكيان")
     scope = models.CharField("النطاق", max_length=8, choices=Scope.choices)
+    partnership_date = models.CharField("تاريخ الشراكة", max_length=7, blank=True, default="", validators=[RegexValidator(r"\A(?:[12]\d{3}-(?:0[1-9]|1[0-2]))?\Z", "أدخل تاريخ الشراكة بصيغة الشهر والسنة (YYYY-MM).")])
     starts_on = models.DateField("تاريخ بداية الشراكة", null=True, blank=True)
     ends_on = models.DateField("تاريخ نهاية الشراكة", null=True, blank=True)
     is_active = models.BooleanField("حالة السجل", default=True)

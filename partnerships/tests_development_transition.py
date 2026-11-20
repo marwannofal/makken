@@ -42,7 +42,7 @@ class DevelopmentTransitionTests(TestCase):
     def confirm(self, token=None):
         writer = PdfWriter(); writer.add_blank_page(width=100,height=100)
         data = BytesIO(); writer.write(data)
-        return self.client.post(self.url, {'action':'confirm','token':token or self.transition_preview(), 'agreement_type':'official_letter', 'attachments':[SimpleUploadedFile('agreement.pdf',data.getvalue(),content_type='application/pdf')]})
+        return self.client.post(self.url, {'action':'confirm','token':token or self.transition_preview(), 'agreement_type':'mou', 'attachments':[SimpleUploadedFile('agreement.pdf',data.getvalue(),content_type='application/pdf')]})
 
     def test_preview_cancel_and_get_do_not_write(self):
         token = self.transition_preview()

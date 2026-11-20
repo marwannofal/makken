@@ -40,7 +40,7 @@ class WillingnessAttachmentTests(TestCase):
         self.item,_=self.save();self.original=self.item.development_state_at
         self.url='/partnerships/?q='+self.item.name+'&capacity_min=10&capacity_max=200000'
 
-    def post(self,files=None,agreement='official_letter',ajax=True,token=None):
+    def post(self,files=None,agreement='mou',ajax=True,token=None):
         values={'action':'confirm','token':token or self.transition_preview(),'agreement_type':agreement}
         if files is not None:values['attachments']=files
         return self.client.post(self.url,values,**({'HTTP_X_REQUESTED_WITH':'XMLHttpRequest'} if ajax else {}))
@@ -55,7 +55,7 @@ class WillingnessAttachmentTests(TestCase):
         self.assertFalse(any(Path(self.private.name).rglob('*.*')))
 
     def test_all_four_choices_and_required_form(self):
-        self.assertEqual(list(PreliminaryAgreementType.labels),['خطاب رسمي','مذكرة موقعة','محضر اجتماع موقع','اتفاقية أو مذكرة تفاهم'])
+        self.assertEqual(list(PreliminaryAgreementType.labels),['مذكرة تفاهم','تعاون','عقد خدمة','اجتماعية','أخرى'])
         response=self.post()
         self.assertEqual(response.status_code,400)
         self.assertIn('attachments',response.json()['errors']);self.assert_unchanged()
@@ -68,11 +68,11 @@ class WillingnessAttachmentTests(TestCase):
             # Each choice is a real, valid enum value, independently checked by the form.
             from .willingness import WillingnessTransitionForm
             self.assertTrue(WillingnessTransitionForm({'agreement_type':agreement},{'attachments':[pdf()]}).is_valid())
-        response=self.post([pdf(),image(),image('JPEG','صورة.jpg'),image('JPEG','صورة ثانية.jpeg')],agreement='agreement_or_mou')
+        response=self.post([pdf(),image(),image('JPEG','صورة.jpg'),image('JPEG','صورة ثانية.jpeg')],agreement='cooperation')
         self.assertEqual(response.status_code,200,response.content)
         self.assertIn('redirect',response.json())
         self.item.refresh_from_db();self.assertEqual(self.item.development_state_id,'willingness')
-        self.assertEqual(self.item.preliminary_agreement_type,'agreement_or_mou')
+        self.assertEqual(self.item.preliminary_agreement_type,'cooperation')
         self.assertEqual(self.item.willingness_attachments.count(),4)
         for attachment in self.item.willingness_attachments.all():
             self.assertTrue(Path(attachment.file.path).is_file())
@@ -82,7 +82,7 @@ class WillingnessAttachmentTests(TestCase):
             with self.assertRaises(ValueError):_=attachment.file.url
         detail=self.client.get('/partnerships/',{'detail':self.item.pk})
         self.assertContains(detail,'المرفقات الداعمة للتحويل إلى رغبة')
-        self.assertContains(detail,'اتفاقية أو مذكرة تفاهم')
+        self.assertContains(detail,'تعاون')
         self.assertContains(detail,'willingness-attachment-card',count=4)
         self.assertContains(detail,'/download/',count=4)
         self.assertNotIn('private_uploads',detail.content.decode())

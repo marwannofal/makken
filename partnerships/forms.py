@@ -45,6 +45,7 @@ class PartnershipForm(forms.Form):
     entity_type = forms.ChoiceField(label="نوع الكيان", choices=[("", "اختر نوع الكيان"), *EntityType.choices])
     entity = forms.ModelChoiceField(label="الكيان", queryset=Entity.objects.none(), empty_label="اختر الكيان")
     scope = forms.ChoiceField(label="النطاق", choices=[("", "اختر النطاق"), *Scope.choices])
+    partnership_date = forms.CharField(label="تاريخ الشراكة", max_length=7, required=False, widget=forms.TextInput(attrs={"type": "month", "dir": "ltr", "placeholder": "YYYY-MM"}), help_text="اختر الشهر والسنة فقط (بدون يوم).")
     starts_on = term_date_field("تاريخ بداية الشراكة")
     ends_on = term_date_field("تاريخ نهاية الشراكة")
     is_active = forms.ChoiceField(label="حالة السجل", choices=[("1", "نشط"), ("0", "غير نشط")], widget=forms.RadioSelect, initial="1")
@@ -130,8 +131,18 @@ class PartnershipForm(forms.Form):
             result.append({"sector": sector, "shape": shape, "specializations": sorted(selected), "is_active": row["is_active"]})
         return result
 
+    def clean_partnership_date(self):
+        raw = (self.cleaned_data.get("partnership_date") or "").strip()
+        if not raw:
+            return ""
+        if not re.fullmatch(r"[12]\d{3}-(?:0[1-9]|1[0-2])", raw):
+            raise forms.ValidationError("أدخل تاريخ الشراكة بصيغة الشهر والسنة فقط (YYYY-MM).")
+        return raw
+
     def clean(self):
         data = super().clean()
+        if self.instance and self.add_prefix("partnership_date") not in self.data:
+            data["partnership_date"] = self.instance.partnership_date
         if self.instance and not any(self.add_prefix(name) in self.data for name in ("starts_on", "ends_on")):
             # An editor opened before the update may still submit a form without dates.
             data["starts_on"], data["ends_on"] = self.instance.starts_on, self.instance.ends_on

@@ -14,7 +14,7 @@ from .sponsor_requests import (
 from .willingness import download_attachment
 
 app_name = "partnerships"
-urlpatterns = [path("<int:pk>/willingness/attachments/<int:attachment_id>/download/", download_attachment, name="attachment_download"), path("", views.index, name="index"), path("new/", views.editor, name="create"), path("<int:pk>/edit/", views.editor, name="edit")]
+urlpatterns = [path("<int:pk>/willingness/attachments/<int:attachment_id>/download/", download_attachment, name="attachment_download"), path("", views.index, name="index"), path("capability/", views.capability_index, name="capability_index"), path("willingness/", views.willingness_index, name="willingness_index"), path("willingness/new/", views.editor_willingness, name="create_willingness"), path("new/", views.editor, name="create"), path("<int:pk>/edit/", views.editor, name="edit")]
 
 urlpatterns += [
     path("agreements/inquiries/", agreement_inquiries, name="agreement_inquiries"),

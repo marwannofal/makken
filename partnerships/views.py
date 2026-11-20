@@ -98,7 +98,7 @@ def _fingerprint(data, lock=False):
 
 def _serialized(cleaned):
     return {"administrative_regions": [region.pk for region in cleaned["administrative_regions"]], "name": cleaned["name"], "representative": cleaned["representative"], "phone_country": cleaned["phone_country"], "phone": cleaned["phone"], "email": cleaned["email"], "entity_type": cleaned["entity_type"], "entity": str(cleaned["entity"].pk), "scope": cleaned["scope"], "is_active": cleaned["is_active"], "offerings": json.dumps(cleaned["offerings"]), "financial_capacity": amount_string(cleaned["financial_capacity"]),
-            "starts_on": cleaned["starts_on"].isoformat() if cleaned["starts_on"] else "",
+            "partnership_date": cleaned["partnership_date"], "starts_on": cleaned["starts_on"].isoformat() if cleaned["starts_on"] else "",
             "ends_on": cleaned["ends_on"].isoformat() if cleaned["ends_on"] else ""}
 
 
@@ -106,7 +106,7 @@ def _initial(item):
     if not item:
         return {"phone_country": "SA", "is_active": "1", "offerings": "[]"}
     return {"administrative_regions": list(item.administrative_regions.values_list("pk",flat=True)), "name": item.name, "representative": item.representative, "phone_country": item.phone_country, "phone": item.phone, "email": item.email, "entity_type": item.entity.entity_type, "entity": item.entity_id, "scope": item.scope, "is_active": "1" if item.is_active else "0", "offerings": json.dumps(offering_data(item)), "financial_capacity": amount_string(item.financial_capacity),
-            "starts_on": item.starts_on or "", "ends_on": item.ends_on or ""}
+            "partnership_date": item.partnership_date or "", "starts_on": item.starts_on or "", "ends_on": item.ends_on or ""}
 
 
 def _catalog(item):
@@ -143,11 +143,14 @@ def _save(payload, user):
         clean = form.cleaned_data
         ensure_allowed(item, "edit", clean["is_active"] == "1")
         new = item is None
+        initial_state = payload.get("initial_state") or DevelopmentState.CAPABILITY
+        if initial_state not in {DevelopmentState.CAPABILITY, DevelopmentState.WILLINGNESS}:
+            initial_state = DevelopmentState.CAPABILITY
         if new:
-            if not StateColor.objects.filter(pk=DevelopmentState.CAPABILITY).exists():
-                raise Conflict("حالة قدرة غير موجودة. تأكد من تطبيق ترحيلات حالات تطور المنظمات للرعاية.")
-            item = Partnership(request_key=payload["nonce"], created_by=user)
-        for field in ["name", "representative", "phone_country", "phone", "email", "entity", "scope", "financial_capacity", "starts_on", "ends_on"]:
+            if not StateColor.objects.filter(pk=initial_state).exists():
+                raise Conflict("حالة التطور المحددة غير موجودة. تأكد من تطبيق ترحيلات حالات تطور المنظمات للرعاية.")
+            item = Partnership(request_key=payload["nonce"], created_by=user, development_state_id=initial_state)
+        for field in ["name", "representative", "phone_country", "phone", "email", "entity", "scope", "financial_capacity", "partnership_date", "starts_on", "ends_on"]:
             setattr(item, field, clean[field])
         item.is_active = clean["is_active"] == "1"
         if not new:
@@ -155,7 +158,7 @@ def _save(payload, user):
         item.save()
         item.administrative_regions.set(clean["administrative_regions"])
         if new:
-            DevelopmentHistory.objects.create(partnership=item, state_id=DevelopmentState.CAPABILITY, entered_at=item.development_state_at)
+            DevelopmentHistory.objects.create(partnership=item, state_id=initial_state, entered_at=item.development_state_at)
         item.offerings.all().delete()
         for position, row in enumerate(clean["offerings"]):
             offering = PartnershipOffering.objects.create(partnership=item, sector_id=row["sector"], sponsorship_shape_id=row["shape"], is_active=row["is_active"], position=position)
@@ -166,11 +169,18 @@ def _save(payload, user):
 @module_view('partnerships')
 @login_required(login_url="accounts:login")
 @require_http_methods(["GET", "POST"])
-def editor(request, pk=None):
+def editor(request, pk=None, initial_state=DevelopmentState.CAPABILITY):
     item = get_object_or_404(_query(request.user), pk=pk) if pk else None
-    context = _base(request, "تعديل جهة لسجل الشراكات المحتملة التي لها القدرة" if item else "إضافة جهة لسجل الشراكات المحتملة التي لها القدرة", "partnership_editor")
+    is_will_create = item is None and initial_state == DevelopmentState.WILLINGNESS
+    heading = (
+        "تعديل جهة لسجل الشراكات"
+        if item
+        else ("إضافة جهة لسجل الشراكات المحتملة التي لها الرغبة" if is_will_create else "إضافة جهة لسجل الشراكات المحتملة التي لها القدرة")
+    )
+    active_nav = "partnerships_willingness" if is_will_create else "partnership_editor"
+    context = _base(request, heading, active_nav)
     status, pending = 200, None
-    snapshot = _sign({"kind": "editor", "id": pk, "version": item.version if item else None, "nonce": str(uuid.uuid4())}, request.user)
+    snapshot = _sign({"kind": "editor", "id": pk, "version": item.version if item else None, "nonce": str(uuid.uuid4()), "initial_state": initial_state}, request.user)
     form = PartnershipForm(initial=_initial(item), instance=item, actor=request.user)
     try:
         if request.method == "POST":
@@ -188,7 +198,7 @@ def editor(request, pk=None):
                     data = _serialized(form.cleaned_data)
                     token = _sign({**original, "kind": "save", "data": data, "catalog": _fingerprint(data)}, request.user)
                     pending = {"title": "تأكيد تعديل الجهة" if item else "تأكيد إضافة الجهة", "name": data["name"], "token": token, "action": "save", "button": "تأكيد الحفظ", "financial_capacity": data["financial_capacity"],
-                               "starts_on": form.cleaned_data["starts_on"], "ends_on": form.cleaned_data["ends_on"]}
+                               "partnership_date": form.cleaned_data["partnership_date"], "starts_on": form.cleaned_data["starts_on"], "ends_on": form.cleaned_data["ends_on"]}
                 else:
                     status = 400
             elif action == "confirm":
@@ -221,8 +231,16 @@ def editor(request, pk=None):
     if item:
         from agreement_clauses.workflow import partnership_panel
         context["clause_panel"] = partnership_panel(item)
-    context.update(item=item, form=form, snapshot=snapshot, pending=pending, catalog=_catalog(item), drafts=drafts, history=_history(item))
+    back_url = reverse("partnerships:willingness_index") if is_will_create else reverse("partnerships:capability_index")
+    context.update(item=item, form=form, snapshot=snapshot, pending=pending, catalog=_catalog(item), drafts=drafts, history=_history(item), back_url=back_url)
     return add_login_headers(render(request, "partnerships/editor.html", context, status=status))
+
+
+@module_view('partnerships')
+@login_required(login_url="accounts:login")
+@require_http_methods(["GET", "POST"])
+def editor_willingness(request):
+    return editor(request, pk=None, initial_state=DevelopmentState.WILLINGNESS)
 
 
 def _search(query, term):
@@ -251,8 +269,17 @@ def _search(query, term):
 @module_view('partnerships')
 @login_required(login_url="accounts:login")
 @require_http_methods(["GET", "POST"])
-def index(request):
-    context = _base(request, "إدارة سجل الشراكات", "partnerships")
+def index(request, fixed_state=None):
+    if fixed_state == DevelopmentState.CAPABILITY:
+        heading, active_nav = "إدارة سجل شراكات القدرة", "partnerships_capability"
+        add_url, reset_url = reverse("partnerships:create"), reverse("partnerships:capability_index")
+    elif fixed_state == DevelopmentState.WILLINGNESS:
+        heading, active_nav = "إدارة سجل شراكات الرغبة", "partnerships_willingness"
+        add_url, reset_url = reverse("partnerships:create_willingness"), reverse("partnerships:willingness_index")
+    else:
+        heading, active_nav = "إدارة سجل الشراكات", "partnerships"
+        add_url, reset_url = reverse("partnerships:create"), reverse("partnerships:index")
+    context = _base(request, heading, active_nav)
     status, pending = 200, None
     saved_paths = []
     willingness_form = WillingnessTransitionForm()
@@ -334,11 +361,19 @@ def index(request):
     query = _search(_query(request.user), q)
     if active in {"1", "0"}:
         query = query.filter(is_active=active == "1")
-    development = DevelopmentFilter(request, query)
-    context.update(development.context)
-    if not development.valid:
-        status = 400
-    query = development.queryset
+    if fixed_state in {DevelopmentState.CAPABILITY, DevelopmentState.WILLINGNESS}:
+        if fixed_state == DevelopmentState.CAPABILITY:
+            query = query.filter(development_state_id=DevelopmentState.CAPABILITY)
+        else:
+            query = query.filter(development_state_id__in=[DevelopmentState.WILLINGNESS, DevelopmentState.CAPABILITY])
+        development = None
+        context["development_filter_active"] = False
+    else:
+        development = DevelopmentFilter(request, query)
+        context.update(development.context)
+        if not development.valid:
+            status = 400
+        query = development.queryset
     # MAKKEN FINANCIAL RANGE
     financial = FinancialRange(request, query)
     context.update(financial.context)
@@ -359,11 +394,26 @@ def index(request):
     params = {"q": q, "status": active, "page": page.number}
     # MAKKEN FINANCIAL QUERY PARAMS
     params.update(financial.params)
-    params.update(development.params)
+    if development is not None:
+        params.update(development.params)
     context["financial_pagination_query"] = urlencode({key: value for key, value in params.items() if key != "page"})
     result_query = urlencode(params)
     if detail:
         from agreement_clauses.workflow import partnership_panel
         context["clause_panel"] = partnership_panel(detail)
-    context.update(rows=rows, page_obj=page, q=q, selected_status=active, pending=pending, detail=detail, history=_history(detail), result_query=result_query, list_url=reverse("partnerships:index") + "?" + result_query)
+    context.update(rows=rows, page_obj=page, q=q, selected_status=active, pending=pending, detail=detail, history=_history(detail), result_query=result_query, list_url=reset_url + "?" + result_query, add_url=add_url, reset_url=reset_url, hide_development_filter=bool(fixed_state))
     return add_login_headers(render(request, "partnerships/index.html", context, status=status))
+
+
+@module_view('partnerships')
+@login_required(login_url="accounts:login")
+@require_http_methods(["GET", "POST"])
+def capability_index(request):
+    return index(request, fixed_state=DevelopmentState.CAPABILITY)
+
+
+@module_view('partnerships')
+@login_required(login_url="accounts:login")
+@require_http_methods(["GET", "POST"])
+def willingness_index(request):
+    return index(request, fixed_state=DevelopmentState.WILLINGNESS)

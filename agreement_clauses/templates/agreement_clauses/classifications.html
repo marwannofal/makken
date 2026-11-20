@@ -1,0 +1,143 @@
+{% extends "core/makken_base.html" %}
+{% load access_tags static %}
+{% block title %}تصنيف الاتفاقية | مكّن{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'care_states/states.css' %}?v=20261015-1">
+<link rel="stylesheet" href="{% static 'levels/levels.css' %}?v=20261015-1">
+{% include "core/partials/settings_filters_assets.html" %}
+{% endblock %}
+{% block content %}
+<section class="page-introduction levels-introduction" aria-labelledby="page-heading">
+  <div>
+    <p class="eyebrow">الإعدادات</p>
+    <h1 id="page-heading">تصنيف الاتفاقية<span class="greeting-dot">.</span></h1>
+    <p class="page-description">إدارة تصنيفات الاتفاقية وحالة تفعيلها في مكان واحد.</p>
+  </div>
+  {% if can_add %}<a href="?{% if settings_filter_query %}{{ settings_filter_query }}&amp;{% endif %}edit=new" class="button button-primary add-level"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>إضافة تصنيف اتفاقية</a>{% endif %}
+</section>
+
+{% include "core/partials/settings_filters.html" %}
+
+{% if error %}<div class="feedback feedback-error" role="alert">{{ error }}</div>{% endif %}
+{% for message in messages %}<div class="feedback feedback-success" role="status">{{ message }}</div>{% endfor %}
+
+<section class="states-card levels-card" aria-labelledby="table-heading">
+  <header class="states-card-header">
+    <div>
+      <h2 id="table-heading">قائمة تصنيفات الاتفاقية</h2>
+      <p>أضف تصنيفات الاتفاقية، وعدّل بياناتها أو حالة تفعيلها.</p>
+    </div>
+    <span class="fixed-tag">{% include "core/partials/record_count.html" with record_count=page_obj.paginator.count only %}</span>
+  </header>
+  <table class="states-table levels-table">
+    <caption class="visually-hidden">قائمة تصنيفات الاتفاقية وحالة تفعيل كل تصنيف</caption>
+    <thead>
+      <tr>
+        <th scope="col">تصنيف الاتفاقية</th>
+        <th scope="col">حالة السجل</th>
+        <th scope="col" class="action-cell">الإجراء</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for entry in row_items %}
+      <tr>
+        <th scope="row"><bdi class="level-name">{{ entry.item.name }}</bdi></th>
+        <td>
+          {% if can_toggle %}
+          <form method="post" action="{% url 'agreement_clauses:classifications' %}">
+            {% csrf_token %}
+            <input type="hidden" name="operation" value="toggle">
+            <input type="hidden" name="snapshot" value="{{ entry.toggle_snapshot }}">
+            <button class="level-status{% if entry.item.is_active %} status-active{% else %} status-inactive{% endif %}" type="submit" aria-label="{% if entry.item.is_active %}إيقاف{% else %}تفعيل{% endif %} {{ entry.item.name }}"><span aria-hidden="true"></span>{% if entry.item.is_active %}نشط{% else %}غير نشط{% endif %}</button>
+          </form>
+          {% else %}
+          <span class="level-status{% if entry.item.is_active %} status-active{% else %} status-inactive{% endif %}"><span aria-hidden="true"></span>{% if entry.item.is_active %}نشط{% else %}غير نشط{% endif %}</span>
+          {% endif %}
+        </td>
+        <td class="action-cell">
+          <div class="level-row-actions">
+            {% if can_edit %}
+            <a class="level-action" href="?{% if settings_filter_query %}{{ settings_filter_query }}&amp;{% endif %}edit={{ entry.item.pk }}" aria-label="تعديل {{ entry.item.name }}">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m16 4 4 4M4 20l5-1L20 8a2.8 2.8 0 0 0-4-4L5 15Z"/></svg>
+              <span>تعديل</span>
+            </a>
+            {% endif %}
+            {% if can_delete %}
+            <form method="post" action="{% url 'agreement_clauses:classifications' %}">
+              {% csrf_token %}
+              <input type="hidden" name="operation" value="delete">
+              <input type="hidden" name="snapshot" value="{{ entry.delete_snapshot }}">
+              <button class="level-action action-delete" type="submit" aria-label="حذف {{ entry.item.name }}">
+                <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7"/></svg>
+                <span>حذف</span>
+              </button>
+            </form>
+            {% endif %}
+          </div>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="3">
+          <div class="levels-empty">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+            {% if settings_filter_active %}
+            <strong>لا توجد نتائج مطابقة</strong>
+            <p>جرّب كلمة بحث أخرى أو غيّر حالة السجل.</p>
+            {% else %}
+            <strong>لا توجد تصنيفات بعد</strong>
+            <p>ابدأ بإضافة أول تصنيف من الزر أعلاه.</p>
+            {% endif %}
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="states-card-footer">
+    <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10h.01"/></svg>
+    <p>اضغط على حالة السجل لتغييرها. لا يمكن إيقاف أو حذف أي تصنيف مرتبط بسجلات أخرى.</p>
+  </div>
+</section>
+
+{% if page_obj.paginator.num_pages > 1 %}
+<nav class="levels-pagination" aria-label="صفحات تصنيفات الاتفاقية">
+  {% if page_obj.has_previous %}<a class="button button-secondary" href="?q={{ settings_filter_q|urlencode }}&amp;status={{ settings_filter_status|urlencode }}&amp;page={{ page_obj.previous_page_number }}">السابق</a>{% endif %}
+  <span>صفحة {{ page_obj.number }} من {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}<a class="button button-secondary" href="?q={{ settings_filter_q|urlencode }}&amp;status={{ settings_filter_status|urlencode }}&amp;page={{ page_obj.next_page_number }}">التالي</a>{% endif %}
+</nav>
+{% endif %}
+
+<div class="states-page-actions"><a class="button button-secondary close-page" href="{% url 'makken_home' %}">إغلاق</a></div>
+
+{% if form %}
+<dialog id="classification-editor" class="color-dialog" aria-labelledby="editor-title" open style="position:fixed;inset:0;margin:auto;z-index:50;box-shadow:0 24px 80px rgba(11,64,51,.28);">
+  <form method="post" action="{% url 'agreement_clauses:classifications' %}" class="dialog-content">
+    {% csrf_token %}
+    <input type="hidden" name="operation" value="{{ operation }}">
+    <input type="hidden" name="snapshot" value="{{ token }}">
+    <div class="dialog-heading">
+      <span class="dialog-icon"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></span>
+      <a class="icon-button dialog-close" href="{% url 'agreement_clauses:classifications' %}{% if settings_filter_query %}?{{ settings_filter_query }}{% endif %}" aria-label="إغلاق"><svg aria-hidden="true"><use href="#icon-close"></use></svg></a>
+    </div>
+    <p class="dialog-eyebrow">إدارة تصنيفات الاتفاقية</p>
+    <h2 id="editor-title">{% if operation == 'edit' %}تعديل تصنيف الاتفاقية{% else %}إضافة تصنيف اتفاقية{% endif %}</h2>
+    <p class="dialog-description">أدخل اسم تصنيف الاتفاقية ثم احفظ التغييرات.</p>
+    {% if form.non_field_errors %}<div class="feedback feedback-error" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+    {% for field in form %}
+    <div class="level-field">
+      <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span aria-hidden="true">*</span>{% endif %}</label>
+      {{ field }}
+      {% if field.errors %}<div class="field-error" role="alert">{{ field.errors }}</div>{% endif %}
+    </div>
+    {% endfor %}
+    <div class="dialog-actions">
+      <button class="button button-primary" type="submit">حفظ</button>
+      <a class="button button-secondary" href="{% url 'agreement_clauses:classifications' %}{% if settings_filter_query %}?{{ settings_filter_query }}{% endif %}">إلغاء</a>
+    </div>
+  </form>
+</dialog>
+{% endif %}
+
+{% include "core/partials/dependency_block.html" with close_url=request.path %}
+{% endblock %}

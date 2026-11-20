@@ -85,11 +85,19 @@ def requested_operations(request,module,view,kwargs):
         if request.method == 'POST' and request.POST.get('operation') in {'save_details', 'renew'}:
             return ['view', 'edit']
         raise PermissionDenied
+    if module == 'agreement_classifications' and name == 'classifications':
+        if request.method in {'GET', 'HEAD'}:
+            edit = request.GET.get('edit')
+            return ['view', 'create' if edit == 'new' else 'edit'] if edit else ['view']
+        operation = {'add': 'create', 'edit': 'edit', 'toggle': 'change_status', 'delete': 'delete'}.get(request.POST.get('operation'))
+        if request.method == 'POST' and operation:
+            return ['view', operation]
+        raise PermissionDenied
     if module == 'agreement_clauses' and name == 'references':
         if request.method in {'GET', 'HEAD'}:
             edit = request.GET.get('edit')
             return ['view', 'create' if edit == 'new' else 'edit'] if edit else ['view']
-        operation = {'add': 'create', 'edit': 'edit', 'toggle': 'change_status'}.get(request.POST.get('operation'))
+        operation = {'add': 'create', 'edit': 'edit', 'toggle': 'change_status', 'delete': 'delete'}.get(request.POST.get('operation'))
         if request.method == 'POST' and operation:
             return ['view', operation]
         raise PermissionDenied
@@ -106,7 +114,7 @@ def requested_operations(request,module,view,kwargs):
         return ['view', needed]
     if request.method in {'GET','HEAD'}:
         if name in {'download','attachment_download','agreement_evidence_download'}:return ['view','export']
-        if name=='create':return ['view','create']
+        if name in {'create','create_willingness'}:return ['view','create']
         if name=='edit':return ['view','edit']
         if name=='followup':
             operation=request.GET.get('operation','')
@@ -131,10 +139,11 @@ def requested_operations(request,module,view,kwargs):
     if module=='partnerships':
         action=post.get('action')
         if action not in {'preview','confirm'}:raise PermissionDenied
-        if name in {'create','edit'}:
+        if name in {'create','create_willingness','edit'}:
+            is_create = name in {'create','create_willingness'}
             payload=implementation._load(post.get('snapshot' if action=='preview' else 'token'),request.user,'editor' if action=='preview' else 'save')
             data=post if action=='preview' else payload.get('data',{})
-            return ['view','create' if name=='create' else 'edit',*_status_permission(module,kwargs.get('pk'),data.get('is_active'),name=='create'),*_details_permissions(module,kwargs.get('pk'),data)]
+            return ['view','create' if is_create else 'edit',*_status_permission(module,kwargs.get('pk'),data.get('is_active'),is_create),*_details_permissions(module,kwargs.get('pk'),data)]
         payload=implementation._load(post.get('token'),request.user,'row' if action=='preview' else 'row-confirm')
         return ['view',{'toggle':'change_status','delete':'delete','advance':'change_status'}[payload['operation']]]
     if module=='service_providers':

@@ -1,7 +1,7 @@
 {% extends 'makken_mail/base.html' %}
 {% block mail_content %}<section class="partnership-card mail-card">
 <header class="card-heading"><div><p class="eyebrow">تفضيلات المستلم</p><h2>{{ person.get_full_name|default:person.get_username }}</h2></div><span class="subtle-badge">{{ person.get_username }}</span></header>
-<p class="mail-caption">الأنواع المحددة تضيف المستخدم إلى المستلمين، والكتم يستثنيه حتى إذا كان المنفّذ أو المدير. يبقى تفعيل النوع وفحص الصلاحيات شرطًا للإرسال.</p>
+<p class="mail-caption">الأنواع المحددة تضيف المستخدم إلى المستلمين. يبقى تفعيل النوع وفحص الصلاحيات شرطًا للإرسال.</p>
 <form method="post" data-ac-confirm="حفظ تفضيلات البريد لهذا المستخدم؟">{% csrf_token %}
 {% include 'makken_mail/_form.html' %}
 <div class="mail-inline mail-actions"><button class="button button-primary" type="submit">حفظ التفضيلات</button><a class="button button-secondary" href="{% url 'makken_mail:index' %}">رجوع</a></div>

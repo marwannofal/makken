@@ -10,7 +10,7 @@
 {% endblock %}
 {% block content %}
 {% include "agreement_clauses/_partnership_panel.html" %}
-<section class="page-introduction partnership-intro"><div><p class="eyebrow">الإدارة · الشراكات المحتملة</p><h1>{{ page_heading }}<span class="greeting-dot">.</span></h1><p class="page-description">بيانات واضحة للجهة، وروابط دقيقة لكل فرصة رعاية.</p></div><a class="button button-secondary" href="{% url 'partnerships:index' %}">العودة للسجل</a></section>
+<section class="page-introduction partnership-intro"><div><p class="eyebrow">الإدارة · الشراكات المحتملة</p><h1>{{ page_heading }}<span class="greeting-dot">.</span></h1><p class="page-description">بيانات واضحة للجهة، وروابط دقيقة لكل فرصة رعاية.</p></div><a class="button button-secondary" href="{{ back_url|default:'/partnerships/capability/' }}">العودة للسجل</a></section>
 {% if error %}<div class="feedback feedback-error" role="alert">{{ error }}</div>{% endif %}
 <noscript><div class="feedback feedback-info">فعّل JavaScript لإدارة بنود القطاعات واستخدام القوائم القابلة للبحث.</div></noscript>
 <form method="post" id="partnership-form" data-partnership-form>
@@ -28,6 +28,7 @@
 {% include "partnerships/_field.html" with field=form.scope %}
 <div class="partnership-field"><label for="id_administrative_regions">{{ form.administrative_regions.label }}{% if form.administrative_regions.field.required %} <span class="required">*</span>{% endif %}</label>{{ form.administrative_regions }}<p class="field-help">{{ form.administrative_regions.help_text }}</p><div class="field-error" role="alert">{{ form.administrative_regions.errors }}</div></div>
 
+{% include "partnerships/_field.html" with field=form.partnership_date %}
 {% guarded_status 'partnerships' %}<fieldset class="partnership-field"><legend>حالة السجل <span class="required" aria-hidden="true">*</span></legend><div class="status-choices">{% for radio in form.is_active %}<label>{{ radio.tag }}<span>{{ radio.choice_label }}</span></label>{% endfor %}</div><div class="field-error" id="error-is_active" role="alert">{{ form.is_active.errors }}</div></fieldset>{% endguarded_status %}
 </div>
 <h3>مدة الشراكة</h3>
@@ -39,7 +40,7 @@
 <section class="partnership-card"><header class="card-heading"><div><p class="eyebrow mk-numbered-section-title">02 · إدارة أشكال الرعاية للجهة</p><h2>القطاعات والتخصصات المرتبطة</h2><p class="muted">أضف بنود الشراكة، ثم احفظ سجل الجهة كاملًا.</p></div><button type="button" class="button button-primary add-offering" data-add-offering>إضافة أشكال الرعاية للجهة</button></header>
 <div id="error-offerings" class="field-error" role="alert">{{ form.offerings.errors }}<span data-offerings-error></span></div><div class="draft-notice" role="status">تعديلات البنود تُحفظ نهائيًا مع زر «حفظ الجهة» أدناه.</div>
 <p class="table-scroll-hint">اسحب الجدول أفقيًا لعرض جميع الأعمدة عند الحاجة.</p><div class="table-scroll"><table class="partnership-table offerings-table"><caption class="visually-hidden">بنود الشراكة المرتبطة بالجهة</caption><thead><tr><th scope="col">اسم القطاع</th><th scope="col">التخصصات المرتبطة</th><th scope="col">شكل الرعاية</th><th scope="col">حالة السجل</th><th scope="col">الإجراء</th></tr></thead><tbody data-offerings-table></tbody></table></div><p class="empty-state" data-offerings-empty>لم تُضف بنود شراكة بعد. أضف قطاعًا وتخصصاته وشكل الرعاية أولًا.</p></section>
-<div class="editor-actions"><button class="button button-primary" type="submit" data-save-partnership>حفظ الجهة</button><a class="button button-secondary" href="{% url 'partnerships:index' %}">إغلاق</a></div></form>
+<div class="editor-actions"><button class="button button-primary" type="submit" data-save-partnership>حفظ الجهة</button><a class="button button-secondary" href="{{ back_url|default:'/partnerships/capability/' }}">إغلاق</a></div></form>
 {% if item %}{% include "partnerships/_history.html" %}{% endif %}
 <dialog id="offering-editor" class="partnership-dialog offering-dialog" aria-labelledby="offering-title"><form class="dialog-body" data-offering-form><div class="dialog-top"><span class="dialog-symbol"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 21h18M4 21V9l6 3V7l6 3V3h4v18"/></svg></span><button type="button" class="icon-button" data-dismiss-dialog aria-label="إغلاق"><svg aria-hidden="true"><use href="#icon-close"/></svg></button></div><p class="eyebrow">بند شراكة</p><h2 id="offering-title">إضافة قطاع وشكل رعاية</h2><p class="dialog-description">تظهر فقط التخصصات المرتبطة بالقطاع المختار.</p>
 <div class="partnership-field"><label for="offering-sector">اسم القطاع <span class="required">*</span></label><select id="offering-sector" required><option value="">اختر القطاع</option></select></div>

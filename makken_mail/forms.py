@@ -112,8 +112,7 @@ class RuleForm(ArabicForm):
 class UserPreferenceForm(ArabicForm):
     selected = forms.MultipleChoiceField(label='أنواع يستقبلها المستخدم', required=False, widget=forms.SelectMultiple(
         attrs={**SELECT, 'data-label': 'اختر أنواع الإشعارات'}))
-    muted = forms.MultipleChoiceField(label='أنواع لا يستقبلها المستخدم', required=False, widget=forms.SelectMultiple(
-        attrs={**SELECT, 'data-label': 'اختر الأنواع المكتومة'}))
+    muted = forms.MultipleChoiceField(label='أنواع لا يستقبلها المستخدم', required=False, widget=forms.MultipleHiddenInput())
     fingerprint = forms.CharField(widget=forms.HiddenInput(), max_length=64)
 
     def __init__(self, *args, **kwargs):

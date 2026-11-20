@@ -148,23 +148,23 @@ class AgreementRecordTests(TestCase):
         self.assertEqual(self.client.get(self.url).status_code, 404)
 
     def test_reference_manager_can_add_edit_and_deactivate_without_removing_links(self):
-        route = reverse('agreement_clauses:references') + '?kind=department'
-        add = self.client.get(route + '&edit=new')
+        route = reverse('agreement_clauses:references')
+        add = self.client.get(route + '?edit=new')
         self.assertEqual(self.client.post(route, {'operation': 'add', 'snapshot': add.context['token'],
-                                                 'name': 'وحدة جديدة', 'department_type': 'unit'}).status_code, 302)
-        new = AgreementOption.objects.get(kind='department', name='وحدة جديدة')
-        editor = self.client.get(route + f'&edit={new.pk}')
+                                                 'name': 'حالة جديدة'}).status_code, 302)
+        new = AgreementOption.objects.get(kind='status', name='حالة جديدة')
+        editor = self.client.get(route + f'?edit={new.pk}')
         self.assertEqual(self.client.post(route, {'operation': 'edit', 'snapshot': editor.context['token'],
-            'name': 'وحدة محدثة', 'department_type': 'unit'}).status_code, 302)
-        profile = AgreementDetails.objects.create(agreement=self.agreement)
-        profile.departments.add(new)
+            'name': 'حالة محدثة'}).status_code, 302)
+        profile = AgreementDetails.objects.create(agreement=self.agreement, status=new)
         row_token = next(token for row, token in self.client.get(route).context['rows'] if row.pk == new.pk)
         self.assertEqual(self.client.post(route, {'operation': 'toggle', 'snapshot': row_token}).status_code, 302)
         self.assertEqual(self.client.post(route, {'operation': 'toggle', 'snapshot': row_token}).status_code, 409)
         new.refresh_from_db()
         self.assertFalse(new.is_active)
-        self.assertIn(new, profile.departments.all())
+        profile.refresh_from_db()
+        self.assertEqual(profile.status_id, new.pk)
         reader = self.limited('catalog-reader', self.region, 'view', module='agreement_clauses')
         self.client.force_login(reader, backend='accounts.backends.EmailOrUsernameBackend')
         self.assertEqual(self.client.get(route).status_code, 200)
-        self.assertEqual(self.client.get(route + '&edit=new').status_code, 403)
+        self.assertEqual(self.client.get(route + '?edit=new').status_code, 403)
