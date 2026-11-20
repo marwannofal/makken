@@ -85,7 +85,7 @@ def requested_operations(request,module,view,kwargs):
         if request.method == 'POST' and request.POST.get('operation') in {'save_details', 'renew'}:
             return ['view', 'edit']
         raise PermissionDenied
-    if module == 'agreement_classifications' and name == 'classifications':
+    if (module == 'agreement_classifications' and name == 'classifications') or (module == 'departments' and name == 'departments'):
         if request.method in {'GET', 'HEAD'}:
             edit = request.GET.get('edit')
             return ['view', 'create' if edit == 'new' else 'edit'] if edit else ['view']

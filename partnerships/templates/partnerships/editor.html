@@ -10,7 +10,7 @@
 {% endblock %}
 {% block content %}
 {% include "agreement_clauses/_partnership_panel.html" %}
-<section class="page-introduction partnership-intro"><div><p class="eyebrow">الإدارة · الشراكات المحتملة</p><h1>{{ page_heading }}<span class="greeting-dot">.</span></h1><p class="page-description">بيانات واضحة للجهة، وروابط دقيقة لكل فرصة رعاية.</p></div><a class="button button-secondary" href="{{ back_url|default:'/partnerships/capability/' }}">العودة للسجل</a></section>
+<section class="page-introduction partnership-intro"><div><p class="eyebrow">الإدارة · الشراكات المحتملة</p><h1>{{ page_heading }}</h1><p class="page-description">بيانات واضحة للجهة، وروابط دقيقة لكل فرصة رعاية.</p></div><a class="button button-secondary" href="{{ back_url|default:'/partnerships/capability/' }}">العودة للسجل</a></section>
 {% if error %}<div class="feedback feedback-error" role="alert">{{ error }}</div>{% endif %}
 <noscript><div class="feedback feedback-info">فعّل JavaScript لإدارة بنود القطاعات واستخدام القوائم القابلة للبحث.</div></noscript>
 <form method="post" id="partnership-form" data-partnership-form>

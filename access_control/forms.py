@@ -3,6 +3,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django.utils.translation import override
+from accounts.models import Department
 from accounts.profile_forms import ProfilePasswordForm, normalize_name
 from .models import Module, RoleProfile, PageScope, RegionScope, Operation
 from regions.models import Region
@@ -45,7 +46,7 @@ class UserForm(AccessFields):
     email=forms.EmailField(label='البريد الإلكتروني',max_length=254,widget=forms.EmailInput(attrs={'dir':'ltr','autocomplete':'off'}))
     is_active=forms.ChoiceField(label='حالة الحساب',choices=[('1','نشط'),('0','غير نشط')],initial='1')
     city=forms.ModelChoiceField(label='المدينة',queryset=AgreementOption.objects.none(),required=False,empty_label='غير محددة',widget=forms.Select(attrs={'data-market-select':'','data-label':'المدينة التي يتبع لها الموظف'}))
-    department=forms.ModelChoiceField(label='الإدارة أو الوحدة',queryset=AgreementOption.objects.none(),required=False,empty_label='غير محددة',widget=forms.Select(attrs={'data-market-select':'','data-label':'الإدارة أو الوحدة التي يتبع لها الموظف'}))
+    department=forms.ModelChoiceField(label='الإدارة أو الوحدة',queryset=Department.objects.none(),required=False,empty_label='غير محددة',widget=forms.Select(attrs={'data-market-select':'','data-label':'الإدارة أو الوحدة التي يتبع لها الموظف'}))
     must_change_password=forms.ChoiceField(label='إلزام تغيير كلمة المرور عند أول دخول',choices=[('1','مفعل — يجب تغيير كلمة المرور عند أول دخول'),('0','معطّل — لا يُطلب تغيير كلمة المرور')],initial='1',required=False)
     send_welcome_email=forms.ChoiceField(label='إرسال بيانات الدخول بالبريد الإلكتروني',choices=[('1','نعم — إرسال بيانات الدخول إلى بريد الموظف'),('0','لا — بدون إرسال بريد ترحيبي')],initial='1',required=False)
     roles=forms.ModelMultipleChoiceField(label='الأدوار',queryset=RoleProfile.objects.select_related('group'),required=False,widget=forms.SelectMultiple(attrs={'data-market-select':'','data-label':'الأدوار'}))
@@ -62,8 +63,8 @@ class UserForm(AccessFields):
         city_id=profile.city_id if profile else None
         dept_id=profile.department_id if profile else None
         self.fields['city'].queryset=AgreementOption.objects.filter(kind=OptionKind.CITY).filter(Q(is_active=True)|Q(pk=city_id)).order_by('name','pk')
-        self.fields['department'].queryset=AgreementOption.objects.filter(kind=OptionKind.DEPARTMENT).filter(Q(is_active=True)|Q(pk=dept_id)).order_by('name','pk')
-        self.fields['department'].label_from_instance=lambda opt: f'{opt.name} · {opt.get_department_type_display()}' + ('' if opt.is_active else ' (غير نشط)')
+        self.fields['department'].queryset=Department.objects.filter(Q(is_active=True)|Q(pk=dept_id)).order_by('name','pk')
+        self.fields['department'].label_from_instance=lambda opt: opt.name + ('' if opt.is_active else ' (غير نشط)')
         if target:
             self.fields.pop('new_password1');self.fields.pop('new_password2');self.fields.pop('send_welcome_email',None)
         for module in DEFINITIONS.values():

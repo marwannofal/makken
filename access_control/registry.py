@@ -36,6 +36,7 @@ MODULES = (
     ModuleDefinition('user_activity', 'سجل نشاط المستخدمين', 'access_control:activity', ('view',)),
     ModuleDefinition('work_assignments', 'إسناد المهام', 'makken_mail:work_index', ('view', 'create', 'edit')),
     ModuleDefinition('agreement_classifications', 'تصنيف الاتفاقية', 'agreement_clauses:classifications', CRUD),
+    ModuleDefinition('departments', 'إدارة الإدارات', 'accounts:departments', CRUD),
 )
 # BEGIN MAKKEN FORMAT EXPORT RIGHTS v1
 TABLE_EXPORT_OPERATIONS = ('export_xlsx', 'export_pdf')

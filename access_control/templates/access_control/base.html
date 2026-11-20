@@ -11,7 +11,7 @@
 {% block access_head %}{% endblock %}
 {% endblock %}
 {% block content %}
-<section class="page-introduction"><div><p class="eyebrow">إدارة آمنة · مكّن</p><h1>{% block access_heading %}إدارة المستخدمين والصلاحيات{% endblock %}<span class="greeting-dot">.</span></h1><p class="page-description">{% block access_description %}التحكم في حسابات المستخدمين والأدوار وصلاحيات الوصول إلى صفحات النظام{% endblock %}</p></div></section>
+<section class="page-introduction"><div><p class="eyebrow">إدارة آمنة · مكّن</p><h1>{% block access_heading %}إدارة المستخدمين والصلاحيات{% endblock %}</h1><p class="page-description">{% block access_description %}التحكم في حسابات المستخدمين والأدوار وصلاحيات الوصول إلى صفحات النظام{% endblock %}</p></div></section>
 {% if access_tab != 'work' %}<nav class="ac-tabs" aria-label="أقسام إدارة الوصول">
 {% if request.user.is_superuser %}
 <a href="{% url 'access_control:index' %}"{% if access_tab == 'users' %} aria-current="page"{% endif %}>المستخدمون</a>

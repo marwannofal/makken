@@ -1,0 +1,1 @@
+{% load access_tags %}{% allowed 'departments' 'view' %}{% include "core/partials/sidebar/_link.html" with nav_page="departments" nav_url="accounts:departments" nav_label="إدارة الإدارات" nav_path="M3 21h18M5 21V6l7-3 7 3v15M9 9h1m4 0h1m-6 4h1m4 0h1M10 21v-5h4v5" active_page=active_page request=request only %}{% endallowed %}

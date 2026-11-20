@@ -10,7 +10,7 @@
 {% include "core/partials/settings_filters_assets.html" %}
 {% endblock %}
 {% block content %}
-<section class="page-introduction expense_items-introduction" aria-labelledby="page-heading"><div><p class="eyebrow">الإعدادات</p><h1 id="page-heading">إدارة بنود الصرف<span class="greeting-dot">.</span></h1><p class="page-description">إدارة بنود الصرف وحالة تفعيلها في مكان واحد.</p></div>{% allowed 'expense_items' 'create' %}<a href="?{% if settings_filter_query %}{{ settings_filter_query }}&amp;{% endif %}edit=new" class="button button-primary add-expense-item" data-add-expense-item data-snapshot="{{ add_snapshot }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>إضافة بند صرف</a>{% endallowed %}</section>
+<section class="page-introduction expense_items-introduction" aria-labelledby="page-heading"><div><p class="eyebrow">الإعدادات</p><h1 id="page-heading">إدارة بنود الصرف</h1><p class="page-description">إدارة بنود الصرف وحالة تفعيلها في مكان واحد.</p></div>{% allowed 'expense_items' 'create' %}<a href="?{% if settings_filter_query %}{{ settings_filter_query }}&amp;{% endif %}edit=new" class="button button-primary add-expense-item" data-add-expense-item data-snapshot="{{ add_snapshot }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>إضافة بند صرف</a>{% endallowed %}</section>
 {% include "core/partials/settings_filters.html" %}
 {% if error %}<div class="feedback feedback-error" role="alert">{{ error }}</div>{% endif %}
 {% if notice %}<div class="feedback feedback-info" role="status">{{ notice }}</div>{% endif %}

@@ -13,7 +13,7 @@
 {% include "core/partials/settings_filters_assets.html" %}
 {% endblock %}
 {% block content %}
-<section class="page-introduction training_programs-introduction" aria-labelledby="page-heading"><div><p class="eyebrow">الإعدادات</p><h1 id="page-heading">إدارة برامج التدريب<span class="greeting-dot">.</span></h1><p class="page-description">نظّم برامج التدريب وتصنيفاتها وبنود الصرف المرتبطة بها.</p></div>{% allowed 'training_programs' 'create' %}<a href="?{% if settings_filter_query %}{{ settings_filter_query }}&amp;{% endif %}edit=new" class="button button-primary add-program" data-add-program><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>إضافة برنامج</a>{% endallowed %}</section>
+<section class="page-introduction training_programs-introduction" aria-labelledby="page-heading"><div><p class="eyebrow">الإعدادات</p><h1 id="page-heading">إدارة برامج التدريب</h1><p class="page-description">نظّم برامج التدريب وتصنيفاتها وبنود الصرف المرتبطة بها.</p></div>{% allowed 'training_programs' 'create' %}<a href="?{% if settings_filter_query %}{{ settings_filter_query }}&amp;{% endif %}edit=new" class="button button-primary add-program" data-add-program><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>إضافة برنامج</a>{% endallowed %}</section>
 {% include "core/partials/settings_filters.html" %}
 {% if error %}<div class="feedback feedback-error" role="alert">{{ error }}</div>{% endif %}
 {% if notice %}<div class="feedback feedback-info" role="status">{{ notice }}</div>{% endif %}

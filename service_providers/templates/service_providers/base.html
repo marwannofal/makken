@@ -13,7 +13,7 @@
 {% endblock %}
 {% block content %}
 <div data-provider-page="{% if active_page == 'service_provider_editor' %}editor{% else %}list{% endif %}">
-<section class="page-introduction partnership-intro"><div><p class="eyebrow">مكّن · مزودو خدمات التدريب</p><h1>{{ page_heading }}<span class="greeting-dot">.</span></h1><p class="page-description">بيانات المزودين ومناطقهم وتخصصاتهم، في مساحة واحدة.</p></div><div class="provider-page-actions">{% block page_actions %}{% endblock %}</div></section>
+<section class="page-introduction partnership-intro"><div><p class="eyebrow">مكّن · مزودو خدمات التدريب</p><h1>{{ page_heading }}</h1><p class="page-description">بيانات المزودين ومناطقهم وتخصصاتهم، في مساحة واحدة.</p></div><div class="provider-page-actions">{% block page_actions %}{% endblock %}</div></section>
 {% if error %}<p class="feedback feedback-error" role="alert">{{ error }}</p>{% endif %}
 {% block provider_content %}{% endblock %}
 {% include "service_providers/_dialogs.html" %}

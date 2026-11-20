@@ -1,5 +1,32 @@
 from django.conf import settings
 from django.db import models
+from expense_items.models import normalize_name, validate_name
+
+
+class Department(models.Model):
+    name = models.CharField('اسم الإدارة أو الوحدة', max_length=200, validators=[validate_name])
+    name_key = models.CharField(max_length=600, editable=False)
+    is_active = models.BooleanField('نشط', default=True)
+    revision = models.PositiveIntegerField(default=1, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['id']
+        default_permissions = ()
+        constraints = [
+            models.UniqueConstraint(fields=['name_key'], name='mk_departments_name_uq'),
+        ]
+
+    def save(self, *args, **kwargs):
+        self.name = normalize_name(self.name)
+        self.name_key = self.name.casefold()
+        if kwargs.get('update_fields') is not None and 'name' in kwargs['update_fields']:
+            kwargs['update_fields'] = {*kwargs['update_fields'], 'name_key'}
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
 
 
 class UserProfile(models.Model):
@@ -15,7 +42,7 @@ class UserProfile(models.Model):
         verbose_name='المدينة',
     )
     department = models.ForeignKey(
-        'agreement_clauses.AgreementOption',
+        'accounts.Department',
         on_delete=models.PROTECT,
         null=True,
         blank=True,

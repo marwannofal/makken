@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from accounts.models import UserProfile
+from accounts.models import Department, UserProfile
 from agreement_clauses.models import (
     Agreement,
     AgreementClause,
@@ -36,11 +36,7 @@ class EmployeeManagementUS01Tests(TestCase):
         cls.riyadh = Region.objects.create(name='منطقة الرياض للموظفين')
         cls.jeddah = Region.objects.create(name='منطقة مكة للموظفين')
         cls.city_riyadh = AgreementOption.objects.create(kind=OptionKind.CITY, name='الرياض للاختبار')
-        cls.dept_training = AgreementOption.objects.create(
-            kind=OptionKind.DEPARTMENT,
-            name='إدارة التدريب للموظفين',
-            department_type=DepartmentType.DEPARTMENT,
-        )
+        cls.dept_training = Department.objects.create(name='إدارة التدريب للموظفين')
         cls.watcher_role = RoleProfile.objects.get(system_key='watcher')
         cls.entity = Entity.objects.create(name='جهة اختبار الموظفين', entity_type='government')
         cls.partner_riyadh = Partnership.objects.create(name='شراكة الرياض للموظف', entity=cls.entity, scope='local')

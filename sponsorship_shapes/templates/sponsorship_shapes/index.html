@@ -10,7 +10,7 @@
 {% include "core/partials/settings_filters_assets.html" %}
 {% endblock %}
 {% block content %}
-<section class="page-introduction sponsorship_shapes-introduction" aria-labelledby="page-heading"><div><p class="eyebrow">الإعدادات</p><h1 id="page-heading">إدارة أشكال الرعاية<span class="greeting-dot">.</span></h1><p class="page-description">نظّم أشكال الرعاية وأوصافها وحدّد ارتباطها بالتوظيف.</p></div>{% allowed 'sponsorship_shapes' 'create' %}<a href="?{% if settings_filter_query %}{{ settings_filter_query }}&amp;{% endif %}edit=new" class="button button-primary add-sponsorship-shape" data-add-sponsorship-shape data-snapshot="{{ add_snapshot }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>إضافة شكل رعاية</a>{% endallowed %}</section>
+<section class="page-introduction sponsorship_shapes-introduction" aria-labelledby="page-heading"><div><p class="eyebrow">الإعدادات</p><h1 id="page-heading">إدارة أشكال الرعاية</h1><p class="page-description">نظّم أشكال الرعاية وأوصافها وحدّد ارتباطها بالتوظيف.</p></div>{% allowed 'sponsorship_shapes' 'create' %}<a href="?{% if settings_filter_query %}{{ settings_filter_query }}&amp;{% endif %}edit=new" class="button button-primary add-sponsorship-shape" data-add-sponsorship-shape data-snapshot="{{ add_snapshot }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>إضافة شكل رعاية</a>{% endallowed %}</section>
 {% include "core/partials/settings_filters.html" %}
 {% if error %}<div class="feedback feedback-error" role="alert">{{ error }}</div>{% endif %}
 {% if notice %}<div class="feedback feedback-info" role="status">{{ notice }}</div>{% endif %}
