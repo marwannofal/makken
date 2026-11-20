@@ -6,7 +6,8 @@ from django.contrib.auth import get_user_model
 from django.core.validators import validate_email
 from django.db.models import Q
 
-from agreement_clauses.models import AgreementClause, ClauseAssignment, Responsibility
+from accounts.models import Department
+from agreement_clauses.models import AgreementClassification, AgreementClause, ClauseAssignment, Responsibility
 from makken_mail.forms import PeopleField, PersonField, SELECT, active_users
 from makken_mail.models import WorkAssignment
 from makken_mail.work import record_update
@@ -30,6 +31,9 @@ DETAIL_FIELDS = (
     'signed_on',
     'duration_months',
     'renewal_rule',
+    'agreement_classification',
+    'concerned_departments',
+    'headquarters_city',
     'signing_region',
     'signing_city',
     'objective',
@@ -54,14 +58,21 @@ class WillingnessDetailsForm(forms.Form):
     partnership_type = forms.ModelChoiceField(label='نوع الشراكة', queryset=PartnershipType.objects.none(), required=False, empty_label='اختر نوع الشراكة')
     renewal_rule = forms.ChoiceField(label='نوع التجديد', choices=[('', 'اختر نوع التجديد'), *RenewalRule.choices], required=False)
     signing_region = forms.ModelChoiceField(label='منطقة التوقيع', queryset=Region.objects.none(), required=False, empty_label='اختر منطقة التوقيع')
+    agreement_classification = forms.ModelChoiceField(label='تصنيف الاتفاقية', queryset=AgreementClassification.objects.none(), required=False, empty_label='اختر تصنيف الاتفاقية')
+    concerned_departments = forms.ModelMultipleChoiceField(label='الإدارة المعنية', queryset=Department.objects.none(), required=False, widget=forms.SelectMultiple(attrs={**SELECT, 'data-label': 'الإدارة المعنية'}), help_text='يمكنك اختيار إدارة واحدة أو أكثر.')
+    headquarters_city = forms.CharField(label='عنوان الجهة (مدينة المقر)', max_length=120, required=False, widget=forms.TextInput(attrs={'placeholder': 'أدخل مدينة المقر'}))
     signing_city = forms.CharField(label='مدينة التوقيع', max_length=120, required=False, widget=forms.TextInput(attrs={'placeholder': 'أدخل مدينة التوقيع'}))
 
     def __init__(self, *args, partnership=None, **kwargs):
         super().__init__(*args, **kwargs)
         cur_type_id = partnership.partnership_type_id if partnership and partnership.pk else None
         cur_reg_id = partnership.signing_region_id if partnership and partnership.pk else None
+        cur_cls_id = partnership.agreement_classification_id if partnership and partnership.pk else None
+        cur_dept_ids = list(partnership.concerned_departments.values_list('pk', flat=True)) if partnership and partnership.pk else []
         self.fields['partnership_type'].queryset = PartnershipType.objects.filter(Q(is_active=True) | Q(pk=cur_type_id)).order_by('id')
         self.fields['signing_region'].queryset = Region.objects.filter(Q(is_active=True) | Q(pk=cur_reg_id)).order_by('id')
+        self.fields['agreement_classification'].queryset = AgreementClassification.objects.filter(Q(is_active=True) | Q(pk=cur_cls_id)).order_by('id')
+        self.fields['concerned_departments'].queryset = Department.objects.filter(Q(is_active=True) | Q(pk__in=cur_dept_ids)).order_by('id')
     objective = forms.CharField(label='هدف الشراكة', max_length=2000, required=False, widget=forms.Textarea(attrs={'rows': 3, 'placeholder': 'اذكر الهدف الرئيسي من الشراكة'}))
     announcement = forms.CharField(label='خبر عن الشراكة', max_length=2000, required=False, widget=forms.Textarea(attrs={'rows': 3, 'placeholder': 'نبذة أو خبر إعلامي عن الشراكة'}))
     audience = forms.CharField(label='الفئات المستهدفة', max_length=2000, required=False, widget=forms.Textarea(attrs={'rows': 3, 'placeholder': 'حدد الفئات المستهدفة من الشراكة'}))
@@ -73,7 +84,9 @@ def details_initial(partnership):
         return {}
     out = {}
     for field in DETAIL_FIELDS:
-        if field in {'partnership_type', 'signing_region'}:
+        if field == 'concerned_departments':
+            out[field] = list(partnership.concerned_departments.values_list('pk', flat=True))
+        elif field in {'partnership_type', 'signing_region', 'agreement_classification'}:
             out[field] = getattr(partnership, f'{field}_id')
         else:
             val = getattr(partnership, field)
@@ -89,7 +102,9 @@ def serialize_details(cleaned):
             out[field] = val.isoformat() if val else ''
         elif field == 'duration_months':
             out[field] = val if val is not None else None
-        elif field in {'partnership_type', 'signing_region'}:
+        elif field == 'concerned_departments':
+            out[field] = [d.pk if hasattr(d, 'pk') else int(d) for d in (val or [])]
+        elif field in {'partnership_type', 'signing_region', 'agreement_classification'}:
             out[field] = val.pk if hasattr(val, 'pk') else (int(val) if val else None)
         else:
             out[field] = val or ''
@@ -105,8 +120,13 @@ def apply_willingness_details(partnership, cleaned_or_serialized, *, skip_partne
                 continue
             partnership.partnership_type_id = val.pk if hasattr(val, 'pk') else (int(val) if val else None)
             continue
+        if field == 'concerned_departments':
+            continue
         if field == 'signing_region':
             partnership.signing_region_id = val.pk if hasattr(val, 'pk') else (int(val) if val else None)
+            continue
+        if field == 'agreement_classification':
+            partnership.agreement_classification_id = val.pk if hasattr(val, 'pk') else (int(val) if val else None)
             continue
         if field == 'signed_on':
             if isinstance(val, str):
@@ -119,6 +139,14 @@ def apply_willingness_details(partnership, cleaned_or_serialized, *, skip_partne
         else:
             val = (val or '').strip()
         setattr(partnership, field, val)
+
+
+def save_partnership_departments(partnership, cleaned_or_serialized):
+    if 'concerned_departments' not in cleaned_or_serialized:
+        return
+    raw = cleaned_or_serialized.get('concerned_departments') or []
+    ids = [d.pk if hasattr(d, 'pk') else int(d) for d in raw]
+    partnership.concerned_departments.set(ids)
 
 
 def existing_team_rows(partnership):

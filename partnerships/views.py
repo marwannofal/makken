@@ -47,6 +47,7 @@ from .willingness_workflow import (
     parse_clauses_payload,
     parse_teams_payload,
     save_partnership_clauses,
+    save_partnership_departments,
     save_partnership_teams,
     serialize_details,
 )
@@ -182,6 +183,7 @@ def _save(payload, user):
         if "details" in payload and payload["details"] is not None:
             apply_willingness_details(item, payload["details"])
             item.save()
+            save_partnership_departments(item, payload["details"])
         if item.development_state_id == DevelopmentState.WILLINGNESS:
             item.ensure_agreement_number()
         if "clauses" in payload and payload["clauses"] is not None:
@@ -270,6 +272,7 @@ def editor(request, pk=None, initial_state=DevelopmentState.CAPABILITY):
                         save_supporting_files(new_item, willingness_form.cleaned_data, request.user, saved_paths)
                         apply_willingness_details(new_item, details_form.cleaned_data, skip_partnership_type_if_empty=True)
                         new_item.save()
+                        save_partnership_departments(new_item, details_form.cleaned_data)
                         new_item.ensure_agreement_number()
                         save_partnership_clauses(new_item, parsed_clauses, request.user, allow_progress=False)
                         save_partnership_teams(new_item, parsed_teams)
@@ -485,6 +488,7 @@ def index(request, fixed_state=None):
                         item.version += 1
                         apply_willingness_details(item, details_form.cleaned_data, skip_partnership_type_if_empty=True)
                         item.save()
+                        save_partnership_departments(item, details_form.cleaned_data)
                         item.ensure_agreement_number()
                         save_partnership_clauses(item, parsed_clauses, request.user, allow_progress=False)
                         save_partnership_teams(item, parsed_teams)

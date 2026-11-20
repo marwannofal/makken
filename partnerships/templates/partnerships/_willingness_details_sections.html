@@ -40,6 +40,22 @@
         {{ details_form.signing_city }}
         <div class="field-error" role="alert">{{ details_form.signing_city.errors }}</div>
       </div>
+      <div class="partnership-field">
+        <label for="{{ details_form.headquarters_city.id_for_label }}">{{ details_form.headquarters_city.label }}</label>
+        {{ details_form.headquarters_city }}
+        <div class="field-error" role="alert">{{ details_form.headquarters_city.errors }}</div>
+      </div>
+      <div class="partnership-field">
+        <label for="{{ details_form.agreement_classification.id_for_label }}">{{ details_form.agreement_classification.label }}</label>
+        {{ details_form.agreement_classification }}
+        <div class="field-error" role="alert">{{ details_form.agreement_classification.errors }}</div>
+      </div>
+      <div class="partnership-field work-full">
+        <label for="{{ details_form.concerned_departments.id_for_label }}">{{ details_form.concerned_departments.label }}</label>
+        {{ details_form.concerned_departments }}
+        <p class="field-help">{{ details_form.concerned_departments.help_text }}</p>
+        <div class="field-error" role="alert">{{ details_form.concerned_departments.errors }}</div>
+      </div>
       {% if show_edit_clauses %}
       <div class="partnership-field">
         <label for="{{ details_form.partnership_type.id_for_label }}">{{ details_form.partnership_type.label }}</label>

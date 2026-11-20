@@ -86,6 +86,9 @@ class Partnership(models.Model):
     partnership_type = models.ForeignKey("partnerships.PartnershipType", on_delete=models.PROTECT, null=True, blank=True, related_name="partnerships", verbose_name="نوع الشراكة")
     signing_region = models.ForeignKey("regions.Region", on_delete=models.PROTECT, null=True, blank=True, related_name="signed_partnerships", verbose_name="منطقة التوقيع")
     signing_city = models.CharField("مدينة التوقيع", max_length=120, blank=True, default="")
+    agreement_classification = models.ForeignKey("agreement_clauses.AgreementClassification", on_delete=models.PROTECT, null=True, blank=True, related_name="partnerships", verbose_name="تصنيف الاتفاقية")
+    concerned_departments = models.ManyToManyField("accounts.Department", through="PartnershipDepartment", blank=True, related_name="concerned_partnerships", verbose_name="الإدارة المعنية")
+    headquarters_city = models.CharField("عنوان الجهة (مدينة المقر)", max_length=120, blank=True, default="")
     development_state_at = models.DateTimeField(default=timezone.now, editable=False)
     agreement_number = models.CharField("رقم الاتفاقية", max_length=24, unique=True, null=True, blank=True, editable=False)
     institution_signatory = models.CharField("اسم موقّع الشراكة من طرف المؤسسة", max_length=160, blank=True, default="")
@@ -153,6 +156,15 @@ class PartnershipRegion(models.Model):
     class Meta:
         default_permissions = ()
         constraints = [models.UniqueConstraint(fields=['partnership', 'region'], name='partnership_admin_region_unique')]
+
+
+class PartnershipDepartment(models.Model):
+    partnership = models.ForeignKey(Partnership, on_delete=models.CASCADE)
+    department = models.ForeignKey('accounts.Department', on_delete=models.PROTECT)
+
+    class Meta:
+        default_permissions = ()
+        constraints = [models.UniqueConstraint(fields=['partnership', 'department'], name='partnership_concerned_dept_unique')]
 
 
 class PartnershipOffering(models.Model):

@@ -142,3 +142,58 @@ class PartnershipTypeAndSigningTests(TestCase):
         self.assertEqual(p.partnership_type_id, pt.pk)
         self.assertEqual(p.signing_region_id, self.region.pk)
         self.assertEqual(p.signing_city, 'جدة')
+
+    def test_classification_departments_and_hq_city_saved_and_protected(self):
+        from accounts.models import Department
+        from agreement_clauses.models import AgreementClassification
+        from core.dependencies import DependencyBlocked, ensure_allowed
+
+        self.client.force_login(self.admin, backend=AUTH_BACKEND)
+        cls_obj = AgreementClassification.objects.first()
+        dept_objs = list(Department.objects.all()[:2])
+        pt = PartnershipType.objects.get(name='مذكرة تفاهم')
+        p = Partnership.objects.create(
+            name='شراكة اختبار التصنيف والإدارات',
+            representative='فيصل',
+            phone_country='SA',
+            phone='+966504445566',
+            email='cls@makken.test',
+            entity=self.entity,
+            scope='local',
+            development_state_id=DevelopmentState.CAPABILITY,
+            created_by=self.admin,
+        )
+        p.administrative_regions.add(self.region)
+
+        url = reverse('partnerships:willingness_index')
+        page = self.client.get(url)
+        row = next(r for r in page.context['rows'] if r['item'].pk == p.pk)
+        preview = self.client.post(url, {'action': 'preview', 'token': row['advance']})
+        ok = self.client.post(url, {
+            'action': 'confirm',
+            'token': preview.context['pending']['token'],
+            'agreement_type': str(pt.pk),
+            'attachments': _make_png('cls.png'),
+            'clauses_json': json.dumps([{'clause_id': self.clause.pk, 'responsibility': Responsibility.SHARED}]),
+            'work-title': 'متابعة التصنيف والإدارات',
+            'work-assignees': [str(self.reader.pk)],
+            'work-manager': str(self.admin.pk),
+            'details-agreement_classification': str(cls_obj.pk),
+            'details-concerned_departments': [str(d.pk) for d in dept_objs],
+            'details-headquarters_city': 'الخبر',
+        })
+        self.assertEqual(ok.status_code, 302)
+        p.refresh_from_db()
+        self.assertEqual(p.agreement_classification_id, cls_obj.pk)
+        self.assertEqual(p.headquarters_city, 'الخبر')
+        self.assertEqual(set(p.concerned_departments.values_list('pk', flat=True)), {d.pk for d in dept_objs})
+
+        # Dependency guard blocks deactivation & deletion of linked classification & departments
+        with self.assertRaises(DependencyBlocked):
+            ensure_allowed(cls_obj, 'toggle', active=False)
+        with self.assertRaises(DependencyBlocked):
+            ensure_allowed(cls_obj, 'delete')
+        with self.assertRaises(DependencyBlocked):
+            ensure_allowed(dept_objs[0], 'toggle', active=False)
+        with self.assertRaises(DependencyBlocked):
+            ensure_allowed(dept_objs[0], 'delete')
