@@ -834,3 +834,14 @@ legend > span[aria-hidden="true"] {
     padding: 20px 18px !important;
   }
 }
+
+/* Compact top spacing across all pages */
+.topbar {
+  min-height: 64px !important;
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+}
+
+.main-content {
+  padding-top: 16px !important;
+}
