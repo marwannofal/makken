@@ -193,6 +193,16 @@ def _save(payload, user):
         return item
 
 
+HIGHLIGHT_SESSION_KEY = "partnerships_highlighted_pk"
+
+
+def _redirect_to_list_with_highlight(request, item, return_to=None):
+    request.session[HIGHLIGHT_SESSION_KEY] = item.pk
+    if return_to == "willingness" or item.development_state_id == DevelopmentState.WILLINGNESS:
+        return redirect("partnerships:willingness_index")
+    return redirect("partnerships:capability_index")
+
+
 @module_view('partnerships')
 @login_required(login_url="accounts:login")
 @require_http_methods(["GET", "POST"])
@@ -210,7 +220,8 @@ def editor(request, pk=None, initial_state=DevelopmentState.CAPABILITY):
     active_nav = "partnerships_willingness" if is_will_create else "partnership_editor"
     context = _base(request, heading, active_nav)
     status, pending = 200, None
-    snapshot = _sign({"kind": "editor", "id": pk, "version": item.version if item else None, "nonce": str(uuid.uuid4()), "initial_state": initial_state}, request.user)
+    return_to = "willingness" if (request.GET.get("from") == "willingness" or is_will_create or (item and item.development_state_id == DevelopmentState.WILLINGNESS)) else "capability"
+    snapshot = _sign({"kind": "editor", "id": pk, "version": item.version if item else None, "nonce": str(uuid.uuid4()), "initial_state": initial_state, "return_to": return_to}, request.user)
     form = PartnershipForm(initial=_initial(item), instance=item, actor=request.user)
     willingness_form = WillingnessTransitionForm() if is_will_create else None
     work_form = PartnershipWorkForm(prefix="work", actor=request.user) if is_will_create else None
@@ -252,7 +263,7 @@ def editor(request, pk=None, initial_state=DevelopmentState.CAPABILITY):
                         repeated = Partnership.objects.filter(request_key=original["nonce"]).first()
                         if repeated:
                             require_write(request.user, repeated)
-                            return add_login_headers(redirect("partnerships:edit", pk=repeated.pk))
+                            return add_login_headers(_redirect_to_list_with_highlight(request, repeated, return_to="willingness"))
                         clean = form.cleaned_data
                         new_item = Partnership(
                             request_key=original["nonce"],
@@ -278,7 +289,7 @@ def editor(request, pk=None, initial_state=DevelopmentState.CAPABILITY):
                         save_partnership_teams(new_item, parsed_teams)
                         create_partnership_work(request.user, work_form.cleaned_data, new_item)
                     messages.success(request, "تم إنشاء الشراكة في حالة رغبة وحفظ المرفقات وبنود الاتفاقية وإسناد العمل بنجاح.")
-                    return add_login_headers(redirect("partnerships:edit", pk=new_item.pk))
+                    return add_login_headers(_redirect_to_list_with_highlight(request, new_item, return_to="willingness"))
                 else:
                     status = 400
                     context["error"] = "راجع الحقول المطلوبة في البيانات الأساسية والمرفقات وبنود الاتفاقية وإسناد العمل."
@@ -327,7 +338,7 @@ def editor(request, pk=None, initial_state=DevelopmentState.CAPABILITY):
                     form = PartnershipForm(payload["data"], instance=item, actor=request.user)
                     saved = _save(payload, request.user)
                     messages.success(request, "تم حفظ بيانات الجهة بنجاح.")
-                    return add_login_headers(redirect("partnerships:edit", pk=saved.pk))
+                    return add_login_headers(_redirect_to_list_with_highlight(request, saved, return_to=payload.get("return_to")))
                 else:
                     raise signing.BadSignature
     except DependencyBlocked as exc:
@@ -351,10 +362,7 @@ def editor(request, pk=None, initial_state=DevelopmentState.CAPABILITY):
             drafts = []
     except (ValueError, TypeError):
         drafts = []
-    if item:
-        from agreement_clauses.workflow import partnership_panel
-        context["clause_panel"] = partnership_panel(item)
-    back_url = reverse("partnerships:willingness_index") if (is_will_create or (item and item.development_state_id == DevelopmentState.WILLINGNESS)) else reverse("partnerships:capability_index")
+    back_url = reverse("partnerships:willingness_index") if return_to == "willingness" else reverse("partnerships:capability_index")
     context.update(
         item=item,
         form=form,
@@ -503,9 +511,12 @@ def index(request, fixed_state=None):
                         item.save(update_fields=["is_active", "version", "updated_at"])
                         message = "تم تحديث حالة السجل بنجاح."
                     messages.success(request, message)
+                    if data["operation"] == "advance":
+                        destination = _redirect_to_list_with_highlight(request, item, return_to="willingness")
+                        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                            return add_login_headers(JsonResponse({"redirect": destination.url}))
+                        return add_login_headers(destination)
                     destination = financial_redirect(request)
-                    if data["operation"] == "advance" and request.headers.get("X-Requested-With") == "XMLHttpRequest":
-                        return add_login_headers(JsonResponse({"redirect": destination.url}))
                     return add_login_headers(destination)
     except DependencyBlocked as exc:
         context.update(blocked_context(exc))
@@ -566,7 +577,13 @@ def index(request, fixed_state=None):
     if not financial.valid:
         status = 400
     query = financial.queryset
-    page = Paginator(query, 15).get_page(request.GET.get("page"))
+    highlighted_pk = request.session.pop(HIGHLIGHT_SESSION_KEY, None) if request.method == "GET" else None
+    page_number = request.GET.get("page")
+    if highlighted_pk and not page_number:
+        ordered_pks = list(query.values_list("pk", flat=True))
+        if highlighted_pk in ordered_pks:
+            page_number = (ordered_pks.index(highlighted_pk) // 15) + 1
+    page = Paginator(query, 15).get_page(page_number)
     rows = []
     for item in page:
         token = {"kind": "row", "id": item.pk, "version": item.version}
@@ -587,7 +604,7 @@ def index(request, fixed_state=None):
     if detail:
         from agreement_clauses.workflow import partnership_panel
         context["clause_panel"] = partnership_panel(detail)
-    context.update(rows=rows, page_obj=page, q=q, selected_status=active, pending=pending, detail=detail, history=_history(detail), result_query=result_query, list_url=reset_url + "?" + result_query, add_url=add_url, reset_url=reset_url, hide_development_filter=bool(fixed_state), show_agreement_number=(fixed_state == DevelopmentState.WILLINGNESS))
+    context.update(rows=rows, page_obj=page, highlighted_pk=highlighted_pk, q=q, selected_status=active, pending=pending, detail=detail, history=_history(detail), result_query=result_query, list_url=reset_url + "?" + result_query, add_url=add_url, reset_url=reset_url, hide_development_filter=bool(fixed_state), show_agreement_number=(fixed_state == DevelopmentState.WILLINGNESS))
     return add_login_headers(render(request, "partnerships/index.html", context, status=status))
 
 

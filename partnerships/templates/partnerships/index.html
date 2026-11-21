@@ -8,8 +8,8 @@
 {% block extra_head %}
   <link rel="stylesheet" href="{% static 'partnerships/willingness_upload.css' %}?v=20261017-1">
   <link rel="stylesheet" href="{% static 'care_states/states.css' %}?v=20261015-1">
-  <link rel="stylesheet" href="{% static 'partnerships/partnerships.css' %}?v=20261015-1">
-  <script src="{% static 'partnerships/partnerships.js' %}?v=20261017-uploads" defer></script>
+  <link rel="stylesheet" href="{% static 'partnerships/partnerships.css' %}?v=20261121-5">
+  <script src="{% static 'partnerships/partnerships.js' %}?v=20261121-5" defer></script>
   {% include "partnerships/_financial_assets.html" %}
   {% include "partnerships/_development_filter_assets.html" %}
   <script src="{% static 'partnerships/willingness_upload.js' %}?v=20261120-1" defer></script>
@@ -74,7 +74,7 @@
         </thead>
         <tbody>
           {% for row in rows %}
-            <tr data-partnership-row data-row-url="?{{ result_query }}&amp;detail={{ row.item.pk }}">
+            <tr data-partnership-row{% if highlighted_pk and row.item.pk == highlighted_pk %} class="is-highlighted-row" data-highlighted-row{% endif %} data-row-url="?{{ result_query }}&amp;detail={{ row.item.pk }}">
               {% if show_agreement_number %}
                 <td><bdi dir="ltr">{{ row.item.agreement_number|default:"—" }}</bdi></td>
               {% endif %}
@@ -121,7 +121,7 @@
               </td><td>
               <div class="row-actions">
                 {% allowed 'partnerships' 'edit' row.item %}
-                  <a class="row-action" href="{% url 'partnerships:edit' row.item.pk %}" aria-label="تعديل {{ row.item.name }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m16 4 4 4M4 20l5-1L20 8a2.8 2.8 0 0 0-4-4L5 15Z"/></svg>تعديل</a>
+                  <a class="row-action" href="{% url 'partnerships:edit' row.item.pk %}{% if show_agreement_number %}?from=willingness{% endif %}" aria-label="تعديل {{ row.item.name }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m16 4 4 4M4 20l5-1L20 8a2.8 2.8 0 0 0-4-4L5 15Z"/></svg>تعديل</a>
                 {% endallowed %}
                 {% allowed 'partnerships' 'delete' row.item %}
                   <form method="post">

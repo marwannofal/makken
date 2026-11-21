@@ -33,6 +33,10 @@
     if (event.target.closest('a,button,input,select,textarea,label,form,[data-development-cell]') || getSelection()?.toString()) return;
     location.assign(row.dataset.rowUrl);
   }));
+  const highlightedRow = $('[data-highlighted-row]');
+  if (highlightedRow) {
+    highlightedRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
 
   const source = $('#partnership-catalog');
   if (!source) return;

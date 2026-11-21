@@ -279,6 +279,25 @@
   background: #f5fbf9;
 }
 
+.register-table tbody tr.is-highlighted-row {
+  background: #e6f7f5;
+  box-shadow: inset -4px 0 0 #24b3af;
+  animation: mk-row-highlight-in 0.7s ease-out;
+}
+
+.register-table tbody tr.is-highlighted-row:hover {
+  background: #dcf3f0;
+}
+
+@keyframes mk-row-highlight-in {
+  0% {
+    background: #c8efea;
+  }
+  100% {
+    background: #e6f7f5;
+  }
+}
+
 .record-link {
   font-weight: 700;
   color: #205a58;
