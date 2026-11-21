@@ -5,7 +5,7 @@
   border-radius: 22px;
   background: linear-gradient(135deg, #005b85 0%, #003f5e 100%);
   color: #ffffff;
-  min-height: calc(100vh - 170px);
+  min-height: calc(90vh - 170px);
   display: flex;
   align-items: center;
   padding: 64px 68px;
