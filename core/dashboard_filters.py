@@ -21,9 +21,9 @@ class DashboardFilterForm(forms.Form):
     period = forms.ChoiceField(label='الفترة الزمنية', required=False, initial='all', choices=[
         ('all','جميع الفترات'), ('month','الشهر الحالي'), ('quarter','الربع الحالي'),
         ('year','السنة الحالية'), ('custom','فترة مخصصة')])
-    date_from = forms.DateField(label='من تاريخ', required=False, input_formats=['%Y-%m-%d'],
+    date_from = forms.DateField(label='من تاريخ', required=False, input_formats=['%d/%m/%Y', '%Y-%m-%d'],
         widget=forms.DateInput(attrs={'type':'date'}))
-    date_to = forms.DateField(label='إلى تاريخ', required=False, input_formats=['%Y-%m-%d'],
+    date_to = forms.DateField(label='إلى تاريخ', required=False, input_formats=['%d/%m/%Y', '%Y-%m-%d'],
         widget=forms.DateInput(attrs={'type':'date'}))
 
     def __init__(self, *args, choices, pairs=(), now=None, **kwargs):

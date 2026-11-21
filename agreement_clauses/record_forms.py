@@ -68,7 +68,7 @@ class LocalErrors:
 
 class DetailsForm(LocalErrors, forms.ModelForm):
     signed_on = forms.DateField(
-        label='تاريخ التوقيع', required=False, input_formats=['%Y-%m-%d'],
+        label='تاريخ التوقيع', required=False, input_formats=['%d/%m/%Y', '%Y-%m-%d'],
         widget=forms.DateInput(format='%Y-%m-%d', attrs={'type': 'date', 'dir': 'ltr'}),
     )
     departments = DepartmentChoice(

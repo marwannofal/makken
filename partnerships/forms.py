@@ -22,7 +22,7 @@ def term_date_field(label):
     return forms.DateField(
         label=label,
         required=False,
-        input_formats=["%Y-%m-%d"],
+        input_formats=["%d/%m/%Y", "%Y-%m-%d"],
         widget=forms.DateInput(format="%Y-%m-%d", attrs={"type": "date", "dir": "ltr"}),
         error_messages={"invalid": "أدخل تاريخًا صحيحًا."},
     )

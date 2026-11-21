@@ -17,11 +17,11 @@ class ActivityFilterForm(forms.Form):
     action = forms.ChoiceField(label='العملية', required=False, choices=[('', 'جميع العمليات'), *ActivityAction.choices])
     outcome = forms.ChoiceField(label='النتيجة', required=False,
                                choices=[('', 'جميع النتائج'), ('success','ناجحة'), ('denied','مرفوضة')])
-    date_from = forms.DateField(label='من تاريخ', required=False, input_formats=['%Y-%m-%d'],
+    date_from = forms.DateField(label='من تاريخ', required=False, input_formats=['%d/%m/%Y', '%Y-%m-%d'],
                                 widget=forms.DateInput(attrs={'type':'date'}))
     time_from = forms.TimeField(label='من الساعة', required=False, input_formats=['%H:%M','%H:%M:%S'],
                                 widget=forms.TimeInput(attrs={'type':'time', 'step':'1'}))
-    date_to = forms.DateField(label='إلى تاريخ', required=False, input_formats=['%Y-%m-%d'],
+    date_to = forms.DateField(label='إلى تاريخ', required=False, input_formats=['%d/%m/%Y', '%Y-%m-%d'],
                               widget=forms.DateInput(attrs={'type':'date'}))
     time_to = forms.TimeField(label='إلى الساعة', required=False, input_formats=['%H:%M','%H:%M:%S'],
                               widget=forms.TimeInput(attrs={'type':'time', 'step':'1'}))
