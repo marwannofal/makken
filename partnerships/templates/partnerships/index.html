@@ -69,7 +69,7 @@
             {% if show_agreement_number %}
               <th scope="col">رقم الشراكة</th>
             {% endif %}
-            <th scope="col">اسم الجهة</th><th scope="col">الكيان / فرعه</th><th scope="col">النطاق</th><th scope="col" class="development-state-heading">حالة التطور الحالي للجهة</th><th scope="col">هاتف التواصل</th><th scope="col">البريد الإلكتروني</th><th scope="col">القدرة المالية</th>{% if show_agreement_number %}<th scope="col">آخر تحديث للمتابعة</th>{% endif %}<th scope="col">حالة السجل</th><th scope="col">الإجراء</th>
+            <th scope="col">اسم الجهة</th><th scope="col">فرع الكيان</th><th scope="col">النطاق</th><th scope="col" class="development-state-heading">حالة التطور الحالي للجهة</th><th scope="col">هاتف التواصل</th><th scope="col">البريد الإلكتروني</th><th scope="col">القدرة المالية</th>{% if show_agreement_number %}<th scope="col">آخر تحديث للمتابعة</th>{% endif %}<th scope="col">حالة السجل</th><th scope="col">الإجراء</th>
           </tr>
         </thead>
         <tbody>
@@ -78,11 +78,7 @@
               {% if show_agreement_number %}
                 <td><bdi dir="ltr">{{ row.item.agreement_number|default:"—" }}</bdi></td>
               {% endif %}
-              <th scope="row"><a class="record-link" href="?{{ result_query }}&amp;detail={{ row.item.pk }}"><bdi>{{ row.item.name }}</bdi></a></th><td><bdi>{{ row.item.entity.name }}</bdi><small>{{ row.item.entity.get_entity_type_display }}
-              {% if row.item.entity.branch %}
-                / {{ row.item.entity.get_branch_display }}
-              {% endif %}
-              </small></td><td>{{ row.item.get_scope_display }}</td><td class="development-state-cell" data-development-cell>{% development_pill row.item.development_state %}</td><td><bdi dir="ltr">{{ row.item.phone }}</bdi></td><td><bdi>{{ row.item.email }}</bdi></td><td class="financial-capacity-cell" data-financial-capacity-cell>
+              <th scope="row"><a class="record-link" href="?{{ result_query }}&amp;detail={{ row.item.pk }}"><bdi>{{ row.item.name }}</bdi></a></th><td><bdi>{% if row.item.entity.branch %}{{ row.item.entity.get_branch_display }}{% else %}{{ row.item.entity.get_entity_type_display }}{% endif %}</bdi></td><td>{{ row.item.get_scope_display }}</td><td class="development-state-cell" data-development-cell>{% development_pill row.item.development_state %}</td><td><bdi dir="ltr">{{ row.item.phone }}</bdi></td><td><bdi>{{ row.item.email }}</bdi></td><td class="financial-capacity-cell" data-financial-capacity-cell>
               {% include "partnerships/_financial_value.html" with amount=row.item.financial_capacity %}
               </td>{% if show_agreement_number %}<td data-followup-cell="{{ row.item.pk }}">{% if row.item.followup_updated_at %}{% timezone "Asia/Riyadh" %}<bdi dir="ltr">{{ row.item.followup_updated_at|date:"d/m/Y H:i" }}</bdi>{% endtimezone %}<small>{{ row.item.followup_updated_by.get_full_name|default:row.item.followup_updated_by.username|default:"" }}</small>{% else %}—{% endif %}</td>{% endif %}<td>
               {% allowed 'partnerships' 'change_status' row.item %}

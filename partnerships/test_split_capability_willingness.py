@@ -121,3 +121,10 @@ class SplitCapabilityWillingnessPagesTests(TestCase):
                 self.assertContains(res, 'detail-dialog-actions')
                 self.assertContains(res, 'detail-close-btn')
                 self.assertContains(res, 'إغلاق')
+
+    def test_partnerships_table_displays_only_entity_branch_column(self):
+        self.client.force_login(self.admin, backend=AUTH_BACKEND)
+        res = self.client.get(reverse('partnerships:capability_index'))
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, '<th scope="col">فرع الكيان</th>', html=True)
+        self.assertNotContains(res, '<th scope="col">الكيان / فرعه</th>', html=True)
