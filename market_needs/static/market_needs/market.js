@@ -36,13 +36,60 @@
     select.labels[0]?.addEventListener('click',e=>{e.preventDefault();trigger.focus();});
     function close(){panel.hidden=true;trigger.setAttribute('aria-expanded','false');if(opened===control)opened=null;}
     function filter(){const term=normal(search.value);$$('[data-option]',options).forEach(n=>n.hidden=!normal(n.textContent).includes(term));let empty=$('.market-select-options-empty',options);if(empty)empty.remove();if(!$$('[data-option]',options).some(n=>!n.hidden))options.append(make('p','market-select-options-empty','لا توجد خيارات مطابقة.'));}
-    function update(){options.replaceChildren();[...select.options].filter(o=>o.value&&!o.hidden&&!o.disabled).forEach(option=>{const b=make('button','search-select-option',(select.multiple?(option.selected?'☑ ':'☐ '):'')+option.textContent);b.type='button';b.dataset.option=option.value;b.setAttribute('aria-pressed',String(option.selected));b.addEventListener('click',()=>{if(select.multiple)option.selected=!option.selected;else select.value=option.value;select.dispatchEvent(new Event('change',{bubbles:true}));error.textContent='';update();if(!select.multiple){close();trigger.focus();}else $('[data-option="'+option.value+'"]',options)?.focus();});options.append(b);});const chosen=[...select.selectedOptions].filter(o=>o.value);summary.textContent=select.multiple?(chosen.length?chosen.length+' اختيار محدد':'اختر من القائمة'):(chosen[0]?.textContent||'اختر من القائمة');tags.textContent=select.multiple?chosen.map(o=>o.textContent).join('، '):'';trigger.disabled=select.disabled||select.dataset.marketLocked==='1';filter();}
+    let multiFooter = null, multiDoneBtn = null;
+    if (select.multiple) {
+      multiFooter = make('div', 'mk-multi-footer');
+      multiDoneBtn = make('button', 'mk-multi-done', 'تم');
+      multiDoneBtn.type = 'button';
+      multiDoneBtn.addEventListener('click', e => { e.stopPropagation(); close(); trigger.focus(); });
+      const multiClearBtn = make('button', 'mk-multi-clear', 'مسح التحديد');
+      multiClearBtn.type = 'button';
+      multiClearBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        [...select.options].forEach(o => { o.selected = false; });
+        select.dispatchEvent(new Event('change', {bubbles: true}));
+        update();
+      });
+      multiFooter.append(multiDoneBtn, multiClearBtn);
+      panel.append(multiFooter);
+    }
+    function update(){
+      const prevScroll = options.scrollTop;
+      options.replaceChildren();
+      [...select.options].filter(o=>o.value&&!o.hidden&&!o.disabled).forEach(option=>{
+        const b=make('button','search-select-option',(select.multiple?(option.selected?'☑ ':'☐ '):'')+option.textContent);
+        b.type='button';
+        b.dataset.option=option.value;
+        b.setAttribute('aria-pressed',String(option.selected));
+        b.addEventListener('click', e => {
+          e.stopPropagation();
+          if(select.multiple) option.selected = !option.selected;
+          else select.value = option.value;
+          select.dispatchEvent(new Event('change',{bubbles:true}));
+          error.textContent='';
+          update();
+          if(!select.multiple){ close(); trigger.focus(); }
+          else {
+            options.scrollTop = prevScroll;
+            $('[data-option="'+option.value+'"]',options)?.focus({preventScroll:true});
+          }
+        });
+        options.append(b);
+      });
+      options.scrollTop = prevScroll;
+      const chosen=[...select.selectedOptions].filter(o=>o.value);
+      summary.textContent=select.multiple?(chosen.length?chosen.length+' اختيار محدد':'اختر من القائمة'):(chosen[0]?.textContent||'اختر من القائمة');
+      if (multiDoneBtn) multiDoneBtn.textContent = chosen.length ? `تم (${chosen.length} محدد)` : 'إغلاق';
+      tags.textContent=select.multiple?chosen.map(o=>o.textContent).join('، '):'';
+      trigger.disabled=select.disabled||select.dataset.marketLocked==='1';
+      filter();
+    }
     function position(){if(!select.closest('.market-edit-lines'))return;const r=trigger.getBoundingClientRect();panel.style.width=r.width+'px';panel.style.left=Math.min(r.left,innerWidth-r.width-20)+'px';panel.style.top=Math.min(r.bottom+5,innerHeight-260)+'px';}
     const control={update,close,trigger};controls.set(select,control);trigger.addEventListener('click',()=>{if(!panel.hidden){close();return;}opened?.close();panel.hidden=false;position();trigger.setAttribute('aria-expanded','true');opened=control;search.value='';filter();search.focus();});search.addEventListener('input',filter);trigger.addEventListener('keydown',e=>{if(e.key==='ArrowDown'){e.preventDefault();if(panel.hidden)trigger.click();else search.focus();}});wrapper.addEventListener('keydown',e=>{if(e.key==='Escape'&&!panel.hidden){e.preventDefault();e.stopPropagation();close();trigger.focus();}if(!panel.hidden&&['ArrowDown','ArrowUp','Home','End'].includes(e.key)){const buttons=$$('[data-option]',options).filter(b=>!b.hidden);if(!buttons.length||e.target===search&&['Home','End'].includes(e.key))return;e.preventDefault();let i=buttons.indexOf(document.activeElement);i=e.key==='Home'?0:e.key==='End'?buttons.length-1:(i+(e.key==='ArrowUp'?-1:1)+buttons.length)%buttons.length;buttons[i].focus();}});select.addEventListener('change',update);select.addEventListener('invalid',e=>{e.preventDefault();error.textContent='اختر قيمة متاحة من القائمة.';trigger.focus();});update();return control;
   }
   $$('[data-market-select]').forEach(enhance);
-  document.addEventListener('click',e=>{if(!e.target.closest('.market-select'))opened?.close();});
-  document.addEventListener('focusin',e=>{if(!e.target.closest('.market-select'))opened?.close();});
+  document.addEventListener('click',e=>{if(e.target.isConnected&&!e.target.closest('.market-select'))opened?.close();});
+  document.addEventListener('focusin',e=>{if(e.target.isConnected&&!e.target.closest('.market-select'))opened?.close();});
   window.addEventListener('resize',()=>opened?.close());
   document.addEventListener('scroll',e=>{if(opened&&opened.trigger.closest('.market-edit-lines')&&!e.target.closest?.('.search-select-panel'))opened.close();},true);
 

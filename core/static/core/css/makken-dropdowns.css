@@ -1,0 +1,163 @@
+/* Makken site-wide readable bold dropdowns (single + multi-select, RTL-first, responsive, CSP-safe). */
+
+:root .main-content .search-select-trigger,
+:root .main-content .market-select-trigger {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: #163d3b !important;
+}
+
+:root .main-content .search-select-panel {
+  padding: 10px !important;
+  border: 1px solid #cde2de !important;
+  border-radius: 14px !important;
+  box-shadow: 0 14px 36px rgba(15, 64, 62, 0.16) !important;
+  z-index: 70 !important;
+}
+
+:root .main-content .search-select-panel input[type="search"],
+:root .main-content .search-select-panel input {
+  height: 44px !important;
+  min-height: 44px !important;
+  padding: 0 14px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #163d3b !important;
+  border: 1px solid #b8d8d3 !important;
+  border-radius: 10px !important;
+}
+
+:root .main-content .search-select-options {
+  max-height: 280px !important;
+  margin-top: 8px !important;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+:root .main-content .search-select-option {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: 100% !important;
+  min-height: 44px !important;
+  padding: 10px 14px !important;
+  border: 1px solid transparent !important;
+  border-radius: 10px !important;
+  background: #ffffff !important;
+  color: #163d3b !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  line-height: 1.65 !important;
+  text-align: start !important;
+  cursor: pointer;
+  transition: background 0.14s ease, border-color 0.14s ease, color 0.14s ease;
+}
+
+:root .main-content .search-select-option:hover {
+  background: #eaf8f5 !important;
+  border-color: #bfe7e1 !important;
+  color: #0d5e59 !important;
+}
+
+:root .main-content .search-select-option[aria-pressed="true"],
+:root .main-content .search-select-option[aria-selected="true"] {
+  background: #dff5f1 !important;
+  border-color: #24b3af !important;
+  color: #0b5550 !important;
+  font-weight: 800 !important;
+}
+
+:root .main-content .search-select-option:focus-visible {
+  outline: 2px solid #24b3af;
+  outline-offset: -2px;
+}
+
+:root .main-content .search-select-option input[type="checkbox"] {
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 18px !important;
+  min-height: 18px !important;
+  accent-color: #24b3af;
+}
+
+:root .main-content .selected-summary {
+  margin-top: 8px;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: #156d67 !important;
+  line-height: 1.8 !important;
+}
+
+:root .main-content .market-select-options-empty,
+:root .main-content .search-select-empty {
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+  color: #5b7977 !important;
+  padding: 12px !important;
+  text-align: center;
+}
+
+/* Multi-select sticky action footer so user can pick many options then close cleanly */
+.mk-multi-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #e1efec;
+}
+
+.mk-multi-done {
+  flex: 1 1 auto;
+  min-height: 38px;
+  padding: 6px 14px;
+  border: 0;
+  border-radius: 10px;
+  background: #24b3af;
+  color: #ffffff;
+  font: 700 13.5px/1.5 Cairo, sans-serif;
+  cursor: pointer;
+  transition: background 0.14s ease;
+}
+
+.mk-multi-done:hover {
+  background: #1a9b97;
+}
+
+.mk-multi-clear {
+  min-height: 38px;
+  padding: 6px 12px;
+  border: 1px solid #d2e4e0;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #3d6360;
+  font: 700 13px/1.5 Cairo, sans-serif;
+  cursor: pointer;
+}
+
+.mk-multi-clear:hover {
+  background: #f3faf8;
+  color: #164946;
+}
+
+/* Native <select> and <option> readability */
+:root .main-content select:not(.native-enhanced) {
+  font-size: 14px;
+  font-weight: 700;
+  color: #163d3b;
+}
+
+:root .main-content select option {
+  font-size: 15px;
+  font-weight: 700;
+  padding: 8px;
+}
+
+@media (max-width: 600px) {
+  :root .main-content .search-select-option {
+    min-height: 48px !important;
+    font-size: 15px !important;
+  }
+}
