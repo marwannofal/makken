@@ -858,11 +858,11 @@ legend > span[aria-hidden="true"] {
 
 .mk-sidebar-toggle {
   position: fixed;
-  top: 15px;
-  inset-inline-start: calc(var(--sidebar-width) - 17px);
+  top: 10px;
+  inset-inline-start: calc(var(--sidebar-width) - 22px);
   z-index: 60;
-  width: 34px;
-  height: 34px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   border: 2px solid #005b85;
   background: #ffffff;
@@ -882,11 +882,11 @@ legend > span[aria-hidden="true"] {
 }
 
 .mk-sidebar-toggle svg {
-  width: 18px;
-  height: 18px;
+  width: 28px;
+  height: 28px;
   fill: none;
   stroke: currentColor;
-  stroke-width: 2.4;
+  stroke-width: 2.8;
   stroke-linecap: round;
   stroke-linejoin: round;
   transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
@@ -920,7 +920,7 @@ body.mk-sidebar-collapsed .mk-sidebar-toggle svg {
 }
 
 body.mk-sidebar-collapsed .topbar {
-  padding-inline-start: 58px !important;
+  padding-inline-start: 68px !important;
 }
 
 @media (max-width: 900px) {
