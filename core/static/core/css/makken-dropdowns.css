@@ -400,3 +400,15 @@ select.mk-ss-native {
   background: #e4f1f8;
   color: #003954;
 }
+
+
+/* CRITICAL: ensure [hidden] always hides filtered dropdown options despite display:flex !important */
+:root .main-content .search-select-option[hidden],
+:root .main-content .search-select-panel[hidden],
+.search-select-option[hidden],
+.search-select-panel[hidden],
+.mk-ss-opt[hidden],
+.mk-ss-panel[hidden],
+.mk-ss-empty[hidden] {
+  display: none !important;
+}
