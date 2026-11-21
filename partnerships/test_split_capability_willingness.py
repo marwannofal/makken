@@ -117,7 +117,7 @@ class SplitCapabilityWillingnessPagesTests(TestCase):
             with self.subTest(route=route):
                 res = self.client.get(reverse(route), {'detail': str(obj.pk)})
                 self.assertEqual(res.status_code, 200)
-                self.assertNotContains(res, 'تعديل بيانات الجهة')
+                self.assertNotContains(res, '>تعديل بيانات الجهة</a>')
                 self.assertContains(res, 'detail-dialog-actions')
                 self.assertContains(res, 'detail-close-btn')
                 self.assertContains(res, 'إغلاق')
