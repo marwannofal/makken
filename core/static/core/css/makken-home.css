@@ -778,4 +778,5 @@ label > span[aria-hidden="true"],
 legend > span[aria-hidden="true"] {
   color: #dc2626;
   font-weight: 700;
+  margin-inline: 0.25em;
 }
