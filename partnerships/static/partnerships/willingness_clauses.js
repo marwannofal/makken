@@ -225,7 +225,11 @@
         const tdName = document.createElement('th');
         tdName.scope = 'row';
         const info = clauseMap.get(String(row.clause_id));
-        tdName.textContent = row.clause_name || (info ? info.name : '#' + row.clause_id);
+        const numBadge = document.createElement('span');
+        numBadge.className = 'mk-clause-num';
+        numBadge.textContent = String(idx + 1);
+        const nameText = document.createTextNode(row.clause_name || (info ? info.name : '#' + row.clause_id));
+        tdName.append(numBadge, nameText);
         tr.appendChild(tdName);
 
         const tdResp = document.createElement('td');

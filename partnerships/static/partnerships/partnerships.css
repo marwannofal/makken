@@ -1380,3 +1380,55 @@
     height: 38px;
   }
 }
+
+
+/* Side-by-side clause notes & evidence + numbered clause badges */
+.mk-cp-clauses-acc {
+  margin-bottom: 14px;
+}
+
+.mk-cp-clause-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mk-cp-num,
+.mk-clause-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: #005b85;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.mk-clause-num {
+  margin-inline-end: 8px;
+}
+
+.mk-cp-extras {
+  grid-column: 1 / -1;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 14px 18px !important;
+  align-items: start;
+  padding-top: 10px;
+  border-top: 1px dashed #d8e3e8;
+}
+
+.mk-cp-extras .mk-cp-notes {
+  min-height: 76px;
+}
+
+@media (max-width: 720px) {
+  .mk-cp-extras {
+    grid-template-columns: 1fr;
+  }
+}

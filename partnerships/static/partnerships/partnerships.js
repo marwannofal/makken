@@ -168,15 +168,22 @@
 
       cpList.replaceChildren();
       const items = Array.isArray(data.clauses) ? data.clauses : [];
+      const countEl = cpDialog.querySelector('[data-cp-clauses-count]');
+      if (countEl) countEl.textContent = `${items.length} بند`;
       if (!items.length) {
         cpList.append(make('div', 'mk-cp-empty', 'لا توجد بنود اتفاقية مسندة لهذه الشراكة بعد.'));
       } else {
-        items.forEach(item => {
+        items.forEach((item, idx) => {
           const row = make('div', 'mk-cp-row');
           row.dataset.cpClauseCard = String(item.id);
           const info = make('div', 'mk-cp-info');
+          const head = make('div', 'mk-cp-clause-head');
+          head.append(
+            make('span', 'mk-cp-num', String(idx + 1)),
+            make('span', 'mk-cp-clause-name', item.name)
+          );
           info.append(
-            make('span', 'mk-cp-clause-name', item.name),
+            head,
             make('span', 'mk-cp-resp', `المسؤولية: ${item.responsibility_label}`)
           );
           const inputWrap = make('div', 'mk-cp-input-wrap');
