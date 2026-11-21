@@ -17,7 +17,8 @@ class ModuleDefinition:
 
 
 MODULES = (
-    ModuleDefinition('dashboard', 'الرئيسية', 'makken_home', ('view',)),
+    ModuleDefinition('home', 'الرئيسية', 'makken_home', ('view',)),
+    ModuleDefinition('dashboard', 'مركز المؤشرات والتحليلات', 'core:dashboard', ('view',)),
     ModuleDefinition('care_states', 'حالات التطور', 'care_states:index', ('view', 'edit')),
     ModuleDefinition('levels', 'المستويات', 'levels:index', CRUD),
     ModuleDefinition('regions', 'المناطق', 'regions:index', CRUD),
@@ -38,6 +39,10 @@ MODULES = (
     ModuleDefinition('agreement_classifications', 'تصنيف الاتفاقية', 'agreement_clauses:classifications', CRUD),
     ModuleDefinition('departments', 'إدارة الإدارات', 'accounts:departments', CRUD),
     ModuleDefinition('partnership_types', 'أنواع الشراكة', 'partnership_types', CRUD),
+    ModuleDefinition('partnerships_all', 'جميع الشراكات', 'partnerships:all_index', ('view',)),
+    ModuleDefinition('agreement_inquiries', 'الاستعلامات', 'partnerships:agreement_inquiries', ('view',)),
+    ModuleDefinition('partnership_achievement', 'إنجاز الشراكات', 'partnerships:achievement_report', ('view',)),
+    ModuleDefinition('sponsor_requests', 'طلبات الرعاة الخارجيين', 'partnerships:sponsor_requests', ('view', 'edit')),
 )
 # BEGIN MAKKEN FORMAT EXPORT RIGHTS v1
 TABLE_EXPORT_OPERATIONS = ('export_xlsx', 'export_pdf')

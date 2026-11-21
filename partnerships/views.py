@@ -690,7 +690,7 @@ def willingness_index(request):
     return index(request, fixed_state=DevelopmentState.WILLINGNESS)
 
 
-@module_view('partnerships')
+@module_view('partnerships_all')
 @login_required(login_url="accounts:login")
 @require_http_methods(["GET", "HEAD"])
 def all_index(request):

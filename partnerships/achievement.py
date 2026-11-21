@@ -359,7 +359,7 @@ def build_achievement_report(actor, params):
     return result
 
 
-@module_view('partnerships')
+@module_view('partnership_achievement')
 @require_GET
 def partnership_achievement_report(request):
     report = build_achievement_report(request.user, request.GET)

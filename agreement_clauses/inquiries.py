@@ -359,7 +359,7 @@ def _serialize_row(partnership, works_by_pk):
     }
 
 
-@module_view('partnerships')
+@module_view('agreement_inquiries')
 @require_GET
 def agreement_inquiries(request):
     policy = RegionalPolicy(request.user)

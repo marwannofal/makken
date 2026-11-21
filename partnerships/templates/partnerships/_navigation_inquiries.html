@@ -1,5 +1,5 @@
 {% load access_tags %}
 {# MAKKEN ACCESS NAV v1 #}
-{% allowed 'partnerships' 'view' %}
+{% allowed 'agreement_inquiries' 'view' %}
   {% include "core/partials/sidebar/_link.html" with nav_page="agreement_inquiries" nav_url="partnerships:agreement_inquiries" nav_label="الاستعلامات" nav_path="M11 4a7 7 0 1 0 0 14a7 7 0 1 0 0-14M16 16l5 5" active_page=active_page request=request only %}
 {% endallowed %}

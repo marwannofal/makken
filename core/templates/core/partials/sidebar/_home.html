@@ -1,6 +1,8 @@
 {% load access_tags %}
 {# MAKKEN ACCESS NAV v1 #}
-{% include "core/partials/sidebar/_link.html" with nav_page="home" nav_url="makken_home" nav_label="الرئيسية" nav_use="#icon-home" active_page=active_page request=request only %}
+{% allowed 'home' 'view' %}
+  {% include "core/partials/sidebar/_link.html" with nav_page="home" nav_url="makken_home" nav_label="الرئيسية" nav_use="#icon-home" active_page=active_page request=request only %}
+{% endallowed %}
 {% allowed 'dashboard' 'view' %}
   {% include "core/partials/sidebar/_link.html" with nav_page="dashboard" nav_url="core:dashboard" nav_label="مركز المؤشرات والتحليلات" nav_path="M3 3v18h18M7 15l4-4 3 3 5-6" active_page=active_page request=request only %}
 {% endallowed %}

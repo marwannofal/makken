@@ -26,7 +26,7 @@ class AccessBoundaryMiddleware(MiddlewareMixin):
         if route in SELF_ROUTES:return None
         if request.resolver_match.namespace=='admin' or getattr(view_func,'_access_superuser',False):
             return None if policy.superuser else denied(request,'هذه الصفحة متاحة لمدير النظام الأعلى فقط.')
-        if route in {'makken_home','home'} and not policy.can('dashboard'):
+        if route in {'makken_home','home'} and not policy.can('home'):
             return redirect(policy.first_url())
         module=getattr(view_func,'_access_module',None)
         if module is None:

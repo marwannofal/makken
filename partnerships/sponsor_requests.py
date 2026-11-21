@@ -431,7 +431,7 @@ def public_sponsor_thanks(request):
     }))
 
 
-@module_view('partnerships')
+@module_view('sponsor_requests')
 @require_GET
 def sponsor_request_queue(request):
     """RBAC and regionally-scoped admin review queue for external sponsor requests."""
@@ -460,7 +460,7 @@ def sponsor_request_queue(request):
         )
 
     policy = AccessPolicy(request.user)
-    can_decide = request.user.is_superuser or policy.can('partnerships', 'create') or policy.can('partnerships', 'edit')
+    can_decide = request.user.is_superuser or policy.can('sponsor_requests', 'edit')
     name = request.user.get_short_name() or request.user.get_username()
     return add_login_headers(render(request, 'partnerships/sponsor_requests.html', {
         'display_name': name,
@@ -476,7 +476,7 @@ def sponsor_request_queue(request):
     }))
 
 
-@module_view('partnerships')
+@module_view('sponsor_requests')
 @require_http_methods(['GET', 'POST'])
 def sponsor_request_review(request, request_id):
     """Review and approve/reject an external sponsor registration request."""
@@ -490,7 +490,7 @@ def sponsor_request_review(request, request_id):
         return denied(request, 'لا تملك صلاحية الوصول إلى هذا الطلب خارج نطاق مناطقك.')
 
     policy = AccessPolicy(request.user)
-    can_decide = request.user.is_superuser or policy.can('partnerships', 'create') or policy.can('partnerships', 'edit')
+    can_decide = request.user.is_superuser or policy.can('sponsor_requests', 'edit')
     reject_form = RejectSponsorRequestForm()
     error_message = ''
     status_code = 200
@@ -626,7 +626,7 @@ def sponsor_request_review(request, request_id):
     }, status=status_code))
 
 
-@module_view('partnerships')
+@module_view('sponsor_requests')
 @require_GET
 def sponsor_request_attachment_download(request, request_id, attachment_id):
     req = get_object_or_404(SponsorRegistrationRequest.objects.prefetch_related('administrative_regions'), pk=request_id)

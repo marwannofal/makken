@@ -42,8 +42,8 @@ class SponsorRegistrationUS15Tests(TestCase):
         acc_rev.region_scope = RegionScope.SELECTED
         acc_rev.save()
         acc_rev.allowed_regions.set([self.region_a])
-        PermissionOverride.objects.create(user=self.reviewer_a, module_id='partnerships', operation='view', effect='grant')
-        PermissionOverride.objects.create(user=self.reviewer_a, module_id='partnerships', operation='create', effect='grant')
+        PermissionOverride.objects.create(user=self.reviewer_a, module_id='sponsor_requests', operation='view', effect='grant')
+        PermissionOverride.objects.create(user=self.reviewer_a, module_id='sponsor_requests', operation='edit', effect='grant')
 
         acc_w, _ = UserAccess.objects.get_or_create(
             user=self.watcher,
@@ -52,7 +52,7 @@ class SponsorRegistrationUS15Tests(TestCase):
         acc_w.page_scope = 'all'
         acc_w.region_scope = RegionScope.ALL
         acc_w.save()
-        PermissionOverride.objects.create(user=self.watcher, module_id='partnerships', operation='view', effect='grant')
+        PermissionOverride.objects.create(user=self.watcher, module_id='sponsor_requests', operation='view', effect='grant')
 
     def _public_payload(self, name='شركة الراعي الخارجي الأولى', region=None):
         region = region or self.region_a

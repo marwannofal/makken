@@ -50,7 +50,7 @@ class PartnershipAchievementUS08Tests(TestCase):
         acc.region_scope = RegionScope.SELECTED
         acc.save()
         acc.allowed_regions.set([self.region_a])
-        PermissionOverride.objects.create(user=self.regional_user, module_id='partnerships', operation='view', effect='grant')
+        PermissionOverride.objects.create(user=self.regional_user, module_id='partnership_achievement', operation='view', effect='grant')
 
         # Partnership A: Region A, 2025, Tech/AI, active, 100% progress (2 clauses: 100 + 100)
         self.p_a = Partnership.objects.create(
@@ -159,7 +159,7 @@ class PartnershipAchievementUS08Tests(TestCase):
 
         # Grant export_xlsx -> 200 with valid Excel file
         PermissionOverride.objects.create(
-            user=self.regional_user, module_id='partnerships', operation='export_xlsx', effect='grant'
+            user=self.regional_user, module_id='partnership_achievement', operation='export_xlsx', effect='grant'
         )
         ok_export = self.client.get(url, {'_mk_export': 'xlsx'})
         self.assertEqual(ok_export.status_code, 200)

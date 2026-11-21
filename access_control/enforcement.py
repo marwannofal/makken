@@ -69,15 +69,19 @@ def requested_operations(request,module,view,kwargs):
         if name in {'work_targets', 'work_stats'} and request.method in {'GET', 'HEAD'}:
             return ['view']
         raise PermissionDenied
-    if module == 'partnerships' and name in {'agreement_inquiries', 'achievement_report', 'sponsor_requests', 'sponsor_request_attachment_download'}:
+    if module in {'home', 'partnerships_all', 'agreement_inquiries', 'partnership_achievement'}:
         if request.method in {'GET', 'HEAD'}:
             return ['view']
         raise PermissionDenied
-    if module == 'partnerships' and name == 'sponsor_request_review':
+    if module == 'sponsor_requests' and name in {'sponsor_requests', 'sponsor_request_attachment_download'}:
+        if request.method in {'GET', 'HEAD'}:
+            return ['view']
+        raise PermissionDenied
+    if module == 'sponsor_requests' and name == 'sponsor_request_review':
         if request.method in {'GET', 'HEAD'}:
             return ['view']
         if request.method == 'POST' and request.POST.get('operation') in {'approve', 'reject'}:
-            return ['view', 'create']
+            return ['view', 'edit']
         raise PermissionDenied
     if module == 'partnerships' and name == 'agreement_details':
         if request.method in {'GET', 'HEAD'}:
