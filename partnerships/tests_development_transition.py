@@ -1,6 +1,9 @@
 """One-time, confirmed capability -> willingness transitions."""
 from datetime import datetime, timezone as utc
+import json
 from io import BytesIO
+from django.urls import reverse
+from agreement_clauses.models import AgreementClause, Responsibility
 from tempfile import TemporaryDirectory
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import override_settings
@@ -40,9 +43,19 @@ class DevelopmentTransitionTests(TestCase):
         return response.context['pending']['token']
 
     def confirm(self, token=None):
+        clause, _ = AgreementClause.objects.get_or_create(name='بند اختبار التحويل', defaults={'is_active': True})
         writer = PdfWriter(); writer.add_blank_page(width=100,height=100)
         data = BytesIO(); writer.write(data)
-        return self.client.post(self.url, {'action':'confirm','token':token or self.transition_preview(), 'agreement_type':'mou', 'attachments':[SimpleUploadedFile('agreement.pdf',data.getvalue(),content_type='application/pdf')]})
+        return self.client.post(self.url, {
+            'action': 'confirm',
+            'token': token or self.transition_preview(),
+            'agreement_type': 'mou',
+            'attachments': [SimpleUploadedFile('agreement.pdf', data.getvalue(), content_type='application/pdf')],
+            'clauses_json': json.dumps([{'clause_id': clause.pk, 'responsibility': Responsibility.SHARED}]),
+            'work-title': 'متابعة تحويل الشراكة',
+            'work-assignees': [str(self.user.pk)],
+            'work-manager': str(self.user.pk),
+        })
 
     def test_preview_cancel_and_get_do_not_write(self):
         token = self.transition_preview()
@@ -64,12 +77,12 @@ class DevelopmentTransitionTests(TestCase):
         self.assertEqual(self.item.version,2)
         self.assertEqual(self.item.development_history.get(state_id='willingness').entered_at,entered)
         self.assertEqual(self.item.development_history.get(state_id='capability').entered_at,self.original)
-        self.assertEqual(parse_qs(urlparse(response.url).query)['capacity_min'],['100'])
+        self.assertEqual(response.url, reverse('partnerships:willingness_index'))
         # Freezing django.utils.timezone.now also affects session expiry; the
         # historical business timestamp must not expire the next test request.
         self.client.force_login(self.user)
         detail = self.client.get('/partnerships/',{'detail':self.item.pk})
-        self.assertContains(detail,'2026/10/17 10:15:45')
+        self.assertContains(detail,'17/10/2026 10:15:45')
         self.assertEqual(next(s for s in detail.context['history'] if s['current'])['label'],'رغبة')
 
     def test_replay_and_fresh_willingness_request_are_rejected(self):
