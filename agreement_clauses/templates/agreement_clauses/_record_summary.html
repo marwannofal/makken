@@ -1,64 +1,183 @@
 <section class="partnership-card agreement-card">
-  <header class="card-heading"><div><p class="eyebrow">سجل الاتفاقية</p><h2>بيانات التوقيع والمدة</h2></div>
-    <span class="subtle-badge">{{ details.status|default:"حالة غير محددة" }}</span></header>
-  {% if not details.pk %}<p class="feedback feedback-info">لم تُستكمل البيانات الداخلية لهذه الاتفاقية بعد. يمكنك متابعة بنودها كما هي.</p>{% endif %}
+  <header class="card-heading">
+    <div>
+      <p class="eyebrow">سجل الاتفاقية</p><h2>بيانات التوقيع والمدة</h2>
+    </div>
+    <span class="subtle-badge">{{ details.status|default:"حالة غير محددة" }}</span>
+  </header>
+  {% if not details.pk %}
+    <p class="feedback feedback-info">لم تُستكمل البيانات الداخلية لهذه الاتفاقية بعد. يمكنك متابعة بنودها كما هي.</p>
+  {% endif %}
   <dl class="agreement-summary">
-    <div><dt>نوع الجهة</dt><dd>{{ details.entity_type|default:"—" }}</dd></div>
-    <div><dt>نوع الشراكة</dt><dd>{{ details.partnership_type|default:"—" }}</dd></div>
-    <div><dt>تصنيف الاتفاقية</dt><dd>{{ details.classification|default:"—" }}</dd></div>
-    <div><dt>تاريخ التوقيع</dt><dd><bdi>{{ details.signed_on|date:"Y-m-d"|default:"—" }}</bdi></dd></div>
-    <div><dt>المدة الأصلية بالأشهر</dt><dd><bdi>{{ details.duration_months|default:"—" }}</bdi></dd></div>
-    <div><dt>الانتهاء الأصلي</dt><dd><bdi>{{ details.initial_expiry|date:"Y-m-d"|default:"—" }}</bdi></dd></div>
-    <div class="agreement-highlight"><dt>تاريخ الانتهاء الحالي للاتفاقية</dt><dd><bdi>{{ current_expiry|date:"Y-m-d"|default:"—" }}</bdi></dd></div>
-    <div><dt>نوع التجديد</dt><dd>{{ details.get_renewal_rule_display|default:"—" }}</dd></div>
-    <div><dt>مكان التوقيع</dt><dd>{{ details.signing_region|default:"—" }}{% if details.signing_city %} · {{ details.signing_city }}{% endif %}</dd></div>
-    <div><dt>مدينة مقر الجهة</dt><dd>{{ details.headquarters_city|default:"—" }}</dd></div>
-    <div><dt>الإدارات المعنية</dt><dd>{% if details.pk %}{% for item in details.departments.all %}{{ item.name }} ({{ item.get_department_type_display }}){% if not forloop.last %}<br>{% endif %}{% empty %}—{% endfor %}{% else %}—{% endif %}</dd></div>
-    <div><dt>آخر تحديث</dt><dd><bdi>{{ details.updated_at|date:"Y-m-d H:i"|default:"—" }}</bdi>{% if details.updated_by %} · {{ details.updated_by.get_full_name|default:details.updated_by.username }}{% endif %}</dd></div>
+    <div>
+      <dt>نوع الجهة</dt><dd>{{ details.entity_type|default:"—" }}</dd>
+    </div>
+    <div>
+      <dt>نوع الشراكة</dt><dd>{{ details.partnership_type|default:"—" }}</dd>
+    </div>
+    <div>
+      <dt>تصنيف الاتفاقية</dt><dd>{{ details.classification|default:"—" }}</dd>
+    </div>
+    <div>
+      <dt>تاريخ التوقيع</dt><dd><bdi>{{ details.signed_on|date:"Y-m-d"|default:"—" }}</bdi></dd>
+    </div>
+    <div>
+      <dt>المدة الأصلية بالأشهر</dt><dd><bdi>{{ details.duration_months|default:"—" }}</bdi></dd>
+    </div>
+    <div>
+      <dt>الانتهاء الأصلي</dt><dd><bdi>{{ details.initial_expiry|date:"Y-m-d"|default:"—" }}</bdi></dd>
+    </div>
+    <div class="agreement-highlight">
+      <dt>تاريخ الانتهاء الحالي للاتفاقية</dt><dd><bdi>{{ current_expiry|date:"Y-m-d"|default:"—" }}</bdi></dd>
+    </div>
+    <div>
+      <dt>نوع التجديد</dt><dd>{{ details.get_renewal_rule_display|default:"—" }}</dd>
+    </div>
+    <div>
+      <dt>مكان التوقيع</dt><dd>{{ details.signing_region|default:"—" }}
+      {% if details.signing_city %}
+        · {{ details.signing_city }}
+      {% endif %}
+      </dd>
+    </div>
+    <div>
+      <dt>مدينة مقر الجهة</dt><dd>{{ details.headquarters_city|default:"—" }}</dd>
+    </div>
+    <div>
+      <dt>الإدارات المعنية</dt><dd>
+      {% if details.pk %}
+        {% for item in details.departments.all %}
+          {{ item.name }} ({{ item.get_department_type_display }})
+          {% if not forloop.last %}
+            <br>
+          {% endif %}
+        {% empty %}
+          —
+        {% endfor %}
+      {% else %}
+        —
+      {% endif %}
+      </dd>
+    </div>
+    <div>
+      <dt>آخر تحديث</dt><dd><bdi>{{ details.updated_at|date:"Y-m-d H:i"|default:"—" }}</bdi>
+      {% if details.updated_by %}
+        · {{ details.updated_by.get_full_name|default:details.updated_by.username }}
+      {% endif %}
+      </dd>
+    </div>
   </dl>
   <p class="field-help">مدة الاتفاقية مستقلة عن مدة الشراكة. تسجيل تجديد لا يغيّر تاريخ انتهاء الشراكة.</p>
 </section>
 <section class="partnership-card agreement-card">
-  <header class="card-heading"><div><p class="eyebrow">الأطراف والمسؤوليات</p><h2>الموقّعون وجهات الاتصال</h2></div></header>
+  <header class="card-heading">
+    <div>
+      <p class="eyebrow">الأطراف والمسؤوليات</p><h2>الموقّعون وجهات الاتصال</h2>
+    </div>
+  </header>
   <dl class="agreement-summary">
-    <div><dt>الموقّع عن المؤسسة</dt><dd>{{ details.institution_signatory|default:"—" }}{% if details.institution_signatory_title %}<br>{{ details.institution_signatory_title }}{% endif %}</dd></div>
-    <div><dt>الموقّع عن الجهة</dt><dd>{{ details.partner_signatory|default:"—" }}{% if details.partner_signatory_title %}<br>{{ details.partner_signatory_title }}{% endif %}</dd></div>
-    <div><dt>الموظف المسؤول عن الاتفاقية</dt><dd>{% if details.responsible_employee %}{{ details.responsible_employee.get_full_name|default:details.responsible_employee.username }}{% else %}—{% endif %}</dd></div>
-    <div><dt>ممثل الإدارة المعنية</dt><dd>{% if details.department_representative %}{{ details.department_representative.get_full_name|default:details.department_representative.username }}{% else %}—{% endif %}</dd></div>
-    <div><dt>هاتف الجهة</dt><dd><bdi>{{ details.partner_phone|default:"—" }}</bdi></dd></div>
-    <div><dt>البريد الإلكتروني للجهة</dt><dd><bdi>{{ details.partner_email|default:"—" }}</bdi></dd></div>
+    <div>
+      <dt>الموقّع عن المؤسسة</dt><dd>{{ details.institution_signatory|default:"—" }}
+      {% if details.institution_signatory_title %}
+        <br>{{ details.institution_signatory_title }}
+      {% endif %}
+      </dd>
+    </div>
+    <div>
+      <dt>الموقّع عن الجهة</dt><dd>{{ details.partner_signatory|default:"—" }}
+      {% if details.partner_signatory_title %}
+        <br>{{ details.partner_signatory_title }}
+      {% endif %}
+      </dd>
+    </div>
+    <div>
+      <dt>الموظف المسؤول عن الاتفاقية</dt><dd>
+      {% if details.responsible_employee %}
+        {{ details.responsible_employee.get_full_name|default:details.responsible_employee.username }}
+      {% else %}
+        —
+      {% endif %}
+      </dd>
+    </div>
+    <div>
+      <dt>ممثل الإدارة المعنية</dt><dd>
+      {% if details.department_representative %}
+        {{ details.department_representative.get_full_name|default:details.department_representative.username }}
+      {% else %}
+        —
+      {% endif %}
+      </dd>
+    </div>
+    <div>
+      <dt>هاتف الجهة</dt><dd><bdi>{{ details.partner_phone|default:"—" }}</bdi></dd>
+    </div>
+    <div>
+      <dt>البريد الإلكتروني للجهة</dt><dd><bdi>{{ details.partner_email|default:"—" }}</bdi></dd>
+    </div>
   </dl>
 </section>
 {% include "agreement_clauses/_team_list.html" %}
 <section class="partnership-card agreement-card">
-  <header class="card-heading"><div><p class="eyebrow">الأثر المتوقع</p><h2>هدف الشراكة والنتائج</h2></div></header>
+  <header class="card-heading">
+    <div>
+      <p class="eyebrow">الأثر المتوقع</p><h2>هدف الشراكة والنتائج</h2>
+    </div>
+  </header>
   <dl class="agreement-summary agreement-prose">
-    <div><dt>هدف الشراكة</dt><dd>{{ details.objective|default:"—" }}</dd></div>
-    <div><dt>خبر عن الشراكة</dt><dd>{{ details.announcement|default:"—" }}</dd></div>
-    <div><dt>الفئات المستهدفة</dt><dd>{{ details.audience|default:"—" }}</dd></div>
-    <div><dt>النتائج المتوقعة</dt><dd>{{ details.expected_results|default:"—" }}</dd></div>
+    <div>
+      <dt>هدف الشراكة</dt><dd>{{ details.objective|default:"—" }}</dd>
+    </div>
+    <div>
+      <dt>خبر عن الشراكة</dt><dd>{{ details.announcement|default:"—" }}</dd>
+    </div>
+    <div>
+      <dt>الفئات المستهدفة</dt><dd>{{ details.audience|default:"—" }}</dd>
+    </div>
+    <div>
+      <dt>النتائج المتوقعة</dt><dd>{{ details.expected_results|default:"—" }}</dd>
+    </div>
   </dl>
 </section>
 <section class="partnership-card agreement-card" id="agreement-renewals">
-  <header class="card-heading"><div><p class="eyebrow">مدة الاتفاقية</p><h2>سجل التجديد</h2></div></header>
+  <header class="card-heading">
+    <div>
+      <p class="eyebrow">مدة الاتفاقية</p><h2>سجل التجديد</h2>
+    </div>
+  </header>
   {% for renewal in renewals %}
     <div class="agreement-card-row">
-      <div><bdi>{{ renewal.starts_on|date:"Y-m-d" }}</bdi> ← <bdi>{{ renewal.expires_on|date:"Y-m-d" }}</bdi>
-      <p class="muted">{{ renewal.get_rule_display }}{% if renewal.approval_reference %} · مرجع الموافقة: {{ renewal.approval_reference }}{% endif %}</p></div>
-      <div><bdi>{{ renewal.recorded_at|date:"Y-m-d" }}</bdi>{% if renewal.recorded_by %} · {{ renewal.recorded_by.get_full_name|default:renewal.recorded_by.username }}{% endif %}</div>
+      <div>
+        <bdi>{{ renewal.starts_on|date:"Y-m-d" }}</bdi> ← <bdi>{{ renewal.expires_on|date:"Y-m-d" }}</bdi> <p class="muted">{{ renewal.get_rule_display }}
+        {% if renewal.approval_reference %}
+          · مرجع الموافقة: {{ renewal.approval_reference }}
+        {% endif %}
+        </p>
+      </div>
+      <div>
+        <bdi>{{ renewal.recorded_at|date:"Y-m-d" }}</bdi>
+        {% if renewal.recorded_by %}
+          · {{ renewal.recorded_by.get_full_name|default:renewal.recorded_by.username }}
+        {% endif %}
+      </div>
     </div>
-  {% empty %}<p class="muted">لم يُسجّل أي تجديد بعد.</p>{% endfor %}
+  {% empty %}
+    <p class="muted">لم يُسجّل أي تجديد بعد.</p>
+  {% endfor %}
   {% if renew_form %}
     <details class="agreement-renew" {% if renew_form.errors %}open{% endif %}>
-      <summary>تسجيل تجديد</summary>
+      <summary>
+        تسجيل تجديد
+      </summary>
       <p class="field-help">يبدأ التجديد من الانتهاء الحالي <bdi>{{ current_expiry|date:"Y-m-d" }}</bdi>. يُسجّل التجديد بعد التأكيد.</p>
       <form method="post" data-market-confirm="هل تريد تسجيل فترة التجديد في تاريخ الاتفاقية؟" data-agreement-period data-start-date="{{ current_expiry|date:'Y-m-d' }}">
-        {% csrf_token %}<input type="hidden" name="operation" value="renew">
-        <input type="hidden" name="snapshot" value="{{ renew_token }}">
+        {% csrf_token %}
+        <input type="hidden" name="operation" value="renew"> <input type="hidden" name="snapshot" value="{{ renew_token }}">
         <div class="agreement-grid">
-          {% for field in renew_form %}{% include "agreement_clauses/_record_field.html" with field=field only %}{% endfor %}
-          <div class="partnership-field"><label for="renewal-expiry-preview">انتهاء فترة التجديد</label>
-            <output class="agreement-output" id="renewal-expiry-preview" for="id_renewal-duration_months" dir="ltr" data-expiry-preview>—</output>
+          {% for field in renew_form %}
+            {% include "agreement_clauses/_record_field.html" with field=field only %}
+          {% endfor %}
+          <div class="partnership-field">
+            <label for="renewal-expiry-preview">انتهاء فترة التجديد</label> <output class="agreement-output" id="renewal-expiry-preview" for="id_renewal-duration_months" dir="ltr" data-expiry-preview>—</output>
           </div>
         </div>
         <button class="button button-primary" type="submit">حفظ التجديد</button>

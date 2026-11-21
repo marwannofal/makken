@@ -7,16 +7,18 @@
   border-radius: 20px;
   box-shadow: 0 6px 25px #153a3c04;
 }
+
 .settings-filters {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 160px auto auto;
   align-items: end;
   gap: 14px;
 }
-.settings-filters-search,
-.settings-filters-status {
+
+.settings-filters-search, .settings-filters-status {
   min-width: 0;
 }
+
 .settings-filters label {
   display: block;
   margin-bottom: 9px;
@@ -24,6 +26,7 @@
   font-weight: 700;
   color: #274c4f;
 }
+
 .settings-filters-input-wrap {
   display: flex;
   align-items: center;
@@ -35,12 +38,14 @@
   border: 1px solid #d7e6e2;
   border-radius: 11px;
 }
+
 .settings-filters-input-wrap svg {
   width: 18px;
   height: 18px;
   flex-shrink: 0;
   color: #7c9795;
 }
+
 .settings-filters #settings-filter-q {
   width: 100%;
   min-width: 0;
@@ -53,6 +58,7 @@
   font: inherit;
   font-size: 13px;
 }
+
 .settings-filters #settings-filter-status {
   box-sizing: border-box;
   width: 100%;
@@ -72,6 +78,7 @@
   background-position: left 14px center;
   background-size: 16px 16px;
 }
+
 .settings-filters .button {
   box-sizing: border-box;
   height: 48px;
@@ -79,6 +86,7 @@
   padding-block: 0;
   white-space: nowrap;
 }
+
 .settings-filters-summary {
   margin: 16px 0 0;
   color: #70878a;
@@ -86,9 +94,11 @@
   line-height: 1.9;
   overflow-wrap: anywhere;
 }
+
 .settings-filters-summary strong {
   color: #27635c;
 }
+
 @media (max-width: 1100px) {
   .settings-filters {
     grid-template-columns: minmax(0, 1fr) auto auto;
@@ -97,6 +107,7 @@
     grid-column: 1 / -1;
   }
 }
+
 @media (max-width: 600px) {
   .settings-filters-card {
     padding: 18px 14px;
@@ -106,14 +117,14 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
   }
-  .settings-filters-search,
-  .settings-filters-status {
+  .settings-filters-search, .settings-filters-status {
     grid-column: 1 / -1;
   }
   .settings-filters .button {
     width: 100%;
   }
 }
+
 @media (forced-colors: active) {
   .settings-filters #settings-filter-status {
     appearance: auto;

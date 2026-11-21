@@ -1,220 +1,273 @@
 <details class="mk-accordion" {% if open_details %}open{% endif %}>
   <summary>
     <div class="mk-acc-head">
-      <h3 class="mk-acc-title">{{ num_term|default:"04" }} · مدة الاتفاقية والتوقيع والتجديد</h3>
-      <p class="mk-acc-subtitle">تاريخ التوقيع ومدة الاتفاقية بالأشهر وحساب تاريخ الانتهاء آليًا ونوع التجديد.</p>
+      <h3 class="mk-acc-title">{{ num_term|default:"04" }} · مدة الاتفاقية والتوقيع والتجديد</h3> <p class="mk-acc-subtitle">تاريخ التوقيع ومدة الاتفاقية بالأشهر وحساب تاريخ الانتهاء آليًا ونوع التجديد.</p>
     </div>
     <span class="mk-acc-meta">
-      {% if item and item.agreement_number %}<span class="subtle-badge">رقم الاتفاقية: <bdi dir="ltr">{{ item.agreement_number }}</bdi></span>{% endif %}
-      <svg class="mk-acc-arrow" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
-    </span>
+    {% if item and item.agreement_number %}
+      <span class="subtle-badge">رقم الاتفاقية: <bdi dir="ltr">{{ item.agreement_number }}</bdi></span>
+    {% endif %}
+    <svg class="mk-acc-arrow" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg> </span>
   </summary>
   <div class="mk-acc-body" data-expiry-scope>
     <div class="work-grid-2">
       <div class="partnership-field">
-        <label for="{{ details_form.signed_on.id_for_label }}">{{ details_form.signed_on.label }}</label>
-        {{ details_form.signed_on }}
-        <div class="field-error" role="alert">{{ details_form.signed_on.errors }}</div>
+        <label for="{{ details_form.signed_on.id_for_label }}">{{ details_form.signed_on.label }}</label> {{ details_form.signed_on }}
+        <div class="field-error" role="alert">
+          {{ details_form.signed_on.errors }}
+        </div>
       </div>
       <div class="partnership-field">
-        <label for="{{ details_form.duration_months.id_for_label }}">{{ details_form.duration_months.label }}</label>
-        {{ details_form.duration_months }}
-        <div class="field-error" role="alert">{{ details_form.duration_months.errors }}</div>
+        <label for="{{ details_form.duration_months.id_for_label }}">{{ details_form.duration_months.label }}</label> {{ details_form.duration_months }}
+        <div class="field-error" role="alert">
+          {{ details_form.duration_months.errors }}
+        </div>
       </div>
       <div class="partnership-field">
         <label>تاريخ الانتهاء (يُحسب آليًا)</label>
-        <div class="expiry-readonly-box" dir="ltr" data-calculated-expiry>{% if item and item.calculated_expiry %}{{ item.calculated_expiry|date:"Y-m-d" }}{% else %}يُحسب تلقائيًا عند إدخال تاريخ التوقيع والمدة{% endif %}</div>
+        <div class="expiry-readonly-box" dir="ltr" data-calculated-expiry>
+          {% if item and item.calculated_expiry %}
+            {{ item.calculated_expiry|date:"Y-m-d" }}
+          {% else %}
+            يُحسب تلقائيًا عند إدخال تاريخ التوقيع والمدة
+          {% endif %}
+        </div>
       </div>
       <div class="partnership-field">
-        <label for="{{ details_form.renewal_rule.id_for_label }}">{{ details_form.renewal_rule.label }}</label>
-        {{ details_form.renewal_rule }}
-        <div class="field-error" role="alert">{{ details_form.renewal_rule.errors }}</div>
+        <label for="{{ details_form.renewal_rule.id_for_label }}">{{ details_form.renewal_rule.label }}</label> {{ details_form.renewal_rule }}
+        <div class="field-error" role="alert">
+          {{ details_form.renewal_rule.errors }}
+        </div>
       </div>
       <div class="partnership-field">
-        <label for="{{ details_form.signing_region.id_for_label }}">{{ details_form.signing_region.label }}</label>
-        {{ details_form.signing_region }}
-        <div class="field-error" role="alert">{{ details_form.signing_region.errors }}</div>
+        <label for="{{ details_form.signing_region.id_for_label }}">{{ details_form.signing_region.label }}</label> {{ details_form.signing_region }}
+        <div class="field-error" role="alert">
+          {{ details_form.signing_region.errors }}
+        </div>
       </div>
       <div class="partnership-field">
-        <label for="{{ details_form.signing_city.id_for_label }}">{{ details_form.signing_city.label }}</label>
-        {{ details_form.signing_city }}
-        <div class="field-error" role="alert">{{ details_form.signing_city.errors }}</div>
+        <label for="{{ details_form.signing_city.id_for_label }}">{{ details_form.signing_city.label }}</label> {{ details_form.signing_city }}
+        <div class="field-error" role="alert">
+          {{ details_form.signing_city.errors }}
+        </div>
       </div>
       <div class="partnership-field">
-        <label for="{{ details_form.headquarters_city.id_for_label }}">{{ details_form.headquarters_city.label }}</label>
-        {{ details_form.headquarters_city }}
-        <div class="field-error" role="alert">{{ details_form.headquarters_city.errors }}</div>
+        <label for="{{ details_form.headquarters_city.id_for_label }}">{{ details_form.headquarters_city.label }}</label> {{ details_form.headquarters_city }}
+        <div class="field-error" role="alert">
+          {{ details_form.headquarters_city.errors }}
+        </div>
       </div>
       <div class="partnership-field">
-        <label for="{{ details_form.agreement_classification.id_for_label }}">{{ details_form.agreement_classification.label }}</label>
-        {{ details_form.agreement_classification }}
-        <div class="field-error" role="alert">{{ details_form.agreement_classification.errors }}</div>
+        <label for="{{ details_form.agreement_classification.id_for_label }}">{{ details_form.agreement_classification.label }}</label> {{ details_form.agreement_classification }}
+        <div class="field-error" role="alert">
+          {{ details_form.agreement_classification.errors }}
+        </div>
       </div>
       <div class="partnership-field work-full">
-        <label for="{{ details_form.concerned_departments.id_for_label }}">{{ details_form.concerned_departments.label }}</label>
-        {{ details_form.concerned_departments }}
-        <p class="field-help">{{ details_form.concerned_departments.help_text }}</p>
-        <div class="field-error" role="alert">{{ details_form.concerned_departments.errors }}</div>
+        <label for="{{ details_form.concerned_departments.id_for_label }}">{{ details_form.concerned_departments.label }}</label> {{ details_form.concerned_departments }} <p class="field-help">{{ details_form.concerned_departments.help_text }}</p>
+        <div class="field-error" role="alert">
+          {{ details_form.concerned_departments.errors }}
+        </div>
       </div>
       {% if show_edit_clauses %}
-      <div class="partnership-field">
-        <label for="{{ details_form.partnership_type.id_for_label }}">{{ details_form.partnership_type.label }}</label>
-        {{ details_form.partnership_type }}
-        <div class="field-error" role="alert">{{ details_form.partnership_type.errors }}</div>
-      </div>
+        <div class="partnership-field">
+          <label for="{{ details_form.partnership_type.id_for_label }}">{{ details_form.partnership_type.label }}</label> {{ details_form.partnership_type }}
+          <div class="field-error" role="alert">
+            {{ details_form.partnership_type.errors }}
+          </div>
+        </div>
       {% endif %}
     </div>
   </div>
 </details>
-
 <details class="mk-accordion" {% if open_details %}open{% endif %}>
   <summary>
     <div class="mk-acc-head">
-      <h3 class="mk-acc-title">{{ num_signatories|default:"05" }} · الموقّعون والممثلون</h3>
-      <p class="mk-acc-subtitle">بيانات موقّعي الشراكة وممثلي المؤسسة والجهة.</p>
+      <h3 class="mk-acc-title">{{ num_signatories|default:"05" }} · الموقّعون والممثلون</h3> <p class="mk-acc-subtitle">بيانات موقّعي الشراكة وممثلي المؤسسة والجهة.</p>
     </div>
-    <span class="mk-acc-meta">
-      <svg class="mk-acc-arrow" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
-    </span>
+    <span class="mk-acc-meta"> <svg class="mk-acc-arrow" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg> </span>
   </summary>
   <div class="mk-acc-body">
     <div class="work-grid-2">
       <div class="partnership-field">
-        <label for="{{ details_form.institution_signatory.id_for_label }}">{{ details_form.institution_signatory.label }}</label>
-        {{ details_form.institution_signatory }}
-        <div class="field-error" role="alert">{{ details_form.institution_signatory.errors }}</div>
+        <label for="{{ details_form.institution_signatory.id_for_label }}">{{ details_form.institution_signatory.label }}</label> {{ details_form.institution_signatory }}
+        <div class="field-error" role="alert">
+          {{ details_form.institution_signatory.errors }}
+        </div>
       </div>
       <div class="partnership-field">
-        <label for="{{ details_form.institution_signatory_title.id_for_label }}">{{ details_form.institution_signatory_title.label }}</label>
-        {{ details_form.institution_signatory_title }}
-        <div class="field-error" role="alert">{{ details_form.institution_signatory_title.errors }}</div>
+        <label for="{{ details_form.institution_signatory_title.id_for_label }}">{{ details_form.institution_signatory_title.label }}</label> {{ details_form.institution_signatory_title }}
+        <div class="field-error" role="alert">
+          {{ details_form.institution_signatory_title.errors }}
+        </div>
       </div>
       <div class="partnership-field">
-        <label for="{{ details_form.partner_signatory.id_for_label }}">{{ details_form.partner_signatory.label }}</label>
-        {{ details_form.partner_signatory }}
-        <div class="field-error" role="alert">{{ details_form.partner_signatory.errors }}</div>
+        <label for="{{ details_form.partner_signatory.id_for_label }}">{{ details_form.partner_signatory.label }}</label> {{ details_form.partner_signatory }}
+        <div class="field-error" role="alert">
+          {{ details_form.partner_signatory.errors }}
+        </div>
       </div>
       <div class="partnership-field">
-        <label for="{{ details_form.partner_signatory_title.id_for_label }}">{{ details_form.partner_signatory_title.label }}</label>
-        {{ details_form.partner_signatory_title }}
-        <div class="field-error" role="alert">{{ details_form.partner_signatory_title.errors }}</div>
+        <label for="{{ details_form.partner_signatory_title.id_for_label }}">{{ details_form.partner_signatory_title.label }}</label> {{ details_form.partner_signatory_title }}
+        <div class="field-error" role="alert">
+          {{ details_form.partner_signatory_title.errors }}
+        </div>
       </div>
       <div class="partnership-field">
-        <label for="{{ details_form.institution_rep_name.id_for_label }}">{{ details_form.institution_rep_name.label }}</label>
-        {{ details_form.institution_rep_name }}
-        <div class="field-error" role="alert">{{ details_form.institution_rep_name.errors }}</div>
+        <label for="{{ details_form.institution_rep_name.id_for_label }}">{{ details_form.institution_rep_name.label }}</label> {{ details_form.institution_rep_name }}
+        <div class="field-error" role="alert">
+          {{ details_form.institution_rep_name.errors }}
+        </div>
       </div>
       <div class="partnership-field">
-        <label for="{{ details_form.institution_rep_email.id_for_label }}">{{ details_form.institution_rep_email.label }}</label>
-        {{ details_form.institution_rep_email }}
-        <div class="field-error" role="alert">{{ details_form.institution_rep_email.errors }}</div>
+        <label for="{{ details_form.institution_rep_email.id_for_label }}">{{ details_form.institution_rep_email.label }}</label> {{ details_form.institution_rep_email }}
+        <div class="field-error" role="alert">
+          {{ details_form.institution_rep_email.errors }}
+        </div>
       </div>
       <div class="partnership-field">
-        <label for="{{ details_form.institution_rep_phone.id_for_label }}">{{ details_form.institution_rep_phone.label }}</label>
-        {{ details_form.institution_rep_phone }}
-        <div class="field-error" role="alert">{{ details_form.institution_rep_phone.errors }}</div>
+        <label for="{{ details_form.institution_rep_phone.id_for_label }}">{{ details_form.institution_rep_phone.label }}</label> {{ details_form.institution_rep_phone }}
+        <div class="field-error" role="alert">
+          {{ details_form.institution_rep_phone.errors }}
+        </div>
       </div>
       <div class="partnership-field">
-        <label for="{{ details_form.partner_rep_email.id_for_label }}">{{ details_form.partner_rep_email.label }}</label>
-        {{ details_form.partner_rep_email }}
-        <div class="field-error" role="alert">{{ details_form.partner_rep_email.errors }}</div>
+        <label for="{{ details_form.partner_rep_email.id_for_label }}">{{ details_form.partner_rep_email.label }}</label> {{ details_form.partner_rep_email }}
+        <div class="field-error" role="alert">
+          {{ details_form.partner_rep_email.errors }}
+        </div>
       </div>
       <div class="partnership-field">
-        <label for="{{ details_form.partner_rep_phone.id_for_label }}">{{ details_form.partner_rep_phone.label }}</label>
-        {{ details_form.partner_rep_phone }}
-        <div class="field-error" role="alert">{{ details_form.partner_rep_phone.errors }}</div>
+        <label for="{{ details_form.partner_rep_phone.id_for_label }}">{{ details_form.partner_rep_phone.label }}</label> {{ details_form.partner_rep_phone }}
+        <div class="field-error" role="alert">
+          {{ details_form.partner_rep_phone.errors }}
+        </div>
       </div>
     </div>
   </div>
 </details>
-
 <details class="mk-accordion" {% if open_details %}open{% endif %}>
   <summary>
     <div class="mk-acc-head">
-      <h3 class="mk-acc-title">{{ num_teams|default:"06" }} · فرق العمل (المؤسسة والجهة)</h3>
-      <p class="mk-acc-subtitle">أضف أعضاء فريق عمل المؤسسة وفريق عمل الجهة وصفاتهم (ممثل، رئيس، ضابط اتصال).</p>
+      <h3 class="mk-acc-title">{{ num_teams|default:"06" }} · فرق العمل (المؤسسة والجهة)</h3> <p class="mk-acc-subtitle">أضف أعضاء فريق عمل المؤسسة وفريق عمل الجهة وصفاتهم (ممثل، رئيس، ضابط اتصال).</p>
     </div>
-    <span class="mk-acc-meta">
-      <svg class="mk-acc-arrow" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
-    </span>
+    <span class="mk-acc-meta"> <svg class="mk-acc-arrow" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg> </span>
   </summary>
   <div class="mk-acc-body" data-teams-scope>
     <input type="hidden" name="teams_json" value="{{ teams_json|default:'[]' }}" data-teams-input>
-    {% if teams_error %}<div class="field-error" id="teams-errors" role="alert">{{ teams_error }}</div>{% endif %}
-
+    {% if teams_error %}
+      <div class="field-error" id="teams-errors" role="alert">
+        {{ teams_error }}
+      </div>
+    {% endif %}
     <div class="team-sub-block" data-team-side="institution">
       <h4 class="team-sub-title">فريق عمل الاتفاقية — المؤسسة</h4>
       <div class="team-picker-grid">
-        <div class="partnership-field"><label>الاسم</label><input type="text" data-team-name placeholder="الاسم الكامل"></div>
-        <div class="partnership-field"><label>الهاتف</label><input type="text" dir="ltr" data-team-phone placeholder="+9665XXXXXXXX"></div>
-        <div class="partnership-field"><label>البريد الإلكتروني</label><input type="email" dir="ltr" data-team-email placeholder="name@tvtc.gov.sa"></div>
-        <div class="partnership-field"><label>الإدارة / الجهة</label><input type="text" data-team-org placeholder="الإدارة أو الوحدة"></div>
-        <div class="partnership-field"><label>الصفة</label><select data-team-role><option value="">اختر الصفة</option></select></div>
-        <div><button type="button" class="button button-secondary" data-add-team-row>+ إضافة عضو</button></div>
+        <div class="partnership-field">
+          <label>الاسم</label><input type="text" data-team-name placeholder="الاسم الكامل">
+        </div>
+        <div class="partnership-field">
+          <label>الهاتف</label><input type="text" dir="ltr" data-team-phone placeholder="+9665XXXXXXXX">
+        </div>
+        <div class="partnership-field">
+          <label>البريد الإلكتروني</label><input type="email" dir="ltr" data-team-email placeholder="name@tvtc.gov.sa">
+        </div>
+        <div class="partnership-field">
+          <label>الإدارة / الجهة</label><input type="text" data-team-org placeholder="الإدارة أو الوحدة">
+        </div>
+        <div class="partnership-field">
+          <label>الصفة</label><select data-team-role><option value="">اختر الصفة</option></select>
+        </div>
+        <div>
+          <button type="button" class="button button-secondary" data-add-team-row>+ إضافة عضو</button>
+        </div>
       </div>
-      <div class="field-error" data-team-error role="alert"></div>
+      <div class="field-error" data-team-error role="alert">
+      </div>
       <div class="table-scroll">
         <table class="partnership-table" data-no-export>
-          <thead><tr><th>الاسم</th><th>الهاتف</th><th>البريد الإلكتروني</th><th>الإدارة / الجهة</th><th>الصفة</th><th>الإجراء</th></tr></thead>
-          <tbody data-team-tbody></tbody>
+          <thead>
+            <tr>
+              <th>الاسم</th><th>الهاتف</th><th>البريد الإلكتروني</th><th>الإدارة / الجهة</th><th>الصفة</th><th>الإجراء</th>
+            </tr>
+          </thead>
+          <tbody data-team-tbody>
+          </tbody>
         </table>
       </div>
       <p class="empty-state" data-team-empty>لم يُضف أعضاء لفريق المؤسسة بعد.</p>
     </div>
-
     <div class="team-sub-block" data-team-side="partner">
       <h4 class="team-sub-title">فريق عمل الاتفاقية — الجهة</h4>
       <div class="team-picker-grid">
-        <div class="partnership-field"><label>الاسم</label><input type="text" data-team-name placeholder="الاسم الكامل"></div>
-        <div class="partnership-field"><label>الهاتف</label><input type="text" dir="ltr" data-team-phone placeholder="+9665XXXXXXXX"></div>
-        <div class="partnership-field"><label>البريد الإلكتروني</label><input type="email" dir="ltr" data-team-email placeholder="name@partner.com"></div>
-        <div class="partnership-field"><label>الجهة</label><input type="text" data-team-org placeholder="اسم الجهة أو القسم"></div>
-        <div class="partnership-field"><label>الصفة</label><select data-team-role><option value="">اختر الصفة</option></select></div>
-        <div><button type="button" class="button button-secondary" data-add-team-row>+ إضافة عضو</button></div>
+        <div class="partnership-field">
+          <label>الاسم</label><input type="text" data-team-name placeholder="الاسم الكامل">
+        </div>
+        <div class="partnership-field">
+          <label>الهاتف</label><input type="text" dir="ltr" data-team-phone placeholder="+9665XXXXXXXX">
+        </div>
+        <div class="partnership-field">
+          <label>البريد الإلكتروني</label><input type="email" dir="ltr" data-team-email placeholder="name@partner.com">
+        </div>
+        <div class="partnership-field">
+          <label>الجهة</label><input type="text" data-team-org placeholder="اسم الجهة أو القسم">
+        </div>
+        <div class="partnership-field">
+          <label>الصفة</label><select data-team-role><option value="">اختر الصفة</option></select>
+        </div>
+        <div>
+          <button type="button" class="button button-secondary" data-add-team-row>+ إضافة عضو</button>
+        </div>
       </div>
-      <div class="field-error" data-team-error role="alert"></div>
+      <div class="field-error" data-team-error role="alert">
+      </div>
       <div class="table-scroll">
         <table class="partnership-table" data-no-export>
-          <thead><tr><th>الاسم</th><th>الهاتف</th><th>البريد الإلكتروني</th><th>الجهة</th><th>الصفة</th><th>الإجراء</th></tr></thead>
-          <tbody data-team-tbody></tbody>
+          <thead>
+            <tr>
+              <th>الاسم</th><th>الهاتف</th><th>البريد الإلكتروني</th><th>الجهة</th><th>الصفة</th><th>الإجراء</th>
+            </tr>
+          </thead>
+          <tbody data-team-tbody>
+          </tbody>
         </table>
       </div>
       <p class="empty-state" data-team-empty>لم يُضف أعضاء لفريق الجهة بعد.</p>
     </div>
   </div>
 </details>
-
 <details class="mk-accordion" {% if open_details %}open{% endif %}>
   <summary>
     <div class="mk-acc-head">
-      <h3 class="mk-acc-title">{{ num_content|default:"07" }} · المحتوى والأثر</h3>
-      <p class="mk-acc-subtitle">هدف الشراكة، خبر عن الشراكة، الفئات المستهدفة، والنتائج المتوقعة.</p>
+      <h3 class="mk-acc-title">{{ num_content|default:"07" }} · المحتوى والأثر</h3> <p class="mk-acc-subtitle">هدف الشراكة، خبر عن الشراكة، الفئات المستهدفة، والنتائج المتوقعة.</p>
     </div>
-    <span class="mk-acc-meta">
-      <svg class="mk-acc-arrow" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
-    </span>
+    <span class="mk-acc-meta"> <svg class="mk-acc-arrow" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg> </span>
   </summary>
   <div class="mk-acc-body">
     <div class="work-grid-2">
       <div class="partnership-field">
-        <label for="{{ details_form.objective.id_for_label }}">{{ details_form.objective.label }}</label>
-        {{ details_form.objective }}
-        <div class="field-error" role="alert">{{ details_form.objective.errors }}</div>
+        <label for="{{ details_form.objective.id_for_label }}">{{ details_form.objective.label }}</label> {{ details_form.objective }}
+        <div class="field-error" role="alert">
+          {{ details_form.objective.errors }}
+        </div>
       </div>
       <div class="partnership-field">
-        <label for="{{ details_form.announcement.id_for_label }}">{{ details_form.announcement.label }}</label>
-        {{ details_form.announcement }}
-        <div class="field-error" role="alert">{{ details_form.announcement.errors }}</div>
+        <label for="{{ details_form.announcement.id_for_label }}">{{ details_form.announcement.label }}</label> {{ details_form.announcement }}
+        <div class="field-error" role="alert">
+          {{ details_form.announcement.errors }}
+        </div>
       </div>
       <div class="partnership-field">
-        <label for="{{ details_form.audience.id_for_label }}">{{ details_form.audience.label }}</label>
-        {{ details_form.audience }}
-        <div class="field-error" role="alert">{{ details_form.audience.errors }}</div>
+        <label for="{{ details_form.audience.id_for_label }}">{{ details_form.audience.label }}</label> {{ details_form.audience }}
+        <div class="field-error" role="alert">
+          {{ details_form.audience.errors }}
+        </div>
       </div>
       <div class="partnership-field">
-        <label for="{{ details_form.expected_results.id_for_label }}">{{ details_form.expected_results.label }}</label>
-        {{ details_form.expected_results }}
-        <div class="field-error" role="alert">{{ details_form.expected_results.errors }}</div>
+        <label for="{{ details_form.expected_results.id_for_label }}">{{ details_form.expected_results.label }}</label> {{ details_form.expected_results }}
+        <div class="field-error" role="alert">
+          {{ details_form.expected_results.errors }}
+        </div>
       </div>
     </div>
   </div>

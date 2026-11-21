@@ -4,8 +4,8 @@
   max-height: 90vh;
   overflow-y: auto;
 }
-
 /* Collapsible accordion sections with big, bold, high-contrast headers */
+
 .mk-accordion {
   border: 1.5px solid #cde0dd;
   border-radius: 14px;
@@ -115,15 +115,13 @@
 }
 
 @media (max-width: 860px) {
-  .clause-picker-row,
-  .team-picker-grid {
+  .clause-picker-row, .team-picker-grid {
     grid-template-columns: 1fr 1fr;
   }
 }
 
 @media (max-width: 560px) {
-  .clause-picker-row,
-  .team-picker-grid {
+  .clause-picker-row, .team-picker-grid {
     grid-template-columns: 1fr;
   }
 }
@@ -199,9 +197,7 @@
   color: #0e4c48;
 }
 
-.mk-accordion select,
-.willingness-big-dialog select,
-.clause-inline-select {
+.mk-accordion select, .willingness-big-dialog select, .clause-inline-select {
   appearance: none;
   -webkit-appearance: none;
   background-color: #ffffff;

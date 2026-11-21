@@ -1,2 +1,7 @@
 {% extends 'access_control/activity.html' %}
-{% block access_content %}<section class="partnership-card">{% include 'access_control/_activity_detail.html' %}<a class="button button-secondary" href="{% url 'access_control:activity' %}">العودة إلى سجل النشاط</a></section>{% endblock %}
+{% block access_content %}
+  <section class="partnership-card">
+    {% include 'access_control/_activity_detail.html' %}
+    <a class="button button-secondary" href="{% url 'access_control:activity' %}">العودة إلى سجل النشاط</a>
+  </section>
+{% endblock %}

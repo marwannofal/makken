@@ -1,42 +1,127 @@
-{% extends 'access_control/base.html' %}{% load static tz %}
-{% block title %}سجل نشاط المستخدمين | مكّن{% endblock %}
-{% block access_head %}<link rel="stylesheet" href="{% static 'access_control/activity.css' %}?v=20261108-1"><script src="{% static 'access_control/activity.js' %}?v=20261108-1" defer></script>{% endblock %}
-{% block access_heading %}سجل نشاط المستخدمين{% endblock %}
-{% block access_description %}من قام بالإجراء، وعلى أي سجل، ومتى؟ متابعة واضحة للمشاهدات والتغييرات والتصدير.{% endblock %}
+{% extends 'access_control/base.html' %}
+{% load static tz %}
+{% block title %}
+  سجل نشاط المستخدمين | مكّن
+{% endblock %}
+{% block access_head %}
+  <link rel="stylesheet" href="{% static 'access_control/activity.css' %}?v=20261108-1">
+  <script src="{% static 'access_control/activity.js' %}?v=20261108-1" defer></script>
+{% endblock %}
+{% block access_heading %}
+  سجل نشاط المستخدمين
+{% endblock %}
+{% block access_description %}
+  من قام بالإجراء، وعلى أي سجل، ومتى؟ متابعة واضحة للمشاهدات والتغييرات والتصدير.
+{% endblock %}
 {% block access_content %}
-<section class="partnership-card activity-filter-card" aria-labelledby="activity-filter-heading">
-  <header class="card-heading"><div><p class="eyebrow">01 · البحث والتصفية</p><h2 id="activity-filter-heading">ابحث عن نشاط محدد</h2></div><span class="subtle-badge">توقيت الرياض · UTC+03:00</span></header>
-  <p class="ac-note">السجل للقراءة فقط. تُسجّل المشاهدات الناجحة والإجراءات المحفوظة؛ فتح نموذج أو نافذة تأكيد لا يُعد تعديلًا. السجلات السابقة متاحة بقدر ما حفظه النظام، والمشاهدات تُسجّل من تاريخ تفعيل هذه الميزة.</p>
-  {% if filter_error %}<p class="feedback feedback-error" role="alert">راجع الفلاتر الموضّحة أدناه. لم تُعرض نتائج خارج الفلاتر المختارة.</p>{% endif %}
-  <form method="get" class="activity-filters" action="{% url 'access_control:activity' %}">
-    {% for field in form %}{% if field.name != 'date_from' and field.name != 'time_from' and field.name != 'date_to' and field.name != 'time_to' %}{% include 'access_control/_field.html' with field=field %}{% endif %}{% endfor %}
-    <fieldset class="activity-date-range"><legend>الفترة الزمنية · بتوقيت الرياض</legend><div class="activity-date-grid">
-      {% include 'access_control/_field.html' with field=form.date_from %}
-      {% include 'access_control/_field.html' with field=form.time_from %}
-      {% include 'access_control/_field.html' with field=form.date_to %}
-      {% include 'access_control/_field.html' with field=form.time_to %}
-    </div></fieldset>
-    <div class="activity-filter-actions"><button type="submit" class="button button-primary"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg>بحث</button><a class="button button-secondary" href="{% url 'access_control:activity' %}">إعادة ضبط</a></div>
-  </form>
-</section>
-<section class="partnership-card" aria-labelledby="activity-table-heading">
-  <header class="card-heading"><div><p class="eyebrow">02 · الأحداث المسجلة</p><h2 id="activity-table-heading">نشاط المستخدمين</h2><p class="muted">الأحدث أولًا. اضغط على السجل لعرض تفاصيله.</p></div><span class="subtle-badge">عدد السجلات: {{ page_obj.paginator.count|default:0 }}</span></header>
-  <p class="activity-scope-note">تظهر الأحداث ضمن صلاحية سجل النشاط ونطاق مناطق حسابك. الأحداث المشتركة لا تظهر إلا لمن يملك جميع مناطق الحدث.</p>
-  <div class="table-scroll" tabindex="0" aria-label="سجل نشاط المستخدمين، يمكن تمريره أفقيًا">
-    <table class="partnership-table activity-table"><thead><tr><th>التاريخ والوقت</th><th>المستخدم المنفذ</th><th>الصفحة / القسم</th><th>العملية</th><th>السجل المتأثر</th><th>المناطق</th><th>النتيجة</th><th>التغييرات</th><th>الإجراء</th></tr></thead><tbody>
-    {% for event in rows %}<tr data-activity-url="{% url 'access_control:activity_detail' event.pk %}" tabindex="0" aria-label="تفاصيل الحدث {{ event.pk }}، {{ event.description }}">
-      <td><time datetime="{{ event.created_at|date:'c' }}">{% timezone activity_timezone %}<bdi>{{ event.created_at|date:'Y-m-d' }}</bdi><small><bdi>{{ event.created_at|date:'H:i:s' }}</bdi></small>{% endtimezone %}</time></td>
-      <th scope="row">{{ event.actor_name }}<small><bdi>{{ event.actor_username|default:'عملية نظام' }}</bdi></small></th>
-      <td>{{ event.module_title }}</td><td><span class="activity-action activity-action-{{ event.action }}">{{ event.get_action_display }}</span><small>{{ event.description }}</small></td>
-      <td>{{ event.target_label|default:'عرض صفحة / إجراء عام' }}{% if event.target_key %}<small>رقم السجل: <bdi>{{ event.target_key }}</bdi></small>{% endif %}</td>
-      <td>{% for region in event.region_snapshots.all %}<span class="tag">{{ region.name }}</span>{% empty %}{% if event.scope == 'unknown' %}غير محددة تاريخيًا{% else %}إجراء عام{% endif %}{% endfor %}</td>
-      <td><span class="record-status {% if event.outcome == 'success' %}is-enabled{% else %}is-disabled{% endif %}">{{ event.get_outcome_display }}</span></td>
-      <td class="activity-changes"><div class="activity-change-preview">{{ event.change_summary }}</div></td>
-      <td class="action-cell"><a class="row-action" href="{% url 'access_control:activity_detail' event.pk %}" data-activity-open><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>التفاصيل</a></td>
-    </tr>{% empty %}<tr><td colspan="9"><div class="empty-state"><strong>لا توجد أحداث مطابقة</strong><p>غيّر الفلاتر أو انتظر تسجيل نشاط جديد ضمن المناطق المسموحة.</p></div></td></tr>{% endfor %}
-    </tbody></table>
-  </div>
-  {% if page_obj.paginator.num_pages > 1 %}<nav class="ac-pagination" aria-label="صفحات سجل النشاط">{% if page_obj.has_previous %}<a class="button button-secondary" href="?{{ pagination_query }}&amp;page={{ page_obj.previous_page_number }}">السابق</a>{% endif %}<span>صفحة {{ page_obj.number }} من {{ page_obj.paginator.num_pages }}</span>{% if page_obj.has_next %}<a class="button button-secondary" href="?{{ pagination_query }}&amp;page={{ page_obj.next_page_number }}">التالي</a>{% endif %}</nav>{% endif %}
-</section>
-<dialog id="activity-detail" class="partnership-dialog activity-dialog" aria-labelledby="activity-detail-title"><div class="dialog-body"><div class="dialog-top"><span class="dialog-symbol"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 5H5v16h14V5h-4M9 3h6v4H9ZM8 11h8m-8 4h5"/></svg></span><button type="button" class="icon-button" data-activity-close aria-label="إغلاق التفاصيل"><svg aria-hidden="true"><use href="#icon-close"/></svg></button></div><h2 id="activity-detail-title">تفاصيل النشاط</h2><div data-activity-content aria-live="polite"></div><div class="dialog-actions"><button type="button" class="button button-secondary" data-activity-close>إغلاق</button></div></div></dialog>
+  <section class="partnership-card activity-filter-card" aria-labelledby="activity-filter-heading">
+    <header class="card-heading">
+      <div>
+        <p class="eyebrow">01 · البحث والتصفية</p><h2 id="activity-filter-heading">ابحث عن نشاط محدد</h2>
+      </div>
+      <span class="subtle-badge">توقيت الرياض · UTC+03:00</span>
+    </header>
+    <p class="ac-note">السجل للقراءة فقط. تُسجّل المشاهدات الناجحة والإجراءات المحفوظة؛ فتح نموذج أو نافذة تأكيد لا يُعد تعديلًا. السجلات السابقة متاحة بقدر ما حفظه النظام، والمشاهدات تُسجّل من تاريخ تفعيل هذه الميزة.</p>
+    {% if filter_error %}
+      <p class="feedback feedback-error" role="alert">راجع الفلاتر الموضّحة أدناه. لم تُعرض نتائج خارج الفلاتر المختارة.</p>
+    {% endif %}
+    <form method="get" class="activity-filters" action="{% url 'access_control:activity' %}">
+      {% for field in form %}
+        {% if field.name != 'date_from' and field.name != 'time_from' and field.name != 'date_to' and field.name != 'time_to' %}
+          {% include 'access_control/_field.html' with field=field %}
+        {% endif %}
+      {% endfor %}
+      <fieldset class="activity-date-range">
+        <legend>الفترة الزمنية · بتوقيت الرياض</legend>
+        <div class="activity-date-grid">
+          {% include 'access_control/_field.html' with field=form.date_from %}
+          {% include 'access_control/_field.html' with field=form.time_from %}
+          {% include 'access_control/_field.html' with field=form.date_to %}
+          {% include 'access_control/_field.html' with field=form.time_to %}
+        </div>
+      </fieldset>
+      <div class="activity-filter-actions">
+        <button type="submit" class="button button-primary"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg>بحث</button><a class="button button-secondary" href="{% url 'access_control:activity' %}">إعادة ضبط</a>
+      </div>
+    </form>
+  </section>
+  <section class="partnership-card" aria-labelledby="activity-table-heading">
+    <header class="card-heading">
+      <div>
+        <p class="eyebrow">02 · الأحداث المسجلة</p><h2 id="activity-table-heading">نشاط المستخدمين</h2><p class="muted">الأحدث أولًا. اضغط على السجل لعرض تفاصيله.</p>
+      </div>
+      <span class="subtle-badge">عدد السجلات: {{ page_obj.paginator.count|default:0 }}</span>
+    </header>
+    <p class="activity-scope-note">تظهر الأحداث ضمن صلاحية سجل النشاط ونطاق مناطق حسابك. الأحداث المشتركة لا تظهر إلا لمن يملك جميع مناطق الحدث.</p>
+    <div class="table-scroll" tabindex="0" aria-label="سجل نشاط المستخدمين، يمكن تمريره أفقيًا">
+      <table class="partnership-table activity-table">
+        <thead>
+          <tr>
+            <th>التاريخ والوقت</th><th>المستخدم المنفذ</th><th>الصفحة / القسم</th><th>العملية</th><th>السجل المتأثر</th><th>المناطق</th><th>النتيجة</th><th>التغييرات</th><th>الإجراء</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for event in rows %}
+            <tr data-activity-url="{% url 'access_control:activity_detail' event.pk %}" tabindex="0" aria-label="تفاصيل الحدث {{ event.pk }}، {{ event.description }}">
+              <td><time datetime="{{ event.created_at|date:'c' }}">
+              {% timezone activity_timezone %}
+                <bdi>{{ event.created_at|date:'Y-m-d' }}</bdi><small><bdi>{{ event.created_at|date:'H:i:s' }}</bdi></small>
+              {% endtimezone %}
+              </time></td> <th scope="row">{{ event.actor_name }}<small><bdi>{{ event.actor_username|default:'عملية نظام' }}</bdi></small></th> <td>{{ event.module_title }}</td><td><span class="activity-action activity-action-{{ event.action }}">{{ event.get_action_display }}</span><small>{{ event.description }}</small></td> <td>{{ event.target_label|default:'عرض صفحة / إجراء عام' }}
+              {% if event.target_key %}
+                <small>رقم السجل: <bdi>{{ event.target_key }}</bdi></small>
+              {% endif %}
+              </td> <td>
+              {% for region in event.region_snapshots.all %}
+                <span class="tag">{{ region.name }}</span>
+              {% empty %}
+                {% if event.scope == 'unknown' %}
+                  غير محددة تاريخيًا
+                {% else %}
+                  إجراء عام
+                {% endif %}
+              {% endfor %}
+              </td> <td><span class="record-status {% if event.outcome == 'success' %}is-enabled{% else %}is-disabled{% endif %}">{{ event.get_outcome_display }}</span></td> <td class="activity-changes">
+              <div class="activity-change-preview">
+                {{ event.change_summary }}
+              </div>
+              </td> <td class="action-cell"><a class="row-action" href="{% url 'access_control:activity_detail' event.pk %}" data-activity-open><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>التفاصيل</a></td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="9">
+              <div class="empty-state">
+                <strong>لا توجد أحداث مطابقة</strong><p>غيّر الفلاتر أو انتظر تسجيل نشاط جديد ضمن المناطق المسموحة.</p>
+              </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% if page_obj.paginator.num_pages > 1 %}
+      <nav class="ac-pagination" aria-label="صفحات سجل النشاط">
+        {% if page_obj.has_previous %}
+          <a class="button button-secondary" href="?{{ pagination_query }}&amp;page={{ page_obj.previous_page_number }}">السابق</a>
+        {% endif %}
+        <span>صفحة {{ page_obj.number }} من {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+          <a class="button button-secondary" href="?{{ pagination_query }}&amp;page={{ page_obj.next_page_number }}">التالي</a>
+        {% endif %}
+      </nav>
+    {% endif %}
+  </section>
+  <dialog id="activity-detail" class="partnership-dialog activity-dialog" aria-labelledby="activity-detail-title">
+    <div class="dialog-body">
+      <div class="dialog-top">
+        <span class="dialog-symbol"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 5H5v16h14V5h-4M9 3h6v4H9ZM8 11h8m-8 4h5"/></svg></span><button type="button" class="icon-button" data-activity-close aria-label="إغلاق التفاصيل"><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+      </div>
+      <h2 id="activity-detail-title">تفاصيل النشاط</h2>
+      <div data-activity-content aria-live="polite">
+      </div>
+      <div class="dialog-actions">
+        <button type="button" class="button button-secondary" data-activity-close>إغلاق</button>
+      </div>
+    </div>
+  </dialog>
 {% endblock %}

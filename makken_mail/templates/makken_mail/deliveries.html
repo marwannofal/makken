@@ -1,11 +1,48 @@
-{% extends 'makken_mail/base.html' %}{% load tz %}
+{% extends 'makken_mail/base.html' %}
+{% load tz %}
 {% block mail_content %}
-<section class="partnership-card mail-card">
-<header class="card-heading"><div><p class="eyebrow">تتبع التسليم</p><h2>سجل إرسال الإشعارات</h2></div><span class="subtle-badge">عدد السجلات: {{ rows.paginator.count }}</span></header>
-<p class="mail-caption">«قبله مزود البريد» تعني قبول خادم SMTP للرسالة. وصولها إلى صندوق الوارد يخضع لمزود البريد.</p>
-<form method="get" class="mail-inline"><div class="partnership-field"><label for="mail-state">حالة الإرسال</label><select name="status" id="mail-state"><option value="">جميع الحالات</option>{% for value,label in statuses %}<option value="{{ value }}"{% if selected == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></div><button class="button button-primary" type="submit">بحث</button><a class="button button-secondary" href="{% url 'makken_mail:deliveries' %}">مسح</a></form>
-<div class="table-scroll" tabindex="0"><table class="partnership-table" data-no-export><thead><tr><th>النوع</th><th>المستلم</th><th>وقت التسجيل (الرياض)</th><th>المحاولات</th><th>الحالة</th><th>النتيجة</th></tr></thead>
-<tbody>{% for row in rows %}<tr><th scope="row">{{ row.label }}</th><td>{{ row.recipient|default:'حساب غير متاح' }}</td><td><bdi>{% timezone 'Asia/Riyadh' %}{{ row.created_at|date:"Y-m-d H:i" }}{% endtimezone %}</bdi></td><td>{{ row.attempts }}</td><td><span class="mail-pill{% if row.status == 'sent' %} is-on{% endif %}">{{ row.get_status_display }}</span></td><td>{{ row.reason_label|default:'—' }}</td></tr>{% empty %}<tr><td colspan="6">لا توجد رسائل مطابقة حاليًا.</td></tr>{% endfor %}</tbody>
-</table></div>
-{% include 'makken_mail/pager.html' with entries=rows %}
-</section>{% endblock %}
+  <section class="partnership-card mail-card">
+    <header class="card-heading">
+      <div>
+        <p class="eyebrow">تتبع التسليم</p><h2>سجل إرسال الإشعارات</h2>
+      </div>
+      <span class="subtle-badge">عدد السجلات: {{ rows.paginator.count }}</span>
+    </header>
+    <p class="mail-caption">«قبله مزود البريد» تعني قبول خادم SMTP للرسالة. وصولها إلى صندوق الوارد يخضع لمزود البريد.</p>
+    <form method="get" class="mail-inline">
+      <div class="partnership-field">
+        <label for="mail-state">حالة الإرسال</label><select name="status" id="mail-state"><option value="">جميع الحالات</option>
+        {% for value,label in statuses %}
+          <option value="{{ value }}"{% if selected == value %} selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+        </select>
+      </div>
+      <button class="button button-primary" type="submit">بحث</button><a class="button button-secondary" href="{% url 'makken_mail:deliveries' %}">مسح</a>
+    </form>
+    <div class="table-scroll" tabindex="0">
+      <table class="partnership-table" data-no-export>
+        <thead>
+          <tr>
+            <th>النوع</th><th>المستلم</th><th>وقت التسجيل (الرياض)</th><th>المحاولات</th><th>الحالة</th><th>النتيجة</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in rows %}
+            <tr>
+              <th scope="row">{{ row.label }}</th><td>{{ row.recipient|default:'حساب غير متاح' }}</td><td><bdi>
+              {% timezone 'Asia/Riyadh' %}
+                {{ row.created_at|date:"Y-m-d H:i" }}
+              {% endtimezone %}
+              </bdi></td><td>{{ row.attempts }}</td><td><span class="mail-pill{% if row.status == 'sent' %} is-on{% endif %}">{{ row.get_status_display }}</span></td><td>{{ row.reason_label|default:'—' }}</td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="6">لا توجد رسائل مطابقة حاليًا.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% include 'makken_mail/pager.html' with entries=rows %}
+  </section>
+{% endblock %}

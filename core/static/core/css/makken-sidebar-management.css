@@ -1,4 +1,5 @@
 /* Sidebar */
+
 .sidebar {
   background: #24b3af;
   color: #fff;
@@ -9,9 +10,7 @@
   filter: brightness(0) invert(1);
 }
 
-.sidebar .navigation-label,
-.sidebar .user-name,
-.sidebar .user-email {
+.sidebar .navigation-label, .sidebar .user-name, .sidebar .user-email {
   color: #fff;
 }
 
@@ -23,8 +22,8 @@
 .sidebar :focus-visible {
   outline-color: #fff;
 }
-
 /* Navigation */
+
 .sidebar .nav-link {
   color: #fff;
   background: transparent;
@@ -42,8 +41,8 @@
 .sidebar .nav-dot {
   background: currentColor;
 }
-
 /* Management dropdown */
+
 .nav-management {
   margin-top: 4px;
   min-width: 0;
@@ -95,8 +94,8 @@
 .nav-management[open] > .nav-management-toggle .management-chevron {
   transform: rotate(0);
 }
-
 /* Dropdown links */
+
 .nav-management-links {
   min-width: 0;
   margin-block: 10px 8px;
@@ -134,8 +133,8 @@
 .nav-management:not([open]) > .nav-management-links {
   display: none;
 }
-
 /* User profile */
+
 .sidebar .sidebar-footer {
   border-color: rgb(255 255 255 / 25%);
 }
@@ -144,8 +143,8 @@
   color: #24b3af;
   background: #fff;
 }
-
 /* Logout */
+
 .sidebar .logout-button {
   color: #fff;
   background: transparent;
@@ -157,8 +156,8 @@
   background: #fff;
   border-color: #fff;
 }
-
 /* Mobile drawer */
+
 .sidebar .drawer-close {
   color: #fff;
   background: transparent;
@@ -167,31 +166,26 @@
 .sidebar .drawer-close:hover {
   background: rgb(255 255 255 / 16%);
 }
-
 /* Responsive */
+
 @media (max-width: 1100px) {
   .nav-management-toggle {
     gap: 10px;
     font-size: 13px;
   }
-
   .nav-management-links {
     margin-inline: 16px 2px;
     padding-inline-start: 8px;
   }
-
   .nav-management-links .nav-link {
     padding-inline: 10px;
     font-size: 11px;
   }
 }
-
 /* Reduced motion */
+
 @media (prefers-reduced-motion: reduce) {
-  .nav-management-toggle,
-  .nav-management-toggle .management-chevron,
-  .sidebar .nav-link,
-  .sidebar .logout-button {
+  .nav-management-toggle, .nav-management-toggle .management-chevron, .sidebar .nav-link, .sidebar .logout-button {
     transition: none;
   }
 }

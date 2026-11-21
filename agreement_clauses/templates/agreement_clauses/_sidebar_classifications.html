@@ -1,1 +1,4 @@
-{% load access_tags %}{% allowed 'agreement_classifications' 'view' %}{% include "core/partials/sidebar/_link.html" with nav_page="agreement_classifications" nav_url="agreement_clauses:classifications" nav_label="إدارة تصنيف الاتفاقية" nav_path="M4 6h16M4 12h16M4 18h10" active_page=active_page request=request only %}{% endallowed %}
+{% load access_tags %}
+{% allowed 'agreement_classifications' 'view' %}
+  {% include "core/partials/sidebar/_link.html" with nav_page="agreement_classifications" nav_url="agreement_clauses:classifications" nav_label="إدارة تصنيف الاتفاقية" nav_path="M4 6h16M4 12h16M4 18h10" active_page=active_page request=request only %}
+{% endallowed %}

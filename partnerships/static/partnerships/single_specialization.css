@@ -1,4 +1,5 @@
 /* Single specialty control; keep all customized partnership styles intact. */
+
 #offering-specializations + .search-select .search-select-trigger {
   appearance: none;
   -webkit-appearance: none;
@@ -12,6 +13,7 @@
   background-position: left 14px center;
   background-size: 16px 16px;
 }
+
 #offering-specializations + .search-select .search-select-trigger > [aria-hidden="true"] {
   display: none;
 }

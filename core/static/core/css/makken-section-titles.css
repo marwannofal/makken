@@ -1,6 +1,6 @@
 /* Makken numbered section headings. Shared across Arabic RTL pages. */
-.main-content .mk-numbered-section-title,
-.mk-numbered-section-title {
+
+.main-content .mk-numbered-section-title, .mk-numbered-section-title {
   display: block;
   max-width: 100%;
   margin-block: 0 10px;
@@ -15,9 +15,9 @@
   white-space: normal;
   overflow-wrap: break-word;
 }
+
 @media (max-width: 640px) {
-  .main-content .mk-numbered-section-title,
-  .mk-numbered-section-title {
+  .main-content .mk-numbered-section-title, .mk-numbered-section-title {
     font-size: 20px !important;
     line-height: 1.7 !important;
     margin-block-end: 8px;

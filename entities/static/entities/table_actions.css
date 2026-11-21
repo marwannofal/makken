@@ -1,4 +1,5 @@
 /* Entities use the same edit/delete controls as the other settings tables. */
+
 .entities-table .entity-row-actions {
   flex-direction: row;
   gap: 8px;
@@ -52,7 +53,6 @@
     width: 44px;
     padding: 10px;
   }
-
   .entities-table .entity-action > span {
     display: none;
   }

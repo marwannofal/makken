@@ -1,15 +1,94 @@
-{% extends 'makken_mail/base.html' %}{% load tz %}
-{% block mail_content %}<section class="partnership-card mail-card">
-<header class="card-heading"><div><p class="eyebrow">العمل رقم {{ work.pk }}</p><h2>{{ work.title }}</h2></div><span class="mail-pill{% if work.status == 'complete' %} is-on{% endif %}">{{ work.get_status_display }}</span></header>
-<dl class="mail-grid mail-details"><div><dt>الموظفون المسند إليهم</dt><dd>{% for person in assignees %}<span class="tag">{{ person.get_full_name|default:person }}</span>{% empty %}{{ work.employee.get_full_name|default:work.employee }}{% endfor %}</dd></div><div><dt>المدير</dt><dd>{{ work.manager.get_full_name|default:work.manager }}</dd></div><div><dt>الاستحقاق</dt><dd><bdi>{{ work.due_on|date:"Y-m-d"|default:'—' }}</bdi></dd></div><div><dt>السجل المرتبط</dt><dd>{% if linked_url %}<a href="{{ linked_url }}">{{ linked }}</a>{% else %}—{% endif %}</dd></div></dl>
-{% if work.instructions %}<p class="mail-notes">{{ work.instructions }}</p>{% endif %}
-<div class="mail-progress"><label for="work-progress">الإنجاز <bdi>{{ work.progress }}%</bdi></label><progress id="work-progress" value="{{ work.progress }}" max="100">{{ work.progress }}%</progress></div>
-<div class="mail-inline mail-actions">{% if can_reassign %}<a class="button button-secondary" href="{% url 'makken_mail:work_edit' work.pk %}">تعديل / إعادة إسناد</a>{% endif %}<a class="button button-secondary" href="{% url 'makken_mail:work_index' %}">كل الأعمال</a></div>
-</section>
-{% if form %}<section class="partnership-card mail-card"><header class="card-heading"><h2>تحديث المتابعة</h2></header>
-<form method="post" data-ac-confirm="حفظ تغيير حالة العمل وتقدّمه؟">{% csrf_token %}{% include 'makken_mail/_form.html' %}
-<div class="mail-inline mail-actions"><button type="submit" class="button button-primary">حفظ التقدم</button></div></form></section>{% endif %}
-<section class="partnership-card mail-card"><header class="card-heading"><h2>سجل التحديثات</h2></header>
-<div class="table-scroll" tabindex="0"><table class="partnership-table" data-no-export><thead><tr><th>العملية</th><th>المنفّذ</th><th>الوقت (الرياض)</th><th>الحالة</th><th>الإنجاز</th><th>الملاحظة</th></tr></thead><tbody>
-{% for row in history %}<tr><th scope="row">{{ row.label }}</th><td>{{ row.actor|default:'—' }}</td><td><bdi>{% timezone 'Asia/Riyadh' %}{{ row.created_at|date:"Y-m-d H:i" }}{% endtimezone %}</bdi></td><td>{{ row.status_label }}</td><td><bdi>{{ row.snapshot.progress }}%</bdi></td><td class="mail-notes">{{ row.note|default:'—' }}</td></tr>{% empty %}<tr><td colspan="6">لا توجد تحديثات.</td></tr>{% endfor %}</tbody></table></div>{% include 'makken_mail/pager.html' with entries=history %}</section>
+{% extends 'makken_mail/base.html' %}
+{% load tz %}
+{% block mail_content %}
+  <section class="partnership-card mail-card">
+    <header class="card-heading">
+      <div>
+        <p class="eyebrow">العمل رقم {{ work.pk }}</p><h2>{{ work.title }}</h2>
+      </div>
+      <span class="mail-pill{% if work.status == 'complete' %} is-on{% endif %}">{{ work.get_status_display }}</span>
+    </header>
+    <dl class="mail-grid mail-details">
+      <div>
+        <dt>الموظفون المسند إليهم</dt><dd>
+        {% for person in assignees %}
+          <span class="tag">{{ person.get_full_name|default:person }}</span>
+        {% empty %}
+          {{ work.employee.get_full_name|default:work.employee }}
+        {% endfor %}
+        </dd>
+      </div>
+      <div>
+        <dt>المدير</dt><dd>{{ work.manager.get_full_name|default:work.manager }}</dd>
+      </div>
+      <div>
+        <dt>الاستحقاق</dt><dd><bdi>{{ work.due_on|date:"Y-m-d"|default:'—' }}</bdi></dd>
+      </div>
+      <div>
+        <dt>السجل المرتبط</dt><dd>
+        {% if linked_url %}
+          <a href="{{ linked_url }}">{{ linked }}</a>
+        {% else %}
+          —
+        {% endif %}
+        </dd>
+      </div>
+    </dl>
+    {% if work.instructions %}
+      <p class="mail-notes">{{ work.instructions }}</p>
+    {% endif %}
+    <div class="mail-progress">
+      <label for="work-progress">الإنجاز <bdi>{{ work.progress }}%</bdi></label><progress id="work-progress" value="{{ work.progress }}" max="100">{{ work.progress }}%</progress>
+    </div>
+    <div class="mail-inline mail-actions">
+      {% if can_reassign %}
+        <a class="button button-secondary" href="{% url 'makken_mail:work_edit' work.pk %}">تعديل / إعادة إسناد</a>
+      {% endif %}
+      <a class="button button-secondary" href="{% url 'makken_mail:work_index' %}">كل الأعمال</a>
+    </div>
+  </section>
+  {% if form %}
+    <section class="partnership-card mail-card">
+      <header class="card-heading">
+        <h2>تحديث المتابعة</h2>
+      </header>
+      <form method="post" data-ac-confirm="حفظ تغيير حالة العمل وتقدّمه؟">
+        {% csrf_token %}
+        {% include 'makken_mail/_form.html' %}
+        <div class="mail-inline mail-actions">
+          <button type="submit" class="button button-primary">حفظ التقدم</button>
+        </div>
+      </form>
+    </section>
+  {% endif %}
+  <section class="partnership-card mail-card">
+    <header class="card-heading">
+      <h2>سجل التحديثات</h2>
+    </header>
+    <div class="table-scroll" tabindex="0">
+      <table class="partnership-table" data-no-export>
+        <thead>
+          <tr>
+            <th>العملية</th><th>المنفّذ</th><th>الوقت (الرياض)</th><th>الحالة</th><th>الإنجاز</th><th>الملاحظة</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in history %}
+            <tr>
+              <th scope="row">{{ row.label }}</th><td>{{ row.actor|default:'—' }}</td><td><bdi>
+              {% timezone 'Asia/Riyadh' %}
+                {{ row.created_at|date:"Y-m-d H:i" }}
+              {% endtimezone %}
+              </bdi></td><td>{{ row.status_label }}</td><td><bdi>{{ row.snapshot.progress }}%</bdi></td><td class="mail-notes">{{ row.note|default:'—' }}</td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="6">لا توجد تحديثات.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% include 'makken_mail/pager.html' with entries=history %}
+  </section>
 {% endblock %}

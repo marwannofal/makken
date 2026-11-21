@@ -1,10 +1,85 @@
 <section class="dash-chart partnership-card" aria-labelledby="chart-title-{{ chart.slug }}">
-  <header class="card-heading"><h2 id="chart-title-{{ chart.slug }}">{{ chart.title }}</h2><button type="button" class="dash-chart-data" data-chart-open="{{ chart.slug }}" aria-label="عرض بيانات {{ chart.title }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 4h16v16H4ZM4 10h16M10 4v16"/></svg>البيانات</button></header>
+  <header class="card-heading">
+    <h2 id="chart-title-{{ chart.slug }}">{{ chart.title }}</h2><button type="button" class="dash-chart-data" data-chart-open="{{ chart.slug }}" aria-label="عرض بيانات {{ chart.title }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 4h16v16H4ZM4 10h16M10 4v16"/></svg>البيانات</button>
+  </header>
   <p class="dash-caption">{{ chart.caption }}</p>
   {% if chart.has_data %}
-    {% if chart.kind == 'donut' %}<div class="dash-donut-layout"><div class="dash-donut" role="img" aria-label="{{ chart.title }}؛ الإجمالي {{ chart.total }}. تفاصيل القيم في القائمة المجاورة." ><svg viewBox="0 0 170 170" aria-hidden="true"><circle cx="85" cy="85" r="70" fill="none" stroke="#edf5f3" stroke-width="22"/>{% for row in chart.rows %}<circle cx="85" cy="85" r="70" fill="none" stroke="{{ row.color }}" stroke-width="22" pathLength="100" stroke-dasharray="{{ row.dash }} 100" stroke-dashoffset="{{ row.offset }}" transform="rotate(-90 85 85)"/>{% endfor %}</svg><div><strong>{{ chart.total }}</strong><span>الإجمالي</span></div></div><ul class="dash-legend">{% for row in chart.rows %}<li><svg class="dash-legend-dot" viewBox="0 0 10 10" aria-hidden="true"><circle cx="5" cy="5" r="5" fill="{{ row.color }}"/></svg>{% if row.href %}<a href="{{ row.href }}">{{ row.label }}</a>{% else %}<span>{{ row.label }}</span>{% endif %}<strong><bdi>{{ row.display }}</bdi><small>{{ row.share }}%</small></strong></li>{% endfor %}</ul></div>
-    {% else %}<div class="dash-bars">{% for row in chart.rows %}<div class="dash-bar-row"><div class="dash-bar-label">{% if row.href %}<a href="{{ row.href }}">{{ row.label }}</a>{% else %}<span>{{ row.label }}</span>{% endif %}<bdi>{{ row.display }}{% if chart.unit %} {{ chart.unit }}{% endif %}</bdi></div><svg class="dash-track" role="img" aria-label="{{ row.label }}: {{ row.display }} {{ chart.unit }}" viewBox="0 0 100 8" preserveAspectRatio="none"><rect width="100" height="8" rx="4" fill="#edf5f3"/><rect width="{{ row.width }}" height="8" rx="4" fill="#24B3AF"/></svg>{% if row.second_display %}<svg class="dash-track is-support" role="img" aria-label="الدعم المعتمد: {{ row.second_display }} ريال" viewBox="0 0 100 6" preserveAspectRatio="none"><rect width="100" height="6" rx="3" fill="#edf5f3"/><rect width="{{ row.second_width }}" height="6" rx="3" fill="#6F9AB9"/></svg><small class="dash-support-number">الدعم: <bdi>{{ row.second_display }}</bdi> ريال</small>{% endif %}</div>{% endfor %}</div>{% endif %}
-  {% else %}<div class="dash-chart-empty"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 20h16M7 16v-4m5 4V8m5 8V4"/></svg><strong>لا توجد بيانات لهذا الرسم</strong><span>غيّر الفلاتر أو أضف بيانات من صفحات النظام المسموحة.</span></div>{% endif %}
-  {% if chart.more %}<p class="dash-caption">الرسم يعرض جزءًا مختصرًا؛ زر البيانات والتقرير يشملان جميع النتائج.</p>{% endif %}
-  <template id="dash-chart-{{ chart.slug }}"><h3>{{ chart.title }}</h3><p class="dash-caption">{{ chart.caption }}</p><div class="table-scroll" tabindex="0"><table class="partnership-table" data-no-export><thead><tr>{% for cell in chart.headers %}<th>{{ cell }}</th>{% endfor %}</tr></thead><tbody>{% for row in chart.all_rows %}<tr>{% for cell in row.cells %}<td>{{ cell }}</td>{% endfor %}</tr>{% empty %}<tr><td colspan="{{ chart.headers|length }}">لا توجد بيانات مطابقة.</td></tr>{% endfor %}</tbody></table></div></template>
+    {% if chart.kind == 'donut' %}
+      <div class="dash-donut-layout">
+        <div class="dash-donut" role="img" aria-label="{{ chart.title }}؛ الإجمالي {{ chart.total }}. تفاصيل القيم في القائمة المجاورة." >
+          <svg viewBox="0 0 170 170" aria-hidden="true"><circle cx="85" cy="85" r="70" fill="none" stroke="#edf5f3" stroke-width="22"/>{% for row in chart.rows %}<circle cx="85" cy="85" r="70" fill="none" stroke="{{ row.color }}" stroke-width="22" pathLength="100" stroke-dasharray="{{ row.dash }} 100" stroke-dashoffset="{{ row.offset }}" transform="rotate(-90 85 85)"/>{% endfor %}</svg>
+          <div>
+            <strong>{{ chart.total }}</strong><span>الإجمالي</span>
+          </div>
+        </div>
+        <ul class="dash-legend">
+          {% for row in chart.rows %}
+            <li><svg class="dash-legend-dot" viewBox="0 0 10 10" aria-hidden="true"><circle cx="5" cy="5" r="5" fill="{{ row.color }}"/></svg>
+            {% if row.href %}
+              <a href="{{ row.href }}">{{ row.label }}</a>
+            {% else %}
+              <span>{{ row.label }}</span>
+            {% endif %}
+            <strong><bdi>{{ row.display }}</bdi><small>{{ row.share }}%</small></strong></li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% else %}
+      <div class="dash-bars">
+        {% for row in chart.rows %}
+          <div class="dash-bar-row">
+            <div class="dash-bar-label">
+              {% if row.href %}
+                <a href="{{ row.href }}">{{ row.label }}</a>
+              {% else %}
+                <span>{{ row.label }}</span>
+              {% endif %}
+              <bdi>{{ row.display }}
+              {% if chart.unit %}
+                {{ chart.unit }}
+              {% endif %}
+              </bdi>
+            </div>
+            <svg class="dash-track" role="img" aria-label="{{ row.label }}: {{ row.display }} {{ chart.unit }}" viewBox="0 0 100 8" preserveAspectRatio="none"><rect width="100" height="8" rx="4" fill="#edf5f3"/><rect width="{{ row.width }}" height="8" rx="4" fill="#24B3AF"/></svg>
+            {% if row.second_display %}
+              <svg class="dash-track is-support" role="img" aria-label="الدعم المعتمد: {{ row.second_display }} ريال" viewBox="0 0 100 6" preserveAspectRatio="none"><rect width="100" height="6" rx="3" fill="#edf5f3"/><rect width="{{ row.second_width }}" height="6" rx="3" fill="#6F9AB9"/></svg><small class="dash-support-number">الدعم: <bdi>{{ row.second_display }}</bdi> ريال</small>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% else %}
+    <div class="dash-chart-empty">
+      <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 20h16M7 16v-4m5 4V8m5 8V4"/></svg><strong>لا توجد بيانات لهذا الرسم</strong><span>غيّر الفلاتر أو أضف بيانات من صفحات النظام المسموحة.</span>
+    </div>
+  {% endif %}
+  {% if chart.more %}
+    <p class="dash-caption">الرسم يعرض جزءًا مختصرًا؛ زر البيانات والتقرير يشملان جميع النتائج.</p>
+  {% endif %}
+  <template id="dash-chart-{{ chart.slug }}"><h3>{{ chart.title }}</h3><p class="dash-caption">{{ chart.caption }}</p>
+  <div class="table-scroll" tabindex="0">
+    <table class="partnership-table" data-no-export>
+      <thead>
+        <tr>
+          {% for cell in chart.headers %}
+            <th>{{ cell }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in chart.all_rows %}
+          <tr>
+            {% for cell in row.cells %}
+              <td>{{ cell }}</td>
+            {% endfor %}
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="{{ chart.headers|length }}">لا توجد بيانات مطابقة.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  </template>
 </section>

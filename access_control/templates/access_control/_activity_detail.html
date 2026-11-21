@@ -1,7 +1,67 @@
-{% load tz %}<article class="activity-detail-content" data-activity-detail>
-{% if event.imported_history %}<p class="ac-note">حدث مستورد من سجل العمل السابق. أسماء بعض المناطق مسترجعة من مراجع المناطق الحالية؛ لا توجد مشاهدات قديمة غير مسجلة.</p>{% endif %}
-<p class="eyebrow">حدث رقم {{ event.pk }}</p><h3>{{ event.description }}</h3>
-<dl class="activity-detail-grid"><div><dt>المستخدم المنفذ</dt><dd>{{ event.actor_name }} <bdi>{{ event.actor_username }}</bdi></dd></div><div><dt>التاريخ والوقت</dt><dd>{% timezone activity_timezone %}<bdi>{{ event.created_at|date:'Y-m-d H:i:s' }}</bdi>{% endtimezone %}<small>توقيت الرياض · UTC+03:00</small></dd></div><div><dt>الصفحة / القسم</dt><dd>{{ event.module_title }}</dd></div><div><dt>العملية والنتيجة</dt><dd>{{ event.get_action_display }} · {{ event.get_outcome_display }}</dd></div><div><dt>السجل المتأثر</dt><dd>{{ event.target_label|default:'عرض صفحة / إجراء عام' }}{% if event.target_key %} · {{ event.target_key }}{% endif %}</dd></div><div><dt>المناطق المسجلة للحدث</dt><dd>{% for region in event.region_snapshots.all %}<span class="tag">{{ region.name }}</span>{% empty %}{% if event.scope == 'unknown' %}لم تحفظ في السجل السابق{% else %}إجراء عام{% endif %}{% endfor %}</dd></div></dl>
-{% if event.change_rows %}<h3>ما الذي تغيّر؟</h3><div class="table-scroll" tabindex="0" aria-label="القيم السابقة والجديدة"><table class="partnership-table activity-values" data-no-export><thead><tr><th>الحقل</th><th>قبل الإجراء</th><th>بعد الإجراء</th></tr></thead><tbody>{% for row in event.change_rows %}<tr><th scope="row">{{ row.label }}</th><td>{{ row.before }}</td><td>{{ row.after }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<p class="ac-note">هذا حدث مشاهدة أو إجراء بلا تغييرات محفوظة على الحقول المعروضة.</p>{% endif %}
-<p class="muted activity-detail-note">السجل للقراءة فقط. لا يتضمن كلمات المرور أو رموز التأكيد أو محتوى المرفقات. تسجيل المشاهدة يعني أن الخادم أعاد الصفحة بنجاح، ولا يثبت قراءة المستخدم لكل محتواها.</p>
+{% load tz %}
+<article class="activity-detail-content" data-activity-detail>
+  {% if event.imported_history %}
+    <p class="ac-note">حدث مستورد من سجل العمل السابق. أسماء بعض المناطق مسترجعة من مراجع المناطق الحالية؛ لا توجد مشاهدات قديمة غير مسجلة.</p>
+  {% endif %}
+  <p class="eyebrow">حدث رقم {{ event.pk }}</p><h3>{{ event.description }}</h3>
+  <dl class="activity-detail-grid">
+    <div>
+      <dt>المستخدم المنفذ</dt><dd>{{ event.actor_name }} <bdi>{{ event.actor_username }}</bdi></dd>
+    </div>
+    <div>
+      <dt>التاريخ والوقت</dt><dd>
+      {% timezone activity_timezone %}
+        <bdi>{{ event.created_at|date:'Y-m-d H:i:s' }}</bdi>
+      {% endtimezone %}
+      <small>توقيت الرياض · UTC+03:00</small></dd>
+    </div>
+    <div>
+      <dt>الصفحة / القسم</dt><dd>{{ event.module_title }}</dd>
+    </div>
+    <div>
+      <dt>العملية والنتيجة</dt><dd>{{ event.get_action_display }} · {{ event.get_outcome_display }}</dd>
+    </div>
+    <div>
+      <dt>السجل المتأثر</dt><dd>{{ event.target_label|default:'عرض صفحة / إجراء عام' }}
+      {% if event.target_key %}
+        · {{ event.target_key }}
+      {% endif %}
+      </dd>
+    </div>
+    <div>
+      <dt>المناطق المسجلة للحدث</dt><dd>
+      {% for region in event.region_snapshots.all %}
+        <span class="tag">{{ region.name }}</span>
+      {% empty %}
+        {% if event.scope == 'unknown' %}
+          لم تحفظ في السجل السابق
+        {% else %}
+          إجراء عام
+        {% endif %}
+      {% endfor %}
+      </dd>
+    </div>
+  </dl>
+  {% if event.change_rows %}
+    <h3>ما الذي تغيّر؟</h3>
+    <div class="table-scroll" tabindex="0" aria-label="القيم السابقة والجديدة">
+      <table class="partnership-table activity-values" data-no-export>
+        <thead>
+          <tr>
+            <th>الحقل</th><th>قبل الإجراء</th><th>بعد الإجراء</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in event.change_rows %}
+            <tr>
+              <th scope="row">{{ row.label }}</th><td>{{ row.before }}</td><td>{{ row.after }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="ac-note">هذا حدث مشاهدة أو إجراء بلا تغييرات محفوظة على الحقول المعروضة.</p>
+  {% endif %}
+  <p class="muted activity-detail-note">السجل للقراءة فقط. لا يتضمن كلمات المرور أو رموز التأكيد أو محتوى المرفقات. تسجيل المشاهدة يعني أن الخادم أعاد الصفحة بنجاح، ولا يثبت قراءة المستخدم لكل محتواها.</p>
 </article>

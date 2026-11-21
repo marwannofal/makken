@@ -1,21 +1,82 @@
-.clause-card { margin-block-end: 1.25rem; }
-.clause-inline { display: flex; flex-wrap: wrap; gap: 1rem; align-items: end; margin-block: 1rem; padding-inline: clamp(0.875rem, 3vw, 1.5rem); }
-.clause-inline .partnership-field { flex: 1 1 11rem; min-inline-size: 0; }
-.clause-picker-form .partnership-field:first-of-type { flex: 2 1 16rem; }
-.clause-inline .partnership-field select:not([multiple]) { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23336e70' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: left 14px center; background-size: 16px; padding-left: 40px; padding-right: 13px; }
-.clause-remove { display: inline-block; }
-.clause-edit { margin: 0.75rem clamp(0.875rem, 3vw, 1.5rem); padding: 0.75rem; border: 1px solid #d6e8e7; border-radius: 12px; }
-.clause-edit > summary { cursor: pointer; font-weight: 700; color: #165e60; overflow-wrap: anywhere; }
-.clause-edit:target { outline: 2px solid #24b3af; }
-@media (max-width: 480px) {
-  .clause-inline > button { width: 100%; }
+.clause-card {
+  margin-block-end: 1.25rem;
 }
 
-.clause-inline .partnership-field { display: flex; flex-direction: column; gap: 6px; margin: 0; }
-.clause-inline .partnership-field > label { margin: 0; }
-.clause-inline input:not([type=hidden]),
-.clause-inline select,
-.clause-inline .search-select-trigger,
-.clause-inline > .button { height: 48px; min-height: 48px; box-sizing: border-box; margin: 0; }
-.clause-inline .search-select .selected-summary:empty,
-.clause-inline .search-select .field-error:empty { display: none; margin: 0; }
+.clause-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: end;
+  margin-block: 1rem;
+  padding-inline: clamp(0.875rem, 3vw, 1.5rem);
+}
+
+.clause-inline .partnership-field {
+  flex: 1 1 11rem;
+  min-inline-size: 0;
+}
+
+.clause-picker-form .partnership-field:first-of-type {
+  flex: 2 1 16rem;
+}
+
+.clause-inline .partnership-field select:not([multiple]) {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23336e70' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left 14px center;
+  background-size: 16px;
+  padding-left: 40px;
+  padding-right: 13px;
+}
+
+.clause-remove {
+  display: inline-block;
+}
+
+.clause-edit {
+  margin: 0.75rem clamp(0.875rem, 3vw, 1.5rem);
+  padding: 0.75rem;
+  border: 1px solid #d6e8e7;
+  border-radius: 12px;
+}
+
+.clause-edit > summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: #165e60;
+  overflow-wrap: anywhere;
+}
+
+.clause-edit:target {
+  outline: 2px solid #24b3af;
+}
+
+@media (max-width: 480px) {
+  .clause-inline > button {
+    width: 100%;
+  }
+}
+
+.clause-inline .partnership-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+}
+
+.clause-inline .partnership-field > label {
+  margin: 0;
+}
+
+.clause-inline input:not([type=hidden]), .clause-inline select, .clause-inline .search-select-trigger, .clause-inline > .button {
+  height: 48px;
+  min-height: 48px;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.clause-inline .search-select .selected-summary:empty, .clause-inline .search-select .field-error:empty {
+  display: none;
+  margin: 0;
+}

@@ -1,1 +1,5 @@
-{% load access_tags %}{# MAKKEN ACCESS NAV v1 #}{% allowed 'partnerships' 'view' %}{% include "core/partials/sidebar/_link.html" with nav_page="sponsor_requests" nav_url="partnerships:sponsor_requests" nav_label="طلبات الرعاة الخارجيين" nav_path="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2m8.5-10a4 4 0 1 0 0-8 4 4 0 0 0 0 8m11.5 1h-6m3-3v6" active_page=active_page request=request only %}{% endallowed %}
+{% load access_tags %}
+{# MAKKEN ACCESS NAV v1 #}
+{% allowed 'partnerships' 'view' %}
+  {% include "core/partials/sidebar/_link.html" with nav_page="sponsor_requests" nav_url="partnerships:sponsor_requests" nav_label="طلبات الرعاة الخارجيين" nav_path="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2m8.5-10a4 4 0 1 0 0-8 4 4 0 0 0 0 8m11.5 1h-6m3-3v6" active_page=active_page request=request only %}
+{% endallowed %}

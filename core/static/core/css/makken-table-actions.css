@@ -1,21 +1,11 @@
 /* Shared table action typography; keep each component's colors and layout. */
-:root .main-content :is(
-  .level-action, .region-action, .entity-action, .specialization-action,
-  .sector-action, .expense-item-action, .program-action,
-  .sponsorship-shape-action, .row-action, .edit-color
-),
-:root .main-content table :is(button, a.button),
-:root .main-content table .action-cell a {
+
+:root .main-content :is( .level-action, .region-action, .entity-action, .specialization-action, .sector-action, .expense-item-action, .program-action, .sponsorship-shape-action, .row-action, .edit-color ), :root .main-content table :is(button, a.button), :root .main-content table .action-cell a {
   font-size: 14px !important;
   font-weight: 700 !important;
 }
 
-:root .main-content :is(
-  .level-action, .region-action, .entity-action, .specialization-action,
-  .sector-action, .expense-item-action, .program-action,
-  .sponsorship-shape-action, .row-action, .edit-color
-) svg,
-:root .main-content table :is(button, a.button):not(.development-transition-button) > svg {
+:root .main-content :is( .level-action, .region-action, .entity-action, .specialization-action, .sector-action, .expense-item-action, .program-action, .sponsorship-shape-action, .row-action, .edit-color ) svg, :root .main-content table :is(button, a.button):not(.development-transition-button) > svg {
   width: 16px !important;
   height: 16px !important;
   min-width: 16px;
@@ -23,12 +13,7 @@
   flex-shrink: 0;
 }
 
-:root .main-content :is(
-  .level-action, .region-action, .entity-action, .specialization-action,
-  .sector-action, .expense-item-action, .program-action,
-  .sponsorship-shape-action, .row-action, .edit-color
-) > span:not([aria-hidden="true"]):not(.visually-hidden),
-:root .main-content table :is(button, a.button) > span:not([aria-hidden="true"]):not(.visually-hidden) {
+:root .main-content :is( .level-action, .region-action, .entity-action, .specialization-action, .sector-action, .expense-item-action, .program-action, .sponsorship-shape-action, .row-action, .edit-color ) > span:not([aria-hidden="true"]):not(.visually-hidden), :root .main-content table :is(button, a.button) > span:not([aria-hidden="true"]):not(.visually-hidden) {
   font-size: inherit !important;
   font-weight: inherit !important;
 }

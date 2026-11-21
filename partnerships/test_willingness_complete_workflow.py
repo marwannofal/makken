@@ -260,7 +260,7 @@ class WillingnessUnifiedWorkflowTests(TestCase):
         self.assertEqual(p.development_state_id, DevelopmentState.WILLINGNESS)
         self.assertEqual(p.agreement_number, p.format_agreement_number())
         list_page = self.client.get(url)
-        self.assertContains(list_page, 'رقم الاتفاقية')
+        self.assertContains(list_page, 'رقم الشراكة')
         self.assertContains(list_page, p.agreement_number)
         self.assertEqual(p.institution_signatory, 'د. أحمد الفهد')
         self.assertEqual(p.signed_on, date(2026, 1, 15))

@@ -1,119 +1,224 @@
 {% extends "core/makken_base.html" %}
 {% load static access_tags %}
 {% load tz %}
-{% block title %}{{ page_heading }} | مكّن{% endblock %}
+{% block title %}
+  {{ page_heading }} | مكّن
+{% endblock %}
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'care_states/states.css' %}">
-<link rel="stylesheet" href="{% static 'partnerships/partnerships.css' %}">
-<link rel="stylesheet" href="{% static 'market_needs/market.css' %}">
-<link rel="stylesheet" href="{% static 'agreement_clauses/workflow.css' %}?v=20261119-1">
-<script src="{% static 'market_needs/market.js' %}" defer></script>
-<script src="{% static 'agreement_clauses/workflow.js' %}" defer></script>
-{% if agreement %}
-<link rel="stylesheet" href="{% static 'agreement_clauses/record.css' %}?v=1">
-<link rel="stylesheet" href="{% static 'agreement_clauses/followup.css' %}">
-<script src="{% static 'agreement_clauses/record.js' %}?v=1" defer></script>
-{% endif %}
+  <link rel="stylesheet" href="{% static 'care_states/states.css' %}">
+  <link rel="stylesheet" href="{% static 'partnerships/partnerships.css' %}">
+  <link rel="stylesheet" href="{% static 'market_needs/market.css' %}">
+  <link rel="stylesheet" href="{% static 'agreement_clauses/workflow.css' %}?v=20261119-1">
+  <script src="{% static 'market_needs/market.js' %}" defer></script>
+  <script src="{% static 'agreement_clauses/workflow.js' %}" defer></script>
+  {% if agreement %}
+    <link rel="stylesheet" href="{% static 'agreement_clauses/record.css' %}?v=1">
+    <link rel="stylesheet" href="{% static 'agreement_clauses/followup.css' %}">
+    <script src="{% static 'agreement_clauses/record.js' %}?v=1" defer></script>
+  {% endif %}
 {% endblock %}
 {% block content %}
-<section class="page-introduction partnership-intro">
-  <div><p class="eyebrow">مكّن · سجل الشراكات</p><h1>{{ page_heading }}</h1>
-    <p class="page-description">{{ partnership.name }}{% if agreement %} · <bdi>{{ agreement.number }}</bdi> · {{ agreement.title }}{% endif %}</p>
-  </div>
-  <div class="market-page-actions">
-    {% if agreement %}<a class="button button-primary" href="{% url 'partnerships:agreement_details' partnership.pk agreement.pk %}">بيانات الاتفاقية</a>{% endif %}
-    {% if agreement %}<a class="button button-secondary" href="{% url 'partnerships:clauses' partnership.pk %}">اتفاقيات الشراكة</a>{% endif %}
-    <a class="button button-secondary" href="{% url 'partnerships:index' %}?detail={{ partnership.pk }}">تفاصيل الشراكة</a>
-  </div>
-</section>
-{% include "access_control/_regional_notice.html" with item=partnership %}
-{% if error %}<p class="feedback feedback-error" role="alert">{{ error }}</p>{% endif %}
-{% for message in messages %}<p class="feedback feedback-success" role="status">{{ message }}</p>{% endfor %}
-{% if not partnership.is_active %}<p class="feedback feedback-info">الشراكة غير نشطة. الاتفاقيات والبنود متاحة للعرض فقط.</p>{% endif %}
-{% if agreement %}
-<nav class="market-page-actions followup-nav" aria-label="أقسام بطاقة المتابعة">
-  <a class="button button-secondary" href="#agreement-clauses">البنود والإنجاز</a>
-  <a class="button button-secondary" href="#agreement-updates">الملاحظات والشواهد</a>
-  <a class="button button-secondary" href="#agreement-teams">فرق العمل وضباط الاتصال</a>
-</nav>
-{% endif %}
-<section class="partnership-card clause-card">
-  <header class="card-heading"><div><p class="eyebrow">متابعة الإنجاز</p><h2>{% if agreement %}إجمالي إنجاز الاتفاقية{% else %}إجمالي إنجاز الشراكة{% endif %}</h2>
-    <p>{% if agreement %}متوسط نسب البنود المسندة إلى هذه الاتفاقية.{% else %}متوسط نسب البنود المباشرة وبنود جميع اتفاقيات هذه الشراكة. لكل بند الوزن نفسه.{% endif %}</p>
-  </div><span class="subtle-badge"><bdi>{% if agreement %}{% include "agreement_clauses/_percent.html" with value=progress only %}{% else %}{% include "agreement_clauses/_percent.html" with value=overall only %}{% endif %}</bdi></span></header>
+  <section class="page-introduction partnership-intro">
+    <div>
+      <p class="eyebrow">مكّن · سجل الشراكات</p><h1>{{ page_heading }}</h1> <p class="page-description">{{ partnership.name }}
+      {% if agreement %}
+        · <bdi>{{ agreement.number }}</bdi> · {{ agreement.title }}
+      {% endif %}
+      </p>
+    </div>
+    <div class="market-page-actions">
+      {% if agreement %}
+        <a class="button button-primary" href="{% url 'partnerships:agreement_details' partnership.pk agreement.pk %}">بيانات الاتفاقية</a>
+      {% endif %}
+      {% if agreement %}
+        <a class="button button-secondary" href="{% url 'partnerships:clauses' partnership.pk %}">اتفاقيات الشراكة</a>
+      {% endif %}
+      <a class="button button-secondary" href="{% url 'partnerships:index' %}?detail={{ partnership.pk }}">تفاصيل الشراكة</a>
+    </div>
+  </section>
+  {% include "access_control/_regional_notice.html" with item=partnership %}
+  {% if error %}
+    <p class="feedback feedback-error" role="alert">{{ error }}</p>
+  {% endif %}
+  {% for message in messages %}
+    <p class="feedback feedback-success" role="status">{{ message }}</p>
+  {% endfor %}
+  {% if not partnership.is_active %}
+    <p class="feedback feedback-info">الشراكة غير نشطة. الاتفاقيات والبنود متاحة للعرض فقط.</p>
+  {% endif %}
   {% if agreement %}
-  <dl class="followup-meta">
-    <div><dt>الموظف المسؤول</dt><dd>{% if details.responsible_employee %}{{ details.responsible_employee.get_full_name|default:details.responsible_employee.get_username }}{% else %}غير محدد{% endif %}</dd></div>
-    <div><dt>آخر تحديث (توقيت الرياض)</dt><dd>{% timezone "Asia/Riyadh" %}<time datetime="{{ followup_updated_at|date:'c' }}" dir="ltr">{{ followup_updated_at|date:"Y/m/d H:i" }}</time>{% endtimezone %}</dd></div>
-    <div><dt>حدّثه</dt><dd>{% if followup_updated_by %}{{ followup_updated_by.get_full_name|default:followup_updated_by.get_username }}{% else %}غير متاح{% endif %}</dd></div>
-  </dl>
+    <nav class="market-page-actions followup-nav" aria-label="أقسام بطاقة المتابعة">
+      <a class="button button-secondary" href="#agreement-clauses">البنود والإنجاز</a> <a class="button button-secondary" href="#agreement-updates">الملاحظات والشواهد</a> <a class="button button-secondary" href="#agreement-teams">فرق العمل وضباط الاتصال</a>
+    </nav>
   {% endif %}
-  {% if agreement and partnership.is_active %}
-    {% allowed 'partnerships' 'edit' partnership %}
-      <form class="clause-inline" method="post" data-market-confirm="هل تريد حفظ عنوان الاتفاقية؟">{% csrf_token %}
-        <input type="hidden" name="operation" value="rename_agreement"><input type="hidden" name="snapshot" value="{{ title_token }}">
-        <div class="partnership-field">{{ title_form.title.label_tag }}{{ title_form.title }}{{ title_form.title.errors }}</div>
-        <button class="button button-secondary" type="submit">تعديل العنوان</button>
-      </form>
-    {% endallowed %}
+  <section class="partnership-card clause-card">
+    <header class="card-heading">
+      <div>
+        <p class="eyebrow">متابعة الإنجاز</p><h2>
+        {% if agreement %}
+          إجمالي إنجاز الاتفاقية
+        {% else %}
+          إجمالي إنجاز الشراكة
+        {% endif %}
+        </h2> <p>
+        {% if agreement %}
+          متوسط نسب البنود المسندة إلى هذه الاتفاقية.
+        {% else %}
+          متوسط نسب البنود المباشرة وبنود جميع اتفاقيات هذه الشراكة. لكل بند الوزن نفسه.
+        {% endif %}
+        </p>
+      </div>
+      <span class="subtle-badge"><bdi>
+      {% if agreement %}
+        {% include "agreement_clauses/_percent.html" with value=progress only %}
+      {% else %}
+        {% include "agreement_clauses/_percent.html" with value=overall only %}
+      {% endif %}
+      </bdi></span>
+    </header>
+    {% if agreement %}
+      <dl class="followup-meta">
+        <div>
+          <dt>الموظف المسؤول</dt><dd>
+          {% if details.responsible_employee %}
+            {{ details.responsible_employee.get_full_name|default:details.responsible_employee.get_username }}
+          {% else %}
+            غير محدد
+          {% endif %}
+          </dd>
+        </div>
+        <div>
+          <dt>آخر تحديث (توقيت الرياض)</dt><dd>
+          {% timezone "Asia/Riyadh" %}
+            <time datetime="{{ followup_updated_at|date:'c' }}" dir="ltr">{{ followup_updated_at|date:"Y/m/d H:i" }}</time>
+          {% endtimezone %}
+          </dd>
+        </div>
+        <div>
+          <dt>حدّثه</dt><dd>
+          {% if followup_updated_by %}
+            {{ followup_updated_by.get_full_name|default:followup_updated_by.get_username }}
+          {% else %}
+            غير متاح
+          {% endif %}
+          </dd>
+        </div>
+      </dl>
+    {% endif %}
+    {% if agreement and partnership.is_active %}
+      {% allowed 'partnerships' 'edit' partnership %}
+        <form class="clause-inline" method="post" data-market-confirm="هل تريد حفظ عنوان الاتفاقية؟">
+          {% csrf_token %}
+          <input type="hidden" name="operation" value="rename_agreement"><input type="hidden" name="snapshot" value="{{ title_token }}">
+          <div class="partnership-field">
+            {{ title_form.title.label_tag }}{{ title_form.title }}{{ title_form.title.errors }}
+          </div>
+          <button class="button button-secondary" type="submit">تعديل العنوان</button>
+        </form>
+      {% endallowed %}
+    {% endif %}
+  </section>
+  <section class="partnership-card clause-card" id="agreement-clauses">
+    <header class="card-heading">
+      <div>
+        <p class="eyebrow">المسؤوليات والمتابعة</p><h2>
+        {% if agreement %}
+          بنود الاتفاقية
+        {% else %}
+          بنود الشراكة المباشرة
+        {% endif %}
+        </h2> <p>اختر بندًا أو أكثر من الدليل. يمكنك تعديل المسؤولية ونسبة الإنجاز لكل بند على حدة.</p>
+      </div>
+      <span class="subtle-badge">عدد البنود: {{ rows|length }}</span>
+    </header>
+    {% if partnership.is_active %}
+      {% allowed 'partnerships' 'edit' partnership %}
+        <form class="clause-inline clause-picker-form" method="post" data-market-confirm="هل تريد إسناد البنود المحددة؟">
+          {% csrf_token %}
+          <input type="hidden" name="operation" value="add_clauses"><input type="hidden" name="snapshot" value="{{ add_token }}">
+          <div class="partnership-field">
+            {{ assign_form.clauses.label_tag }}{{ assign_form.clauses }}{{ assign_form.clauses.errors }}
+          </div>
+          <div class="partnership-field">
+            {{ assign_form.responsibility.label_tag }}{{ assign_form.responsibility }}{{ assign_form.responsibility.errors }}
+          </div>
+          <button class="button button-primary" type="submit">إسناد البنود</button>
+        </form>
+      {% endallowed %}
+    {% endif %}
+    <div class="table-scroll" tabindex="0" aria-label="جدول بنود الاتفاقية ونسب الإنجاز">
+      <table class="partnership-table">
+        <caption class="visually-hidden">بنود الاتفاقية ومسؤولياتها ونسب الإنجاز</caption>
+        <thead>
+          <tr>
+            <th scope="col">بند الاتفاقية</th><th scope="col">المسؤولية</th><th scope="col">نسبة الإنجاز</th><th scope="col">آخر تحديث</th><th scope="col">الإجراء</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row, form, snapshot in rows %}
+            <tr>
+              <th scope="row">{{ row.clause.name }}
+              {% if not row.clause.is_active %}
+                <small>(غير نشط)</small>
+              {% endif %}
+              </th> <td>{{ row.get_responsibility_display }}</td><td><bdi>{{ row.progress }}%</bdi></td> <td><bdi>{{ row.updated_at|date:"Y-m-d H:i" }}</bdi>
+              {% if row.updated_by %}
+                <br>{{ row.updated_by.get_full_name|default:row.updated_by.username }}
+              {% endif %}
+              </td> <td>
+              {% if partnership.is_active %}
+                {% allowed 'partnerships' 'edit' partnership %}
+                  <a class="button button-secondary" href="#edit-clause-{{ row.pk }}">تعديل</a>
+                {% endallowed %}
+                {% allowed 'partnerships' 'delete' partnership %}
+                  <form class="clause-remove" method="post" data-danger data-market-confirm="هل تريد إزالة هذا البند من السجل؟ لن يُحذف البند من الدليل.">
+                    {% csrf_token %}
+                    <input type="hidden" name="operation" value="remove_clause"><input type="hidden" name="snapshot" value="{{ snapshot }}"> <button class="button market-danger" type="submit" aria-label="إزالة بند {{ row.clause.name }}">إزالة</button>
+                  </form>
+                {% endallowed %}
+              {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="5">لا توجد بنود مسندة بعد.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% if partnership.is_active %}
+      {% allowed 'partnerships' 'edit' partnership %}
+        {% for row, form, snapshot in rows %}
+          <details id="edit-clause-{{ row.pk }}" class="clause-edit"{% if form.errors %} open{% endif %}>
+            <summary>
+              تعديل بند: {{ row.clause.name }}
+            </summary>
+            <form class="clause-inline" method="post" data-market-confirm="هل تريد حفظ مسؤولية البند ونسبة إنجازه؟">
+              {% csrf_token %}
+              <input type="hidden" name="operation" value="update_clause"><input type="hidden" name="snapshot" value="{{ snapshot }}">
+              <div class="partnership-field">
+                {{ form.responsibility.label_tag }}{{ form.responsibility }}{{ form.responsibility.errors }}
+              </div>
+              <div class="partnership-field">
+                {{ form.progress.label_tag }}{{ form.progress }}{{ form.progress.errors }}
+              </div>
+              <button class="button button-primary" type="submit">حفظ التقدم</button>
+            </form>
+          </details>
+        {% endfor %}
+      {% endallowed %}
+    {% endif %}
+  </section>
+  {% if agreement %}
+    {% include "agreement_clauses/_followup.html" %}
   {% endif %}
-</section>
-<section class="partnership-card clause-card" id="agreement-clauses">
-  <header class="card-heading"><div><p class="eyebrow">المسؤوليات والمتابعة</p><h2>{% if agreement %}بنود الاتفاقية{% else %}بنود الشراكة المباشرة{% endif %}</h2>
-    <p>اختر بندًا أو أكثر من الدليل. يمكنك تعديل المسؤولية ونسبة الإنجاز لكل بند على حدة.</p></div>
-    <span class="subtle-badge">عدد البنود: {{ rows|length }}</span></header>
-  {% if partnership.is_active %}
-    {% allowed 'partnerships' 'edit' partnership %}
-      <form class="clause-inline clause-picker-form" method="post" data-market-confirm="هل تريد إسناد البنود المحددة؟">{% csrf_token %}
-        <input type="hidden" name="operation" value="add_clauses"><input type="hidden" name="snapshot" value="{{ add_token }}">
-        <div class="partnership-field">{{ assign_form.clauses.label_tag }}{{ assign_form.clauses }}{{ assign_form.clauses.errors }}</div>
-        <div class="partnership-field">{{ assign_form.responsibility.label_tag }}{{ assign_form.responsibility }}{{ assign_form.responsibility.errors }}</div>
-        <button class="button button-primary" type="submit">إسناد البنود</button>
-      </form>
-    {% endallowed %}
-  {% endif %}
-  <div class="table-scroll" tabindex="0" aria-label="جدول بنود الاتفاقية ونسب الإنجاز">
-    <table class="partnership-table"><caption class="visually-hidden">بنود الاتفاقية ومسؤولياتها ونسب الإنجاز</caption>
-      <thead><tr><th scope="col">بند الاتفاقية</th><th scope="col">المسؤولية</th><th scope="col">نسبة الإنجاز</th><th scope="col">آخر تحديث</th><th scope="col">الإجراء</th></tr></thead>
-      <tbody>{% for row, form, snapshot in rows %}
-        <tr><th scope="row">{{ row.clause.name }}{% if not row.clause.is_active %} <small>(غير نشط)</small>{% endif %}</th>
-          <td>{{ row.get_responsibility_display }}</td><td><bdi>{{ row.progress }}%</bdi></td>
-          <td><bdi>{{ row.updated_at|date:"Y-m-d H:i" }}</bdi>{% if row.updated_by %}<br>{{ row.updated_by.get_full_name|default:row.updated_by.username }}{% endif %}</td>
-          <td>{% if partnership.is_active %}
-            {% allowed 'partnerships' 'edit' partnership %}<a class="button button-secondary" href="#edit-clause-{{ row.pk }}">تعديل</a>{% endallowed %}
-            {% allowed 'partnerships' 'delete' partnership %}
-              <form class="clause-remove" method="post" data-danger data-market-confirm="هل تريد إزالة هذا البند من السجل؟ لن يُحذف البند من الدليل.">{% csrf_token %}
-                <input type="hidden" name="operation" value="remove_clause"><input type="hidden" name="snapshot" value="{{ snapshot }}">
-                <button class="button market-danger" type="submit" aria-label="إزالة بند {{ row.clause.name }}">إزالة</button>
-              </form>
-            {% endallowed %}
-          {% endif %}</td>
-        </tr>
-      {% empty %}<tr><td colspan="5">لا توجد بنود مسندة بعد.</td></tr>{% endfor %}</tbody>
-    </table>
-  </div>
-  {% if partnership.is_active %}
-    {% allowed 'partnerships' 'edit' partnership %}
-      {% for row, form, snapshot in rows %}
-        <details id="edit-clause-{{ row.pk }}" class="clause-edit"{% if form.errors %} open{% endif %}>
-          <summary>تعديل بند: {{ row.clause.name }}</summary>
-          <form class="clause-inline" method="post" data-market-confirm="هل تريد حفظ مسؤولية البند ونسبة إنجازه؟">{% csrf_token %}
-            <input type="hidden" name="operation" value="update_clause"><input type="hidden" name="snapshot" value="{{ snapshot }}">
-            <div class="partnership-field">{{ form.responsibility.label_tag }}{{ form.responsibility }}{{ form.responsibility.errors }}</div>
-            <div class="partnership-field">{{ form.progress.label_tag }}{{ form.progress }}{{ form.progress.errors }}</div>
-            <button class="button button-primary" type="submit">حفظ التقدم</button>
-          </form>
-        </details>
-      {% endfor %}
-    {% endallowed %}
-  {% endif %}
-</section>
-{% if agreement %}{% include "agreement_clauses/_followup.html" %}{% endif %}
-<dialog id="market-confirm" class="partnership-dialog confirmation-dialog" aria-labelledby="market-confirm-title">
-  <div class="dialog-body">
-    <p class="eyebrow">مراجعة وتأكيد</p><h2 id="market-confirm-title">تأكيد العملية</h2>
-    <p class="dialog-description" data-confirm-text></p>
-    <div class="dialog-actions"><button class="button button-primary" type="button" data-confirm-yes>تأكيد</button><button class="button button-secondary" type="button" data-market-close autofocus>إلغاء</button></div>
-  </div>
-</dialog>
+  <dialog id="market-confirm" class="partnership-dialog confirmation-dialog" aria-labelledby="market-confirm-title">
+    <div class="dialog-body">
+      <p class="eyebrow">مراجعة وتأكيد</p><h2 id="market-confirm-title">تأكيد العملية</h2> <p class="dialog-description" data-confirm-text></p>
+      <div class="dialog-actions">
+        <button class="button button-primary" type="button" data-confirm-yes>تأكيد</button><button class="button button-secondary" type="button" data-market-close autofocus>إلغاء</button>
+      </div>
+    </div>
+  </dialog>
 {% endblock %}

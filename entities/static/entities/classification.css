@@ -1,8 +1,21 @@
 /* Classification register: four columns, shared dropdown sizing and RTL arrow. */
-.entities-table thead th:nth-child(1) { width: 24%; }
-.entities-table thead th:nth-child(2) { width: 30%; }
-.entities-table thead th:nth-child(3) { width: 22%; }
-.entities-table thead th:nth-child(4) { width: 24%; }
+
+.entities-table thead th:nth-child(1) {
+  width: 24%;
+}
+
+.entities-table thead th:nth-child(2) {
+  width: 30%;
+}
+
+.entities-table thead th:nth-child(3) {
+  width: 22%;
+}
+
+.entities-table thead th:nth-child(4) {
+  width: 24%;
+}
+
 #entity-type, #entity-branch {
   appearance: none;
   -webkit-appearance: none;
@@ -16,7 +29,12 @@
   background-position: left 14px center;
   background-size: 16px 16px;
 }
+
 @media (max-width: 700px) {
-  .entities-table .action-cell { grid-column: 1 / -1; }
-  .entities-table .entity-row-actions { flex-direction: row; }
+  .entities-table .action-cell {
+    grid-column: 1 / -1;
+  }
+  .entities-table .entity-row-actions {
+    flex-direction: row;
+  }
 }
