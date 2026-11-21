@@ -349,3 +349,4 @@ class SponsorRegistrationUS15Tests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertContains(res, 'accounts/images/header-logo.svg')
         self.assertContains(res, '<div class="pub-phone-row" dir="ltr">')
+        self.assertNotContains(res, 'العودة لتسجيل الدخول')

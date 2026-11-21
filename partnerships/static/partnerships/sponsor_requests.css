@@ -837,11 +837,12 @@
 }
 
 .pub-tvtc-logo {
-  height: 62px;
+  height: 64px;
   width: auto;
-  max-width: 240px;
+  max-width: 250px;
   object-fit: contain;
   display: block;
+  filter: brightness(0) invert(1);
 }
 
 .pub-brand {
