@@ -36,6 +36,9 @@
       {% allowed 'user_activity' 'view' %}
         <a href="{% url 'access_control:activity' %}"{% if access_tab == 'activity' %} aria-current="page"{% endif %}>نشاط المستخدمين</a>
       {% endallowed %}
+      {% allowed 'departments' 'view' %}
+        <a href="{% url 'accounts:departments' %}"{% if access_tab == 'departments' %} aria-current="page"{% endif %}>إدارات الهيكل التنظيمي</a>
+      {% endallowed %}
     </nav>
   {% endif %}
   {% if error %}

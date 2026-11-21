@@ -38,7 +38,7 @@ class DepartmentLookupTests(TestCase):
         self.client.force_login(self.reader, backend='accounts.backends.EmailOrUsernameBackend')
         res = self.client.get(self.url)
         self.assertEqual(res.status_code, 200)
-        self.assertContains(res, 'إدارة الإدارات')
+        self.assertContains(res, 'إدارات الهيكل التنظيمي')
         self.assertNotContains(res, 'إضافة إدارة')
         self.assertEqual(self.client.get(f'{self.url}?edit=new').status_code, 403)
 
@@ -125,3 +125,16 @@ class DepartmentLookupTests(TestCase):
         dept_qs = list(page.context['form'].fields['department'].queryset)
         self.assertIn(active_dept, dept_qs)
         self.assertNotIn(inactive_dept, dept_qs)
+
+    def test_departments_tab_in_access_control_and_removed_from_sidebar(self):
+        self.client.force_login(self.admin)
+        ac_page = self.client.get(reverse('access_control:index'))
+        self.assertEqual(ac_page.status_code, 200)
+        self.assertContains(ac_page, 'إدارات الهيكل التنظيمي')
+        self.assertContains(ac_page, self.url)
+        dept_page = self.client.get(self.url)
+        self.assertEqual(dept_page.status_code, 200)
+        self.assertEqual(dept_page.context['active_page'], 'access_control')
+        self.assertEqual(dept_page.context['access_tab'], 'departments')
+        self.assertContains(dept_page, 'class="ac-tabs"')
+        self.assertNotContains(dept_page, 'data-management-group" open')
