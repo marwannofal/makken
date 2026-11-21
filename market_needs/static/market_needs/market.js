@@ -3,7 +3,17 @@
   const $ = (s, root = document) => root.querySelector(s);
   const $$ = (s, root = document) => [...root.querySelectorAll(s)];
   const make = (tag, cls, text) => { const n = document.createElement(tag); n.className = cls || ''; if (text !== undefined) n.textContent = text; return n; };
-  const normal = s => String(s).normalize('NFKC').toLocaleLowerCase().replace(/[\u064b-\u065f\u0670]/g, '');
+  const normal = s => String(s || '')
+    .normalize('NFKC')
+    .toLocaleLowerCase()
+    .replace(/[\u064b-\u065f\u0670\u0640]/g, '')
+    .replace(/[أإآٱ]/g, 'ا')
+    .replace(/ة/g, 'ه')
+    .replace(/ى/g, 'ي')
+    .replace(/[٠-٩]/g, c => String(c.charCodeAt(0) - 1632))
+    .replace(/[۰-۹]/g, c => String(c.charCodeAt(0) - 1776))
+    .replace(/\s+/g, ' ')
+    .trim();
   const show = d => { if (d && !d.open) {const current=document.activeElement;d._marketReturn=current?.closest('.market-select')?.querySelector('.market-select-trigger')||current;d.showModal();} };
   $$('dialog.partnership-dialog').forEach(d=>d.addEventListener('close',()=>{const previous=d._marketReturn;if(previous?.isConnected&&previous.getClientRects().length&&!previous.disabled&&!previous.matches('.native-enhanced'))previous.focus({preventScroll:true});else $('#main-content')?.focus({preventScroll:true});}));
   let busy = false, confirmationCancel = null;
@@ -35,7 +45,7 @@
     const label=select.labels[0]?.textContent.trim()||select.dataset.label||'الاختيارات';trigger.setAttribute('aria-label',label);search.type='search';search.placeholder='ابحث هنا…';search.autocomplete='off';search.setAttribute('aria-label','البحث في '+label);options.setAttribute('role','group');options.setAttribute('aria-label',label);panel.append(search,options);error.setAttribute('role','alert');select.classList.add('native-enhanced');select.tabIndex=-1;select.setAttribute('aria-hidden','true');
     select.labels[0]?.addEventListener('click',e=>{e.preventDefault();trigger.focus();});
     function close(){panel.hidden=true;trigger.setAttribute('aria-expanded','false');if(opened===control)opened=null;}
-    function filter(){const term=normal(search.value);$$('[data-option]',options).forEach(n=>n.hidden=!normal(n.textContent).includes(term));let empty=$('.market-select-options-empty',options);if(empty)empty.remove();if(!$$('[data-option]',options).some(n=>!n.hidden))options.append(make('p','market-select-options-empty','لا توجد خيارات مطابقة.'));}
+    function filter(){const tokens=normal(search.value).split(' ').filter(Boolean);$$('[data-option]',options).forEach(n=>{const hay=normal(n.textContent)+' '+normal(n.dataset.value||'');n.hidden=tokens.length>0&&!tokens.every(t=>hay.includes(t));});let empty=$('.market-select-options-empty',options);if(empty)empty.remove();if(!$$('[data-option]',options).some(n=>!n.hidden))options.append(make('p','market-select-options-empty','لا توجد خيارات مطابقة.'));}
     let multiFooter = null, multiDoneBtn = null;
     if (select.multiple) {
       multiFooter = make('div', 'mk-multi-footer');
