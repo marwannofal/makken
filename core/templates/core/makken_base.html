@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{% static 'core/css/makken-home.css' %}?v=20261121-blue6">
-  <script src="{% static 'core/js/makken-home.js' %}?v=20261015-1" defer></script>
+  <link rel="stylesheet" href="{% static 'core/css/makken-home.css' %}?v=20261121-blue7">
+  <script src="{% static 'core/js/makken-home.js' %}?v=20261121-clock1" defer></script>
   {% block extra_head %}{% endblock %}
   <!-- BEGIN MAKKEN SIDEBAR MANAGEMENT -->
   <link rel="stylesheet" href="{% static 'core/css/makken-sidebar-management.css' %}?v=20261121-blue6">
@@ -51,7 +51,7 @@
           </button>
           <span class="breadcrumb-brand">مكّن</span><span class="breadcrumb-divider" aria-hidden="true">/</span><span class="current-location">{{ page_heading|default:"الرئيسية" }}</span>
         </div>
-        <div class="account-chip"><span class="status-dot" aria-hidden="true"></span><span>مرحبًا، <bdi>{{ display_name }}</bdi></span></div>
+        <div class="account-chip"><span class="status-dot" aria-hidden="true"></span><span class="account-chip-name">مرحبًا، <bdi>{{ display_name }}</bdi></span><span class="account-chip-sep" aria-hidden="true">·</span><span class="account-chip-clock" data-makken-clock></span></div>
       </header>
       <main id="main-content" class="main-content" tabindex="-1">{% block content %}{% endblock %}</main>
       <footer class="site-footer">جميع الحقوق محفوظة لـ © المؤسسة العامة للتدريب التقني والمهني، 2026</footer>

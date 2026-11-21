@@ -780,3 +780,57 @@ legend > span[aria-hidden="true"] {
   font-weight: 700;
   margin-inline: 0.25em;
 }
+
+
+/* Larger greeting chip with live date & time + larger footer */
+.account-chip {
+  font-size: 15.5px !important;
+  font-weight: 700 !important;
+  color: #003954 !important;
+  gap: 10px !important;
+  padding: 8px 16px !important;
+  background: #edf5fa;
+  border: 1px solid #cce0ec;
+  border-radius: 12px;
+  flex-wrap: wrap;
+}
+
+.account-chip .status-dot {
+  width: 10px;
+  height: 10px;
+}
+
+.account-chip-sep {
+  color: #7ea7be;
+  font-weight: 800;
+}
+
+.account-chip-clock {
+  font-size: 14px;
+  font-weight: 700;
+  color: #005b85;
+  white-space: nowrap;
+}
+
+.site-footer {
+  font-size: 14.5px !important;
+  font-weight: 600 !important;
+  color: #465f6c !important;
+  padding: 26px 32px !important;
+  border-top: 1px solid #dce7ec;
+  margin-top: 18px;
+}
+
+@media (max-width: 640px) {
+  .account-chip {
+    font-size: 13.5px !important;
+    padding: 6px 12px !important;
+  }
+  .account-chip-clock {
+    font-size: 12.5px;
+  }
+  .site-footer {
+    font-size: 13px !important;
+    padding: 20px 18px !important;
+  }
+}

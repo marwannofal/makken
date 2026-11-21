@@ -40,3 +40,39 @@
     });
   });
 })();
+
+
+(function () {
+  const clockEl = document.querySelector('[data-makken-clock]');
+  if (!clockEl) return;
+  const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+  function renderClock() {
+    const now = new Date();
+    try {
+      const parts = new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Asia/Riyadh',
+        weekday: 'short',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+      }).formatToParts(now);
+      const map = Object.fromEntries(parts.map((p) => [p.type, p.value]));
+      const wkIdx = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(map.weekday);
+      const arDay = wkIdx >= 0 ? days[wkIdx] : '';
+      const period = (map.dayPeriod || '').toLowerCase() === 'pm' ? 'م' : 'ص';
+      clockEl.textContent = `${arDay} ${map.day}/${map.month}/${map.year} — ${map.hour}:${map.minute} ${period}`;
+    } catch {
+      const d = String(now.getDate()).padStart(2, '0');
+      const m = String(now.getMonth() + 1).padStart(2, '0');
+      const y = now.getFullYear();
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      clockEl.textContent = `${d}/${m}/${y} — ${hh}:${mm}`;
+    }
+  }
+  renderClock();
+  setInterval(renderClock, 15000);
+})();
