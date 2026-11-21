@@ -960,3 +960,47 @@ progress::-moz-progress-bar {
     grid-template-columns:minmax(0,1fr)
   }
 }
+
+
+/* Sponsors followup table: balanced fit-to-data columns, extra height, crisp row hover, zero menu clipping */
+#market-followup-records .table-scroll {
+  min-height: 240px;
+  padding-bottom: 24px;
+}
+
+#market-followup-records table.market-followup {
+  width: 100%;
+  min-width: 0 !important;
+  table-layout: auto;
+}
+
+#market-followup-records table.market-followup th,
+#market-followup-records table.market-followup td {
+  padding: 13px 10px;
+  font-size: 13.5px;
+  vertical-align: middle;
+  white-space: normal;
+}
+
+#market-followup-records table.market-followup th:first-child,
+#market-followup-records table.market-followup td:first-child {
+  min-width: 170px;
+  max-width: 240px;
+}
+
+#market-followup-records table.market-followup td.action-cell,
+#market-followup-records table.market-followup th.action-cell {
+  width: 64px;
+  white-space: nowrap;
+  text-align: center;
+}
+
+#market-followup-records table.market-followup tbody tr {
+  transition: background-color 0.14s ease;
+}
+
+#market-followup-records table.market-followup tbody tr:hover,
+#market-followup-records table.market-followup tbody tr:hover > th,
+#market-followup-records table.market-followup tbody tr:hover > td {
+  background-color: #e4f1f8 !important;
+}

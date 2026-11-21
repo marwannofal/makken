@@ -966,3 +966,17 @@ button.button-secondary:hover,
   border-color: #005b85 !important;
   color: #00334d !important;
 }
+
+
+/* Site-wide table row hover highlight */
+.partnership-table tbody tr,
+.states-table tbody tr {
+  transition: background-color 0.14s ease;
+}
+
+.partnership-table tbody tr:hover > th,
+.partnership-table tbody tr:hover > td,
+.states-table tbody tr:hover > th,
+.states-table tbody tr:hover > td {
+  background-color: #e8f3fa !important;
+}
