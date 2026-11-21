@@ -240,34 +240,29 @@
   display: none !important;
 }
 
-
-/* Site-wide balanced table column spacing & nowrap on headers/numbers/badges */
-:root .main-content table.partnership-table,
-:root .main-content table.states-table,
-:root .main-content table.levels-table,
-:root .main-content table.ac-table {
+/* Site-wide balanced table column spacing: reset inflated per-column min-widths & fixed % widths */
+:root .main-content table:not(.ac-matrix) {
   width: 100%;
+  min-width: 0 !important;
   table-layout: auto !important;
   border-collapse: collapse;
 }
 
-:root .main-content table.partnership-table thead th,
-:root .main-content table.states-table thead th,
-:root .main-content table.levels-table thead th,
-:root .main-content table.ac-table thead th {
+:root .main-content table:not(.ac-matrix) thead th:not(.action-cell):not(.mk-actions-cell),
+:root .main-content table:not(.ac-matrix) tbody th:not(.action-cell):not(.mk-actions-cell),
+:root .main-content table:not(.ac-matrix) tbody td:not(.action-cell):not(.mk-actions-cell) {
+  min-width: 0 !important;
+  width: auto !important;
+}
+
+:root .main-content table:not(.ac-matrix) thead th {
   white-space: nowrap !important;
   padding: 13px 12px !important;
   vertical-align: middle;
 }
 
-:root .main-content table.partnership-table tbody th,
-:root .main-content table.partnership-table tbody td,
-:root .main-content table.states-table tbody th,
-:root .main-content table.states-table tbody td,
-:root .main-content table.levels-table tbody th,
-:root .main-content table.levels-table tbody td,
-:root .main-content table.ac-table tbody th,
-:root .main-content table.ac-table tbody td {
+:root .main-content table:not(.ac-matrix) tbody th,
+:root .main-content table:not(.ac-matrix) tbody td {
   padding: 12px 12px !important;
   vertical-align: middle;
 }
