@@ -234,3 +234,8 @@
     display: none !important;
   }
 }
+
+/* Hide outdated "اضغط على حالة السجل لتغييرها" footer note across all tables */
+.main-content .states-card-footer {
+  display: none !important;
+}

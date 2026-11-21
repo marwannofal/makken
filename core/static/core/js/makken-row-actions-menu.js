@@ -149,7 +149,7 @@
     if (!btn || btn.dataset.mkStatusRelabeled === '1') return;
     btn.dataset.mkStatusRelabeled = '1';
     const isActive = btn.classList.contains('status-active') || btn.classList.contains('is-enabled');
-    btn.classList.add('mk-toggle-action');
+    btn.className = isActive ? 'mk-toggle-action is-deactivate' : 'mk-toggle-action is-activate';
     btn.innerHTML = (isActive ? TOGGLE_OFF_SVG : TOGGLE_ON_SVG)
       + '<span>' + (isActive ? 'إيقاف التفعيل' : 'تفعيل السجل') + '</span>';
   }

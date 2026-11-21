@@ -245,3 +245,11 @@
     display: none !important;
   }
 }
+
+:root .main-content .mk-actions-dropdown .mk-toggle-action svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
