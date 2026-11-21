@@ -101,7 +101,7 @@
           <td><bdi>{{ row.created_at|date:"d/m/Y H:i" }}</bdi></td>
           <td>
             <a class="button button-secondary" href="{% url 'partnerships:sponsor_request_review' row.pk %}">
-              {% if row.status == 'new' and can_decide %}مراجعة واتخاذ قرار{% else %}عرض التفاصيل{% endif %}
+              {% if row.status == 'new' and can_decide %}مراجعة{% else %}عرض التفاصيل{% endif %}
             </a>
           </td>
         </tr>
