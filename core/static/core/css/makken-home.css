@@ -944,3 +944,25 @@ body,
   background: rgba(255, 255, 255, 0.86) !important;
   backdrop-filter: blur(10px);
 }
+
+
+/* Sharper ocean-blue secondary buttons site-wide */
+.button-secondary,
+a.button-secondary,
+button.button-secondary,
+.pub-btn-secondary {
+  background: #e4f1f8 !important;
+  border: 1.5px solid #8ebcd4 !important;
+  color: #004769 !important;
+  font-weight: 700 !important;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.button-secondary:hover,
+a.button-secondary:hover,
+button.button-secondary:hover,
+.pub-btn-secondary:hover {
+  background: #cfe5f2 !important;
+  border-color: #005b85 !important;
+  color: #00334d !important;
+}
