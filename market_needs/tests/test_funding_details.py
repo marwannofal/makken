@@ -12,6 +12,7 @@ from levels.models import Level
 from market_needs import services
 from market_needs.funding import level_key, expense_funding
 from market_needs.models import Sponsorship, SponsorshipAllocation, AuditEvent
+from partnerships.models import Partnership
 from .test_market import MarketFixtures
 
 
@@ -196,13 +197,27 @@ class FundingMigrationTests(MarketFixtures, TransactionTestCase):
         # The fixture is saved while the migration executor has removed
         # later agreement-clause tables. Do not attach clauses to this fixture.
         need = self.create_need()
-        org=self.organization(state='care'); entered=org.development_state_at
-        old=executor.loader.project_state([('market_needs','0001_initial'),('levels','0002_funding_key')]).apps
+        executor = MigrationExecutor(connection)
+        old = executor.loader.project_state(list(executor.loader.applied_migrations)).apps
+        OldPartnership = old.get_model('partnerships', 'Partnership')
+        org = OldPartnership.objects.create(
+            name='جهة الهجرة للتمويل',
+            name_key='جهة الهجرة للتمويل',
+            representative='الممثل',
+            phone='+966501234567',
+            email='person@example.com',
+            entity_id=self.entity.pk,
+            scope='local',
+            financial_capacity=1,
+            is_active=True,
+            development_state_id='care',
+        )
+        entered = org.development_state_at
         decided=timezone.now()-timedelta(days=3)
         record=old.get_model('market_needs','Sponsorship').objects.create(need_id=need.pk,partnership_id=org.pk,status='approved',amount='80.00',decided_at=decided)
         event=AuditEvent.objects.create(need=need,need_number=need.number,sponsorship_id=record.pk,actor=self.user,action='اعتماد مساهمة',after={'amount':'80.00'})
         self.restore_latest()
-        current=Sponsorship.objects.get(pk=record.pk);org.refresh_from_db()
+        current=Sponsorship.objects.get(pk=record.pk);org=Partnership.objects.get(pk=org.pk)
         self.assertEqual(current.amount,80);self.assertEqual(current.decided_at,decided)
         self.assertEqual(current.level.funding_key,'gold');self.assertEqual(current.level_name,'ذهبي')
         self.assertEqual(current.updated_at,event.created_at);self.assertEqual(current.updated_by,self.user)
