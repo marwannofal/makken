@@ -751,3 +751,32 @@
   opacity: 0;
   cursor: pointer;
 }
+
+
+/* Keep مراجعة action button crisp on one line and prevent long region lists from crushing it */
+.sr-table th:last-child,
+.sr-table td:last-child {
+  white-space: nowrap !important;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.sr-table td:last-child .button {
+  white-space: nowrap !important;
+  word-break: keep-all !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.sr-table td:nth-child(5) {
+  max-width: 260px;
+  white-space: normal;
+  line-height: 1.75;
+}

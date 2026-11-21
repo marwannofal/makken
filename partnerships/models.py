@@ -295,6 +295,28 @@ class SponsorRegistrationRequest(models.Model):
         self.representative = normalize_name(self.representative)
         super().save(*args, **kwargs)
 
+    @property
+    def formatted_phone(self):
+        import phonenumbers
+        raw = (self.phone or "").strip()
+        if not raw:
+            return "—"
+        region = (self.phone_country or "SA").strip().upper() or "SA"
+        dial = phonenumbers.country_code_for_region(region)
+        if raw.startswith("+"):
+            try:
+                parsed = phonenumbers.parse(raw, None)
+                return f"+{parsed.country_code} {parsed.national_number}"
+            except phonenumbers.NumberParseException:
+                return raw
+        try:
+            parsed = phonenumbers.parse(raw, region)
+            return f"+{parsed.country_code} {parsed.national_number}"
+        except phonenumbers.NumberParseException:
+            if dial:
+                return f"+{dial} {raw.lstrip('0') or raw}"
+            return raw
+
     def __str__(self):
         return f"{self.reference_code} · {self.name}"
 

@@ -324,3 +324,22 @@ class SponsorRegistrationUS15Tests(TestCase):
         self.assertFalse(unbound.fields['attachments'].required)
         bound = WillingnessTransitionForm({'agreement_type': str(ptype.pk)}, {}, partnership=p)
         self.assertTrue(bound.is_valid(), bound.errors)
+
+    def test_sponsor_request_phone_displays_country_code_in_list_and_detail(self):
+        req = SponsorRegistrationRequest.objects.create(
+            name='جهة الأردن للتدريب',
+            representative='محمود',
+            phone_country='JO',
+            phone='797971718',
+            email='jo@example.com',
+            entity=self.entity,
+            scope='local',
+        )
+        self.assertEqual(req.formatted_phone, '+962 797971718')
+        self.client.force_login(self.admin, backend=AUTH_BACKEND)
+        list_res = self.client.get(reverse('partnerships:sponsor_requests'))
+        self.assertEqual(list_res.status_code, 200)
+        self.assertContains(list_res, '+962 797971718')
+        detail_res = self.client.get(reverse('partnerships:sponsor_request_review', args=[req.pk]))
+        self.assertEqual(detail_res.status_code, 200)
+        self.assertContains(detail_res, '+962 797971718')

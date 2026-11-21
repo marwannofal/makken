@@ -36,7 +36,7 @@
   <dl class="sr-detail-grid">
     <div><dt>اسم الجهة</dt><dd>{{ req.name }}</dd></div>
     <div><dt>ممثل الجهة</dt><dd>{{ req.representative }}</dd></div>
-    <div><dt>هاتف التواصل</dt><dd><bdi>{{ req.phone }}</bdi></dd></div>
+    <div><dt>هاتف التواصل</dt><dd><bdi dir="ltr">{{ req.formatted_phone }}</bdi></dd></div>
     <div><dt>البريد الإلكتروني</dt><dd><bdi>{{ req.email }}</bdi></dd></div>
     <div><dt>نوع الكيان</dt><dd>{{ req.entity.name }}</dd></div>
     <div><dt>النطاق</dt><dd>{{ req.get_scope_display }}</dd></div>

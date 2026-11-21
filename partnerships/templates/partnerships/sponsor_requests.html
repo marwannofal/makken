@@ -93,7 +93,7 @@
           </th>
           <td>
             {{ row.representative }}
-            <small><bdi>{{ row.phone }}</bdi> · <bdi>{{ row.email }}</bdi></small>
+            <small><bdi dir="ltr">{{ row.formatted_phone }}</bdi> · <bdi>{{ row.email }}</bdi></small>
           </td>
           <td>{{ row.entity.name }}<small>{{ row.get_scope_display }}</small></td>
           <td>{% for reg in row.administrative_regions.all %}{{ reg.name }}{% if not forloop.last %}، {% endif %}{% empty %}—{% endfor %}</td>
