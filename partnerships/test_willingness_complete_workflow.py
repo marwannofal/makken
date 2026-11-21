@@ -420,18 +420,6 @@ class WillingnessUnifiedWorkflowTests(TestCase):
         self.assertContains(table_res, rdata['followup_updated_at_display'])
 
 
-<<<<<<< ours
-    def test_us16_partnership_status_department_kind_and_responsible_employee_sync(self):
-        from datetime import date
-        from accounts.models import Department, DepartmentKind
-        from agreement_clauses.models import AgreementOption, OptionKind
-        from partnerships.models import Partnership
-        from partnerships.willingness_workflow import (
-            WillingnessDetailsForm,
-            apply_willingness_details,
-            sync_responsible_employee_work,
-        )
-=======
     def test_us16_status_department_kind_and_edit_work_assignment_accordion(self):
         from datetime import date
         from accounts.models import Department, DepartmentKind
@@ -439,7 +427,6 @@ class WillingnessUnifiedWorkflowTests(TestCase):
         from care_states.models import DevelopmentState
         from partnerships.models import Partnership
         from partnerships.willingness_workflow import WillingnessDetailsForm, apply_willingness_details
->>>>>>> theirs
 
         # 1. Department kind (إدارات المؤسسة / وحدات المؤسسة)
         unit_dept = Department.objects.create(name='كلية التقنية بالرياض للاختبار', kind=DepartmentKind.UNIT)
@@ -449,11 +436,7 @@ class WillingnessUnifiedWorkflowTests(TestCase):
         self.assertContains(dept_page, 'نوع الإدارة')
         self.assertContains(dept_page, 'وحدات المؤسسة')
 
-<<<<<<< ours
-        # 2. Partnership status + responsible employee + calculated_expiry -> ends_on sync
-=======
         # 2. Partnership status + calculated_expiry -> ends_on sync + 04 · إسناد المهام accordion on edit
->>>>>>> theirs
         status_opt, _ = AgreementOption.objects.get_or_create(kind=OptionKind.STATUS, name='مستمرة')
         p = Partnership.objects.create(
             name='شركة اختبار US-16',
@@ -462,10 +445,7 @@ class WillingnessUnifiedWorkflowTests(TestCase):
             email='us16@example.org',
             entity=self.entity,
             scope='local',
-<<<<<<< ours
-=======
             development_state_id=DevelopmentState.WILLINGNESS,
->>>>>>> theirs
             created_by=self.admin,
         )
         form = WillingnessDetailsForm(
@@ -473,10 +453,6 @@ class WillingnessUnifiedWorkflowTests(TestCase):
                 'signed_on': '2026-06-01',
                 'duration_months': '12',
                 'partnership_status': str(status_opt.pk),
-<<<<<<< ours
-                'responsible_employee': str(self.emp.pk),
-=======
->>>>>>> theirs
                 'concerned_departments': [str(unit_dept.pk)],
             },
             partnership=p,
@@ -484,18 +460,6 @@ class WillingnessUnifiedWorkflowTests(TestCase):
         self.assertTrue(form.is_valid(), form.errors)
         apply_willingness_details(p, form.cleaned_data)
         p.save()
-<<<<<<< ours
-        work = sync_responsible_employee_work(p, self.admin)
-
-        p.refresh_from_db()
-        self.assertEqual(p.partnership_status_id, status_opt.pk)
-        self.assertEqual(p.responsible_employee_id, self.emp.pk)
-        self.assertEqual(p.starts_on, date(2026, 6, 1))
-        self.assertEqual(p.ends_on, p.calculated_expiry)
-        self.assertIsNotNone(work)
-        self.assertEqual(work.employee_id, self.emp.pk)
-        self.assertEqual(work.target_key, p.pk)
-=======
 
         p.refresh_from_db()
         self.assertEqual(p.partnership_status_id, status_opt.pk)
@@ -507,4 +471,3 @@ class WillingnessUnifiedWorkflowTests(TestCase):
         self.assertContains(edit_page, '04 · إسناد المهام')
         self.assertContains(edit_page, 'حالة الشراكة')
         self.assertContains(edit_page, 'وحدات المؤسسة')
->>>>>>> theirs
