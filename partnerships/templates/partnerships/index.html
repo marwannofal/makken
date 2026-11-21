@@ -8,8 +8,8 @@
 {% block extra_head %}
   <link rel="stylesheet" href="{% static 'partnerships/willingness_upload.css' %}?v=20261017-1">
   <link rel="stylesheet" href="{% static 'care_states/states.css' %}?v=20261015-1">
-  <link rel="stylesheet" href="{% static 'partnerships/partnerships.css' %}?v=20261121-7">
-  <script src="{% static 'partnerships/partnerships.js' %}?v=20261121-7" defer></script>
+  <link rel="stylesheet" href="{% static 'partnerships/partnerships.css' %}?v=20261121-8">
+  <script src="{% static 'partnerships/partnerships.js' %}?v=20261121-8" defer></script>
   {% include "partnerships/_financial_assets.html" %}
   {% include "partnerships/_development_filter_assets.html" %}
   <script src="{% static 'partnerships/willingness_upload.js' %}?v=20261120-1" defer></script>
@@ -69,7 +69,7 @@
             {% if show_agreement_number %}
               <th scope="col">رقم الشراكة</th>
             {% endif %}
-            <th scope="col">اسم الجهة</th><th scope="col">الكيان / فرعه</th><th scope="col">النطاق</th><th scope="col" class="development-state-heading">حالة التطور الحالي للجهة</th><th scope="col">هاتف التواصل</th><th scope="col">البريد الإلكتروني</th><th scope="col">القدرة المالية</th><th scope="col">حالة السجل</th><th scope="col">الإجراء</th>
+            <th scope="col">اسم الجهة</th><th scope="col">الكيان / فرعه</th><th scope="col">النطاق</th><th scope="col" class="development-state-heading">حالة التطور الحالي للجهة</th><th scope="col">هاتف التواصل</th><th scope="col">البريد الإلكتروني</th><th scope="col">القدرة المالية</th>{% if show_agreement_number %}<th scope="col">آخر تحديث للمتابعة</th>{% endif %}<th scope="col">حالة السجل</th><th scope="col">الإجراء</th>
           </tr>
         </thead>
         <tbody>
@@ -84,7 +84,7 @@
               {% endif %}
               </small></td><td>{{ row.item.get_scope_display }}</td><td class="development-state-cell" data-development-cell>{% development_pill row.item.development_state %}</td><td><bdi dir="ltr">{{ row.item.phone }}</bdi></td><td><bdi>{{ row.item.email }}</bdi></td><td class="financial-capacity-cell" data-financial-capacity-cell>
               {% include "partnerships/_financial_value.html" with amount=row.item.financial_capacity %}
-              </td><td>
+              </td>{% if show_agreement_number %}<td data-followup-cell="{{ row.item.pk }}">{% if row.item.followup_updated_at %}<bdi dir="ltr">{{ row.item.followup_updated_at|date:"d/m/Y H:i" }}</bdi><small>{{ row.item.followup_updated_by.get_full_name|default:row.item.followup_updated_by.username|default:"" }}</small>{% else %}—{% endif %}</td>{% endif %}<td>
               {% allowed 'partnerships' 'change_status' row.item %}
                 <form method="post">
                   {% csrf_token %}
@@ -136,7 +136,7 @@
             </tr>
           {% empty %}
             <tr>
-              <td colspan="{% if show_agreement_number %}10{% else %}9{% endif %}">
+              <td colspan="{% if show_agreement_number %}11{% else %}9{% endif %}">
               <div class="empty-state">
                 <strong>
                 {% if q or selected_status or financial_filter_active or development_filter_active %}
@@ -271,10 +271,13 @@
         <span class="dialog-symbol"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
         <button type="button" class="icon-button" data-dismiss-dialog aria-label="إغلاق" autofocus><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
       </div>
-      <h2 id="clauses-progress-title">نسب إنجاز بنود الشراكة</h2>
+      <h2 id="clauses-progress-title">بطاقة متابعة الشراكة ونسب إنجاز البنود</h2>
       <div class="mk-cp-meta">
         <span class="mk-cp-partner" data-cp-partner></span>
-        <span class="subtle-badge">نسبة إنجاز الشراكة: <strong data-cp-overall>—</strong></span>
+        <div class="mk-cp-badges">
+          <span class="subtle-badge">نسبة إنجاز الشراكة: <strong data-cp-overall>—</strong></span>
+          <span class="subtle-badge" data-cp-updated-wrap hidden>آخر تحديث: <bdi dir="ltr" data-cp-updated-at></bdi> · <span data-cp-updated-by></span></span>
+        </div>
       </div>
       <div class="mk-offering-toast" data-cp-toast role="status" aria-live="polite" hidden>
         <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5"/></svg>
@@ -282,8 +285,21 @@
       </div>
       <p class="field-error" data-cp-error role="alert"></p>
       <div class="mk-cp-list" data-cp-list></div>
+      <details class="mk-accordion mk-cp-teams-acc">
+        <summary>
+          <div class="mk-acc-head">
+            <h3 class="mk-acc-title">فرق العمل وضباط الاتصال وبياناتهم</h3>
+            <p class="mk-acc-subtitle">عرض وتعديل أعضاء فرق العمل وضباط الاتصال للمؤسسة والجهة.</p>
+          </div>
+          <span class="mk-acc-meta"><svg class="mk-acc-arrow" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>
+        </summary>
+        <div class="mk-acc-body">
+          <div class="mk-cp-teams-list" data-cp-teams-list></div>
+          <button type="button" class="button button-secondary mk-cp-add-team" data-cp-add-team>+ إضافة عضو أو ضابط اتصال</button>
+        </div>
+      </details>
       <div class="dialog-actions">
-        <button class="button button-primary" type="submit" data-cp-save>حفظ نسب الإنجاز</button>
+        <button class="button button-primary" type="submit" data-cp-save>حفظ بطاقة المتابعة</button>
         <button class="button button-secondary" type="button" data-dismiss-dialog>إغلاق</button>
       </div>
     </form>

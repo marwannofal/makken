@@ -1,3 +1,4 @@
+from pathlib import Path
 from access_control.enforcement import module_view, service_operation
 # MAKKEN RBAC INTEGRATION v1
 
@@ -86,7 +87,7 @@ def _base(request, title, active):
 
 
 def _query(actor=None):
-    return scoped(Partnership.objects.all(), actor).select_related("entity", "development_state").prefetch_related(
+    return scoped(Partnership.objects.all(), actor).select_related("entity", "development_state", "followup_updated_by").prefetch_related(
         Prefetch("offerings", queryset=PartnershipOffering.objects.select_related("sector", "sponsorship_shape").prefetch_related("specializations")),
         "development_history__state", "willingness_attachments", "administrative_regions")
 
@@ -626,29 +627,47 @@ def willingness_index(request):
 @login_required(login_url="accounts:login")
 @require_http_methods(["GET", "POST"])
 def clauses_progress(request, pk):
+    from django.http import FileResponse
     from access_control.activity_capture import emit, regions_for
-    from agreement_clauses.models import ClauseAssignment, mean_progress
+    from access_control.audit import audit_timezone
+    from agreement_clauses.models import ClauseAssignment, ClauseEvidence, mean_progress
+    from .willingness import safe_filename, validate_attachment
+    from .attachment_storage import willingness_storage
 
     item = get_object_or_404(_query(request.user), pk=pk)
     if item.development_state_id != DevelopmentState.WILLINGNESS:
         return add_login_headers(
-            JsonResponse({"error": "تعديل نسب إنجاز البنود متاح لشراكات الرغبة فقط."}, status=400)
+            JsonResponse({"error": "بطاقة المتابعة ونسب إنجاز البنود متاحة لشراكات الرغبة فقط."}, status=400)
         )
 
     def _serialize_payload(partnership):
+        partnership.refresh_from_db()
         rows = list(
             ClauseAssignment.objects.select_related("clause")
+            .prefetch_related("evidences")
             .filter(partnership=partnership, agreement__isnull=True)
             .order_by("id")
         )
         overall = mean_progress(sum(r.progress for r in rows), len(rows))
         overall_str = "—" if overall is None else (f"{int(overall)}%" if overall == int(overall) else f"{overall:.2f}%")
+        tz = audit_timezone()
+        updated_at_display = (
+            timezone.localtime(partnership.followup_updated_at, tz).strftime("%d/%m/%Y %H:%M")
+            if partnership.followup_updated_at
+            else ""
+        )
+        updated_by_name = ""
+        if partnership.followup_updated_by:
+            updated_by_name = partnership.followup_updated_by.get_full_name() or partnership.followup_updated_by.get_username()
         return {
             "partnership_id": partnership.pk,
             "partnership_name": partnership.name,
             "agreement_number": partnership.agreement_number or "—",
             "overall_progress": float(overall) if overall is not None else None,
             "overall_display": overall_str,
+            "followup_updated_at_display": updated_at_display,
+            "followup_updated_by_name": updated_by_name,
+            "teams": existing_team_rows(partnership),
             "clauses": [
                 {
                     "id": r.pk,
@@ -657,6 +676,20 @@ def clauses_progress(request, pk):
                     "responsibility": r.responsibility,
                     "responsibility_label": r.get_responsibility_display(),
                     "progress": r.progress,
+                    "notes": r.notes or "",
+                    "evidences": [
+                        {
+                            "id": ev.pk,
+                            "name": ev.original_name,
+                            "size": ev.size,
+                            "download_url": reverse(
+                                "partnerships:clause_evidence_download",
+                                kwargs={"pk": partnership.pk, "evidence_id": ev.pk},
+                            ),
+                            "uploaded_at": timezone.localtime(ev.uploaded_at, tz).strftime("%d/%m/%Y %H:%M"),
+                        }
+                        for ev in r.evidences.all()
+                    ],
                 }
                 for r in rows
             ],
@@ -665,12 +698,27 @@ def clauses_progress(request, pk):
     if request.method == "GET":
         return add_login_headers(JsonResponse(_serialize_payload(item)))
 
-    try:
-        body = json.loads((request.body or b"{}").decode("utf-8"))
-    except (ValueError, UnicodeDecodeError):
-        return add_login_headers(JsonResponse({"error": "بيانات الطلب غير صالحة."}, status=400))
+    content_type = (request.content_type or "").lower()
+    teams_submitted = False
+    raw_teams_json = None
+    if content_type.startswith("application/json"):
+        try:
+            body = json.loads((request.body or b"{}").decode("utf-8"))
+        except (ValueError, UnicodeDecodeError):
+            return add_login_headers(JsonResponse({"error": "بيانات الطلب غير صالحة."}, status=400))
+        raw_items = body.get("items")
+        if "teams" in body:
+            teams_submitted = True
+            raw_teams_json = json.dumps(body.get("teams") or [])
+    else:
+        try:
+            raw_items = json.loads(request.POST.get("items_json", "[]"))
+        except (ValueError, TypeError):
+            return add_login_headers(JsonResponse({"error": "قائمة البنود غير صالحة."}, status=400))
+        if "teams_json" in request.POST:
+            teams_submitted = True
+            raw_teams_json = request.POST.get("teams_json", "[]")
 
-    raw_items = body.get("items")
     if not isinstance(raw_items, list):
         return add_login_headers(JsonResponse({"error": "قائمة البنود غير صالحة."}, status=400))
 
@@ -685,37 +733,93 @@ def clauses_progress(request, pk):
             return add_login_headers(JsonResponse({"error": "أدخل نسبة إنجاز صحيحة بين 0 و100 لكل بند."}, status=400))
         if progress_val < 0 or progress_val > 100:
             return add_login_headers(JsonResponse({"error": "يجب أن تكون نسبة الإنجاز بين 0% و100%."}, status=400))
-        updates[assignment_id] = progress_val
+        notes_val = str(entry.get("notes") or "").strip()[:2000]
+        updates[assignment_id] = {"progress": progress_val, "notes": notes_val, "has_notes": "notes" in entry}
 
-    with regional_transaction(request.user) as region_policy:
-        locked_item = Partnership.objects.select_for_update().filter(pk=item.pk).first()
-        if not locked_item:
-            return add_login_headers(JsonResponse({"error": "الشراكة غير موجودة."}, status=404))
-        require_write(request.user, locked_item, policy=region_policy)
-        assignments = {
-            r.pk: r
-            for r in ClauseAssignment.objects.select_for_update().filter(
-                partnership=locked_item, agreement__isnull=True
-            )
-        }
-        changed = []
-        for aid, new_prog in updates.items():
-            row = assignments.get(aid)
-            if row is None:
-                return add_login_headers(JsonResponse({"error": "أحد البنود المحددة غير مرتبط بهذه الشراكة."}, status=400))
-            if row.progress != new_prog:
-                old_prog = row.progress
-                row.progress = new_prog
-                row.version += 1
-                row.updated_by = request.user
-                row.save(update_fields=["progress", "version", "updated_by", "updated_at"])
-                changed.append({"id": aid, "before": old_prog, "after": new_prog})
-        if changed:
+    parsed_teams = None
+    if teams_submitted:
+        try:
+            parsed_teams = parse_teams_payload(raw_teams_json)
+        except django_forms.ValidationError as exc:
+            return add_login_headers(JsonResponse({"error": " ".join(exc.messages)}, status=400))
+
+    # Validate any uploaded per-clause evidence files (evidence_<assignment_id>)
+    validated_files = {}
+    for field_key in request.FILES:
+        if not field_key.startswith("evidence_"):
+            continue
+        raw_aid = field_key[len("evidence_"):]
+        if not raw_aid.isdigit():
+            return add_login_headers(JsonResponse({"error": "معرّف البند للمرفق غير صالح."}, status=400))
+        aid = int(raw_aid)
+        files = request.FILES.getlist(field_key)
+        for upload in files:
+            try:
+                validated_files.setdefault(aid, []).append(validate_attachment(upload))
+            except django_forms.ValidationError as exc:
+                return add_login_headers(JsonResponse({"error": f"{safe_filename(getattr(upload, 'name', 'مرفق'))}: {' '.join(exc.messages)}"}, status=400))
+
+    saved_paths = []
+    try:
+        with regional_transaction(request.user) as region_policy:
+            locked_item = Partnership.objects.select_for_update().filter(pk=item.pk).first()
+            if not locked_item:
+                return add_login_headers(JsonResponse({"error": "الشراكة غير موجودة."}, status=404))
+            require_write(request.user, locked_item, policy=region_policy)
+            assignments = {
+                r.pk: r
+                for r in ClauseAssignment.objects.select_for_update().filter(
+                    partnership=locked_item, agreement__isnull=True
+                )
+            }
+            changed = []
+            for aid, vals in updates.items():
+                row = assignments.get(aid)
+                if row is None:
+                    return add_login_headers(JsonResponse({"error": "أحد البنود المحددة غير مرتبط بهذه الشراكة."}, status=400))
+                new_prog = vals["progress"]
+                new_notes = vals["notes"] if vals["has_notes"] else row.notes
+                if row.progress != new_prog or row.notes != new_notes:
+                    old_prog = row.progress
+                    row.progress = new_prog
+                    row.notes = new_notes
+                    row.version += 1
+                    row.updated_by = request.user
+                    row.save(update_fields=["progress", "notes", "version", "updated_by", "updated_at"])
+                    changed.append({"id": aid, "before": old_prog, "after": new_prog})
+
+            storage = willingness_storage()
+            for aid, uploads in validated_files.items():
+                row = assignments.get(aid)
+                if row is None:
+                    return add_login_headers(JsonResponse({"error": "أحد مرفقات الشواهد يشير إلى بند غير مرتبط بهذه الشراكة."}, status=400))
+                for upload in uploads:
+                    name = "clause_evidence/" + uuid.uuid4().hex + Path(upload.name).suffix.lower()
+                    saved_paths.append(name)
+                    actual = storage.save(name, upload)
+                    if actual != name:
+                        saved_paths.append(actual)
+                    ClauseEvidence.objects.create(
+                        assignment=row,
+                        file=actual,
+                        original_name=safe_filename(upload.name),
+                        size=upload.size,
+                        content_type=upload.verified_content_type,
+                        uploaded_by=request.user,
+                    )
+
+            if parsed_teams is not None:
+                save_partnership_teams(locked_item, parsed_teams)
+
+            locked_item.followup_updated_at = timezone.now()
+            locked_item.followup_updated_by = request.user
+            locked_item.save(update_fields=["followup_updated_at", "followup_updated_by", "updated_at"])
+
             emit(
                 actor=request.user,
                 module="partnerships",
                 action="update",
-                description="تحديث نسب إنجاز بنود الشراكة",
+                description="تحديث بطاقة المتابعة ونسب إنجاز بنود الشراكة",
                 target_model="partnerships.partnership",
                 target_key=str(locked_item.pk),
                 target_label=locked_item.name,
@@ -723,7 +827,34 @@ def clauses_progress(request, pk):
                 after={"clauses": [{"id": c["id"], "progress": c["after"]} for c in changed]},
                 regions=regions_for(locked_item),
             )
+    except Exception:
+        delete_private_files(saved_paths)
+        raise
 
     payload = _serialize_payload(item)
-    payload["message"] = "تم حفظ نسب إنجاز بنود الشراكة بنجاح. يمكنك متابعة التعديل أو إغلاق النافذة."
+    payload["message"] = "تم حفظ بطاقة المتابعة بنجاح. يمكنك متابعة التعديل أو إغلاق النافذة."
     return add_login_headers(JsonResponse(payload))
+
+
+@module_view('partnerships')
+@login_required(login_url="accounts:login")
+@require_http_methods(["GET"])
+def download_clause_evidence(request, pk, evidence_id):
+    from django.http import FileResponse
+    from agreement_clauses.models import ClauseEvidence
+    from .attachment_storage import willingness_storage
+
+    partnership = get_object_or_404(_query(request.user), pk=pk)
+    evidence = get_object_or_404(
+        ClauseEvidence.objects.select_related("assignment"),
+        pk=evidence_id,
+        assignment__partnership=partnership,
+        assignment__agreement__isnull=True,
+    )
+    try:
+        source = willingness_storage().open(evidence.file, "rb")
+    except OSError as exc:
+        raise Http404("الملف غير متاح.") from exc
+    response = FileResponse(source, as_attachment=True, filename=evidence.original_name, content_type=evidence.content_type)
+    response["X-Content-Type-Options"] = "nosniff"
+    return add_login_headers(response)

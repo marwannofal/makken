@@ -109,6 +109,8 @@ class Partnership(models.Model):
     expected_results = models.TextField("النتائج المتوقعة", max_length=2000, blank=True, default="")
     version = models.PositiveBigIntegerField(default=1, editable=False)
     request_key = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    followup_updated_at = models.DateTimeField("تاريخ آخر تحديث للمتابعة", null=True, blank=True)
+    followup_updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="+", verbose_name="آخر تحديث للمتابعة بواسطة")
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, editable=False, related_name="created_partnerships")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

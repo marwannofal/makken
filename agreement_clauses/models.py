@@ -203,6 +203,7 @@ class ClauseAssignment(models.Model):
     agreement = models.ForeignKey(Agreement, on_delete=models.PROTECT, null=True, blank=True, related_name="clause_assignments")
     responsibility = models.CharField("المسؤولية", max_length=12, choices=Responsibility.choices)
     progress = models.PositiveSmallIntegerField("نسبة الإنجاز", default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    notes = models.TextField("ملاحظات البند", blank=True, default="")
     version = models.PositiveBigIntegerField(default=1, editable=False)
     updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name="+")
     updated_at = models.DateTimeField(auto_now=True)
@@ -300,3 +301,17 @@ class AgreementClassification(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class ClauseEvidence(models.Model):
+    assignment = models.ForeignKey(ClauseAssignment, on_delete=models.CASCADE, related_name="evidences")
+    file = models.CharField(max_length=255)
+    original_name = models.CharField(max_length=255)
+    size = models.PositiveBigIntegerField()
+    content_type = models.CharField(max_length=40)
+    uploaded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, editable=False, related_name="+")
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-uploaded_at", "-id"]
+        default_permissions = ()

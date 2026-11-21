@@ -101,6 +101,10 @@ def requested_operations(request,module,view,kwargs):
         if request.method == 'POST' and operation:
             return ['view', operation]
         raise PermissionDenied
+    if module == 'partnerships' and name == 'clause_evidence_download':
+        if request.method in {'GET', 'HEAD'}:
+            return ['view']
+        raise PermissionDenied
     if module == 'partnerships' and name == 'clauses_progress':
         if request.method in {'GET', 'HEAD', 'POST'}:
             return ['view', 'edit']

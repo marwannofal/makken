@@ -350,7 +350,7 @@ class WillingnessUnifiedWorkflowTests(TestCase):
         self.assertEqual(ok.status_code, 200)
         ok_data = ok.json()
         self.assertEqual(ok_data['overall_display'], '75%')
-        self.assertIn('تم حفظ نسب إنجاز بنود الشراكة بنجاح', ok_data['message'])
+        self.assertIn('تم حفظ بطاقة المتابعة بنجاح', ok_data['message'])
         ca1.refresh_from_db()
         ca2.refresh_from_db()
         self.assertEqual((ca1.progress, ca2.progress), (50, 100))
@@ -364,3 +364,57 @@ class WillingnessUnifiedWorkflowTests(TestCase):
             self.assertNotContains(res, 'development-transition-note')
             self.assertNotContains(res, 'اضغط على شارة «قدرة»')
             self.assertContains(res, 'تحويل إلى رغبة')
+
+    def test_us17_followup_notes_evidence_teams_and_last_updated_column(self):
+        from agreement_clauses.models import ClauseEvidence
+        from partnerships.models import PartnershipTeamMember, TeamMemberRole, TeamSide
+
+        self.client.force_login(self.admin)
+        will = self._create_capability('شراكة بطاقة المتابعة الكاملة')
+        will.development_state_id = DevelopmentState.WILLINGNESS
+        will.save(update_fields=['development_state'])
+        ca = ClauseAssignment.objects.create(
+            partnership=will, agreement=None, clause=self.clause_1,
+            responsibility=Responsibility.SHARED, progress=20, updated_by=self.admin,
+        )
+        PartnershipTeamMember.objects.create(
+            partnership=will, side=TeamSide.INSTITUTION, name='أحمد القديم',
+            phone='+966501110000', email='old@tvtc.gov.sa', organization='التشاركية', role=TeamMemberRole.CONTACT,
+        )
+
+        url = reverse('partnerships:clauses_progress', kwargs={'pk': will.pk})
+        # GET retrieves existing clauses + existing team members
+        g = self.client.get(url)
+        self.assertEqual(g.status_code, 200)
+        gdata = g.json()
+        self.assertEqual(len(gdata['teams']), 1)
+        self.assertEqual(gdata['teams'][0]['name'], 'أحمد القديم')
+
+        # POST multipart with updated progress, notes, PNG evidence, and updated teams
+        updated_teams = [
+            {'side': TeamSide.INSTITUTION, 'role': TeamMemberRole.CONTACT, 'name': 'سارة الحربي', 'phone': '+966509998888', 'email': 'sara@tvtc.gov.sa', 'organization': 'الإدارة العامة للتشاركية'},
+            {'side': TeamSide.PARTNER, 'role': TeamMemberRole.LEAD, 'name': 'خالد العتيبي', 'phone': '+966507776666', 'email': 'khaled@partner.sa', 'organization': 'شركة سابك'},
+        ]
+        res = self.client.post(url, {
+            'items_json': json.dumps([{'id': ca.pk, 'progress': 85, 'notes': 'تم تسليم الدفعة الأولى من المتدربين'}]),
+            'teams_json': json.dumps(updated_teams),
+            f'evidence_{ca.pk}': _make_png('proof.png'),
+        })
+        self.assertEqual(res.status_code, 200)
+        rdata = res.json()
+        self.assertEqual(rdata['overall_display'], '85%')
+        self.assertEqual(rdata['clauses'][0]['notes'], 'تم تسليم الدفعة الأولى من المتدربين')
+        self.assertEqual(len(rdata['clauses'][0]['evidences']), 1)
+        self.assertEqual(len(rdata['teams']), 2)
+        self.assertTrue(rdata['followup_updated_at_display'])
+
+        # Authenticated evidence download works
+        ev_url = rdata['clauses'][0]['evidences'][0]['download_url']
+        dl = self.client.get(ev_url)
+        self.assertEqual(dl.status_code, 200)
+        self.assertEqual(ClauseEvidence.objects.filter(assignment=ca).count(), 1)
+
+        # Willingness table shows the new "آخر تحديث للمتابعة" column with actor & timestamp
+        table_res = self.client.get(reverse('partnerships:willingness_index'))
+        self.assertContains(table_res, 'آخر تحديث للمتابعة')
+        self.assertContains(table_res, rdata['followup_updated_at_display'])

@@ -43,7 +43,12 @@
     const cpForm = $('[data-cp-form]', cpDialog);
     const cpPartner = $('[data-cp-partner]', cpDialog);
     const cpOverall = $('[data-cp-overall]', cpDialog);
+    const cpUpdatedWrap = $('[data-cp-updated-wrap]', cpDialog);
+    const cpUpdatedAt = $('[data-cp-updated-at]', cpDialog);
+    const cpUpdatedBy = $('[data-cp-updated-by]', cpDialog);
     const cpList = $('[data-cp-list]', cpDialog);
+    const cpTeamsList = $('[data-cp-teams-list]', cpDialog);
+    const cpAddTeamBtn = $('[data-cp-add-team]', cpDialog);
     const cpError = $('[data-cp-error]', cpDialog);
     const cpToast = $('[data-cp-toast]', cpDialog);
     const cpToastText = $('[data-cp-toast-text]', cpDialog);
@@ -67,7 +72,85 @@
       cpToastTimer = setTimeout(() => {
         cpToast.hidden = true;
         cpToastTimer = null;
-      }, 5000);
+      }, 5500);
+    }
+
+    function makeTeamRow(member = {}) {
+      const row = make('div', 'mk-cp-team-row');
+      row.dataset.cpTeamRow = '1';
+
+      const side = document.createElement('select');
+      side.dataset.cpField = 'side';
+      side.setAttribute('aria-label', 'الطرف');
+      side.add(new Option('المؤسسة', 'institution'));
+      side.add(new Option('الجهة', 'partner'));
+      side.value = member.side === 'partner' ? 'partner' : 'institution';
+
+      const role = document.createElement('select');
+      role.dataset.cpField = 'role';
+      role.setAttribute('aria-label', 'الصفة');
+      role.add(new Option('ممثل', 'representative'));
+      role.add(new Option('رئيس', 'lead'));
+      role.add(new Option('ضابط اتصال', 'contact'));
+      role.value = ['representative', 'lead', 'contact'].includes(member.role) ? member.role : 'contact';
+
+      const name = document.createElement('input');
+      name.type = 'text';
+      name.dataset.cpField = 'name';
+      name.placeholder = 'الاسم *';
+      name.value = member.name || '';
+      name.maxLength = 160;
+
+      const phone = document.createElement('input');
+      phone.type = 'text';
+      phone.dataset.cpField = 'phone';
+      phone.placeholder = 'رقم الجوال';
+      phone.dir = 'ltr';
+      phone.value = member.phone || '';
+      phone.maxLength = 32;
+
+      const email = document.createElement('input');
+      email.type = 'email';
+      email.dataset.cpField = 'email';
+      email.placeholder = 'البريد الإلكتروني';
+      email.dir = 'ltr';
+      email.value = member.email || '';
+      email.maxLength = 254;
+
+      const org = document.createElement('input');
+      org.type = 'text';
+      org.dataset.cpField = 'organization';
+      org.placeholder = 'الإدارة أو الجهة';
+      org.value = member.organization || '';
+      org.maxLength = 160;
+
+      const rm = make('button', 'mk-cp-team-remove', 'حذف');
+      rm.type = 'button';
+      rm.addEventListener('click', () => row.remove());
+
+      row.append(side, role, name, phone, email, org, rm);
+      return row;
+    }
+
+    if (cpAddTeamBtn) {
+      cpAddTeamBtn.addEventListener('click', () => {
+        const empty = $('.mk-cp-empty', cpTeamsList);
+        if (empty) empty.remove();
+        cpTeamsList.append(makeTeamRow());
+      });
+    }
+
+    function updateTableFollowupCell(data) {
+      if (!data.partnership_id || !data.followup_updated_at_display) return;
+      const cell = $(`[data-followup-cell="${data.partnership_id}"]`);
+      if (!cell) return;
+      cell.replaceChildren();
+      const bdi = make('bdi', '', data.followup_updated_at_display);
+      bdi.dir = 'ltr';
+      cell.append(bdi);
+      if (data.followup_updated_by_name) {
+        cell.append(make('small', '', data.followup_updated_by_name));
+      }
     }
 
     function renderCpClauses(data) {
@@ -75,44 +158,90 @@
         ? `${data.partnership_name} (${data.agreement_number})`
         : data.partnership_name;
       cpOverall.textContent = data.overall_display || '—';
+      if (data.followup_updated_at_display) {
+        cpUpdatedAt.textContent = data.followup_updated_at_display;
+        cpUpdatedBy.textContent = data.followup_updated_by_name || '';
+        cpUpdatedWrap.hidden = false;
+      } else {
+        cpUpdatedWrap.hidden = true;
+      }
+
       cpList.replaceChildren();
       const items = Array.isArray(data.clauses) ? data.clauses : [];
       if (!items.length) {
         cpList.append(make('div', 'mk-cp-empty', 'لا توجد بنود اتفاقية مسندة لهذه الشراكة بعد.'));
-        cpSaveBtn.disabled = true;
-        return;
+      } else {
+        items.forEach(item => {
+          const row = make('div', 'mk-cp-row');
+          row.dataset.cpClauseCard = String(item.id);
+          const info = make('div', 'mk-cp-info');
+          info.append(
+            make('span', 'mk-cp-clause-name', item.name),
+            make('span', 'mk-cp-resp', `المسؤولية: ${item.responsibility_label}`)
+          );
+          const inputWrap = make('div', 'mk-cp-input-wrap');
+          const input = make('input', 'mk-cp-input');
+          input.type = 'number';
+          input.min = '0';
+          input.max = '100';
+          input.step = '1';
+          input.required = true;
+          input.value = String(item.progress ?? 0);
+          input.dataset.cpAssignmentId = String(item.id);
+          input.setAttribute('aria-label', `نسبة إنجاز ${item.name}`);
+          inputWrap.append(input, make('span', 'mk-cp-pct', '%'));
+
+          const bar = make('progress', 'mk-cp-progress');
+          bar.max = 100;
+          bar.value = Math.max(0, Math.min(100, Number(item.progress) || 0));
+          input.addEventListener('input', () => {
+            bar.value = Math.max(0, Math.min(100, Number(input.value) || 0));
+          });
+
+          const extras = make('div', 'mk-cp-extras');
+          const notesWrap = make('div');
+          const notesLabel = make('label', 'mk-cp-notes-label', 'ملاحظات البند');
+          const notes = make('textarea', 'mk-cp-notes');
+          notes.rows = 2;
+          notes.maxLength = 2000;
+          notes.placeholder = 'أضف ملاحظات المتابعة الخاصة بهذا البند…';
+          notes.value = item.notes || '';
+          notes.dataset.cpNotesFor = String(item.id);
+          notesWrap.append(notesLabel, notes);
+
+          const evWrap = make('div');
+          const evLabel = make('label', 'mk-cp-ev-label', 'الشواهد والمرفقات (PDF / PNG / JPG)');
+          evWrap.append(evLabel);
+          const evList = make('div', 'mk-cp-ev-files');
+          (item.evidences || []).forEach(ev => {
+            const link = make('a', 'mk-cp-ev-chip', `${ev.name} (${ev.uploaded_at})`);
+            link.href = ev.download_url;
+            link.target = '_blank';
+            link.rel = 'noopener';
+            evList.append(link);
+          });
+          if (evList.childNodes.length) evWrap.append(evList);
+          const fileInput = make('input', 'mk-cp-ev-input');
+          fileInput.type = 'file';
+          fileInput.multiple = true;
+          fileInput.accept = '.pdf,.png,.jpg,.jpeg';
+          fileInput.dataset.cpEvidenceFor = String(item.id);
+          evWrap.append(fileInput);
+
+          extras.append(notesWrap, evWrap);
+          row.append(info, inputWrap, bar, extras);
+          cpList.append(row);
+        });
+      }
+
+      cpTeamsList.replaceChildren();
+      const teams = Array.isArray(data.teams) ? data.teams : [];
+      if (!teams.length) {
+        cpTeamsList.append(make('div', 'mk-cp-empty', 'لا يوجد أعضاء فرق عمل أو ضباط اتصال مسجلون بعد. اضغط على الزر أدناه للإضافة.'));
+      } else {
+        teams.forEach(m => cpTeamsList.append(makeTeamRow(m)));
       }
       cpSaveBtn.disabled = false;
-      items.forEach(item => {
-        const row = make('div', 'mk-cp-row');
-        const info = make('div', 'mk-cp-info');
-        info.append(
-          make('span', 'mk-cp-clause-name', item.name),
-          make('span', 'mk-cp-resp', `المسؤولية: ${item.responsibility_label}`)
-        );
-        const inputWrap = make('div', 'mk-cp-input-wrap');
-        const input = make('input', 'mk-cp-input');
-        input.type = 'number';
-        input.min = '0';
-        input.max = '100';
-        input.step = '1';
-        input.required = true;
-        input.value = String(item.progress ?? 0);
-        input.dataset.cpAssignmentId = String(item.id);
-        input.setAttribute('aria-label', `نسبة إنجاز ${item.name}`);
-        inputWrap.append(input, make('span', 'mk-cp-pct', '%'));
-
-        const bar = make('progress', 'mk-cp-progress');
-        bar.max = 100;
-        bar.value = Math.max(0, Math.min(100, Number(item.progress) || 0));
-
-        input.addEventListener('input', () => {
-          bar.value = Math.max(0, Math.min(100, Number(input.value) || 0));
-        });
-
-        row.append(info, inputWrap, bar);
-        cpList.append(row);
-      });
     }
 
     cpDialog.addEventListener('close', hideCpToast);
@@ -124,18 +253,20 @@
         if (!cpUrl) return;
         hideCpToast();
         cpError.textContent = '';
-        cpPartner.textContent = 'جارٍ تحميل البنود…';
+        cpPartner.textContent = 'جارٍ تحميل بطاقة المتابعة…';
         cpOverall.textContent = '—';
+        cpUpdatedWrap.hidden = true;
         cpList.replaceChildren(make('div', 'mk-cp-empty', 'جارٍ تحميل بنود الشراكة…'));
+        cpTeamsList.replaceChildren();
         cpSaveBtn.disabled = true;
         show(cpDialog);
         try {
           const res = await fetch(cpUrl, {credentials: 'same-origin', headers: {'X-Requested-With': 'XMLHttpRequest'}});
           const data = await res.json();
-          if (!res.ok) throw new Error(data.error || 'تعذّر تحميل بنود الشراكة.');
+          if (!res.ok) throw new Error(data.error || 'تعذّر تحميل بطاقة المتابعة.');
           renderCpClauses(data);
         } catch (err) {
-          cpError.textContent = err.message || 'تعذّر تحميل بنود الشراكة.';
+          cpError.textContent = err.message || 'تعذّر تحميل بطاقة المتابعة.';
           cpList.replaceChildren();
         }
       });
@@ -145,8 +276,36 @@
       event.preventDefault();
       if (!cpUrl || !cpForm.reportValidity()) return;
       cpError.textContent = '';
-      const inputs = $$('[data-cp-assignment-id]', cpList);
-      const items = inputs.map(inp => ({id: Number(inp.dataset.cpAssignmentId), progress: Number(inp.value)}));
+
+      const items = $$('[data-cp-assignment-id]', cpList).map(inp => {
+        const aid = Number(inp.dataset.cpAssignmentId);
+        const notesEl = $(`[data-cp-notes-for="${aid}"]`, cpList);
+        return {
+          id: aid,
+          progress: Number(inp.value),
+          notes: notesEl ? notesEl.value.trim() : '',
+        };
+      });
+
+      const teams = $$('[data-cp-team-row]', cpTeamsList).map(row => ({
+        side: $('[data-cp-field="side"]', row).value,
+        role: $('[data-cp-field="role"]', row).value,
+        name: $('[data-cp-field="name"]', row).value.trim(),
+        phone: $('[data-cp-field="phone"]', row).value.trim(),
+        email: $('[data-cp-field="email"]', row).value.trim(),
+        organization: $('[data-cp-field="organization"]', row).value.trim(),
+      })).filter(m => m.name || m.phone || m.email || m.organization);
+
+      const formData = new FormData();
+      formData.append('items_json', JSON.stringify(items));
+      formData.append('teams_json', JSON.stringify(teams));
+      $$('[data-cp-evidence-for]', cpList).forEach(fileInput => {
+        const aid = fileInput.dataset.cpEvidenceFor;
+        [...(fileInput.files || [])].forEach(file => {
+          formData.append(`evidence_${aid}`, file);
+        });
+      });
+
       const csrf = $('input[name=csrfmiddlewaretoken]', cpForm)?.value || '';
       cpSaveBtn.disabled = true;
       cpSaveBtn.textContent = 'جارٍ الحفظ…';
@@ -155,21 +314,21 @@
           method: 'POST',
           credentials: 'same-origin',
           headers: {
-            'Content-Type': 'application/json',
             'X-CSRFToken': csrf,
             'X-Requested-With': 'XMLHttpRequest',
           },
-          body: JSON.stringify({items}),
+          body: formData,
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'تعذّر حفظ نسب الإنجاز.');
+        if (!res.ok) throw new Error(data.error || 'تعذّر حفظ بطاقة المتابعة.');
         renderCpClauses(data);
-        showCpToast(data.message || 'تم حفظ نسب إنجاز بنود الشراكة بنجاح. يمكنك متابعة التعديل أو إغلاق النافذة.');
+        updateTableFollowupCell(data);
+        showCpToast(data.message || 'تم حفظ بطاقة المتابعة بنجاح. يمكنك متابعة التعديل أو إغلاق النافذة.');
       } catch (err) {
-        cpError.textContent = err.message || 'تعذّر حفظ نسب الإنجاز.';
+        cpError.textContent = err.message || 'تعذّر حفظ بطاقة المتابعة.';
       } finally {
-        cpSaveBtn.disabled = !$$('[data-cp-assignment-id]', cpList).length;
-        cpSaveBtn.textContent = 'حفظ نسب الإنجاز';
+        cpSaveBtn.disabled = false;
+        cpSaveBtn.textContent = 'حفظ بطاقة المتابعة';
       }
     });
   }
