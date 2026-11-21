@@ -246,7 +246,7 @@
     {% endif %}
   </section>
   {% if detail_row %}
-    <dialog id="inquiry-detail" class="partnership-dialog detail-dialog inq-detail-dialog" aria-labelledby="inq-detail-title" open style="position:fixed;inset:0;margin:auto;z-index:60;">
+    <dialog id="inquiry-detail" class="partnership-dialog detail-dialog inq-detail-dialog" aria-labelledby="inq-detail-title" open data-market-server data-close-url="?{{ filter_query }}">
       <div class="dialog-body">
         <div class="dialog-top">
           <p class="eyebrow">تفاصيل الشراكة · <bdi dir="ltr">{{ detail_row.agreement_number }}</bdi></p> <a class="icon-button" href="?{{ filter_query }}" aria-label="إغلاق" autofocus><svg aria-hidden="true"><use href="#icon-close"/></svg></a>
