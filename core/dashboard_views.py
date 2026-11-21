@@ -19,8 +19,8 @@ from .dashboard_snapshot import consistent_dashboard
 
 def base(request, report):
     name=request.user.get_short_name() or request.user.get_username()
-    return {'display_name':name,'avatar_initial':name[:1],'active_page':'home',
-            'page_heading':'لوحة المتابعة','dashboard':report,'filter_form':report.form,
+    return {'display_name':name,'avatar_initial':name[:1],'active_page':'dashboard',
+            'page_heading':'مركز المؤشرات والتحليلات','dashboard':report,'filter_form':report.form,
             'dashboard_timezone':audit_timezone(),
             'generated_at':timezone.localtime(report.generated_at,audit_timezone())}
 
@@ -197,5 +197,5 @@ def records(request,kind):
         elif kind in {'donors','partners'}:row.detail_url=reverse('partnerships:index')+'?detail='+str(row.pk)
         else:row.detail_url=reverse('service_providers:index')+'?detail='+str(row.pk)
     ctx={**base(request,report),'kind':kind,'heading':title,'page_obj':page,'pagination_query':params.urlencode(),
-         'back_url':reverse('makken_home')+'?'+link(report,'cards').partition('?')[2], 'filter_error':error}
+         'back_url':reverse('core:dashboard')+'?'+link(report,'cards').partition('?')[2], 'filter_error':error}
     return add_login_headers(render(request,'core/dashboard/records.html',ctx,status=400 if error else 200))

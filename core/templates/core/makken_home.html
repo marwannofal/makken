@@ -1,7 +1,7 @@
 {% extends 'core/makken_base.html' %}
 {% load static dashboard_tags tz %}
 {% block title %}
-  الرئيسية · لوحة متابعة مكّن
+  مركز المؤشرات والتحليلات | مكّن
 {% endblock %}
 {% block extra_head %}
   <link rel="stylesheet" href="{% static 'care_states/states.css' %}">
@@ -16,7 +16,7 @@
   <div class="dash-page ac-workspace">
     <section class="dash-hero" aria-labelledby="dashboard-heading">
       <div>
-        <p class="eyebrow">مكّن · من الاحتياج إلى الأثر</p><h1 id="dashboard-heading">لوحة المتابعة</h1><p>أهلًا {{ display_name }}، نظرة واضحة على الاحتياجات والتمويل والتنفيذ.</p><time class="dash-update" datetime="{{ generated_at|date:'c' }}">وقت تحديث اللوحة: <bdi>
+        <p class="eyebrow">مكّن · من الاحتياج إلى الأثر</p><h1 id="dashboard-heading">مركز المؤشرات والتحليلات</h1><p>أهلًا {{ display_name }}، نظرة واضحة على الاحتياجات والتمويل والتنفيذ.</p><time class="dash-update" datetime="{{ generated_at|date:'c' }}">وقت تحديث اللوحة: <bdi>
         {% timezone dashboard_timezone %}
           {{ generated_at|date:'d/m/Y H:i:s' }}
         {% endtimezone %}
@@ -41,7 +41,7 @@
       {% if not dashboard.valid %}
         <p class="feedback feedback-error" role="alert">راجع الفلاتر أدناه. لا تعرض اللوحة نتائج خارج الاختيارات الصحيحة.</p>
       {% endif %}
-      <form method="get" action="{% url 'makken_home' %}" class="dash-filters" data-dashboard-filters>
+      <form method="get" action="{% url 'core:dashboard' %}" class="dash-filters" data-dashboard-filters>
         {% for field in filter_form %}
           {% if field.name != 'date_from' and field.name != 'date_to' %}
             {% include 'access_control/_field.html' with field=field %}
@@ -52,7 +52,7 @@
           {% include 'access_control/_field.html' with field=filter_form.date_to %}
         </div>
         <div class="dash-filter-actions">
-          <button class="button button-primary" type="submit"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg>تطبيق الفلاتر</button><a class="button button-secondary" href="{% url 'makken_home' %}">إعادة ضبط</a>
+          <button class="button button-primary" type="submit"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg>تطبيق الفلاتر</button><a class="button button-secondary" href="{% url 'core:dashboard' %}">إعادة ضبط</a>
         </div>
         <p class="dash-filter-note">المؤشرات الأساسية تصف الحالة الحالية للبطاقات المنشأة خلال الفترة المختارة. رسوم اعتماد الدعم واكتمال التنفيذ تستخدم تاريخ الحدث نفسه. جميع الحدود بتوقيت الرياض.</p><p class="dash-filter-note" data-filter-message role="status"></p>
       </form>

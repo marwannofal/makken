@@ -1,0 +1,28 @@
+{% extends "core/makken_base.html" %}
+{% load static %}
+{% block title %}الرئيسية | منصة مكّن{% endblock %}
+{% block extra_head %}
+  <link rel="stylesheet" href="{% static 'core/css/makken-landing-home.css' %}?v=20261121-1">
+{% endblock %}
+{% block content %}
+  <section class="mk-hero-canvas" aria-labelledby="mk-hero-heading">
+    <div class="mk-hero-shapes" aria-hidden="true">
+      <span class="mk-hero-circle c-navy"></span>
+      <span class="mk-hero-circle c-teal"></span>
+      <span class="mk-hero-circle c-gold"></span>
+      <span class="mk-hero-circle c-sky"></span>
+    </div>
+    <div class="mk-hero-inner">
+      <p class="mk-hero-eyebrow">منظومة رقمية لإدارة الشراكات وبرامج الدعم</p>
+      <h1 id="mk-hero-heading" class="mk-hero-title">منصة مكّن</h1>
+      <p class="mk-hero-subtitle">من الشراكة إلى الأثر</p>
+      <div class="mk-hero-gold-rule" aria-hidden="true"></div>
+      <div class="mk-hero-pills">
+        <a class="mk-hero-pill pill-partnerships" href="{% url 'partnerships:willingness_index' %}">الشراكات</a>
+        <a class="mk-hero-pill pill-market" href="{% url 'market_needs:index' %}">حاجة السوق</a>
+        <a class="mk-hero-pill pill-execution" href="{% url 'core:dashboard' %}">التنفيذ والمتابعة</a>
+      </div>
+      <p class="mk-hero-footer-copy">من إدارة الشراكات وتحديد احتياجات السوق إلى تنفيذ البرامج ومتابعة الإنجاز وقياس النتائج</p>
+    </div>
+  </section>
+{% endblock %}
