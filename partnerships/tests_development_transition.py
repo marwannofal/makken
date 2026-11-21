@@ -53,7 +53,7 @@ class DevelopmentTransitionTests(TestCase):
             'attachments': [SimpleUploadedFile('agreement.pdf', data.getvalue(), content_type='application/pdf')],
             'clauses_json': json.dumps([{'clause_id': clause.pk, 'responsibility': Responsibility.SHARED}]),
             'work-title': 'متابعة تحويل الشراكة',
-            'work-assignees': [str(self.user.pk)],
+            'work-assignees': [str(self.other.pk)],
             'work-manager': str(self.user.pk),
         })
 

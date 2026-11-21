@@ -3,6 +3,9 @@
   if (window.MakkenRowActionsMenu) return;
 
   const DOTS_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>';
+  const TOGGLE_OFF_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6m0-6-6 6"/></svg>';
+  const TOGGLE_ON_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5"/></svg>';
+
   const ACTION_CONTAINER_SELECTOR = [
     'table tbody td .row-actions',
     'table tbody td .level-row-actions',
@@ -15,6 +18,18 @@
     'table tbody td .sponsorship-shape-row-actions',
   ].join(', ');
 
+  const STATUS_BTN_SELECTOR = [
+    'button.record-status',
+    'button.level-status',
+    'button.entity-status',
+    'button.region-status',
+    'button.sector-status',
+    'button.specialization-status',
+    'button.expense-item-status',
+    'button.program-status',
+    'button.sponsorship-shape-status',
+  ].join(', ');
+
   let openMenu = null;
   let backdrop = null;
 
@@ -23,7 +38,7 @@
     backdrop = document.createElement('div');
     backdrop.className = 'mk-actions-backdrop';
     backdrop.setAttribute('aria-hidden', 'true');
-    backdrop.addEventListener('click', closeOpenMenu);
+    backdrop.addEventListener('click', () => closeOpenMenu(false));
     document.body.append(backdrop);
     return backdrop;
   }
@@ -52,12 +67,11 @@
     closeOpenMenu(false);
     const {wrapper, trigger, dropdown, row, scroll} = entry;
 
-    // Flip upward if near the bottom of the viewport or in the last 2 rows of a 3+ row table
     const tbody = row?.closest('tbody');
     const allRows = tbody ? [...tbody.rows] : [];
     const rowIndex = row ? allRows.indexOf(row) : -1;
     const rect = trigger.getBoundingClientRect();
-    const nearViewportBottom = window.innerHeight - rect.bottom < 220;
+    const nearViewportBottom = window.innerHeight - rect.bottom < 240;
     const isBottomRow = allRows.length >= 3 && rowIndex >= allRows.length - 2;
     dropdown.classList.toggle('is-dropup', nearViewportBottom || isBottomRow);
 
@@ -73,11 +87,71 @@
     openMenu = entry;
   }
 
-  function collectActionNodes(container) {
-    return [...container.children].filter(node => {
-      if (node.matches('a, button, form')) return true;
-      return false;
+  function createMenuWrapper(td) {
+    const existing = td.querySelector('.mk-actions-menu');
+    if (existing) {
+      return {
+        wrapper: existing,
+        dropdown: existing.querySelector('.mk-actions-dropdown'),
+      };
+    }
+
+    td.classList.add('mk-actions-cell');
+    const wrapper = document.createElement('div');
+    wrapper.className = 'mk-actions-menu';
+
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'mk-actions-trigger';
+    trigger.setAttribute('aria-haspopup', 'menu');
+    trigger.setAttribute('aria-expanded', 'false');
+    trigger.setAttribute('aria-label', 'خيارات الإجراء');
+    trigger.title = 'خيارات الإجراء';
+    trigger.innerHTML = DOTS_SVG;
+
+    const dropdown = document.createElement('div');
+    dropdown.className = 'mk-actions-dropdown';
+    dropdown.setAttribute('role', 'menu');
+    dropdown.hidden = true;
+
+    wrapper.append(trigger, dropdown);
+
+    const entry = {
+      wrapper,
+      trigger,
+      dropdown,
+      row: td.closest('tr'),
+      scroll: td.closest('.table-scroll, .table-wrapper, .states-table-wrapper, .table-responsive'),
+    };
+
+    trigger.addEventListener('click', event => {
+      event.preventDefault();
+      event.stopPropagation();
+      toggleMenu(entry);
     });
+
+    dropdown.addEventListener('click', event => {
+      event.stopPropagation();
+      const clickedAction = event.target.closest('a, button');
+      if (clickedAction) {
+        closeOpenMenu(false);
+      }
+    });
+
+    return {wrapper, dropdown};
+  }
+
+  function collectActionNodes(container) {
+    return [...container.children].filter(node => node.matches('a, button, form'));
+  }
+
+  function formatStatusToggleButton(btn) {
+    if (!btn || btn.dataset.mkStatusRelabeled === '1') return;
+    btn.dataset.mkStatusRelabeled = '1';
+    const isActive = btn.classList.contains('status-active') || btn.classList.contains('is-enabled');
+    btn.classList.add('mk-toggle-action');
+    btn.innerHTML = (isActive ? TOGGLE_OFF_SVG : TOGGLE_ON_SVG)
+      + '<span>' + (isActive ? 'إيقاف التفعيل' : 'تفعيل السجل') + '</span>';
   }
 
   function wrapContainer(container) {
@@ -89,56 +163,21 @@
 
     container.dataset.mkMenuEnhanced = '1';
     const td = container.closest('td');
-    if (td) td.classList.add('mk-actions-cell');
+    if (!td) return;
 
-    const wrapper = document.createElement('div');
-    wrapper.className = 'mk-actions-menu';
-
-    const trigger = document.createElement('button');
-    trigger.type = 'button';
-    trigger.className = 'mk-actions-trigger';
-    trigger.setAttribute('aria-haspopup', 'menu');
-    trigger.setAttribute('aria-expanded', 'false');
-    trigger.setAttribute('aria-label', 'خيارات الإجراء');
-    trigger.title = 'خيارات الإجراء';
-    trigger.innerHTML = DOTS_SVG;
-
-    const dropdown = document.createElement('div');
-    dropdown.className = 'mk-actions-dropdown';
-    dropdown.setAttribute('role', 'menu');
-    dropdown.hidden = true;
-
-    // Move live DOM nodes (preserving all event listeners, CSRF tokens, and form behavior)
+    const {wrapper, dropdown} = createMenuWrapper(td);
     nodes.forEach(node => {
+      const statusBtn = node.matches('form') ? node.querySelector(STATUS_BTN_SELECTOR) : (node.matches(STATUS_BTN_SELECTOR) ? node : null);
+      if (statusBtn) formatStatusToggleButton(statusBtn);
       node.setAttribute('role', 'menuitem');
       dropdown.append(node);
     });
 
-    wrapper.append(trigger, dropdown);
-    container.replaceWith(wrapper);
-
-    const entry = {
-      wrapper,
-      trigger,
-      dropdown,
-      row: wrapper.closest('tr'),
-      scroll: wrapper.closest('.table-scroll, .table-wrapper, .states-table-wrapper, .table-responsive'),
-    };
-
-    trigger.addEventListener('click', event => {
-      event.preventDefault();
-      event.stopPropagation();
-      toggleMenu(entry);
-    });
-
-    dropdown.addEventListener('click', event => {
-      event.stopPropagation();
-      const clickedAction = event.target.closest('a, button');
-      if (clickedAction) {
-        // Close menu cleanly after triggering link/modal/form action
-        closeOpenMenu(false);
-      }
-    });
+    if (!wrapper.isConnected) {
+      container.replaceWith(wrapper);
+    } else {
+      container.remove();
+    }
   }
 
   function enhanceDirectActionCell(td) {
@@ -149,53 +188,58 @@
     if (!nodes.length) return;
 
     td.dataset.mkMenuEnhanced = '1';
-    td.classList.add('mk-actions-cell');
-
-    const wrapper = document.createElement('div');
-    wrapper.className = 'mk-actions-menu';
-
-    const trigger = document.createElement('button');
-    trigger.type = 'button';
-    trigger.className = 'mk-actions-trigger';
-    trigger.setAttribute('aria-haspopup', 'menu');
-    trigger.setAttribute('aria-expanded', 'false');
-    trigger.setAttribute('aria-label', 'خيارات الإجراء');
-    trigger.title = 'خيارات الإجراء';
-    trigger.innerHTML = DOTS_SVG;
-
-    const dropdown = document.createElement('div');
-    dropdown.className = 'mk-actions-dropdown';
-    dropdown.setAttribute('role', 'menu');
-    dropdown.hidden = true;
-
+    const {wrapper, dropdown} = createMenuWrapper(td);
     nodes.forEach(node => {
+      const statusBtn = node.matches('form') ? node.querySelector(STATUS_BTN_SELECTOR) : (node.matches(STATUS_BTN_SELECTOR) ? node : null);
+      if (statusBtn) formatStatusToggleButton(statusBtn);
       node.setAttribute('role', 'menuitem');
       dropdown.append(node);
     });
-
-    wrapper.append(trigger, dropdown);
     td.append(wrapper);
+  }
 
-    const entry = {
-      wrapper,
-      trigger,
-      dropdown,
-      row: wrapper.closest('tr'),
-      scroll: wrapper.closest('.table-scroll, .table-wrapper, .states-table-wrapper, .table-responsive'),
-    };
+  function moveRowStatusTogglesIntoMenu(main) {
+    main.querySelectorAll('table tbody tr').forEach(tr => {
+      if (tr.closest('dialog, template, [data-ac-matrix]')) return;
+      const statusForms = [...tr.querySelectorAll('td form')].filter(form => {
+        if (form.dataset.mkStatusMoved === '1') return false;
+        if (form.closest('.mk-actions-menu, .mk-actions-dropdown')) return false;
+        return Boolean(form.querySelector(STATUS_BTN_SELECTOR));
+      });
+      if (!statusForms.length) return;
 
-    trigger.addEventListener('click', event => {
-      event.preventDefault();
-      event.stopPropagation();
-      toggleMenu(entry);
-    });
+      // Target the row's action cell (prefer existing .mk-actions-menu, or td.action-cell, or last td)
+      let actionTd = tr.querySelector('.mk-actions-menu')?.closest('td')
+        || tr.querySelector('td.action-cell')
+        || tr.cells[tr.cells.length - 1];
+      if (!actionTd) return;
 
-    dropdown.addEventListener('click', event => {
-      event.stopPropagation();
-      const clickedAction = event.target.closest('a, button');
-      if (clickedAction) {
-        closeOpenMenu(false);
+      const {wrapper, dropdown} = createMenuWrapper(actionTd);
+      if (!wrapper.isConnected) {
+        actionTd.append(wrapper);
       }
+
+      statusForms.forEach(form => {
+        const btn = form.querySelector(STATUS_BTN_SELECTOR);
+        if (!btn) return;
+        form.dataset.mkStatusMoved = '1';
+
+        // Leave a clean non-clickable status pill in the original status column
+        const pill = document.createElement('span');
+        pill.className = btn.className;
+        pill.innerHTML = btn.innerHTML;
+        form.before(pill);
+
+        // Relabel and move the live form (preserving CSRF & signed token) into the ⋮ menu
+        formatStatusToggleButton(btn);
+        form.setAttribute('role', 'menuitem');
+        const deleteItem = dropdown.querySelector('.delete-action, .action-delete, [class*="delete"]')?.closest('form, a, button');
+        if (deleteItem && deleteItem.parentElement === dropdown) {
+          dropdown.insertBefore(form, deleteItem);
+        } else {
+          dropdown.append(form);
+        }
+      });
     });
   }
 
@@ -204,6 +248,7 @@
     if (!main || !main.querySelectorAll) return;
     main.querySelectorAll(ACTION_CONTAINER_SELECTOR).forEach(wrapContainer);
     main.querySelectorAll('table tbody td.action-cell').forEach(enhanceDirectActionCell);
+    moveRowStatusTogglesIntoMenu(main);
   }
 
   document.addEventListener('click', event => {

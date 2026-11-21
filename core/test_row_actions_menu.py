@@ -61,3 +61,6 @@ class RowActionsMenuTests(TestCase):
         self.assertIn('MutationObserver', js)
         self.assertIn("event.key === 'Escape'", js)
         self.assertIn('stopPropagation()', js)
+        self.assertIn('moveRowStatusTogglesIntoMenu', js)
+        self.assertIn('إيقاف التفعيل', js)
+        self.assertIn('تفعيل السجل', js)
