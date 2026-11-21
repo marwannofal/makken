@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{% static 'core/css/makken-home.css' %}?v=20261121-blue8">
-  <script src="{% static 'core/js/makken-home.js' %}?v=20261121-clock1" defer></script>
+  <link rel="stylesheet" href="{% static 'core/css/makken-home.css' %}?v=20261121-blue9">
+  <script src="{% static 'core/js/makken-home.js' %}?v=20261121-clock2" defer></script>
   {% block extra_head %}{% endblock %}
   <!-- BEGIN MAKKEN SIDEBAR MANAGEMENT -->
   <link rel="stylesheet" href="{% static 'core/css/makken-sidebar-management.css' %}?v=20261121-blue6">
@@ -40,9 +40,12 @@
   <a class="skip-link" href="#main-content">انتقل إلى المحتوى</a>
   {% include "core/partials/makken_icons.html" %}
   <div class="app-layout">
-    <aside class="desktop-sidebar sidebar" aria-label="القائمة الرئيسية">
+    <aside class="desktop-sidebar sidebar" id="desktop-sidebar" aria-label="القائمة الرئيسية">
       {% include "core/partials/makken_sidebar.html" %}
     </aside>
+    <button class="mk-sidebar-toggle" type="button" data-sidebar-toggle aria-controls="desktop-sidebar" aria-expanded="true" aria-label="إخفاء القائمة الجانبية" title="إخفاء / إظهار القائمة الجانبية">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+    </button>
     <div class="workspace">
       <header class="topbar">
         <div class="page-location">

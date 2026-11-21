@@ -76,3 +76,27 @@
   renderClock();
   setInterval(renderClock, 15000);
 })();
+
+
+(function () {
+  const btn = document.querySelector('[data-sidebar-toggle]');
+  if (!btn) return;
+  const KEY = 'makken_sidebar_collapsed_v1';
+
+  function applyState(collapsed) {
+    document.body.classList.toggle('mk-sidebar-collapsed', collapsed);
+    btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    btn.setAttribute('aria-label', collapsed ? 'إظهار القائمة الجانبية' : 'إخفاء القائمة الجانبية');
+    btn.setAttribute('title', collapsed ? 'إظهار القائمة الجانبية' : 'إخفاء القائمة الجانبية');
+  }
+
+  try {
+    if (localStorage.getItem(KEY) === '1') applyState(true);
+  } catch {}
+
+  btn.addEventListener('click', () => {
+    const next = !document.body.classList.contains('mk-sidebar-collapsed');
+    applyState(next);
+    try { localStorage.setItem(KEY, next ? '1' : '0'); } catch {}
+  });
+})();
