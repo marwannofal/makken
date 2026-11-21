@@ -64,3 +64,69 @@ class RowActionsMenuTests(TestCase):
         self.assertIn('moveRowStatusTogglesIntoMenu', js)
         self.assertIn('إيقاف التفعيل', js)
         self.assertIn('تفعيل السجل', js)
+
+    def test_row_click_navigation_is_removed_across_all_site_scripts(self):
+        base = Path(settings.BASE_DIR)
+        partnerships_js = (base / 'partnerships' / 'static' / 'partnerships' / 'partnerships.js').read_text(encoding='utf-8')
+        self.assertNotIn("$$('[data-partnership-row]')", partnerships_js)
+        self.assertNotIn('row.dataset.rowUrl', partnerships_js)
+
+        market_js = (base / 'market_needs' / 'static' / 'market_needs' / 'market.js').read_text(encoding='utf-8')
+        self.assertNotIn("$$('[data-market-row]')", market_js)
+
+        providers_js = (base / 'service_providers' / 'static' / 'service_providers' / 'providers.js').read_text(encoding='utf-8')
+        self.assertNotIn("$$('[data-provider-row]')", providers_js)
+
+        execution_js = (base / 'market_needs' / 'static' / 'market_needs' / 'execution.js').read_text(encoding='utf-8')
+        self.assertIn('[data-execution-dialog]:not(tr)', execution_js)
+
+    def test_dots_menu_adds_view_action_with_eye_icon_and_resets_row_cursor(self):
+        base = Path(settings.BASE_DIR)
+        js = (base / 'core' / 'static' / 'core' / 'js' / 'makken-row-actions-menu.js').read_text(encoding='utf-8')
+        self.assertIn('EYE_SVG', js)
+        self.assertIn('moveRowDetailLinksIntoMenu', js)
+        self.assertIn('مشاهدة', js)
+        self.assertIn('mk-view-action', js)
+        self.assertIn('data-row-url', js)
+        self.assertIn('data-url', js)
+        self.assertIn('data-execution-dialog', js)
+
+        css = (base / 'core' / 'static' / 'core' / 'css' / 'makken-row-actions-menu.css').read_text(encoding='utf-8')
+        self.assertIn('cursor: default !important;', css)
+        self.assertIn('.mk-view-action', css)
+
+    def test_operational_tables_expose_detail_urls_for_dots_menu_view_action(self):
+        from entities.models import Entity
+        from partnerships.models import Partnership
+        from service_providers.models import ServiceProvider
+
+        entity = Entity.objects.create(name='جهة اختبار المشاهدة', entity_type='government', is_active=True)
+        p = Partnership.objects.create(
+            name='شراكة اختبار المشاهدة',
+            representative='ممثل',
+            phone_country='SA',
+            phone='+966501234567',
+            email='viewtest@makken.test',
+            entity=entity,
+            scope='local',
+            development_state_id='capability',
+            is_active=True,
+        )
+        sp = ServiceProvider.objects.create(
+            name='مزود اختبار المشاهدة',
+            phone='+966501234568',
+            email='spview@makken.test',
+            provider_type='government',
+            scope='local',
+            is_active=True,
+        )
+
+        p_res = self.client.get(reverse('partnerships:capability_index'))
+        self.assertEqual(p_res.status_code, 200)
+        self.assertContains(p_res, f'detail={p.pk}')
+        self.assertContains(p_res, 'makken-row-actions-menu.js')
+
+        sp_res = self.client.get(reverse('service_providers:index'))
+        self.assertEqual(sp_res.status_code, 200)
+        self.assertContains(sp_res, f'detail={sp.pk}')
+        self.assertContains(sp_res, 'makken-row-actions-menu.js')

@@ -19,7 +19,6 @@
   let busy = false, confirmationCancel = null;
   $$('[data-market-close]').forEach(b => b.addEventListener('click', () => {if (!busy) {const dialog=b.closest('dialog');if(dialog.id==='market-confirm'){const cancel=confirmationCancel;confirmationCancel=null;confirmationAction=null;cancel?.();}dialog.close();}}));
   $$('[data-market-server]').forEach(d => {d.removeAttribute('open');show(d);if(d.dataset.closeUrl)d.addEventListener('cancel', e=>{e.preventDefault();location.assign(d.dataset.closeUrl);});});
-  $$('[data-market-row]').forEach(row=>row.addEventListener('click',e=>{if(!e.target.closest('a,button,input,select,label,form')&&!getSelection()?.toString())location.assign(row.dataset.url);}));
   const confirmation = $('#market-confirm');
   let confirmationAction = null;
   function ask(text, callback, danger=false, cancel=null) {

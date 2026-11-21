@@ -2,6 +2,7 @@
   'use strict';
   if (window.MakkenRowActionsMenu) return;
 
+  const EYE_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>';
   const DOTS_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>';
   const TOGGLE_OFF_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6m0-6-6 6"/></svg>';
   const TOGGLE_ON_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5"/></svg>';
@@ -243,12 +244,77 @@
     });
   }
 
+
+  function ensureRowActionCell(tr) {
+    const existingMenuTd = tr.querySelector('.mk-actions-menu')?.closest('td');
+    if (existingMenuTd) return existingMenuTd;
+    const explicitTd = tr.querySelector('td.action-cell, td.mk-actions-cell');
+    if (explicitTd) return explicitTd;
+    const table = tr.closest('table');
+    if (table) {
+      const headRow = table.querySelector('thead tr');
+      if (headRow && !headRow.querySelector('th.action-cell, th.mk-auto-action-th')) {
+        const th = document.createElement('th');
+        th.scope = 'col';
+        th.className = 'action-cell mk-auto-action-th';
+        th.textContent = 'الإجراء';
+        headRow.append(th);
+      }
+    }
+    const td = document.createElement('td');
+    td.className = 'action-cell';
+    tr.append(td);
+    return td;
+  }
+
+  function moveRowDetailLinksIntoMenu(main) {
+    main.querySelectorAll('table tbody tr[data-row-url], table tbody tr[data-url], table tbody tr[data-execution-dialog]').forEach(tr => {
+      if (tr.dataset.mkViewAdded === '1') return;
+      if (tr.closest('dialog, template, [data-ac-matrix]')) return;
+      const detailUrl = tr.dataset.rowUrl || tr.dataset.url || '';
+      const dialogId = tr.dataset.executionDialog || '';
+      if (!detailUrl && !dialogId) return;
+
+      tr.dataset.mkViewAdded = '1';
+      const actionTd = ensureRowActionCell(tr);
+      const {wrapper, dropdown} = createMenuWrapper(actionTd);
+      if (!wrapper.isConnected) {
+        actionTd.append(wrapper);
+      }
+      if (dropdown.querySelector('.mk-view-action')) return;
+
+      let item;
+      if (detailUrl) {
+        item = document.createElement('a');
+        item.href = detailUrl;
+        item.className = 'mk-view-action';
+        item.setAttribute('role', 'menuitem');
+        item.innerHTML = EYE_SVG + '<span>مشاهدة</span>';
+      } else {
+        item = document.createElement('button');
+        item.type = 'button';
+        item.className = 'mk-view-action';
+        item.setAttribute('role', 'menuitem');
+        item.innerHTML = EYE_SVG + '<span>مشاهدة</span>';
+        item.addEventListener('click', () => {
+          const dlg = document.getElementById(dialogId);
+          if (dlg && !dlg.open) {
+            dlg._marketReturn = document.activeElement;
+            dlg.showModal();
+          }
+        });
+      }
+      dropdown.prepend(item);
+    });
+  }
+
   function enhanceAll(root = document) {
     const main = root.querySelector?.('#main-content') || root;
     if (!main || !main.querySelectorAll) return;
     main.querySelectorAll(ACTION_CONTAINER_SELECTOR).forEach(wrapContainer);
     main.querySelectorAll('table tbody td.action-cell').forEach(enhanceDirectActionCell);
     moveRowStatusTogglesIntoMenu(main);
+    moveRowDetailLinksIntoMenu(main);
   }
 
   document.addEventListener('click', event => {

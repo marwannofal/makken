@@ -253,3 +253,25 @@
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+
+
+/* Disable clickable-row pointer cursor site-wide; detail view lives under ⋮ as مشاهدة */
+:root .main-content table tbody tr[data-partnership-row],
+:root .main-content table tbody tr[data-market-row],
+:root .main-content table tbody tr[data-provider-row],
+:root .main-content table tbody tr[data-execution-dialog] {
+  cursor: default !important;
+}
+
+.mk-actions-dropdown .mk-view-action {
+  color: #005b85 !important;
+  font-weight: 700;
+}
+
+.mk-actions-dropdown .mk-view-action svg {
+  stroke: #005b85;
+  fill: none;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
