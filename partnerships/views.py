@@ -472,8 +472,11 @@ def _search(query, term):
 @module_view('partnerships')
 @login_required(login_url="accounts:login")
 @require_http_methods(["GET", "POST"])
-def index(request, fixed_state=None):
-    if fixed_state == DevelopmentState.CAPABILITY:
+def index(request, fixed_state=None, read_only=False):
+    if read_only:
+        heading, active_nav = "جميع الشراكات", "partnerships_all"
+        add_url, reset_url = "", reverse("partnerships:all_index")
+    elif fixed_state == DevelopmentState.CAPABILITY:
         heading, active_nav = "إدارة سجل شراكات القدرة", "partnerships_capability"
         add_url, reset_url = reverse("partnerships:create"), reverse("partnerships:capability_index")
     elif fixed_state == DevelopmentState.WILLINGNESS:
@@ -657,7 +660,7 @@ def index(request, fixed_state=None):
     if detail:
         from agreement_clauses.workflow import partnership_panel
         context["clause_panel"] = partnership_panel(detail)
-    context.update(rows=rows, page_obj=page, highlighted_pk=highlighted_pk, q=q, selected_status=active, pending=pending, detail=detail, history=_history(detail), result_query=result_query, list_url=reset_url + "?" + result_query, add_url=add_url, reset_url=reset_url, hide_development_filter=bool(fixed_state), show_agreement_number=(fixed_state == DevelopmentState.WILLINGNESS))
+    context.update(rows=rows, page_obj=page, highlighted_pk=highlighted_pk, q=q, selected_status=active, pending=pending, detail=detail, history=_history(detail), result_query=result_query, list_url=reset_url + "?" + result_query, add_url=add_url, read_only=read_only, reset_url=reset_url, hide_development_filter=bool(fixed_state), show_agreement_number=(fixed_state == DevelopmentState.WILLINGNESS))
     return add_login_headers(render(request, "partnerships/index.html", context, status=status))
 
 
@@ -673,6 +676,13 @@ def capability_index(request):
 @require_http_methods(["GET", "POST"])
 def willingness_index(request):
     return index(request, fixed_state=DevelopmentState.WILLINGNESS)
+
+
+@module_view('partnerships')
+@login_required(login_url="accounts:login")
+@require_http_methods(["GET", "HEAD"])
+def all_index(request):
+    return index(request, fixed_state=None, read_only=True)
 
 
 @module_view('partnerships')

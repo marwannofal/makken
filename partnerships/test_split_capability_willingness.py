@@ -128,3 +128,37 @@ class SplitCapabilityWillingnessPagesTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertContains(res, '<th scope="col">فرع الكيان</th>', html=True)
         self.assertNotContains(res, '<th scope="col">الكيان / فرعه</th>', html=True)
+
+    def test_all_partnerships_page_lists_all_states_and_statuses_read_only(self):
+        p_care = Partnership.objects.create(
+            name='جهة رعاية مستقلة',
+            representative='عمر',
+            phone='0503333333',
+            email='care@example.com',
+            entity=self.entity,
+            scope='local',
+            development_state_id=DevelopmentState.CARE,
+            is_active=True,
+        )
+        p_inactive = Partnership.objects.create(
+            name='جهة غير نشطة مستقلة',
+            representative='فيصل',
+            phone='0504444444',
+            email='inactive@example.com',
+            entity=self.entity,
+            scope='local',
+            development_state_id=DevelopmentState.CAPABILITY,
+            is_active=False,
+        )
+        self.client.force_login(self.admin, backend=AUTH_BACKEND)
+        url = reverse('partnerships:all_index')
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, 'جميع الشراكات')
+        for obj in (self.p_cap, self.p_will, p_care, p_inactive):
+            self.assertContains(res, obj.name)
+        self.assertNotContains(res, 'إضافة جهة جديدة')
+        self.assertNotContains(res, 'delete-action')
+        self.assertNotContains(res, 'تحويل إلى رغبة')
+        self.assertContains(res, 'مشاهدة')
+        self.assertEqual(self.client.post(url, {'action': 'preview'}).status_code, 405)

@@ -24,9 +24,11 @@
     <div>
       <p class="eyebrow">الإدارة · الشراكات</p><h1>{{ page_heading }}</h1><p class="page-description">جهات محتملة، فرص مترابطة، وخطوة أولى نحو شراكة مؤثرة.</p>
     </div>
-    {% allowed 'partnerships' 'create' %}
-      <a class="button button-primary" href="{{ add_url }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>إضافة جهة جديدة</a>
-    {% endallowed %}
+    {% if not read_only %}
+      {% allowed 'partnerships' 'create' %}
+        <a class="button button-primary" href="{{ add_url }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>إضافة جهة جديدة</a>
+      {% endallowed %}
+    {% endif %}
   </section>
   {% if error %}
     <div class="feedback feedback-error" role="alert">
@@ -81,18 +83,7 @@
               <th scope="row"><a class="record-link" href="?{{ result_query }}&amp;detail={{ row.item.pk }}"><bdi>{{ row.item.name }}</bdi></a></th><td><bdi>{% if row.item.entity.branch %}{{ row.item.entity.get_branch_display }}{% else %}{{ row.item.entity.get_entity_type_display }}{% endif %}</bdi></td><td>{{ row.item.get_scope_display }}</td><td class="development-state-cell" data-development-cell>{% development_pill row.item.development_state %}</td><td><bdi dir="ltr">{{ row.item.phone }}</bdi></td><td><bdi>{{ row.item.email }}</bdi></td><td class="financial-capacity-cell" data-financial-capacity-cell>
               {% include "partnerships/_financial_value.html" with amount=row.item.financial_capacity %}
               </td>{% if show_agreement_number %}<td data-followup-cell="{{ row.item.pk }}">{% if row.item.followup_updated_at %}{% timezone "Asia/Riyadh" %}<bdi dir="ltr">{{ row.item.followup_updated_at|date:"d/m/Y H:i" }}</bdi>{% endtimezone %}<small>{{ row.item.followup_updated_by.get_full_name|default:row.item.followup_updated_by.username|default:"" }}</small>{% else %}—{% endif %}</td>{% endif %}<td>
-              {% allowed 'partnerships' 'change_status' row.item %}
-                <form method="post">
-                  {% csrf_token %}
-                  <input type="hidden" name="action" value="preview"><input type="hidden" name="token" value="{{ row.toggle }}"><button type="submit" class="record-status{% if row.item.is_active %} is-enabled{% else %} is-disabled{% endif %}" aria-label="تغيير حالة {{ row.item.name }}">
-                  {% if row.item.is_active %}
-                    نشط
-                  {% else %}
-                    غير نشط
-                  {% endif %}
-                  </button>
-                </form>
-              {% elseallowed %}
+              {% if read_only %}
                 <span class="record-status{% if row.item.is_active %} is-enabled{% else %} is-disabled{% endif %}">
                 {% if row.item.is_active %}
                   نشط
@@ -100,9 +91,33 @@
                   غير نشط
                 {% endif %}
                 </span>
-              {% endallowed %}
+              {% else %}
+                {% allowed 'partnerships' 'change_status' row.item %}
+                  <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="preview"><input type="hidden" name="token" value="{{ row.toggle }}"><button type="submit" class="record-status{% if row.item.is_active %} is-enabled{% else %} is-disabled{% endif %}" aria-label="تغيير حالة {{ row.item.name }}">
+                    {% if row.item.is_active %}
+                      نشط
+                    {% else %}
+                      غير نشط
+                    {% endif %}
+                    </button>
+                  </form>
+                {% elseallowed %}
+                  <span class="record-status{% if row.item.is_active %} is-enabled{% else %} is-disabled{% endif %}">
+                  {% if row.item.is_active %}
+                    نشط
+                  {% else %}
+                    غير نشط
+                  {% endif %}
+                  </span>
+                {% endallowed %}
+              {% endif %}
               </td><td>
               <div class="row-actions">
+                {% if read_only %}
+                  <a class="row-action" href="?{{ result_query }}&amp;detail={{ row.item.pk }}" aria-label="مشاهدة {{ row.item.name }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>مشاهدة</a>
+                {% else %}
                 {% if row.advance %}
                   {% allowed 'partnerships' 'change_status' row.item %}
                     <form method="post" class="development-transition-form">
@@ -127,6 +142,7 @@
                     <input type="hidden" name="action" value="preview"><input type="hidden" name="token" value="{{ row.delete }}"><button class="row-action delete-action" type="submit" aria-label="حذف {{ row.item.name }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7"/></svg>حذف</button>
                   </form>
                 {% endallowed %}
+                {% endif %}
               </div>
               </td>
             </tr>
