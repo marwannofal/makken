@@ -187,3 +187,140 @@ class SponsorRegistrationUS15Tests(TestCase):
             self.client.post(reverse('partnerships:sponsor_request_review', args=[req_b.pk]), {'operation': 'approve'}).status_code,
             403,
         )
+
+
+    def test_public_register_capability_fields_receipt_email_and_admin_notification_rule(self):
+        import json
+        from unittest.mock import patch
+        from makken_mail.models import Delivery, EventRule, SMTPConfig
+        from makken_mail.worker import build_context
+        from specializations.models import Specialization
+
+        spec = Specialization.objects.create(name='تخصص الذكاء الاصطناعي للاختبار', sector=self.sector)
+        SMTPConfig.objects.update_or_create(
+            pk=1,
+            defaults={'host': 'smtp.example.org', 'sender': 'makken@example.org', 'enabled': True},
+        )
+        rule, _ = EventRule.objects.get_or_create(code='sponsor_request.submitted')
+        rule.enabled = True
+        rule.save()
+        rule.recipients.add(self.admin)
+
+        sent_receipts = []
+        def fake_send(config, address, context, message_id):
+            sent_receipts.append((address, context))
+
+        offerings_payload = json.dumps([
+            {'sector': self.sector.pk, 'specializations': [spec.pk], 'shape': self.shape.pk}
+        ])
+        with patch('makken_mail.smtp.send', side_effect=fake_send):
+            res = self.client.post(
+                reverse('partnerships:public_sponsor_register'),
+                {
+                    'name': 'شركة المستقبل للتدريب',
+                    'representative': 'عبدالرحمن العتيبي',
+                    'phone_country': 'SA',
+                    'phone': '0551234567',
+                    'email': 'future-sponsor@example.org',
+                    'entity_type': self.entity.entity_type,
+                    'entity': self.entity.pk,
+                    'scope': 'local',
+                    'administrative_regions': [self.riyadh.pk],
+                    'offerings_json': offerings_payload,
+                    'financial_capacity': '250000',
+                    'notes': 'طلب شراكة تدريبية',
+                },
+            )
+        self.assertEqual(res.status_code, 302)
+        req = SponsorRegistrationRequest.objects.get(name='شركة المستقبل للتدريب')
+        self.assertEqual(req.phone_country, 'SA')
+        self.assertEqual(len(req.offerings), 1)
+        self.assertEqual(req.offerings[0]['specializations'], [spec.pk])
+
+        # 1. Sponsor received automatic confirmation receipt at their submitted email
+        self.assertEqual(len(sent_receipts), 1)
+        self.assertEqual(sent_receipts[0][0], 'future-sponsor@example.org')
+        self.assertIn(req.reference_code, dict(sent_receipts[0][1]['details']).values())
+
+        # 2. Admin notification rule queued a Delivery for configured recipients
+        delivery = Delivery.objects.get(rule_id='sponsor_request.submitted', recipient=self.admin)
+        ctx = build_context(delivery, None)
+        self.assertEqual(dict(ctx['details'])['رقم الطلب'], req.reference_code)
+
+        # 3. Approving converts into a قدرة Partnership carrying all offerings & specializations
+        self.client.force_login(self.admin, backend='accounts.backends.EmailOrUsernameBackend')
+        with patch('makken_mail.smtp.send'):
+            app_res = self.client.post(
+                reverse('partnerships:sponsor_request_review', args=[req.pk]),
+                {'operation': 'approve'},
+            )
+        self.assertEqual(app_res.status_code, 302)
+        req.refresh_from_db()
+        self.assertEqual(req.status, 'approved')
+        p = req.created_partnership
+        self.assertIsNotNone(p)
+        self.assertEqual(p.development_state_id, 'capability')
+        off = p.offerings.first()
+        self.assertIsNotNone(off)
+        self.assertEqual(list(off.specializations.values_list('pk', flat=True)), [spec.pk])
+
+
+    def test_public_register_partnership_type_and_attachments_prefill_willingness_transition(self):
+        import io
+        from unittest.mock import patch
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        from PIL import Image
+        from partnerships.models import PartnershipType
+        from partnerships.willingness import WillingnessTransitionForm
+
+        ptype, _ = PartnershipType.objects.get_or_create(name='مذكرة تفاهم')
+        buf = io.BytesIO()
+        Image.new('RGB', (40, 40), color=(36, 179, 175)).save(buf, format='PNG')
+        upload = SimpleUploadedFile('sponsor-doc.png', buf.getvalue(), content_type='image/png')
+
+        with patch('makken_mail.smtp.send'):
+            res = self.client.post(
+                reverse('partnerships:public_sponsor_register'),
+                {
+                    'name': 'شركة المرفقات الداعمة',
+                    'representative': 'خالد الحربي',
+                    'phone_country': 'SA',
+                    'phone': '0559876543',
+                    'email': 'att-sponsor@example.org',
+                    'entity_type': self.entity.entity_type,
+                    'entity': self.entity.pk,
+                    'scope': 'local',
+                    'administrative_regions': [self.riyadh.pk],
+                    'partnership_type': ptype.pk,
+                    'attachments': [upload],
+                },
+            )
+        self.assertEqual(res.status_code, 302)
+        req = SponsorRegistrationRequest.objects.get(name='شركة المرفقات الداعمة')
+        self.assertEqual(req.partnership_type_id, ptype.pk)
+        self.assertEqual(req.attachments.count(), 1)
+
+        # Admin downloads attachment & approves request into قدرة
+        self.client.force_login(self.admin, backend='accounts.backends.EmailOrUsernameBackend')
+        att = req.attachments.first()
+        dl = self.client.get(reverse('partnerships:sponsor_request_attachment_download', args=[req.pk, att.pk]))
+        self.assertEqual(dl.status_code, 200)
+        dl.close()
+
+        with patch('makken_mail.smtp.send'):
+            app_res = self.client.post(
+                reverse('partnerships:sponsor_request_review', args=[req.pk]),
+                {'operation': 'approve'},
+            )
+        self.assertEqual(app_res.status_code, 302)
+        req.refresh_from_db()
+        p = req.created_partnership
+        self.assertEqual(p.partnership_type_id, ptype.pk)
+        self.assertEqual(p.willingness_attachments.count(), 1)
+
+        # Converting that قدرة partnership to رغبة pre-fills partnership_type & satisfies attachments without re-upload
+        unbound = WillingnessTransitionForm(partnership=p)
+        self.assertEqual(unbound.fields['agreement_type'].initial, ptype.pk)
+        self.assertFalse(unbound.fields['attachments'].required)
+        bound = WillingnessTransitionForm({'agreement_type': str(ptype.pk)}, {}, partnership=p)
+        self.assertTrue(bound.is_valid(), bound.errors)

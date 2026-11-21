@@ -5,8 +5,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>تسجيل راعٍ جديد | مكّن</title>
-  <link rel="stylesheet" href="{% static 'partnerships/sponsor_requests.css' %}?v=20261121-blue1">
+  <link rel="stylesheet" href="{% static 'partnerships/sponsor_requests.css' %}?v=20261121-blue2">
   {% include "core/partials/accessibility_assets.html" %}
+  <script src="{% static 'partnerships/public_register.js' %}?v=20261121-blue2" defer></script>
 </head>
 <body class="pub-body">
   <main class="pub-shell">
@@ -14,7 +15,7 @@
       <div class="pub-brand">
         <span class="pub-badge">منصة مكّن</span>
         <h1>طلب شراكة جديدة لراعي جديد</h1>
-        <p>قدّم بيانات جهتك للانضمام إلى رعاة برامج المؤسسة العامة للتدريب التقني والمهني. ستتم مراجعة الطلب من الفريق المختص قبل اعتماده وإدراجه في سجل الشراكات.</p>
+        <p>قدّم بيانات جهتك للانضمام إلى رعاة برامج المؤسسة العامة للتدريب التقني والمهني. ستتم مراجعة الطلب من الفريق المختص قبل اعتماده وإدراجه في سجل شراكات القدرة.</p>
       </div>
       <a class="pub-back-link" href="{% url 'accounts:login' %}">العودة لتسجيل الدخول</a>
     </header>
@@ -28,9 +29,10 @@
       </div>
       {% endif %}
 
-      <form method="post" action="{% url 'partnerships:public_sponsor_register' %}" class="pub-form" novalidate>
+      <form method="post" action="{% url 'partnerships:public_sponsor_register' %}" class="pub-form" enctype="multipart/form-data" novalidate data-public-register-form>
         {% csrf_token %}
         <div class="pub-hp" aria-hidden="true">{{ form.website }}</div>
+        {{ form.offerings_json }}
 
         <div class="pub-grid">
           <div class="pub-field">
@@ -47,7 +49,11 @@
 
           <div class="pub-field">
             <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }} <span class="req">*</span></label>
-            {{ form.phone }}
+            <div class="pub-phone-row">
+              {{ form.phone_country }}
+              {{ form.phone }}
+            </div>
+            {% for err in form.phone_country.errors %}<span class="pub-err">{{ err }}</span>{% endfor %}
             {% for err in form.phone.errors %}<span class="pub-err">{{ err }}</span>{% endfor %}
           </div>
 
@@ -55,6 +61,12 @@
             <label for="{{ form.email.id_for_label }}">{{ form.email.label }} <span class="req">*</span></label>
             {{ form.email }}
             {% for err in form.email.errors %}<span class="pub-err">{{ err }}</span>{% endfor %}
+          </div>
+
+          <div class="pub-field">
+            <label for="{{ form.entity_type.id_for_label }}">{{ form.entity_type.label }} <span class="req">*</span></label>
+            {{ form.entity_type }}
+            {% for err in form.entity_type.errors %}<span class="pub-err">{{ err }}</span>{% endfor %}
           </div>
 
           <div class="pub-field">
@@ -70,52 +82,106 @@
           </div>
 
           <div class="pub-field">
-            <label for="{{ form.sector.id_for_label }}">{{ form.sector.label }}</label>
-            {{ form.sector }}
-            {% for err in form.sector.errors %}<span class="pub-err">{{ err }}</span>{% endfor %}
-          </div>
-
-          <div class="pub-field">
-            <label for="{{ form.sponsorship_shape.id_for_label }}">{{ form.sponsorship_shape.label }}</label>
-            {{ form.sponsorship_shape }}
-            {% for err in form.sponsorship_shape.errors %}<span class="pub-err">{{ err }}</span>{% endfor %}
-          </div>
-
-          <div class="pub-field">
             <label for="{{ form.financial_capacity.id_for_label }}">{{ form.financial_capacity.label }}</label>
             {{ form.financial_capacity }}
             {% for err in form.financial_capacity.errors %}<span class="pub-err">{{ err }}</span>{% endfor %}
           </div>
+
+          <div class="pub-field">
+            <label for="{{ form.partnership_type.id_for_label }}">{{ form.partnership_type.label }}</label>
+            {{ form.partnership_type }}
+            {% for err in form.partnership_type.errors %}<span class="pub-err">{{ err }}</span>{% endfor %}
+          </div>
         </div>
 
         <fieldset class="pub-regions">
-          <legend>{{ form.administrative_regions.label }} <small>(مطلوب للشراكة المحلية)</small></legend>
-          <div class="pub-region-grid">
-            {% for checkbox in form.administrative_regions %}
-            <label class="pub-region-item">{{ checkbox.tag }}<span>{{ checkbox.choice_label }}</span></label>
-            {% empty %}
-            <p class="pub-muted">لا توجد مناطق متاحة حاليًا.</p>
+          <legend>{{ form.administrative_regions.label }} <span class="pub-hint">(مطلوبة للنطاق المحلي)</span></legend>
+          <div class="pub-regions-grid">
+            {% for cb in form.administrative_regions %}
+            <label class="pub-check">{{ cb.tag }} <span>{{ cb.choice_label }}</span></label>
             {% endfor %}
           </div>
           {% for err in form.administrative_regions.errors %}<span class="pub-err">{{ err }}</span>{% endfor %}
         </fieldset>
 
-        <div class="pub-field pub-wide">
+        <section class="pub-offerings" aria-labelledby="pub-offerings-title">
+          <div class="pub-offerings-head">
+            <div>
+              <h3 id="pub-offerings-title">القطاعات والتخصصات وأشكال الرعاية</h3>
+              <p class="pub-hint">يمكنك إضافة قطاع واحد أو أكثر مع التخصصات وشكل الرعاية المناسب لجهتك.</p>
+            </div>
+            <button type="button" class="pub-btn-outline" data-pub-add-offering>+ إضافة قطاع وشكل رعاية</button>
+          </div>
+          {% for err in form.offerings_json.errors %}<span class="pub-err">{{ err }}</span>{% endfor %}
+          <div class="pub-offerings-list" data-pub-offerings-list>
+            <p class="pub-offerings-empty">لم تتم إضافة قطاعات وأشكال رعاية بعد.</p>
+          </div>
+        </section>
+
+        <section class="pub-offerings" aria-labelledby="pub-att-title">
+          <div class="pub-offerings-head">
+            <div>
+              <h3 id="pub-att-title">المرفقات الداعمة للشراكة (اختياري)</h3>
+              <p class="pub-hint">أرفق المستندات الداعمة (PDF، PNG، JPG، JPEG · حتى 100 MB لكل ملف). تُحفظ تلقائيًا وتُنقل مع الشراكة عند تحويلها إلى رغبة.</p>
+            </div>
+            <label class="pub-upload-btn" for="pub-attachments-input">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0-4 4m4-4 4 4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+              <span>اختيار المرفقات</span>
+              {{ form.attachments }}
+            </label>
+          </div>
+          <span class="pub-hint" data-pub-attachments-status>لم يتم اختيار ملفات بعد</span>
+          {% for err in form.attachments.errors %}<span class="pub-err">{{ err }}</span>{% endfor %}
+        </section>
+
+        <div class="pub-field pub-field-full">
           <label for="{{ form.notes.id_for_label }}">{{ form.notes.label }}</label>
           {{ form.notes }}
           {% for err in form.notes.errors %}<span class="pub-err">{{ err }}</span>{% endfor %}
         </div>
 
         <div class="pub-actions">
-          <button type="submit" class="pub-btn-primary">إرسال طلب التسجيل</button>
-          <a href="{% url 'accounts:login' %}" class="pub-btn-secondary">إلغاء</a>
+          <button type="submit" class="pub-submit">إرسال طلب التسجيل</button>
         </div>
       </form>
     </section>
-
-    <footer class="pub-footer">
-      <p>جميع الحقوق محفوظة لـ © المؤسسة العامة للتدريب التقني والمهني، 2026</p>
-    </footer>
   </main>
+
+  <dialog id="pub-offering-dialog" class="pub-dialog" aria-labelledby="pub-offering-dialog-title">
+    <div class="pub-dialog-card">
+      <div class="pub-dialog-head">
+        <h3 id="pub-offering-dialog-title">إضافة قطاع وشكل رعاية</h3>
+        <button type="button" class="pub-dialog-close" data-pub-close-dialog aria-label="إغلاق">×</button>
+      </div>
+      <div class="pub-toast" data-pub-offering-toast hidden role="status"></div>
+      <div class="pub-dialog-body">
+        <div class="pub-field">
+          <label for="pub-off-sector">القطاع <span class="req">*</span></label>
+          <select id="pub-off-sector" data-pub-off-sector>
+            <option value="">اختر القطاع</option>
+          </select>
+        </div>
+        <div class="pub-field">
+          <label>التخصصات المرتبطة بالقطاع</label>
+          <div class="pub-specs-box" data-pub-off-specs>
+            <span class="pub-hint">اختر القطاع أولًا لعرض التخصصات المرتبطة به.</span>
+          </div>
+        </div>
+        <div class="pub-field">
+          <label for="pub-off-shape">شكل الرعاية <span class="req">*</span></label>
+          <select id="pub-off-shape" data-pub-off-shape>
+            <option value="">اختر شكل الرعاية</option>
+          </select>
+        </div>
+        <span class="pub-err" data-pub-off-error hidden></span>
+      </div>
+      <div class="pub-dialog-actions">
+        <button type="button" class="pub-submit" data-pub-save-offering>إضافة للقائمة</button>
+        <button type="button" class="pub-btn-outline" data-pub-close-dialog>إغلاق</button>
+      </div>
+    </div>
+  </dialog>
+
+  {{ public_catalog|json_script:"pub-catalog-data" }}
 </body>
 </html>

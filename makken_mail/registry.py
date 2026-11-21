@@ -34,6 +34,7 @@ WORK_EVENTS = {
 }
 BUSINESS_EVENTS = {
     PARTNERSHIP_EXPIRY: EventType('تذكير بقرب انتهاء الشراكة', 'الشراكات', ('employee',), True, assignment_only=True),
+    'sponsor_request.submitted': EventType('استلام طلب تسجيل راعٍ خارجي جديد', 'الشراكات'),
     'agreement.clause_progress': EventType('تحديث إنجاز بند الاتفاقية', 'متابعة الاتفاقيات', (), True),
     'sponsorship.added': EventType('إضافة جهة مرشحة للرعاية', 'متابعة الرعاية', (), True),
     'sponsorship.approved': EventType('اعتماد مساهمة رعاية', 'متابعة الرعاية', ('employee', 'manager'), True),

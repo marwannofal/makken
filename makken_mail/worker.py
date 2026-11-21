@@ -65,6 +65,23 @@ def build_context(delivery, item):
         if number:
             details.append(('الاتفاقية', safe_label(number)))
         path = reverse('partnerships:clauses', args=[item.pk])
+    elif code == 'sponsor_request.submitted':
+        from partnerships.models import SponsorRegistrationRequest
+        req = SponsorRegistrationRequest.objects.filter(pk=delivery.record_key).prefetch_related('administrative_regions').first()
+        description = 'تم استلام طلب تسجيل راعٍ خارجي جديد عبر النموذج العام في منصة مكّن وبانتظار المراجعة والاعتماد.'
+        if req is not None:
+            regions_text = '، '.join(req.administrative_regions.values_list('name', flat=True)) or '—'
+            details += [
+                ('رقم الطلب', safe_label(req.reference_code)),
+                ('اسم الجهة', safe_label(req.name)),
+                ('ممثل الجهة', safe_label(req.representative)),
+                ('البريد الإلكتروني', safe_label(req.email)),
+                ('هاتف التواصل', safe_label(req.phone)),
+                ('المناطق الإدارية', safe_label(regions_text)),
+            ]
+            path = reverse('partnerships:sponsor_request_review', args=[req.pk])
+        else:
+            path = reverse('partnerships:sponsor_requests')
     elif code == 'account.regions_assigned':
         from partnerships.models import Partnership
         description = 'تم تعيين أو تحديث نطاق المناطق المسموح لك بها في منصة مكّن، وفيما يلي ملخص الشراكات والاتفاقيات المرتبطة بنطاقك.'

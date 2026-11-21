@@ -9,6 +9,7 @@ from .sponsor_requests import (
     public_sponsor_register,
     public_sponsor_thanks,
     sponsor_request_queue,
+    sponsor_request_attachment_download,
     sponsor_request_review,
 )
 from .willingness import download_attachment
@@ -23,6 +24,7 @@ urlpatterns += [
     path("register/submitted/", public_sponsor_thanks, name="public_sponsor_thanks"),
     path("requests/", sponsor_request_queue, name="sponsor_requests"),
     path("requests/<int:request_id>/", sponsor_request_review, name="sponsor_request_review"),
+    path("requests/<int:request_id>/attachments/<int:attachment_id>/download/", sponsor_request_attachment_download, name="sponsor_request_attachment_download"),
     path("<int:pk>/clauses/", workflow, name="clauses"),
     path("<int:pk>/clauses-progress/", views.clauses_progress, name="clauses_progress"),
     path("<int:pk>/clauses-evidence/<int:evidence_id>/download/", views.download_clause_evidence, name="clause_evidence_download"),

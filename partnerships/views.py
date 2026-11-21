@@ -518,7 +518,7 @@ def index(request, fixed_state=None):
                         pending.update(title="التحويل من قدرة إلى رغبة", button="حفظ والتحويل إلى رغبة")
                 else:
                     if data["operation"] == "advance":
-                        willingness_form = WillingnessTransitionForm(request.POST, request.FILES)
+                        willingness_form = WillingnessTransitionForm(request.POST, request.FILES, partnership=item)
                         work_form = PartnershipWorkForm(request.POST, prefix="work", actor=request.user)
                         details_form = WillingnessDetailsForm(request.POST, prefix="details")
                         clauses_json = request.POST.get("clauses_json", "[]")

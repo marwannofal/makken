@@ -41,9 +41,26 @@
     <div><dt>نوع الكيان</dt><dd>{{ req.entity.name }}</dd></div>
     <div><dt>النطاق</dt><dd>{{ req.get_scope_display }}</dd></div>
     <div><dt>المناطق الإدارية</dt><dd>{% for reg in req.administrative_regions.all %}{{ reg.name }}{% if not forloop.last %}، {% endif %}{% empty %}—{% endfor %}</dd></div>
-    <div><dt>القطاع</dt><dd>{{ req.sector.name|default:'—' }}</dd></div>
-    <div><dt>شكل الرعاية</dt><dd>{{ req.sponsorship_shape.name|default:'—' }}</dd></div>
+    <div><dt>القطاعات والتخصصات وأشكال الرعاية</dt><dd>
+      {% if offering_rows %}
+        {% for off in offering_rows %}
+          <div><strong>{{ off.sector_name }}</strong> — {{ off.shape_name }}{% if off.specializations %} ({{ off.specializations|join:'، ' }}){% endif %}</div>
+        {% endfor %}
+      {% else %}
+        {{ req.sector.name|default:'—' }}{% if req.sponsorship_shape %} — {{ req.sponsorship_shape.name }}{% endif %}
+      {% endif %}
+    </dd></div>
     <div><dt>القدرة المالية</dt><dd>{% if req.financial_capacity is not None %}<bdi>{{ req.financial_capacity }}</bdi> ريال{% else %}—{% endif %}</dd></div>
+    <div><dt>نوع الشراكة</dt><dd>{{ req.partnership_type.name|default:'—' }}</dd></div>
+    <div><dt>المرفقات الداعمة</dt><dd>
+      {% if req.attachments.all %}
+        {% for att in req.attachments.all %}
+          <div><a href="{% url 'partnerships:sponsor_request_attachment_download' req.pk att.pk %}"><bdi>{{ att.original_name }}</bdi></a></div>
+        {% endfor %}
+      {% else %}
+        —
+      {% endif %}
+    </dd></div>
     <div><dt>تاريخ التقديم</dt><dd><bdi>{{ req.created_at|date:"d/m/Y H:i" }}</bdi></dd></div>
     {% if req.reviewed_at %}
     <div><dt>تمت المراجعة</dt><dd>{{ req.reviewed_by.get_full_name|default:req.reviewed_by }} · <bdi>{{ req.reviewed_at|date:"d/m/Y H:i" }}</bdi></dd></div>

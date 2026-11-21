@@ -72,6 +72,8 @@ class MultipleAttachmentField(forms.FileField):
     def clean(self, data, initial=None):
         files = data if isinstance(data, (list, tuple)) else [data] if data else []
         if not files:
+            if not self.required:
+                return []
             raise forms.ValidationError('أضف مرفقًا داعمًا واحدًا على الأقل.')
         if len(files) > MAX_FILES:
             raise forms.ValidationError('يمكن رفع 20 مرفقًا كحد أقصى في التحويل الواحد.')
@@ -115,9 +117,17 @@ class WillingnessTransitionForm(forms.Form):
     )
     attachments = MultipleAttachmentField(label='المرفقات الداعمة', widget=MultipleAttachmentInput(attrs={'id': 'willingness-files', 'accept': '.pdf,.png,.jpg,.jpeg', 'required': True, 'aria-describedby': 'willingness-upload-help attachments-errors'}))
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, partnership=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['agreement_type'].queryset = PartnershipType.objects.filter(is_active=True).order_by('id')
+        self.existing_attachments = []
+        if partnership and partnership.pk:
+            if partnership.partnership_type_id and not self.is_bound:
+                self.fields['agreement_type'].initial = partnership.partnership_type_id
+            self.existing_attachments = list(partnership.willingness_attachments.all().order_by('id'))
+            if self.existing_attachments:
+                self.fields['attachments'].required = False
+                self.fields['attachments'].widget.attrs.pop('required', None)
 
 
 def save_supporting_files(item, cleaned, user, saved_paths):

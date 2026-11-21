@@ -267,6 +267,8 @@ class SponsorRegistrationRequest(models.Model):
     sector = models.ForeignKey("sectors.Sector", on_delete=models.PROTECT, null=True, blank=True, related_name="sponsor_requests", verbose_name="القطاع")
     sponsorship_shape = models.ForeignKey("sponsorship_shapes.SponsorshipShape", on_delete=models.PROTECT, null=True, blank=True, related_name="sponsor_requests", verbose_name="شكل الرعاية")
     financial_capacity = models.DecimalField("القدرة المالية", max_digits=14, decimal_places=2, null=True, blank=True, validators=[MinValueValidator(Decimal("0"))])
+    partnership_type = models.ForeignKey("partnerships.PartnershipType", on_delete=models.PROTECT, null=True, blank=True, related_name="sponsor_requests", verbose_name="نوع الشراكة")
+    offerings = models.JSONField("القطاعات والتخصصات وأشكال الرعاية", default=list, blank=True)
     notes = models.TextField("نبذة وملاحظات إضافية", max_length=2000, blank=True)
     status = models.CharField("حالة الطلب", max_length=12, choices=SponsorRequestStatus.choices, default=SponsorRequestStatus.NEW, db_index=True)
     rejection_reason = models.TextField("سبب الرفض", max_length=1000, blank=True)
@@ -312,3 +314,25 @@ class PartnershipTeamMember(models.Model):
     def __str__(self):
         return f"{self.name} ({self.get_role_display()})"
 
+
+
+def sponsor_attachment_path(instance, filename):
+    suffix = Path(filename).suffix.lower()
+    return f"sponsor_requests/{uuid.uuid4().hex}{suffix}"
+
+
+class SponsorRequestAttachment(models.Model):
+    sponsor_request = models.ForeignKey(
+        SponsorRegistrationRequest,
+        on_delete=models.CASCADE,
+        related_name="attachments",
+    )
+    file = models.FileField(storage=willingness_storage, upload_to=sponsor_attachment_path, max_length=255)
+    original_name = models.CharField(max_length=255)
+    size = models.PositiveBigIntegerField()
+    content_type = models.CharField(max_length=40)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["id"]
+        default_permissions = ()
