@@ -240,7 +240,12 @@
   display: none !important;
 }
 
-/* Site-wide balanced table column spacing: reset inflated per-column min-widths & fixed % widths */
+/* Site-wide balanced table grid: natural column fit, wrapped long pills/bdi, zero viewport overflow */
+:root .main-content :is(.table-scroll, .states-table-wrapper, .table-wrapper, .table-responsive) {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
 :root .main-content table:not(.ac-matrix) {
   width: 100%;
   min-width: 0 !important;
@@ -256,25 +261,60 @@
 }
 
 :root .main-content table:not(.ac-matrix) thead th {
-  white-space: nowrap !important;
-  padding: 13px 12px !important;
+  white-space: normal;
+  line-height: 1.5;
+  padding: 12px 10px !important;
   vertical-align: middle;
 }
 
 :root .main-content table:not(.ac-matrix) tbody th,
 :root .main-content table:not(.ac-matrix) tbody td {
-  padding: 12px 12px !important;
+  padding: 11px 10px !important;
   vertical-align: middle;
+  white-space: normal;
+  overflow-wrap: break-word;
 }
 
-:root .main-content table tbody td bdi,
-:root .main-content table tbody td time,
-:root .main-content table tbody td .market-status,
-:root .main-content table tbody td .market-level,
-:root .main-content table tbody td .record-status,
-:root .main-content table tbody td .level-status,
-:root .main-content table tbody td .state-pill,
-:root .main-content table tbody td .subtle-badge,
-:root .main-content table tbody td .tag {
+:root .main-content table:not(.ac-matrix) tbody th bdi,
+:root .main-content table:not(.ac-matrix) tbody td bdi {
+  white-space: normal !important;
+  overflow-wrap: break-word;
+}
+
+:root .main-content table :is(.expense_item-tags, .specialization-tags, .program-type-tags) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  max-width: 260px;
+}
+
+:root .main-content table :is(.expense_item-tag, .specialization-tag, .inquiry-tag) {
+  white-space: normal !important;
+  overflow-wrap: break-word;
+  word-break: normal;
+  max-width: 250px;
+  text-align: start;
+  line-height: 1.5;
+  padding: 4px 9px;
+  font-size: 12px;
+}
+
+:root .main-content table tbody td :is(
+  time,
+  .market-status,
+  .market-level,
+  .record-status,
+  .level-status,
+  .state-pill,
+  .program-status,
+  .entity-status,
+  .region-status,
+  .sector-status,
+  .specialization-status,
+  .expense-item-status,
+  .sponsorship-shape-status,
+  .sr-pill,
+  .mail-pill
+) {
   white-space: nowrap !important;
 }

@@ -116,3 +116,13 @@ class CompactTableLayoutTests(TestCase):
         self.assertIn('نتائج البحث', compact_js)
         self.assertIn('mk-header-compact-hidden', compact_js)
         self.assertIn('.dash-page', compact_js)
+
+    def test_table_tags_and_bdi_wrap_cleanly_without_overflowing_grid(self):
+        css = (Path(settings.BASE_DIR) / 'core' / 'static' / 'core' / 'css' / 'makken-compact-tables.css').read_text(encoding='utf-8')
+        self.assertNotIn('table tbody td bdi,', css)
+        self.assertIn(':is(.expense_item-tags, .specialization-tags, .program-type-tags)', css)
+        self.assertIn('max-width: 260px;', css)
+        self.assertIn('max-width: 250px;', css)
+        res = self.client.get(reverse('training_programs:index'))
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, 'makken-compact-tables.css?v=20261121-cols2')
