@@ -107,3 +107,17 @@ class SplitCapabilityWillingnessPagesTests(TestCase):
         self.assertTrue(
             DevelopmentHistory.objects.filter(partnership=created, state_id=DevelopmentState.WILLINGNESS).exists()
         )
+
+    def test_capability_and_willingness_detail_modals_show_only_corner_close_button(self):
+        self.client.force_login(self.admin, backend=AUTH_BACKEND)
+        for route, obj in (
+            ('partnerships:capability_index', self.p_cap),
+            ('partnerships:willingness_index', self.p_will),
+        ):
+            with self.subTest(route=route):
+                res = self.client.get(reverse(route), {'detail': str(obj.pk)})
+                self.assertEqual(res.status_code, 200)
+                self.assertNotContains(res, 'تعديل بيانات الجهة')
+                self.assertContains(res, 'detail-dialog-actions')
+                self.assertContains(res, 'detail-close-btn')
+                self.assertContains(res, 'إغلاق')

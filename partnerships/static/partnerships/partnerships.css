@@ -1479,3 +1479,21 @@
   border: 1.5px solid #8ebcd4 !important;
   color: #003954 !important;
 }
+
+
+/* Partnership view-only detail modal: single compact close button aligned in the corner */
+.detail-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid #e2edf3;
+}
+
+.detail-dialog-actions .detail-close-btn {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: 120px;
+  padding: 9px 24px;
+}
