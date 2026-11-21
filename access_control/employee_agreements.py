@@ -48,9 +48,6 @@ def _partnership_links_for_users(user_ids, emails_by_uid=None):
             if assignee.pk in links and assignee.pk != work.employee_id:
                 add_role(assignee.pk, pid, 'عضو مسند له')
 
-    for p in Partnership.objects.filter(responsible_employee_id__in=user_ids).only('pk', 'responsible_employee_id'):
-        add_role(p.responsible_employee_id, p.pk, 'الموظف المسؤول')
-
     if emails_by_uid:
         uid_by_email = {
             email.strip().casefold(): uid
