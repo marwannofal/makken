@@ -205,6 +205,7 @@ class PartnershipReminderTests(TestCase):
         access = UserAccess.objects.create(user=extra, page_scope=PageScope.SELECTED, region_scope=RegionScope.SELECTED)
         access.allowed_pages.add(Module.objects.get(pk='partnerships'))
         access.allowed_regions.add(self.region)
+        PermissionOverride.objects.create(user=extra, module_id='partnerships', operation='view', effect='grant')
 
         # signed_on=2026-01-18 + 12 months => calculated_expiry=2027-01-18 (exactly 2 months from NOW=2026-11-18)
         item = self.partner()
