@@ -126,6 +126,9 @@ class AccessibilityAndDropdownsTests(TestCase):
         self.assertIn('function unwrapSelect(select)', dd_js)
         self.assertIn("select.classList.contains('native-enhanced')", dd_js)
         self.assertIn('window.MakkenDropdowns = { unwrap: unwrapSelect, scan };', dd_js)
+        dd_css = (base / 'core' / 'static' / 'core' / 'css' / 'makken-dropdowns.css').read_text(encoding='utf-8')
+        self.assertIn('overflow: visible !important;', dd_css)
+        self.assertIn('max-height: none !important;', dd_css)
 
         for rel in (
             'partnerships/static/partnerships/partnerships.js',

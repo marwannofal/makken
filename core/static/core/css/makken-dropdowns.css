@@ -412,3 +412,20 @@ select.mk-ss-native {
 .mk-ss-empty[hidden] {
   display: none !important;
 }
+
+
+/* Remove useless outer scrollbar on dropdown panels; only the inner options list scrolls */
+:root .main-content .search-select-panel,
+:root .main-content .market-select .search-select-panel,
+.mk-ss-panel {
+  overflow: visible !important;
+  max-height: none !important;
+}
+
+:root .main-content .search-select-options,
+.mk-ss-list {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  max-height: 260px !important;
+  overscroll-behavior: contain;
+}
