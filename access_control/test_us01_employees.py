@@ -233,7 +233,7 @@ class EmployeeManagementUS01Tests(TestCase):
             side=TeamSide.INSTITUTION,
             name='خالد',
             email='unified-extra@makken.test',
-            role=TeamMemberRole.LIAISON,
+            role=TeamMemberRole.CONTACT,
         )
 
         c1 = AgreementClause.objects.create(name='بند موحد 1')
@@ -259,7 +259,7 @@ class EmployeeManagementUS01Tests(TestCase):
 
     def test_regions_assigned_email_includes_regional_partnership_info(self):
         from makken_mail.models import Delivery, EventRule
-        from makken_mail.worker import mail_content
+        from makken_mail.worker import build_context
 
         emp = User.objects.create_user('region-mail-emp', 'region-mail@makken.test', 'EmpPass!2026', first_name='ريم')
         self.partner_riyadh.agreement_number = '202611888'
@@ -281,7 +281,7 @@ class EmployeeManagementUS01Tests(TestCase):
             subject_user=emp,
             source=f'regions:{emp.pk}:test',
         )
-        content = mail_content(delivery, emp)
+        content = build_context(delivery, None)
         details_dict = dict(content['details'])
         self.assertIn('عدد الشراكات والاتفاقيات في النطاق', details_dict)
         self.assertIn(self.partner_riyadh.name, details_dict.get('أبرز الشراكات والاتفاقيات', ''))
