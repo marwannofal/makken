@@ -18,7 +18,8 @@ from agreement_clauses.models import (
 )
 from entities.models import Entity
 from makken_mail.models import Delivery, EventRule, SMTPConfig
-from makken_mail.worker import build_context
+from access_control.models import UserAccess
+        from makken_mail.worker import build_context
 from partnerships.models import Partnership
 from regions.models import Region
 
@@ -259,6 +260,7 @@ class EmployeeManagementUS01Tests(TestCase):
 
     def test_regions_assigned_email_includes_regional_partnership_info(self):
         from makken_mail.models import Delivery, EventRule
+        from access_control.models import UserAccess
         from makken_mail.worker import build_context
 
         emp = User.objects.create_user('region-mail-emp', 'region-mail@makken.test', 'EmpPass!2026', first_name='ريم')

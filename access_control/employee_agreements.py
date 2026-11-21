@@ -137,7 +137,7 @@ def employee_agreements_summary(user):
             subtitle = (
                 p.partnership_type.name
                 if p.partnership_type_id
-                else (p.development_state.name if p.development_state_id else 'شراكة')
+                else (p.development_state.get_state_display() if p.development_state_id else 'شراكة')
             )
             rows.append({
                 'kind': 'partnership',
