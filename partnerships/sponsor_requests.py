@@ -396,8 +396,7 @@ def public_sponsor_register(request):
             enqueue(
                 'sponsor_request.submitted',
                 f'sponsor-request:{req.pk}',
-                record_model='partnerships.sponsorregistrationrequest',
-                record_key=req.pk,
+                item=req,
             )
             request.session['sponsor_request_ref'] = req.reference_code
             request.session['sponsor_request_name'] = req.name

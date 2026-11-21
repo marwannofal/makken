@@ -41,7 +41,7 @@ def can_receive(user, rule, actor_id=None, subject_id=None, work=None, event=Non
         return False
     if rule.code.startswith('work.'):
         return bool(work and can_read_work(user, work))
-    if rule.code == 'account.regions_assigned':
+    if rule.code in {'account.regions_assigned', 'sponsor_request.submitted'}:
         return True
     if event is None:
         return False
