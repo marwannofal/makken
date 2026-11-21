@@ -395,7 +395,7 @@ def _search(query, term):
             if term == label:
                 return query.filter(**{field: value})
     for word in term.split()[:12]:
-        condition = (Q(name__icontains=word) | Q(representative__icontains=word) | Q(phone__icontains=word) | Q(email__icontains=word) | Q(entity__name__icontains=word) | Q(offerings__sector__name__icontains=word) | Q(offerings__specializations__name__icontains=word) | Q(offerings__sponsorship_shape__name__icontains=word)) | financial_search_clause(word)
+        condition = (Q(name__icontains=word) | Q(agreement_number__icontains=word) | Q(representative__icontains=word) | Q(phone__icontains=word) | Q(email__icontains=word) | Q(entity__name__icontains=word) | Q(offerings__sector__name__icontains=word) | Q(offerings__specializations__name__icontains=word) | Q(offerings__sponsorship_shape__name__icontains=word)) | financial_search_clause(word)
         for field, choices in [("entity__entity_type", EntityType.choices), ("entity__branch", EntityBranch.choices), ("scope", Scope.choices), ("development_state_id", DevelopmentState.choices)]:
             found = [value for value, label in choices if word in label]
             if found:
@@ -587,7 +587,7 @@ def index(request, fixed_state=None):
     if detail:
         from agreement_clauses.workflow import partnership_panel
         context["clause_panel"] = partnership_panel(detail)
-    context.update(rows=rows, page_obj=page, q=q, selected_status=active, pending=pending, detail=detail, history=_history(detail), result_query=result_query, list_url=reset_url + "?" + result_query, add_url=add_url, reset_url=reset_url, hide_development_filter=bool(fixed_state))
+    context.update(rows=rows, page_obj=page, q=q, selected_status=active, pending=pending, detail=detail, history=_history(detail), result_query=result_query, list_url=reset_url + "?" + result_query, add_url=add_url, reset_url=reset_url, hide_development_filter=bool(fixed_state), show_agreement_number=(fixed_state == DevelopmentState.WILLINGNESS))
     return add_login_headers(render(request, "partnerships/index.html", context, status=status))
 
 

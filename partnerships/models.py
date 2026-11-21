@@ -140,9 +140,13 @@ class Partnership(models.Model):
             return end_after_months(self.signed_on, self.duration_months)
         return None
 
+    def format_agreement_number(self):
+        dt = timezone.localtime(self.created_at) if self.created_at else timezone.localtime(timezone.now())
+        return f"{dt:%Y%m}{self.pk:03d}"
+
     def ensure_agreement_number(self):
         if not self.agreement_number and self.pk:
-            self.agreement_number = f"AGR-{self.pk:06d}"
+            self.agreement_number = self.format_agreement_number()
             Partnership.objects.filter(pk=self.pk, agreement_number__isnull=True).update(agreement_number=self.agreement_number)
 
     def __str__(self):
