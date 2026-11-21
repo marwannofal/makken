@@ -5,9 +5,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>تسجيل راعٍ جديد | مكّن</title>
-  <link rel="stylesheet" href="{% static 'partnerships/sponsor_requests.css' %}?v=20261121-blue2">
+  <link rel="stylesheet" href="{% static 'partnerships/sponsor_requests.css' %}?v=20261121-blue3">
   {% include "core/partials/accessibility_assets.html" %}
-  <script src="{% static 'partnerships/public_register.js' %}?v=20261121-blue2" defer></script>
+  <script src="{% static 'partnerships/public_register.js' %}?v=20261121-blue3" defer></script>
 </head>
 <body class="pub-body">
   <main class="pub-shell">
@@ -96,9 +96,9 @@
 
         <fieldset class="pub-regions">
           <legend>{{ form.administrative_regions.label }} <span class="pub-hint">(مطلوبة للنطاق المحلي)</span></legend>
-          <div class="pub-regions-grid">
+          <div class="pub-region-grid">
             {% for cb in form.administrative_regions %}
-            <label class="pub-check">{{ cb.tag }} <span>{{ cb.choice_label }}</span></label>
+            <label class="pub-region-item">{{ cb.tag }} <span>{{ cb.choice_label }}</span></label>
             {% endfor %}
           </div>
           {% for err in form.administrative_regions.errors %}<span class="pub-err">{{ err }}</span>{% endfor %}
@@ -134,14 +134,14 @@
           {% for err in form.attachments.errors %}<span class="pub-err">{{ err }}</span>{% endfor %}
         </section>
 
-        <div class="pub-field pub-field-full">
+        <div class="pub-field pub-wide">
           <label for="{{ form.notes.id_for_label }}">{{ form.notes.label }}</label>
           {{ form.notes }}
           {% for err in form.notes.errors %}<span class="pub-err">{{ err }}</span>{% endfor %}
         </div>
 
         <div class="pub-actions">
-          <button type="submit" class="pub-submit">إرسال طلب التسجيل</button>
+          <button type="submit" class="pub-btn-primary">إرسال طلب التسجيل</button>
         </div>
       </form>
     </section>
@@ -176,7 +176,7 @@
         <span class="pub-err" data-pub-off-error hidden></span>
       </div>
       <div class="pub-dialog-actions">
-        <button type="button" class="pub-submit" data-pub-save-offering>إضافة للقائمة</button>
+        <button type="button" class="pub-btn-primary" data-pub-save-offering>إضافة للقائمة</button>
         <button type="button" class="pub-btn-outline" data-pub-close-dialog>إغلاق</button>
       </div>
     </div>

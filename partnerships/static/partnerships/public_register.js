@@ -154,7 +154,7 @@
     }
     for (const sp of matching) {
       const lbl = document.createElement('label');
-      lbl.className = 'pub-check';
+      lbl.className = 'pub-region-item';
       const cb = document.createElement('input');
       cb.type = 'checkbox';
       cb.value = String(sp.id);
