@@ -629,7 +629,7 @@ def willingness_index(request):
 def clauses_progress(request, pk):
     from django.http import FileResponse
     from access_control.activity_capture import emit, regions_for
-    from access_control.audit import audit_timezone
+    from access_control.activity_data import audit_timezone
     from agreement_clauses.models import ClauseAssignment, ClauseEvidence, mean_progress
     from .willingness import safe_filename, validate_attachment
     from .attachment_storage import willingness_storage
