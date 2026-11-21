@@ -239,3 +239,47 @@
 .main-content .states-card-footer {
   display: none !important;
 }
+
+
+/* Site-wide balanced table column spacing & nowrap on headers/numbers/badges */
+:root .main-content table.partnership-table,
+:root .main-content table.states-table,
+:root .main-content table.levels-table,
+:root .main-content table.ac-table {
+  width: 100%;
+  table-layout: auto !important;
+  border-collapse: collapse;
+}
+
+:root .main-content table.partnership-table thead th,
+:root .main-content table.states-table thead th,
+:root .main-content table.levels-table thead th,
+:root .main-content table.ac-table thead th {
+  white-space: nowrap !important;
+  padding: 13px 12px !important;
+  vertical-align: middle;
+}
+
+:root .main-content table.partnership-table tbody th,
+:root .main-content table.partnership-table tbody td,
+:root .main-content table.states-table tbody th,
+:root .main-content table.states-table tbody td,
+:root .main-content table.levels-table tbody th,
+:root .main-content table.levels-table tbody td,
+:root .main-content table.ac-table tbody th,
+:root .main-content table.ac-table tbody td {
+  padding: 12px 12px !important;
+  vertical-align: middle;
+}
+
+:root .main-content table tbody td bdi,
+:root .main-content table tbody td time,
+:root .main-content table tbody td .market-status,
+:root .main-content table tbody td .market-level,
+:root .main-content table tbody td .record-status,
+:root .main-content table tbody td .level-status,
+:root .main-content table tbody td .state-pill,
+:root .main-content table tbody td .subtle-badge,
+:root .main-content table tbody td .tag {
+  white-space: nowrap !important;
+}
