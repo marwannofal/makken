@@ -121,3 +121,21 @@ class ErrorPageTests(SimpleTestCase):
         with patch("django.template.context.RequestContext.bind_template", side_effect=AssertionError("request context used")):
             response = error_response(self.factory.get("/"), 500)
         self.assertEqual(response.status_code, 500)
+
+    def test_build_error_pages_command_renders_all_codes_with_ocean_blue_theme(self):
+        import tempfile
+        from pathlib import Path
+        from django.core.management import call_command
+
+        with tempfile.TemporaryDirectory() as tmp:
+            call_command("build_error_pages", output=tmp)
+            out = Path(tmp)
+            for code in CATALOG:
+                page = (out / f"{code}.html").read_text(encoding="utf-8")
+                self.assertIn(f'data-error-code="{code}"', page)
+                self.assertIn("error.css?v=20261121-blue1", page)
+            css = (out / "assets" / "error.css").read_text(encoding="utf-8")
+            self.assertIn("--primary: #005b85;", css)
+            self.assertNotIn("#24b3af", css)
+            self.assertTrue((out / "assets" / "error.js").is_file())
+            self.assertTrue((out / "assets" / "header-logo.svg").is_file())

@@ -70,6 +70,7 @@ services:
       - /var/lib/makken/private_uploads:/app/private_uploads
       - ./staticfiles:/app/staticfiles
       - ./media:/app/media
+      - ./makken_errors:/app/makken_errors
     healthcheck:
       test:
         - CMD
