@@ -1,7 +1,7 @@
 {% extends "core/makken_base.html" %}
 {% load access_tags %}
 {# MAKKEN ACCESS UI v1 #}
-{% load static partnership_states %}
+{% load static partnership_states tz %}
 {% block title %}
   {{ page_heading }} | مكّن
 {% endblock %}
@@ -84,7 +84,7 @@
               {% endif %}
               </small></td><td>{{ row.item.get_scope_display }}</td><td class="development-state-cell" data-development-cell>{% development_pill row.item.development_state %}</td><td><bdi dir="ltr">{{ row.item.phone }}</bdi></td><td><bdi>{{ row.item.email }}</bdi></td><td class="financial-capacity-cell" data-financial-capacity-cell>
               {% include "partnerships/_financial_value.html" with amount=row.item.financial_capacity %}
-              </td>{% if show_agreement_number %}<td data-followup-cell="{{ row.item.pk }}">{% if row.item.followup_updated_at %}<bdi dir="ltr">{{ row.item.followup_updated_at|date:"d/m/Y H:i" }}</bdi><small>{{ row.item.followup_updated_by.get_full_name|default:row.item.followup_updated_by.username|default:"" }}</small>{% else %}—{% endif %}</td>{% endif %}<td>
+              </td>{% if show_agreement_number %}<td data-followup-cell="{{ row.item.pk }}">{% if row.item.followup_updated_at %}{% timezone "Asia/Riyadh" %}<bdi dir="ltr">{{ row.item.followup_updated_at|date:"d/m/Y H:i" }}</bdi>{% endtimezone %}<small>{{ row.item.followup_updated_by.get_full_name|default:row.item.followup_updated_by.username|default:"" }}</small>{% else %}—{% endif %}</td>{% endif %}<td>
               {% allowed 'partnerships' 'change_status' row.item %}
                 <form method="post">
                   {% csrf_token %}
