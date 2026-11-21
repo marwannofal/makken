@@ -65,20 +65,37 @@ def build_context(delivery, item):
             details.append(('الاتفاقية', safe_label(number)))
         path = reverse('partnerships:clauses', args=[item.pk])
     elif code == 'account.regions_assigned':
-        description = 'تم تعيين أو تحديث نطاق المناطق المسموح لك بها في منصة مكّن.'
+        from partnerships.models import Partnership
+        description = 'تم تعيين أو تحديث نطاق المناطق المسموح لك بها في منصة مكّن، وفيما يلي ملخص الشراكات والاتفاقيات المرتبطة بنطاقك.'
         subject = delivery.subject_user
         access = getattr(subject, 'makken_access', None) if subject else None
         if access and access.region_scope == 'selected':
+            region_ids = list(access.allowed_regions.order_by('name').values_list('id', flat=True))
             names = list(access.allowed_regions.order_by('name').values_list('name', flat=True))
             region_text = '، '.join(names) if names else 'لم تُحدد مناطق'
+            regional_qs = Partnership.objects.filter(
+                is_active=True, administrative_regions__id__in=region_ids
+            ).distinct().order_by('-pk') if region_ids else Partnership.objects.none()
         else:
             region_text = 'جميع المناطق'
+            regional_qs = Partnership.objects.filter(is_active=True).order_by('-pk')
         if subject:
             details.append(('الحساب', safe_label(subject.get_username())))
         details.append(('المناطق المعينة', safe_label(region_text)))
+        partner_count = regional_qs.count()
+        details.append(('عدد الشراكات والاتفاقيات في النطاق', str(partner_count)))
+        if partner_count:
+            sample = []
+            for p in regional_qs[:5]:
+                num = f' ({p.agreement_number})' if p.agreement_number else ''
+                sample.append(f'{p.name}{num}')
+            summary_text = '، '.join(sample)
+            if partner_count > 5:
+                summary_text += f' (+{partner_count - 5} أخرى)'
+            details.append(('أبرز الشراكات والاتفاقيات', safe_label(summary_text)))
         if delivery.actor:
             details.append(('منفّذ الإجراء', safe_label(delivery.actor.get_full_name() or delivery.actor.get_username())))
-        path = reverse('accounts:login')
+        path = reverse('partnerships:agreement_inquiries')
     elif code.startswith('account.') or event.module in {'accounts', 'access_control'}:
         description = 'تم تسجيل هذا الإجراء في منصة مكّن.'
         if code == 'account.created' and recipient.pk == delivery.subject_user_id:

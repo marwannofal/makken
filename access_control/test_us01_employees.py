@@ -203,3 +203,86 @@ class EmployeeManagementUS01Tests(TestCase):
         list_page = self.client.get(reverse('access_control:index'))
         self.assertContains(list_page, self.city_riyadh.name)
         self.assertContains(list_page, self.dept_training.name)
+
+    def test_unified_willingness_partnership_progress_and_followup_shown_for_employee(self):
+        from django.utils import timezone
+        from makken_mail.models import WorkAssignment
+        from partnerships.models import PartnershipTeamMember, TeamMemberRole, TeamSide
+
+        emp = User.objects.create_user('unified-emp', 'unified-emp@makken.test', 'EmpPass!2026', first_name='سارة')
+        extra = User.objects.create_user('unified-extra', 'unified-extra@makken.test', 'EmpPass!2026', first_name='خالد')
+        UserProfile.objects.create(user=emp, city=self.city_riyadh, department=self.dept_training)
+        UserProfile.objects.create(user=extra, city=self.city_riyadh, department=self.dept_training)
+
+        self.partner_riyadh.agreement_number = '202611999'
+        self.partner_riyadh.followup_updated_at = timezone.now()
+        self.partner_riyadh.followup_updated_by = self.admin
+        self.partner_riyadh.save(update_fields=['agreement_number', 'followup_updated_at', 'followup_updated_by'])
+
+        work = WorkAssignment.objects.create(
+            title='متابعة شراكة الرياض',
+            target_model='partnerships.partnership',
+            target_key=self.partner_riyadh.pk,
+            employee=emp,
+            manager=self.admin,
+            created_by=self.admin,
+        )
+        work.assignees.add(emp, extra)
+        PartnershipTeamMember.objects.create(
+            partnership=self.partner_riyadh,
+            side=TeamSide.INSTITUTION,
+            name='خالد',
+            email='unified-extra@makken.test',
+            role=TeamMemberRole.LIAISON,
+        )
+
+        c1 = AgreementClause.objects.create(name='بند موحد 1')
+        c2 = AgreementClause.objects.create(name='بند موحد 2')
+        ClauseAssignment.objects.create(partnership=self.partner_riyadh, clause=c1, responsibility='shared', progress=40, updated_by=self.admin)
+        ClauseAssignment.objects.create(partnership=self.partner_riyadh, clause=c2, responsibility='institution', progress=80, updated_by=self.admin)
+
+        edit_page = self.client.get(reverse('access_control:user_edit', args=[emp.pk]))
+        self.assertEqual(edit_page.status_code, 200)
+        self.assertContains(edit_page, '202611999')
+        self.assertContains(edit_page, self.partner_riyadh.name)
+        self.assertContains(edit_page, '60%')
+        self.assertContains(edit_page, 'الموظف المسؤول')
+
+        extra_page = self.client.get(reverse('access_control:user_edit', args=[extra.pk]))
+        self.assertEqual(extra_page.status_code, 200)
+        self.assertContains(extra_page, '202611999')
+        self.assertContains(extra_page, 'ضابط اتصال')
+
+        list_page = self.client.get(reverse('access_control:index'), {'q': 'unified-emp'})
+        self.assertEqual(list_page.status_code, 200)
+        self.assertContains(list_page, f'/access-control/users/{emp.pk}/#employee-agreements')
+
+    def test_regions_assigned_email_includes_regional_partnership_info(self):
+        from makken_mail.models import Delivery, EventRule
+        from makken_mail.worker import mail_content
+
+        emp = User.objects.create_user('region-mail-emp', 'region-mail@makken.test', 'EmpPass!2026', first_name='ريم')
+        self.partner_riyadh.agreement_number = '202611888'
+        self.partner_riyadh.save(update_fields=['agreement_number'])
+        self.partner_riyadh.administrative_regions.add(self.riyadh)
+
+        access, _ = UserAccess.objects.get_or_create(user=emp, defaults={'region_scope': 'selected'})
+        access.region_scope = 'selected'
+        access.save()
+        access.allowed_regions.set([self.riyadh])
+
+        rule, _ = EventRule.objects.get_or_create(code='account.regions_assigned', defaults={'to_subject': True, 'enabled': True})
+        delivery = Delivery.objects.create(
+            rule=rule,
+            recipient=emp,
+            recipient_key=emp.pk,
+            email_digest='test',
+            actor=self.admin,
+            subject_user=emp,
+            source=f'regions:{emp.pk}:test',
+        )
+        content = mail_content(delivery, emp)
+        details_dict = dict(content['details'])
+        self.assertIn('عدد الشراكات والاتفاقيات في النطاق', details_dict)
+        self.assertIn(self.partner_riyadh.name, details_dict.get('أبرز الشراكات والاتفاقيات', ''))
+        self.assertIn('202611888', details_dict.get('أبرز الشراكات والاتفاقيات', ''))

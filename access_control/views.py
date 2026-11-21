@@ -99,14 +99,9 @@ def index(request):
     if status in {'1','0'}:users=users.filter(is_active=status=='1')
     if numeric_id(role) is not None:users=users.filter(groups__makken_role__pk=numeric_id(role))
     page=Paginator(users,15).get_page(request.GET.get('page'))
-    from agreement_clauses.models import AgreementDetails
+    from .employee_agreements import employee_agreement_counts
     page_users=list(page)
-    user_ids=[u.pk for u in page_users]
-    agr_counts={uid:0 for uid in user_ids}
-    if user_ids:
-        for resp_id,rep_id in AgreementDetails.objects.filter(Q(responsible_employee_id__in=user_ids)|Q(department_representative_id__in=user_ids)).values_list('responsible_employee_id','department_representative_id'):
-            if resp_id in agr_counts:agr_counts[resp_id]+=1
-            if rep_id in agr_counts and rep_id!=resp_id:agr_counts[rep_id]+=1
+    agr_counts=employee_agreement_counts(page_users)
     rows=[{'user':u,'profile':getattr(u,'makken_profile',None),'agreement_count':agr_counts.get(u.pk,0),'roles':[g.name for g in u.groups.all()],'status_token':token(request,'user','status',u),'scope':getattr(getattr(u,'makken_access',None),'get_page_scope_display',lambda:'غير مهيأ')()} for u in page_users]
     context.update(rows=rows,page_obj=page,q=q,selected_status=status,selected_role=role,roles=RoleProfile.objects.select_related('group'),total_users=User.objects.count(),active_users=User.objects.filter(is_active=True).count(),inactive_users=User.objects.filter(is_active=False).count(),role_count=RoleProfile.objects.count())
     return finish(request,'users.html',context)

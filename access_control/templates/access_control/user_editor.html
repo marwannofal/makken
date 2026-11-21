@@ -84,21 +84,21 @@
     <section class="partnership-card" id="employee-agreements" aria-labelledby="employee-agreements-heading">
       <header class="card-heading">
         <div>
-          <h2 id="employee-agreements-heading">اتفاقيات الموظف</h2> <p class="muted">الاتفاقيات المسندة لهذا الموظف بصفة موظف مسؤول أو ممثل للإدارة المعنية، مع نسبة الإنجاز وآخر متابعة.</p>
+          <h2 id="employee-agreements-heading">شراكات واتفاقيات الموظف</h2> <p class="muted">الشراكات والاتفاقيات المسندة لهذا الموظف مع نسبة الإنجاز وتاريخ آخر متابعة.</p>
         </div>
-        <span class="subtle-badge">عدد الاتفاقيات: {{ employee_agreements|length }}</span>
+        <span class="subtle-badge">عدد الشراكات: {{ employee_agreements|length }}</span>
       </header>
-      <div class="table-scroll" tabindex="0" aria-label="اتفاقيات الموظف، يمكن تمريرها أفقيًا">
+      <div class="table-scroll" tabindex="0" aria-label="شراكات واتفاقيات الموظف، يمكن تمريرها أفقيًا">
         <table class="partnership-table ac-table">
           <thead>
             <tr>
-              <th scope="col">رقم الاتفاقية</th> <th scope="col">الاتفاقية والشراكة</th> <th scope="col">الدور</th> <th scope="col">نسبة الإنجاز</th> <th scope="col">آخر متابعة</th> <th scope="col">الإجراء</th>
+              <th scope="col">رقم الشراكة</th> <th scope="col">الشراكة / الاتفاقية</th> <th scope="col">الدور</th> <th scope="col">نسبة الإنجاز</th> <th scope="col">تاريخ آخر متابعة</th> <th scope="col">الإجراء</th>
             </tr>
           </thead>
           <tbody>
             {% for item in employee_agreements %}
               <tr>
-                <td><bdi dir="ltr">{{ item.agreement.number }}</bdi></td> <th scope="row"> <a href="{% url 'partnerships:agreement' item.partnership.pk item.agreement.pk %}"><bdi>{{ item.agreement.title }}</bdi></a> <small><bdi>{{ item.partnership.name }}</bdi></small> </th> <td>
+                <td><bdi dir="ltr">{{ item.number }}</bdi></td> <th scope="row"> <a href="{{ item.detail_url }}"><bdi>{{ item.title }}</bdi></a> <small><bdi>{{ item.subtitle }}</bdi></small> </th> <td>
                 {% for role_label in item.roles %}
                   <span class="tag">{{ role_label }}</span>
                 {% endfor %}
@@ -112,7 +112,7 @@
                 {% endif %}
                 </td> <td>
                 <div class="row-actions">
-                  <a class="row-action" href="{% url 'partnerships:agreement' item.partnership.pk item.agreement.pk %}">بطاقة المتابعة</a> <a class="row-action" href="{% url 'partnerships:agreement_details' item.partnership.pk item.agreement.pk %}">بيانات الاتفاقية</a>
+                  <a class="row-action" href="{{ item.detail_url }}">عرض التفاصيل</a> <a class="row-action" href="{{ item.secondary_url }}">{{ item.secondary_label }}</a>
                 </div>
                 </td>
               </tr>
