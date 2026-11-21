@@ -164,3 +164,36 @@ class PartnershipAchievementUS08Tests(TestCase):
         ok_export = self.client.get(url, {'_mk_export': 'xlsx'})
         self.assertEqual(ok_export.status_code, 200)
         self.assertIn('spreadsheetml', ok_export['Content-Type'])
+
+    def test_summary_and_details_tables_paginate_15_per_page_preserving_filters(self):
+        from partnerships.models import Partnership
+        url = reverse('partnerships:achievement_report')
+        self.client.force_login(self.admin, backend=AUTH_BACKEND)
+
+        for i in range(16):
+            p = Partnership.objects.create(
+                name=f'جهة ترقيم {i:02d}',
+                representative=f'ممثل {i:02d}',
+                phone_country='SA',
+                phone=f'+96650000{i:04d}',
+                email=f'page_{i}@example.com',
+                entity=self.entity,
+                scope='local',
+                is_active=True,
+                development_state_id=DevelopmentState.CAPABILITY,
+            )
+            p.administrative_regions.set([self.region_a])
+
+        res1 = self.client.get(url, {'status': 'active'})
+        self.assertEqual(res1.status_code, 200)
+        self.assertEqual(len(res1.context['rows_page_obj']), 15)
+        self.assertEqual(res1.context['rows_page_obj'].paginator.num_pages, 2)
+        self.assertContains(res1, '1 / 2')
+        self.assertContains(res1, 'status=active&amp;page=2')
+        self.assertContains(res1, 'class="table-footer"')
+
+        res2 = self.client.get(url, {'status': 'active', 'page': '2'})
+        self.assertEqual(res2.status_code, 200)
+        self.assertEqual(res2.context['rows_page_obj'].number, 2)
+        self.assertContains(res2, '2 / 2')
+        self.assertContains(res2, 'status=active&amp;page=1')

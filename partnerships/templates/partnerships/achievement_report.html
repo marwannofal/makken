@@ -159,7 +159,7 @@
         </tr>
       </thead>
       <tbody>
-        {% for grp in report.groups %}
+        {% for grp in groups_page_obj %}
         <tr>
           <th scope="row">{{ grp.label }}</th>
           <td><strong><bdi>{{ grp.partnership_count }}</bdi></strong></td>
@@ -175,6 +175,18 @@
       </tbody>
     </table>
   </div>
+  <footer class="table-footer">
+    <span>عرض {{ groups_page_obj.start_index }}–{{ groups_page_obj.end_index }} من {{ groups_page_obj.paginator.count }}</span>
+    <nav class="pagination" aria-label="صفحات ملخص إنجاز الشراكات">
+      {% if groups_page_obj.has_previous %}
+        <a class="button button-secondary" href="?{% if groups_pagination_query %}{{ groups_pagination_query }}&amp;{% endif %}group_page={{ groups_page_obj.previous_page_number }}">السابق</a>
+      {% endif %}
+      <span>{{ groups_page_obj.number }} / {{ groups_page_obj.paginator.num_pages }}</span>
+      {% if groups_page_obj.has_next %}
+        <a class="button button-secondary" href="?{% if groups_pagination_query %}{{ groups_pagination_query }}&amp;{% endif %}group_page={{ groups_page_obj.next_page_number }}">التالي</a>
+      {% endif %}
+    </nav>
+  </footer>
 </section>
 
 <section class="partnership-card ach-card" aria-labelledby="ach-detail-heading">
@@ -202,7 +214,7 @@
         </tr>
       </thead>
       <tbody>
-        {% for row in report.rows %}
+        {% for row in rows_page_obj %}
         <tr>
           <th scope="row">
             <a class="ach-link" href="{% url 'partnerships:edit' row.pk %}">{{ row.name }}</a>
@@ -235,5 +247,17 @@
       {% endif %}
     </table>
   </div>
+  <footer class="table-footer">
+    <span>عرض {{ rows_page_obj.start_index }}–{{ rows_page_obj.end_index }} من {{ rows_page_obj.paginator.count }}</span>
+    <nav class="pagination" aria-label="صفحات تفاصيل إنجاز الشراكات">
+      {% if rows_page_obj.has_previous %}
+        <a class="button button-secondary" href="?{% if rows_pagination_query %}{{ rows_pagination_query }}&amp;{% endif %}page={{ rows_page_obj.previous_page_number }}">السابق</a>
+      {% endif %}
+      <span>{{ rows_page_obj.number }} / {{ rows_page_obj.paginator.num_pages }}</span>
+      {% if rows_page_obj.has_next %}
+        <a class="button button-secondary" href="?{% if rows_pagination_query %}{{ rows_pagination_query }}&amp;{% endif %}page={{ rows_page_obj.next_page_number }}">التالي</a>
+      {% endif %}
+    </nav>
+  </footer>
 </section>
 {% endblock %}

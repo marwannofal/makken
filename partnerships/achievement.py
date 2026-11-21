@@ -1,6 +1,7 @@
 """US-08 Partnership achievement reports by year, region, sector, activity, and status."""
 from decimal import Decimal
 
+from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import render
 from django.views.decorators.http import require_GET
@@ -363,6 +364,17 @@ def build_achievement_report(actor, params):
 @require_GET
 def partnership_achievement_report(request):
     report = build_achievement_report(request.user, request.GET)
+    is_export = '_mk_export' in request.GET
+    groups_per_page = max(1, len(report['groups'])) if is_export else 15
+    rows_per_page = max(1, len(report['rows'])) if is_export else 15
+    groups_page_obj = Paginator(report['groups'], groups_per_page).get_page(request.GET.get('group_page'))
+    rows_page_obj = Paginator(report['rows'], rows_per_page).get_page(request.GET.get('page'))
+
+    groups_params = request.GET.copy()
+    groups_params.pop('group_page', None)
+    rows_params = request.GET.copy()
+    rows_params.pop('page', None)
+
     name = request.user.get_short_name() or request.user.get_username()
     return add_login_headers(render(request, 'partnerships/achievement_report.html', {
         'display_name': name,
@@ -370,4 +382,8 @@ def partnership_achievement_report(request):
         'active_page': 'partnership_achievement',
         'page_heading': 'تقرير إنجاز الشراكات',
         'report': report,
+        'groups_page_obj': groups_page_obj,
+        'rows_page_obj': rows_page_obj,
+        'groups_pagination_query': groups_params.urlencode(),
+        'rows_pagination_query': rows_params.urlencode(),
     }))
