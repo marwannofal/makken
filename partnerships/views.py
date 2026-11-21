@@ -469,10 +469,7 @@ def _search(query, term):
     return query.distinct()
 
 
-@module_view('partnerships')
-@login_required(login_url="accounts:login")
-@require_http_methods(["GET", "POST"])
-def index(request, fixed_state=None, read_only=False):
+def _render_index(request, fixed_state=None, read_only=False):
     if read_only:
         heading, active_nav = "جميع الشراكات", "partnerships_all"
         add_url, reset_url = "", reverse("partnerships:all_index")
@@ -679,22 +676,29 @@ def index(request, fixed_state=None, read_only=False):
 @module_view('partnerships')
 @login_required(login_url="accounts:login")
 @require_http_methods(["GET", "POST"])
+def index(request, fixed_state=None, read_only=False):
+    return _render_index(request, fixed_state=fixed_state, read_only=read_only)
+
+
+@module_view('partnerships')
+@login_required(login_url="accounts:login")
+@require_http_methods(["GET", "POST"])
 def capability_index(request):
-    return index(request, fixed_state=DevelopmentState.CAPABILITY)
+    return _render_index(request, fixed_state=DevelopmentState.CAPABILITY)
 
 
 @module_view('partnerships')
 @login_required(login_url="accounts:login")
 @require_http_methods(["GET", "POST"])
 def willingness_index(request):
-    return index(request, fixed_state=DevelopmentState.WILLINGNESS)
+    return _render_index(request, fixed_state=DevelopmentState.WILLINGNESS)
 
 
 @module_view('partnerships_all')
 @login_required(login_url="accounts:login")
 @require_http_methods(["GET", "HEAD"])
 def all_index(request):
-    return index(request, fixed_state=None, read_only=True)
+    return _render_index(request, fixed_state=None, read_only=True)
 
 
 @module_view('partnerships')
