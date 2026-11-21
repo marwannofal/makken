@@ -641,7 +641,7 @@ def clauses_progress(request, pk):
             .filter(partnership=partnership, agreement__isnull=True)
             .order_by("id")
         )
-        overall = mean_progress([r.progress for r in rows])
+        overall = mean_progress(sum(r.progress for r in rows), len(rows))
         overall_str = "—" if overall is None else (f"{overall:g}%" if overall == int(overall) else f"{overall:.2f}%")
         return {
             "partnership_id": partnership.pk,
