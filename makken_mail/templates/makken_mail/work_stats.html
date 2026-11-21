@@ -7,10 +7,7 @@
     <h2>إحصائيات المهام حسب الموظف</h2>
     <p class="muted">عدد المهام المسندة لكل موظف وحالات الإنجاز خلال الفترة الزمنية المحددة ضمن نطاقك.</p>
   </div>
-  <div class="work-stats-actions">
-    <a class="button button-secondary" href="{% url 'makken_mail:work_index' %}">سجل الأعمال</a>
-    {% if can_create_work %}<a class="button button-primary" href="{% url 'makken_mail:work_create' %}">إسناد عمل جديد</a>{% endif %}
-  </div>
+
 </header>
 
 <form method="get" class="mail-inline">

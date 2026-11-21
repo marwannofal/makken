@@ -315,7 +315,7 @@ def work_stats(request):
     policy = AccessPolicy(request.user)
     stats = build_work_stats(request.user, request.GET)
     can_create = request.user.is_superuser or policy.can('work_assignments', 'create')
-    return page(request, 'work_stats', section='work', stats=stats, can_create_work=can_create)
+    return page(request, 'work_stats', section='work', active_page='work_stats', page_heading='إحصائيات المهام', stats=stats, can_create_work=can_create)
 
 
 @module_view('work_assignments')
