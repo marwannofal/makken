@@ -206,6 +206,40 @@
   const lineDialog = $('#offering-editor'), lineForm = $('[data-offering-form]'), confirmation = $('#offering-confirmation');
   let editingIndex = null, confirmAction = null;
   const lineError = $('[data-offering-error]');
+  const offeringToast = $('[data-offering-toast]');
+  const offeringToastText = $('[data-offering-toast-text]');
+  let offeringToastTimer = null;
+  function hideOfferingToast() {
+    if (offeringToastTimer) {
+      clearTimeout(offeringToastTimer);
+      offeringToastTimer = null;
+    }
+    if (offeringToast) offeringToast.hidden = true;
+  }
+  function showOfferingToast(message) {
+    if (!offeringToast || !offeringToastText) return;
+    hideOfferingToast();
+    offeringToastText.textContent = message;
+    offeringToast.hidden = false;
+    lineDialog.scrollTop = 0;
+    offeringToastTimer = setTimeout(() => {
+      offeringToast.hidden = true;
+      offeringToastTimer = null;
+    }, 5000);
+  }
+  function resetOfferingFields(row = null) {
+    lineForm.reset();
+    lineError.textContent = '';
+    sectorSelect.value = row ? String(row.sector) : '';
+    shapeSelect.value = row ? String(row.shape) : '';
+    controls.get(sectorSelect).update();
+    controls.get(shapeSelect).update();
+    filterSpecs(row?.specializations || []);
+    $('#offering-description').value = catalog.shapes.find(s => String(s.id) === shapeSelect.value)?.description || '';
+    const activeRadio = $(`input[name=offering_active][value="${row && !row.is_active ? '0' : '1'}"]`, lineForm);
+    if (activeRadio) activeRadio.checked = true;
+  }
+  lineDialog.addEventListener('close', hideOfferingToast);
   function ask(title, text, callback) {
     $('#offering-confirm-title').textContent = title;
     $('[data-line-confirm-description]').textContent = text;
@@ -221,21 +255,14 @@
   confirmation.addEventListener('close', () => {confirmAction = null;});
   function openEditor(index = null) {
     editingIndex = index;
-    lineForm.reset();
-    lineError.textContent = '';
+    hideOfferingToast();
     const row = index === null ? null : rows[index];
     $('#offering-title').textContent = row ? 'تعديل قطاع وشكل رعاية' : 'إضافة قطاع وشكل رعاية';
     $('button[type=submit]', lineForm).textContent = row ? 'مراجعة التعديل' : 'إضافة البند';
-    sectorSelect.value = row ? String(row.sector) : '';
-    shapeSelect.value = row ? String(row.shape) : '';
-    controls.get(sectorSelect).update();
-    controls.get(shapeSelect).update();
-    filterSpecs(row?.specializations || []);
+    resetOfferingFields(row);
     if (row && row.specializations.length > 1) {
       lineError.textContent = 'هذا بند سابق يحتوي على عدة تخصصات. اختر تخصصًا واحدًا لحفظ تعديله؛ الإلغاء يحتفظ بجميع بياناته السابقة.';
     }
-    $('#offering-description').value = catalog.shapes.find(s => String(s.id) === shapeSelect.value)?.description || '';
-    $(`input[name=offering_active][value="${row && !row.is_active ? '0' : '1'}"]`, lineForm).checked = true;
     show(lineDialog);
     controls.get(sectorSelect).trigger.focus();
   }
@@ -243,7 +270,8 @@
   lineForm.addEventListener('submit', event => {
     event.preventDefault();
     if (!lineForm.reportValidity()) return;
-    const row = {sector: Number(sectorSelect.value), specializations: [Number(specsSelect.value)], shape: Number(shapeSelect.value), is_active: $('input[name=offering_active]:checked', lineForm).value === '1'};
+    const activeInput = $('input[name=offering_active]:checked', lineForm);
+    const row = {sector: Number(sectorSelect.value), specializations: [Number(specsSelect.value)], shape: Number(shapeSelect.value), is_active: activeInput ? activeInput.value === '1' : true};
     if (rows.some((old, index) => index !== editingIndex && old.sector === row.sector && old.shape === row.shape && old.specializations.some(id => row.specializations.includes(id)))) {
       lineError.textContent = 'هذا التخصص وشكل الرعاية موجودان بالفعل داخل القطاع نفسه.';
       return;
@@ -251,9 +279,19 @@
     if (editingIndex === null && rows.length >= 100) {lineError.textContent = 'الحد الأقصى 100 بند.';return;}
     const index = editingIndex;
     const sector = catalog.sectors.find(s => s.id === row.sector)?.name || '';
+    const spec = catalog.specializations.find(s => s.id === row.specializations[0])?.name || '';
     ask(index === null ? 'تأكيد إضافة البند' : 'تأكيد تعديل البند', `هل تريد ${index === null ? 'إضافة' : 'تعديل'} بند الشراكة للقطاع «${sector}»؟`, () => {
-      if (index === null) rows.push(row);else rows[index] = row;
-      renderRows();lineDialog.close();
+      if (index === null) {
+        rows.push(row);
+        renderRows();
+        resetOfferingFields(null);
+        showOfferingToast(`تمت إضافة بند الشراكة للقطاع «${sector}» والتخصص «${spec}» بنجاح. يمكنك إضافة بند آخر أو إغلاق النافذة.`);
+        controls.get(sectorSelect).trigger.focus();
+      } else {
+        rows[index] = row;
+        renderRows();
+        lineDialog.close();
+      }
     });
   });
   function actionButton(text, action, cls = '') {

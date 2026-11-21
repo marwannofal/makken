@@ -8,10 +8,10 @@
 {% block extra_head %}
   <link rel="stylesheet" href="{% static 'partnerships/single_specialization.css' %}?v=20261019-2">
   <link rel="stylesheet" href="{% static 'care_states/states.css' %}?v=20261015-1">
-  <link rel="stylesheet" href="{% static 'partnerships/partnerships.css' %}?v=20261121-5">
+  <link rel="stylesheet" href="{% static 'partnerships/partnerships.css' %}?v=20261121-6">
   <link rel="stylesheet" href="{% static 'partnerships/willingness_upload.css' %}?v=20261017-1">
   <link rel="stylesheet" href="{% static 'partnerships/willingness_clauses.css' %}?v=20261121-4">
-  <script src="{% static 'partnerships/partnerships.js' %}?v=20261019-single-specialization" defer></script>
+  <script src="{% static 'partnerships/partnerships.js' %}?v=20261121-6" defer></script>
   <script src="{% static 'partnerships/willingness_clauses.js' %}?v=20261121-dmy" defer></script>
   {% include "partnerships/_financial_assets.html" %}
   {% include "partnerships/_editor_fields_assets.html" %}
@@ -228,6 +228,10 @@
         <span class="dialog-symbol"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 21h18M4 21V9l6 3V7l6 3V3h4v18"/></svg></span><button type="button" class="icon-button" data-dismiss-dialog aria-label="إغلاق"><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
       </div>
       <p class="eyebrow">بند شراكة</p><h2 id="offering-title">إضافة قطاع وشكل رعاية</h2><p class="dialog-description">تظهر فقط التخصصات المرتبطة بالقطاع المختار.</p>
+      <div class="mk-offering-toast" data-offering-toast role="status" aria-live="polite" hidden>
+        <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5"/></svg>
+        <span data-offering-toast-text></span>
+      </div>
       <div class="partnership-field">
         <label for="offering-sector">اسم القطاع <span class="required">*</span></label><select id="offering-sector" required><option value="">اختر القطاع</option></select>
       </div>

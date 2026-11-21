@@ -290,3 +290,11 @@ class WillingnessUnifiedWorkflowTests(TestCase):
         self.assertEqual(p.renewal_rule, RenewalRule.AUTOMATIC)
         self.assertEqual(p.objective, 'تأهيل وتوظيف المتدربين')
         self.assertEqual(PartnershipTeamMember.objects.filter(partnership=p).count(), 2)
+
+    def test_offering_dialog_renders_toast_and_stays_open_on_add(self):
+        self.client.force_login(self.admin)
+        for route in ('partnerships:create', 'partnerships:create_willingness'):
+            res = self.client.get(reverse(route))
+            self.assertEqual(res.status_code, 200)
+            self.assertContains(res, 'data-offering-toast')
+            self.assertContains(res, 'partnerships.js?v=20261121-6')

@@ -1011,3 +1011,47 @@
 #id_financial_capacity::placeholder {
   text-align: start !important;
 }
+
+.mk-offering-toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border: 1px solid #9ddfd5;
+  border-radius: 12px;
+  background: #ebfaf7;
+  color: #0f5f58;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.75;
+  box-shadow: 0 6px 18px rgba(15, 95, 88, 0.08);
+  animation: mk-toast-in 0.22s ease-out;
+}
+
+.mk-offering-toast[hidden] {
+  display: none;
+}
+
+.mk-offering-toast svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  fill: none;
+  stroke: #14968c;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@keyframes mk-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
