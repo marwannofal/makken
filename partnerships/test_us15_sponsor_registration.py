@@ -343,3 +343,9 @@ class SponsorRegistrationUS15Tests(TestCase):
         detail_res = self.client.get(reverse('partnerships:sponsor_request_review', args=[req.pk]))
         self.assertEqual(detail_res.status_code, 200)
         self.assertContains(detail_res, '+962 797971718')
+
+    def test_public_register_page_includes_tvtc_logo_and_ltr_phone_row(self):
+        res = self.client.get(reverse('partnerships:public_sponsor_register'))
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, 'accounts/images/header-logo.svg')
+        self.assertContains(res, '<div class="pub-phone-row" dir="ltr">')

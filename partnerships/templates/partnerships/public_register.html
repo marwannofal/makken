@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>تسجيل راعٍ جديد | مكّن</title>
-  <link rel="stylesheet" href="{% static 'partnerships/sponsor_requests.css' %}?v=20261121-blue6">
+  <link rel="stylesheet" href="{% static 'partnerships/sponsor_requests.css' %}?v=20261121-blue7">
   {% include "core/partials/accessibility_assets.html" %}
   <link rel="stylesheet" href="{% static 'core/css/makken-dropdowns.css' %}?v=20261121-search2">
   <script src="{% static 'core/js/makken-dropdowns.js' %}?v=20261121-search1" defer></script>
@@ -14,12 +14,17 @@
 <body class="pub-body">
   <main class="pub-shell">
     <header class="pub-header">
+      <div class="pub-header-top">
+        <div class="pub-logo-wrap">
+          <img class="pub-tvtc-logo" src="{% static 'accounts/images/header-logo.svg' %}" alt="المؤسسة العامة للتدريب التقني والمهني" width="220" height="82">
+        </div>
+        <a class="pub-back-link" href="{% url 'accounts:login' %}">العودة لتسجيل الدخول</a>
+      </div>
       <div class="pub-brand">
-        <span class="pub-badge">منصة مكّن</span>
+        <span class="pub-badge">منصة مكّن · الشراكات الاستراتيجية</span>
         <h1>طلب شراكة جديدة لراعي جديد</h1>
         <p>قدّم بيانات جهتك للانضمام إلى رعاة برامج المؤسسة العامة للتدريب التقني والمهني. ستتم مراجعة الطلب من الفريق المختص قبل اعتماده وإدراجه في سجل شراكات القدرة.</p>
       </div>
-      <a class="pub-back-link" href="{% url 'accounts:login' %}">العودة لتسجيل الدخول</a>
     </header>
 
     <section class="pub-card" aria-labelledby="pub-form-title">
@@ -51,7 +56,7 @@
 
           <div class="pub-field">
             <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }} <span class="req">*</span></label>
-            <div class="pub-phone-row">
+            <div class="pub-phone-row" dir="ltr">
               {{ form.phone_country }}
               {{ form.phone }}
             </div>

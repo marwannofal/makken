@@ -780,3 +780,252 @@
   white-space: normal;
   line-height: 1.75;
 }
+
+
+/* === TVTC Ocean-Blue Public Registration Theme & LTR Phone Fix === */
+.pub-body {
+  background: linear-gradient(160deg, #e7f1f7 0%, #f4f9fc 52%, #e2eef5 100%) !important;
+  color: #123446;
+}
+
+.pub-shell {
+  max-width: 1000px;
+  padding: 28px 20px 56px;
+}
+
+.pub-header {
+  display: flex !important;
+  flex-direction: column;
+  gap: 18px;
+  padding: 26px 30px 28px;
+  margin-bottom: 24px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #003b57 0%, #005b85 56%, #0b74a4 100%);
+  color: #ffffff;
+  box-shadow: 0 18px 42px rgba(0, 68, 102, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.pub-header::after {
+  content: "";
+  position: absolute;
+  inset-inline-end: -60px;
+  top: -60px;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0) 70%);
+  pointer-events: none;
+}
+
+.pub-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+  position: relative;
+  z-index: 1;
+}
+
+.pub-logo-wrap {
+  display: inline-flex;
+  align-items: center;
+}
+
+.pub-tvtc-logo {
+  height: 62px;
+  width: auto;
+  max-width: 240px;
+  object-fit: contain;
+  display: block;
+}
+
+.pub-brand {
+  max-width: 760px;
+  position: relative;
+  z-index: 1;
+}
+
+.pub-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16) !important;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: #ffffff !important;
+  font-size: 12.5px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.pub-brand h1 {
+  color: #ffffff !important;
+  font-size: 27px;
+  font-weight: 800;
+  margin: 0 0 8px;
+}
+
+.pub-brand p {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-size: 14.5px;
+  line-height: 1.85;
+}
+
+.pub-back-link {
+  background: rgba(255, 255, 255, 0.14) !important;
+  border: 1px solid rgba(255, 255, 255, 0.38) !important;
+  color: #ffffff !important;
+  padding: 9px 18px;
+  border-radius: 12px;
+  font-weight: 700;
+  transition: background-color 0.16s ease, border-color 0.16s ease;
+}
+
+.pub-back-link:hover {
+  background: rgba(255, 255, 255, 0.24) !important;
+  border-color: #ffffff !important;
+}
+
+.pub-card {
+  border: 1px solid #cfe0ea !important;
+  border-top: 4px solid #005b85 !important;
+  border-radius: 22px;
+  padding: 30px 32px;
+  box-shadow: 0 14px 38px rgba(0, 65, 96, 0.08) !important;
+}
+
+.pub-card h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 20px;
+  font-weight: 800;
+  color: #004c70 !important;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e4eff5;
+  margin-bottom: 22px;
+}
+
+.pub-card h2::before {
+  content: "";
+  width: 5px;
+  height: 22px;
+  border-radius: 99px;
+  background: #005b85;
+  flex-shrink: 0;
+}
+
+.pub-field input,
+.pub-field select,
+.pub-field textarea,
+.pub-field .mk-dd-trigger {
+  border-color: #c5d9e4 !important;
+  background-color: #fcfdfe;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.pub-field input:focus,
+.pub-field select:focus,
+.pub-field textarea:focus,
+.pub-field .mk-dd-trigger:focus {
+  outline: none;
+  border-color: #005b85 !important;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(0, 91, 133, 0.14);
+}
+
+/* Phone field: force clean LTR order ([ SA +966 ⌄ ] on left, [ 05XXXXXXXX ] on right) */
+.pub-phone-row {
+  direction: ltr !important;
+  display: grid !important;
+  grid-template-columns: 148px minmax(0, 1fr) !important;
+  gap: 10px !important;
+  align-items: stretch;
+}
+
+.pub-phone-row .mk-dd-wrap,
+.pub-phone-row select,
+.pub-phone-row input {
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+.pub-phone-row .mk-dd-trigger {
+  direction: ltr !important;
+  text-align: left !important;
+  justify-content: space-between;
+}
+
+.pub-regions,
+.pub-offerings {
+  background: #f6fafd !important;
+  border: 1px solid #d2e3ec !important;
+  border-radius: 16px !important;
+  padding: 18px 20px !important;
+}
+
+.pub-regions legend,
+.pub-offerings h3 {
+  color: #004c70 !important;
+  font-weight: 800;
+}
+
+.pub-region-item {
+  border-color: #d3e3ec !important;
+  transition: border-color 0.14s ease, background-color 0.14s ease;
+}
+
+.pub-region-item:hover {
+  border-color: #005b85 !important;
+  background: #eef6fb !important;
+}
+
+.pub-region-item input[type="checkbox"] {
+  accent-color: #005b85;
+}
+
+.pub-btn-outline {
+  border-color: #005b85 !important;
+  color: #005b85 !important;
+  background: #ffffff !important;
+  font-weight: 700;
+}
+
+.pub-btn-outline:hover {
+  background: #e8f3f9 !important;
+}
+
+.pub-submit,
+.pub-actions button[type="submit"] {
+  background: linear-gradient(135deg, #005b85 0%, #00486a 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 8px 20px rgba(0, 91, 133, 0.24);
+  transition: transform 0.14s ease, box-shadow 0.14s ease;
+}
+
+.pub-submit:hover,
+.pub-actions button[type="submit"]:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px rgba(0, 91, 133, 0.32);
+}
+
+@media (max-width: 640px) {
+  .pub-header {
+    padding: 20px;
+  }
+  .pub-card {
+    padding: 20px;
+  }
+  .pub-tvtc-logo {
+    height: 48px;
+  }
+  .pub-phone-row {
+    grid-template-columns: 128px minmax(0, 1fr) !important;
+  }
+}
