@@ -208,7 +208,7 @@ class PartnershipReminderTests(TestCase):
 
         # signed_on=2026-01-18 + 12 months => calculated_expiry=2027-01-18 (exactly 2 months from NOW=2026-11-18)
         item = self.partner()
-        Partnership.objects.filter(pk=item.pk).update(signed_on=date(2026, 1, 18), duration_months=12, ends_on=None)
+        Partnership.objects.filter(pk=item.pk).update(starts_on=None, ends_on=None, signed_on=date(2026, 1, 18), duration_months=12)
         item.refresh_from_db()
         self.assertIsNone(item.ends_on)
         self.assertEqual(item.calculated_expiry, date(2027, 1, 18))
