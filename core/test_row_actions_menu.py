@@ -90,6 +90,8 @@ class RowActionsMenuTests(TestCase):
         self.assertIn('data-row-url', js)
         self.assertIn('data-url', js)
         self.assertIn('data-execution-dialog', js)
+        self.assertIn('existingView', js)
+        self.assertIn('resolvedTarget', js)
 
         css = (base / 'core' / 'static' / 'core' / 'css' / 'makken-row-actions-menu.css').read_text(encoding='utf-8')
         self.assertIn('cursor: default !important;', css)

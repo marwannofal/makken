@@ -282,6 +282,24 @@
         actionTd.append(wrapper);
       }
       if (dropdown.querySelector('.mk-view-action')) return;
+      const resolvedTarget = detailUrl ? new URL(detailUrl, window.location.href).href : '';
+      const existingView = [...dropdown.querySelectorAll('a, button')].find(el => {
+        const label = (el.textContent || '').trim();
+        if (label === 'مشاهدة' || label === 'عرض التفاصيل') return true;
+        if (resolvedTarget && el.tagName === 'A' && el.getAttribute('href')) {
+          try {
+            return new URL(el.getAttribute('href'), window.location.href).href === resolvedTarget;
+          } catch (_) {
+            return false;
+          }
+        }
+        return false;
+      });
+      if (existingView) {
+        existingView.classList.add('mk-view-action');
+        dropdown.prepend(existingView);
+        return;
+      }
 
       let item;
       if (detailUrl) {
