@@ -9,7 +9,7 @@ from django.utils import timezone
 from .events import can_receive, email_digest
 from .models import Delivery, DeliveryStatus as Status, SMTPConfig, WorkStatus
 from .registry import CATALOG, MODULES, PARTNERSHIP_EXPIRY
-from .reminders import PARTNERSHIP_MODEL, business_date, can_receive_reminder, is_due, reminder_source
+from .reminders import PARTNERSHIP_MODEL, business_date, can_receive_reminder, effective_expiry, is_due, reminder_source
 from .smtp import SendFailure, message_link, ready, send
 from .targets import SCOPED_MODELS, record, record_label, record_path
 from access_control.activity_data import audit_timezone, clean_text
@@ -47,7 +47,8 @@ def build_context(delivery, item):
     path = reverse('makken_home')
     if code == PARTNERSHIP_EXPIRY:
         description = 'اقترب موعد انتهاء الشراكة التي تتابعها في منصة مكّن. افتح سجل الشراكة لمراجعة الإجراءات اللازمة.'
-        details += [('الشراكة', safe_label(item.name)), ('تاريخ نهاية الشراكة', item.ends_on.isoformat())]
+        expiry = effective_expiry(item)
+        details += [('الشراكة', safe_label(item.name)), ('تاريخ نهاية الشراكة', expiry.isoformat() if expiry else '—')]
         path = record_path(item, 'partnerships')
     elif code.startswith('work.') and work:
         description = 'سُجّل تحديث على عمل تتابعه في منصة مكّن.'

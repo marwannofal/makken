@@ -104,5 +104,9 @@ CELERY_BEAT_SCHEDULE = {
         "task": "makken_mail.tasks.deliver_pending_mail",
         "schedule": 60.0,
     },
+    "makken-partnership-expiry-reminders": {
+        "task": "makken_mail.tasks.queue_partnership_expiry_reminders",
+        "schedule": 21600.0,
+    },
 }
 # END MAKKEN RABBITMQ CELERY MAIL v1

@@ -29,13 +29,24 @@ def shifted_month(day, months, *, last_day=False):
     return date(year, month, length if last_day else min(day.day, length))
 
 
+def effective_expiry(partnership):
+    """Return explicit ends_on or US-16 calculated_expiry (signed_on + duration_months)."""
+    if not partnership:
+        return None
+    return partnership.ends_on or partnership.calculated_expiry
+
+
 def reminder_source(partnership):
-    return f'partnership-expiry:{partnership.pk}:{partnership.ends_on.isoformat()}'
+    expiry = effective_expiry(partnership)
+    return f'partnership-expiry:{partnership.pk}:{expiry.isoformat()}'
 
 
 def is_due(partnership, today):
-    return bool(partnership and partnership.is_active and partnership.ends_on and
-                today < partnership.ends_on and shifted_month(partnership.ends_on, -2) <= today)
+    expiry = effective_expiry(partnership)
+    return bool(
+        partnership and partnership.is_active and expiry
+        and today < expiry and shifted_month(expiry, -2) <= today
+    )
 
 
 def open_assignments(partnership_id):
@@ -50,7 +61,7 @@ def can_receive_reminder(user, rule, partnership):
         return False
     routes = Q(pk__in=[])
     if rule.to_employee:
-        routes |= Q(employee_id=user.pk)
+        routes |= Q(employee_id=user.pk) | Q(assignees__id=user.pk)
     if rule.to_manager:
         routes |= Q(manager_id=user.pk)
     return (
@@ -70,8 +81,12 @@ def queue_due_reminders(now=None):
     today = business_date(now)
     # At month end all later days in the target month can map back to today
     # (e.g. April 29 and 30 both map to February 28 in a non-leap year).
+    horizon = shifted_month(today, 2, last_day=True)
     candidates = Partnership.objects.filter(
-        is_active=True, ends_on__gt=today, ends_on__lte=shifted_month(today, 2, last_day=True),
+        is_active=True,
+    ).filter(
+        Q(ends_on__gt=today, ends_on__lte=horizon)
+        | Q(ends_on__isnull=True, signed_on__isnull=False, duration_months__isnull=False)
     ).filter(Exists(open_assignments(OuterRef('pk')))).order_by('pk')
     queued = 0
     for partnership in candidates.iterator(chunk_size=200):
@@ -82,6 +97,9 @@ def queue_due_reminders(now=None):
         recipient_ids = set()
         if rule.to_employee:
             recipient_ids.update(assignments.values_list('employee_id', flat=True))
+            recipient_ids.update(
+                uid for uid in assignments.values_list('assignees__id', flat=True) if uid is not None
+            )
         if rule.to_manager:
             recipient_ids.update(assignments.values_list('manager_id', flat=True))
         recipient_ids.difference_update(Delivery.objects.filter(source=source).values_list('recipient_key', flat=True))

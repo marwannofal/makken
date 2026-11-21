@@ -198,3 +198,29 @@ class PartnershipReminderTests(TestCase):
         preferences = self.client.get(reverse('makken_mail:preferences', args=[self.employee.pk])).context['form']
         self.assertIn(PARTNERSHIP_EXPIRY, dict(preferences.fields['muted'].choices))
         self.assertNotIn(PARTNERSHIP_EXPIRY, dict(preferences.fields['selected'].choices))
+
+    def test_calculated_expiry_without_ends_on_triggers_reminder_for_all_assignees(self):
+        self.enable()
+        extra = User.objects.create_user('reminder-extra', 'extra@example.org', 'TestPassword')
+        access = UserAccess.objects.create(user=extra, page_scope=PageScope.SELECTED, region_scope=RegionScope.SELECTED)
+        access.allowed_pages.add(Module.objects.get(pk='partnerships'))
+        access.allowed_regions.add(self.region)
+
+        # signed_on=2026-01-18 + 12 months => calculated_expiry=2027-01-18 (exactly 2 months from NOW=2026-11-18)
+        item = self.partner(ends_on=None)
+        Partnership.objects.filter(pk=item.pk).update(signed_on=date(2026, 1, 18), duration_months=12, ends_on=None)
+        item.refresh_from_db()
+        self.assertIsNone(item.ends_on)
+        self.assertEqual(item.calculated_expiry, date(2027, 1, 18))
+
+        work = self.assign(item)
+        work.assignees.add(self.employee, extra)
+
+        self.assertEqual(queue_due_reminders(NOW), 2)
+        rows = list(Delivery.objects.filter(rule_id=PARTNERSHIP_EXPIRY).order_by('pk'))
+        self.assertEqual({r.recipient_id for r in rows}, {self.employee.pk, extra.pk})
+
+        row, send = self.deliver()
+        self.assertEqual(row.status, DeliveryStatus.SENT)
+        _, _, values, _ = send.call_args.args
+        self.assertIn(('تاريخ نهاية الشراكة', '2027-01-18'), values['details'])

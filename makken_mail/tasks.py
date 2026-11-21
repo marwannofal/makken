@@ -45,6 +45,13 @@ def deliver_pending_mail(limit=50):
     return run_batch(limit=max(1, min(100, int(limit))), max_seconds=50)
 
 
+@shared_task(name="makken_mail.tasks.queue_partnership_expiry_reminders", ignore_result=True)
+def queue_partnership_expiry_reminders():
+    """Periodic Docker Beat task to queue US-06 2-month partnership expiry reminders."""
+    from .reminders import queue_due_reminders
+    return queue_due_reminders()
+
+
 def _publish(delivery_id):
     try:
         deliver_one_mail.delay(delivery_id)
