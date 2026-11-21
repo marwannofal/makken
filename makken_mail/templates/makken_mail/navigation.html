@@ -1,6 +1,15 @@
-<a class="nav-link{% if active_page == 'work' %} is-active{% endif %}" href="{% url 'makken_mail:work_index' %}"{% if active_page == 'work' %} aria-current="page"{% endif %}>
-<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 5h6m-9 0H4v16h16V5h-2M8 3h8v4H8Zm0 11 3 3 5-6"/></svg><span>متابعة الأعمال</span><span class="nav-dot" aria-hidden="true"></span>
-</a>
-<a class="nav-link{% if active_page == 'work_stats' %} is-active{% endif %}" href="{% url 'makken_mail:work_stats' %}"{% if active_page == 'work_stats' %} aria-current="page"{% endif %}>
-<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 19h16M7 16V9m5 7V5m5 11v-4"/></svg><span>إحصائيات المهام</span><span class="nav-dot" aria-hidden="true"></span>
-</a>
+<details class="nav-management{% if active_page == 'work' or active_page == 'work_stats' %} has-active-page{% endif %}" data-management-group{% if active_page == 'work' or active_page == 'work_stats' %} open{% endif %}>
+  <summary class="nav-management-toggle">
+    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 5h6m-9 0H4v16h16V5h-2M8 3h8v4H8Zm0 11 3 3 5-6"/></svg>
+    <span>متابعة الأعمال</span>
+    <svg class="management-chevron" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+  </summary>
+  <div class="nav-management-links">
+    <a class="nav-link{% if active_page == 'work' %} is-active{% endif %}" href="{% url 'makken_mail:work_index' %}"{% if active_page == 'work' %} aria-current="page"{% endif %}>
+      <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 5h6m-9 0H4v16h16V5h-2M8 3h8v4H8Zm0 11 3 3 5-6"/></svg><span>سجل الأعمال</span><span class="nav-dot" aria-hidden="true"></span>
+    </a>
+    <a class="nav-link{% if active_page == 'work_stats' %} is-active{% endif %}" href="{% url 'makken_mail:work_stats' %}"{% if active_page == 'work_stats' %} aria-current="page"{% endif %}>
+      <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 19h16M7 16V9m5 7V5m5 11v-4"/></svg><span>إحصائيات المهام</span><span class="nav-dot" aria-hidden="true"></span>
+    </a>
+  </div>
+</details>
