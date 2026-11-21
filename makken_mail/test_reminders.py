@@ -8,7 +8,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from access_control.defaults import initialize
-from access_control.models import PermissionOverride, UserAccess
+from access_control.models import Module, PageScope, PermissionOverride, RegionScope, UserAccess
 from entities.models import Entity
 from partnerships.models import Partnership
 from regions.models import Region
