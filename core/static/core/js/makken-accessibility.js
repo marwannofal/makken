@@ -206,7 +206,12 @@
     const icon = document.createElement('span');
     icon.className = 'mk-a11y-section-icon';
     icon.setAttribute('aria-hidden', 'true');
-    icon.textContent = openByDefault ? '−' : '+';
+    const setIcon = isOpen => {
+      icon.innerHTML = isOpen
+        ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg>'
+        : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
+    };
+    setIcon(openByDefault);
     toggle.append(label, icon);
 
     const content = document.createElement('div');
@@ -218,7 +223,7 @@
       const nextOpen = content.hidden;
       content.hidden = !nextOpen;
       toggle.setAttribute('aria-expanded', String(nextOpen));
-      icon.textContent = nextOpen ? '−' : '+';
+      setIcon(nextOpen);
     });
 
     sec.append(toggle, content);
