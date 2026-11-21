@@ -22,7 +22,7 @@
         <dt>المدير</dt><dd>{{ work.manager.get_full_name|default:work.manager }}</dd>
       </div>
       <div>
-        <dt>الاستحقاق</dt><dd><bdi>{{ work.due_on|date:"Y-m-d"|default:'—' }}</bdi></dd>
+        <dt>الاستحقاق</dt><dd><bdi>{{ work.due_on|date:"d/m/Y"|default:'—' }}</bdi></dd>
       </div>
       <div>
         <dt>السجل المرتبط</dt><dd>
@@ -77,7 +77,7 @@
             <tr>
               <th scope="row">{{ row.label }}</th><td>{{ row.actor|default:'—' }}</td><td><bdi>
               {% timezone 'Asia/Riyadh' %}
-                {{ row.created_at|date:"Y-m-d H:i" }}
+                {{ row.created_at|date:"d/m/Y H:i" }}
               {% endtimezone %}
               </bdi></td><td>{{ row.status_label }}</td><td><bdi>{{ row.snapshot.progress }}%</bdi></td><td class="mail-notes">{{ row.note|default:'—' }}</td>
             </tr>

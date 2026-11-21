@@ -25,7 +25,7 @@
       <header>
         <div><h3>{{ entry.clause_name|default:"متابعة عامة للاتفاقية" }}</h3>
           <p class="muted">{% if entry.created_by %}{{ entry.created_by.get_full_name|default:entry.created_by.get_username }}{% else %}المستخدم غير متاح{% endif %}</p></div>
-        {% timezone "Asia/Riyadh" %}<time class="muted" datetime="{{ entry.created_at|date:'c' }}" dir="ltr">{{ entry.created_at|date:"Y/m/d H:i" }}</time>{% endtimezone %}
+        {% timezone "Asia/Riyadh" %}<time class="muted" datetime="{{ entry.created_at|date:'c' }}" dir="ltr">{{ entry.created_at|date:"d/m/Y H:i" }}</time>{% endtimezone %}
       </header>
       {% if entry.note %}<p class="followup-note">{{ entry.note }}</p>{% endif %}
       {% if entry.evidence.all %}

@@ -126,7 +126,7 @@
               <div>
                 <strong>التوقيع:</strong>
                 {% if row.signed_on %}
-                  <bdi dir="ltr">{{ row.signed_on|date:"Y-m-d" }}</bdi>
+                  <bdi dir="ltr">{{ row.signed_on|date:"d/m/Y" }}</bdi>
                 {% else %}
                   غير محدد
                 {% endif %}
@@ -268,7 +268,7 @@
               <dt>نوع الكيان</dt><dd>{{ detail_row.partnership.entity.name }}</dd>
             </div>
             <div>
-              <dt>تاريخ التوقيع</dt><dd><bdi dir="ltr">{{ detail_row.signed_on|date:"Y-m-d"|default:"—" }}</bdi></dd>
+              <dt>تاريخ التوقيع</dt><dd><bdi dir="ltr">{{ detail_row.signed_on|date:"d/m/Y"|default:"—" }}</bdi></dd>
             </div>
             <div>
               <dt>مدة الاتفاقية</dt><dd>
@@ -280,7 +280,7 @@
               </dd>
             </div>
             <div>
-              <dt>تاريخ الانتهاء</dt><dd><bdi dir="ltr">{{ detail_row.expiry|date:"Y-m-d"|default:"—" }}</bdi></dd>
+              <dt>تاريخ الانتهاء</dt><dd><bdi dir="ltr">{{ detail_row.expiry|date:"d/m/Y"|default:"—" }}</bdi></dd>
             </div>
             <div>
               <dt>نوع التجديد</dt><dd>{{ detail_row.partnership.get_renewal_rule_display|default:"—" }}</dd>

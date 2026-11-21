@@ -46,10 +46,10 @@
           <dt>مستوى</dt><dd>{{ selected_record.level_name|default:'—' }}</dd>
         </div>
         <div>
-          <dt>تاريخ الاعتماد / الرفض</dt><dd>{{ selected_record.decided_at|date:'Y/m/d H:i:s T'|default:'—' }}</dd>
+          <dt>تاريخ الاعتماد / الرفض</dt><dd>{{ selected_record.decided_at|date:'d/m/Y H:i:s T'|default:'—' }}</dd>
         </div>
         <div>
-          <dt>تاريخ التعديل</dt><dd>{{ selected_record.updated_at|date:'Y/m/d H:i:s T'|default:'—' }}</dd>
+          <dt>تاريخ التعديل</dt><dd>{{ selected_record.updated_at|date:'d/m/Y H:i:s T'|default:'—' }}</dd>
         </div>
         <div>
           <dt>المستخدم / التعديل</dt><dd>

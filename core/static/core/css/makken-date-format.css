@@ -1,0 +1,90 @@
+/* Makken site-wide DD/MM/YYYY date input styling (RTL-first, responsive, CSP-safe). */
+
+.mk-date-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.mk-date-field > input.mk-date-native {
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline-end: 0;
+  width: 1px !important;
+  height: 1px !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  overflow: hidden;
+}
+
+.mk-date-field > input.mk-date-display {
+  width: 100%;
+  min-width: 0;
+  direction: ltr;
+  text-align: left;
+  padding-inline-end: 42px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.mk-date-field > input.mk-date-display::placeholder {
+  color: #7c9795;
+  letter-spacing: 0.03em;
+}
+
+.mk-date-picker-btn {
+  position: absolute;
+  inset-inline-end: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #274c4f;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.mk-date-picker-btn:hover:not(:disabled) {
+  background: #eaf7f5;
+  color: #147f7c;
+}
+
+.mk-date-picker-btn:focus-visible {
+  outline: 2px solid #24b3af;
+  outline-offset: 2px;
+}
+
+.mk-date-picker-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.mk-date-picker-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-date-picker-btn {
+    transition: none;
+  }
+}

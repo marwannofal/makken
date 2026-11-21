@@ -105,7 +105,7 @@ def send_welcome_credentials_email(user, initial_password, *, must_change_passwo
         details.append(('نطاق المناطق', region_summary))
     details.append((
         'الوقت (الرياض)',
-        timezone.localtime(timezone.now(), audit_timezone()).strftime('%Y-%m-%d %H:%M'),
+        timezone.localtime(timezone.now(), audit_timezone()).strftime('%d/%m/%Y %H:%M'),
     ))
 
     if must_change_password:

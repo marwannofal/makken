@@ -43,7 +43,7 @@ def build_context(delivery, item):
     title = CATALOG[code].label
     details = []
     when = event.created_at if event else delivery.created_at
-    details.append(('الوقت (الرياض)', timezone.localtime(when, audit_timezone()).strftime('%Y-%m-%d %H:%M')))
+    details.append(('الوقت (الرياض)', timezone.localtime(when, audit_timezone()).strftime('%d/%m/%Y %H:%M')))
     path = reverse('makken_home')
     if code == PARTNERSHIP_EXPIRY:
         description = 'اقترب موعد انتهاء الشراكة التي تتابعها في منصة مكّن. افتح سجل الشراكة لمراجعة الإجراءات اللازمة.'

@@ -11,7 +11,7 @@
     <div>
       <dt>التاريخ والوقت</dt><dd>
       {% timezone activity_timezone %}
-        <bdi>{{ event.created_at|date:'Y-m-d H:i:s' }}</bdi>
+        <bdi>{{ event.created_at|date:'d/m/Y H:i:s' }}</bdi>
       {% endtimezone %}
       <small>توقيت الرياض · UTC+03:00</small></dd>
     </div>

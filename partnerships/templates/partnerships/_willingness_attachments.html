@@ -18,7 +18,7 @@
           <div class="willingness-file-info">
             <bdi class="willingness-file-name">{{ attachment.original_name }}</bdi><p><bdi>{{ attachment.size|filesizeformat }}</bdi><span aria-hidden="true"> · </span>
             {% timezone "Asia/Riyadh" %}
-              <time datetime="{{ attachment.uploaded_at|date:'c' }}">{{ attachment.uploaded_at|date:'Y/m/d H:i' }}</time>
+              <time datetime="{{ attachment.uploaded_at|date:'c' }}">{{ attachment.uploaded_at|date:'d/m/Y H:i' }}</time>
             {% endtimezone %}
             </p>
           </div>

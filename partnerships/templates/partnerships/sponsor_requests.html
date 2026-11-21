@@ -98,7 +98,7 @@
           <td>{{ row.entity.name }}<small>{{ row.get_scope_display }}</small></td>
           <td>{% for reg in row.administrative_regions.all %}{{ reg.name }}{% if not forloop.last %}، {% endif %}{% empty %}—{% endfor %}</td>
           <td><span class="sr-pill is-{{ row.status }}">{{ row.get_status_display }}</span></td>
-          <td><bdi>{{ row.created_at|date:"Y-m-d H:i" }}</bdi></td>
+          <td><bdi>{{ row.created_at|date:"d/m/Y H:i" }}</bdi></td>
           <td>
             <a class="button button-secondary" href="{% url 'partnerships:sponsor_request_review' row.pk %}">
               {% if row.status == 'new' and can_decide %}مراجعة واتخاذ قرار{% else %}عرض التفاصيل{% endif %}

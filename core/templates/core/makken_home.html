@@ -18,7 +18,7 @@
       <div>
         <p class="eyebrow">مكّن · من الاحتياج إلى الأثر</p><h1 id="dashboard-heading">لوحة المتابعة</h1><p>أهلًا {{ display_name }}، نظرة واضحة على الاحتياجات والتمويل والتنفيذ.</p><time class="dash-update" datetime="{{ generated_at|date:'c' }}">وقت تحديث اللوحة: <bdi>
         {% timezone dashboard_timezone %}
-          {{ generated_at|date:'Y-m-d H:i:s' }}
+          {{ generated_at|date:'d/m/Y H:i:s' }}
         {% endtimezone %}
         </bdi> · توقيت الرياض</time>
       </div>
@@ -341,7 +341,7 @@
             </div>
             <time datetime="{{ event.created_at|date:'c' }}">
             {% timezone 'Asia/Riyadh' %}
-              {{ event.created_at|date:'Y-m-d H:i' }}
+              {{ event.created_at|date:'d/m/Y H:i' }}
             {% endtimezone %}
             · الرياض</time></li>
           {% empty %}

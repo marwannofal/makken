@@ -27,7 +27,7 @@
         <label>تاريخ الانتهاء (يُحسب آليًا)</label>
         <div class="expiry-readonly-box" dir="ltr" data-calculated-expiry>
           {% if item and item.calculated_expiry %}
-            {{ item.calculated_expiry|date:"Y-m-d" }}
+            {{ item.calculated_expiry|date:"d/m/Y" }}
           {% else %}
             يُحسب تلقائيًا عند إدخال تاريخ التوقيع والمدة
           {% endif %}

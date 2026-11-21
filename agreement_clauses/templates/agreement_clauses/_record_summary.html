@@ -19,16 +19,16 @@
       <dt>تصنيف الاتفاقية</dt><dd>{{ details.classification|default:"—" }}</dd>
     </div>
     <div>
-      <dt>تاريخ التوقيع</dt><dd><bdi>{{ details.signed_on|date:"Y-m-d"|default:"—" }}</bdi></dd>
+      <dt>تاريخ التوقيع</dt><dd><bdi>{{ details.signed_on|date:"d/m/Y"|default:"—" }}</bdi></dd>
     </div>
     <div>
       <dt>المدة الأصلية بالأشهر</dt><dd><bdi>{{ details.duration_months|default:"—" }}</bdi></dd>
     </div>
     <div>
-      <dt>الانتهاء الأصلي</dt><dd><bdi>{{ details.initial_expiry|date:"Y-m-d"|default:"—" }}</bdi></dd>
+      <dt>الانتهاء الأصلي</dt><dd><bdi>{{ details.initial_expiry|date:"d/m/Y"|default:"—" }}</bdi></dd>
     </div>
     <div class="agreement-highlight">
-      <dt>تاريخ الانتهاء الحالي للاتفاقية</dt><dd><bdi>{{ current_expiry|date:"Y-m-d"|default:"—" }}</bdi></dd>
+      <dt>تاريخ الانتهاء الحالي للاتفاقية</dt><dd><bdi>{{ current_expiry|date:"d/m/Y"|default:"—" }}</bdi></dd>
     </div>
     <div>
       <dt>نوع التجديد</dt><dd>{{ details.get_renewal_rule_display|default:"—" }}</dd>
@@ -60,7 +60,7 @@
       </dd>
     </div>
     <div>
-      <dt>آخر تحديث</dt><dd><bdi>{{ details.updated_at|date:"Y-m-d H:i"|default:"—" }}</bdi>
+      <dt>آخر تحديث</dt><dd><bdi>{{ details.updated_at|date:"d/m/Y H:i"|default:"—" }}</bdi>
       {% if details.updated_by %}
         · {{ details.updated_by.get_full_name|default:details.updated_by.username }}
       {% endif %}
@@ -147,14 +147,14 @@
   {% for renewal in renewals %}
     <div class="agreement-card-row">
       <div>
-        <bdi>{{ renewal.starts_on|date:"Y-m-d" }}</bdi> ← <bdi>{{ renewal.expires_on|date:"Y-m-d" }}</bdi> <p class="muted">{{ renewal.get_rule_display }}
+        <bdi>{{ renewal.starts_on|date:"d/m/Y" }}</bdi> ← <bdi>{{ renewal.expires_on|date:"d/m/Y" }}</bdi> <p class="muted">{{ renewal.get_rule_display }}
         {% if renewal.approval_reference %}
           · مرجع الموافقة: {{ renewal.approval_reference }}
         {% endif %}
         </p>
       </div>
       <div>
-        <bdi>{{ renewal.recorded_at|date:"Y-m-d" }}</bdi>
+        <bdi>{{ renewal.recorded_at|date:"d/m/Y" }}</bdi>
         {% if renewal.recorded_by %}
           · {{ renewal.recorded_by.get_full_name|default:renewal.recorded_by.username }}
         {% endif %}
@@ -168,7 +168,7 @@
       <summary>
         تسجيل تجديد
       </summary>
-      <p class="field-help">يبدأ التجديد من الانتهاء الحالي <bdi>{{ current_expiry|date:"Y-m-d" }}</bdi>. يُسجّل التجديد بعد التأكيد.</p>
+      <p class="field-help">يبدأ التجديد من الانتهاء الحالي <bdi>{{ current_expiry|date:"d/m/Y" }}</bdi>. يُسجّل التجديد بعد التأكيد.</p>
       <form method="post" data-market-confirm="هل تريد تسجيل فترة التجديد في تاريخ الاتفاقية؟" data-agreement-period data-start-date="{{ current_expiry|date:'Y-m-d' }}">
         {% csrf_token %}
         <input type="hidden" name="operation" value="renew"> <input type="hidden" name="snapshot" value="{{ renew_token }}">

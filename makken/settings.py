@@ -204,6 +204,11 @@ if not any(_app == "market_needs" or _app.startswith("market_needs.") for _app i
 LANGUAGE_CODE = "ar"
 USE_I18N = True
 LANGUAGES = [("ar", "العربية")]
+DATE_FORMAT = "d/m/Y"
+SHORT_DATE_FORMAT = "d/m/Y"
+DATETIME_FORMAT = "d/m/Y H:i"
+SHORT_DATETIME_FORMAT = "d/m/Y H:i"
+DATE_INPUT_FORMATS = ["%d/%m/%Y", "%Y-%m-%d", "%d-%m-%Y"]
 # END MAKKEN ARABIC VALIDATION
 
 # BEGIN MAKKEN FRIENDLY ERRORS

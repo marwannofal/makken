@@ -35,7 +35,7 @@
       const lastDay = new Date(Date.UTC(targetYear, targetMonth, 0)).getUTCDate();
       const targetDay = Math.min(d, lastDay);
       const pad = n => String(n).padStart(2, '0');
-      output.textContent = `${targetYear}-${pad(targetMonth)}-${pad(targetDay)}`;
+      output.textContent = `${pad(targetDay)}/${pad(targetMonth)}/${targetYear}`;
     }
 
     signedInput.addEventListener('input', compute);

@@ -41,7 +41,7 @@
             {% endif %}
             </td><td>
             {% if row.record.updated_at %}
-              <time datetime="{{ row.record.updated_at|date:'c' }}">{{ row.record.updated_at|date:'Y/m/d H:i:s T' }}</time>
+              <time datetime="{{ row.record.updated_at|date:'c' }}">{{ row.record.updated_at|date:'d/m/Y H:i:s T' }}</time>
             {% else %}
               —
             {% endif %}

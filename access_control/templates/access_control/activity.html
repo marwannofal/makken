@@ -65,7 +65,7 @@
             <tr data-activity-url="{% url 'access_control:activity_detail' event.pk %}" tabindex="0" aria-label="تفاصيل الحدث {{ event.pk }}، {{ event.description }}">
               <td><time datetime="{{ event.created_at|date:'c' }}">
               {% timezone activity_timezone %}
-                <bdi>{{ event.created_at|date:'Y-m-d' }}</bdi><small><bdi>{{ event.created_at|date:'H:i:s' }}</bdi></small>
+                <bdi>{{ event.created_at|date:'d/m/Y' }}</bdi><small><bdi>{{ event.created_at|date:'H:i:s' }}</bdi></small>
               {% endtimezone %}
               </time></td> <th scope="row">{{ event.actor_name }}<small><bdi>{{ event.actor_username|default:'عملية نظام' }}</bdi></small></th> <td>{{ event.module_title }}</td><td><span class="activity-action activity-action-{{ event.action }}">{{ event.get_action_display }}</span><small>{{ event.description }}</small></td> <td>{{ event.target_label|default:'عرض صفحة / إجراء عام' }}
               {% if event.target_key %}

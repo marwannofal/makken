@@ -106,7 +106,7 @@
                 {% include "agreement_clauses/_percent.html" with value=item.progress only %}
                 </strong> <small>{{ item.clause_count }} بند</small> </td> <td>
                 {% if item.last_followup_at %}
-                  <bdi dir="ltr">{{ item.last_followup_at|date:'Y-m-d H:i' }}</bdi> <small><bdi>{{ item.last_followup_by }}</bdi></small>
+                  <bdi dir="ltr">{{ item.last_followup_at|date:'d/m/Y H:i' }}</bdi> <small><bdi>{{ item.last_followup_by }}</bdi></small>
                 {% else %}
                   —
                 {% endif %}

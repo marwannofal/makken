@@ -36,7 +36,7 @@
     </dd>
   </div>
   <div>
-    <dt>تاريخ الرصد</dt><dd>{{ need.observed_on|date:'Y/m/d' }}</dd>
+    <dt>تاريخ الرصد</dt><dd>{{ need.observed_on|date:'d/m/Y' }}</dd>
   </div>
   <div>
     <dt>البرنامج التدريبي</dt><dd>{{ need.program_name }}</dd>
@@ -60,7 +60,7 @@
     </dd>
   </div>
   <div>
-    <dt>تاريخ الإنشاء</dt><dd>{{ need.created_at|date:'Y/m/d H:i:s T' }}</dd>
+    <dt>تاريخ الإنشاء</dt><dd>{{ need.created_at|date:'d/m/Y H:i:s T' }}</dd>
   </div>
 </dl>
 <div class="market-description">

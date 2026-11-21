@@ -124,7 +124,7 @@ def export(request,format):
             label='، '.join(str(options.get(v,v)) for v in value) if isinstance(value,list) else str(options.get(value,value))
             filters.append(field.label+': '+label)
         filters.append('المؤشرات الأساسية: الوضع الحالي للبطاقات المنشأة ضمن الفترة. الرسوم الحدثية تستخدم تاريخ الاعتماد / الاكتمال بتوقيت الرياض.')
-        created=timezone.localtime(report.generated_at,audit_timezone()).strftime('%Y-%m-%d %H:%M:%S UTC+03:00')
+        created=timezone.localtime(report.generated_at,audit_timezone()).strftime('%d/%m/%Y %H:%M:%S UTC+03:00')
         payload=xlsx_bytes(table,' | '.join(filters),created) if format=='xlsx' else pdf_bytes(table,' | '.join(filters),created)
         response=HttpResponse(payload,content_type='application/pdf' if format=='pdf' else 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         response['Content-Disposition']=content_disposition_header(True,'مكّن-لوحة-المتابعة-'+report.generated_at.strftime('%Y%m%d-%H%M')+'.'+format)

@@ -44,9 +44,9 @@
     <div><dt>القطاع</dt><dd>{{ req.sector.name|default:'—' }}</dd></div>
     <div><dt>شكل الرعاية</dt><dd>{{ req.sponsorship_shape.name|default:'—' }}</dd></div>
     <div><dt>القدرة المالية</dt><dd>{% if req.financial_capacity is not None %}<bdi>{{ req.financial_capacity }}</bdi> ريال{% else %}—{% endif %}</dd></div>
-    <div><dt>تاريخ التقديم</dt><dd><bdi>{{ req.created_at|date:"Y-m-d H:i" }}</bdi></dd></div>
+    <div><dt>تاريخ التقديم</dt><dd><bdi>{{ req.created_at|date:"d/m/Y H:i" }}</bdi></dd></div>
     {% if req.reviewed_at %}
-    <div><dt>تمت المراجعة</dt><dd>{{ req.reviewed_by.get_full_name|default:req.reviewed_by }} · <bdi>{{ req.reviewed_at|date:"Y-m-d H:i" }}</bdi></dd></div>
+    <div><dt>تمت المراجعة</dt><dd>{{ req.reviewed_by.get_full_name|default:req.reviewed_by }} · <bdi>{{ req.reviewed_at|date:"d/m/Y H:i" }}</bdi></dd></div>
     {% endif %}
   </dl>
 

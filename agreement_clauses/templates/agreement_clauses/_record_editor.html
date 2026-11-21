@@ -20,7 +20,7 @@
       {% include "agreement_clauses/_record_field.html" with field=form.duration_months only %}
       {% include "agreement_clauses/_record_field.html" with field=form.renewal_rule only %}
       <div class="partnership-field"><label for="agreement-expiry-preview">الانتهاء المحسوب للمدة الأصلية</label>
-        <output class="agreement-output" id="agreement-expiry-preview" for="id_signed_on id_duration_months" dir="ltr" data-expiry-preview>{{ form.expiry_preview|date:"Y-m-d"|default:"—" }}</output>
+        <output class="agreement-output" id="agreement-expiry-preview" for="id_signed_on id_duration_months" dir="ltr" data-expiry-preview>{{ form.expiry_preview|date:"d/m/Y"|default:"—" }}</output>
       </div>
     </div>
     {% if form.signed_on.field.disabled %}<p class="field-help">لا يمكن تعديل تاريخ التوقيع أو المدة الأصلية بعد تسجيل أول تجديد.</p>{% endif %}

@@ -43,7 +43,7 @@ class NeedForm(forms.Form):
     source = forms.CharField(label="مصدر الحاجة", max_length=300, validators=[validate_name])
     beneficiaries = forms.IntegerField(label="عدد المستفيدين", min_value=1, max_value=1000000000)
     requested_support = SARAmountField(label="قيمة الدعم المطلوبة")
-    observed_on = forms.DateField(label="تاريخ الرصد", initial=timezone.localdate, widget=forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"), input_formats=["%Y-%m-%d"])
+    observed_on = forms.DateField(label="تاريخ الرصد", initial=timezone.localdate, widget=forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"), input_formats=["%d/%m/%Y", "%Y-%m-%d"])
     is_active = forms.ChoiceField(label="حالة السجل", choices=[("1", "نشط"), ("0", "غير نشط")], initial="1")
     program = forms.ModelChoiceField(label="البرنامج التدريبي", queryset=TrainingProgram.objects.none())
     lines = forms.CharField(widget=forms.HiddenInput, max_length=60000, initial="[]")

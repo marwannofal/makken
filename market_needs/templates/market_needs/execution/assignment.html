@@ -200,7 +200,7 @@
         </div>
       </header>
       {% if execution.status == 'complete' %}
-        <p class="feedback feedback-info"><strong>اكتمل التنفيذ وأُغلق التعديل.</strong> تاريخ الاكتمال: {{ execution.completed_at|date:'Y/m/d H:i:s T' }}. يبقى السجل متاحًا للمشاهدة والتصدير حسب صلاحياتك.</p>
+        <p class="feedback feedback-info"><strong>اكتمل التنفيذ وأُغلق التعديل.</strong> تاريخ الاكتمال: {{ execution.completed_at|date:'d/m/Y H:i:s T' }}. يبقى السجل متاحًا للمشاهدة والتصدير حسب صلاحياتك.</p>
       {% elif not writable %}
         <p class="feedback feedback-info">هذه الصفحة للعرض فقط وفق صلاحياتك أو حالة البطاقة.</p>
       {% endif %}

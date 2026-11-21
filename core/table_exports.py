@@ -61,7 +61,7 @@ class TableExportMiddleware:
             try:
                 table, filters = self.collect(request, response, index, format)
                 now = timezone.now()
-                created = (timezone.localtime(now) if timezone.is_aware(now) else now).strftime('%Y/%m/%d %H:%M %Z')
+                created = (timezone.localtime(now) if timezone.is_aware(now) else now).strftime('%d/%m/%Y %H:%M %Z')
                 payload = xlsx_bytes(table, filters, created) if format == 'xlsx' else pdf_bytes(table, filters, created)
             finally:
                 EXPORT_LOCK.release()

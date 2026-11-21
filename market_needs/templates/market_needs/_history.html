@@ -7,7 +7,7 @@
     {% regional_event raw_event as event %}
     <details class="market-event">
       <summary>
-        <span>{{ event.action }}</span><time datetime="{{ event.created_at|date:'c' }}">{{ event.created_at|date:'Y/m/d H:i:s T' }}</time><bdi>
+        <span>{{ event.action }}</span><time datetime="{{ event.created_at|date:'c' }}">{{ event.created_at|date:'d/m/Y H:i:s T' }}</time><bdi>
         {% if event.actor %}
           {{ event.actor.get_full_name|default:event.actor.username }}
         {% else %}

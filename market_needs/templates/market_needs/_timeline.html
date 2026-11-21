@@ -12,7 +12,7 @@
           {% endif %}
         </div>
         {% if state.date %}
-          <time datetime="{{ state.date|date:'c' }}" dir="ltr">{{ state.date|date:'Y/m/d H:i:s T' }}</time>
+          <time datetime="{{ state.date|date:'c' }}" dir="ltr">{{ state.date|date:'d/m/Y H:i:s T' }}</time>
         {% else %}
           <p class="muted">لا يوجد تاريخ مسجّل لهذه الحالة</p>
         {% endif %}

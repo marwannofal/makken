@@ -31,7 +31,7 @@
             <tr>
               <th scope="row">{{ row.label }}</th><td>{{ row.recipient|default:'حساب غير متاح' }}</td><td><bdi>
               {% timezone 'Asia/Riyadh' %}
-                {{ row.created_at|date:"Y-m-d H:i" }}
+                {{ row.created_at|date:"d/m/Y H:i" }}
               {% endtimezone %}
               </bdi></td><td>{{ row.attempts }}</td><td><span class="mail-pill{% if row.status == 'sent' %} is-on{% endif %}">{{ row.get_status_display }}</span></td><td>{{ row.reason_label|default:'—' }}</td>
             </tr>

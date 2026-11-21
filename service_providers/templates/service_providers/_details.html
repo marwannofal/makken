@@ -66,10 +66,10 @@
         </dd>
       </div>
       <div>
-        <dt>أنشئ بواسطة</dt><dd>{{ detail.created_by.get_username|default:'—' }} · {{ detail.created_at|date:'Y/m/d H:i:s' }}</dd>
+        <dt>أنشئ بواسطة</dt><dd>{{ detail.created_by.get_username|default:'—' }} · {{ detail.created_at|date:'d/m/Y H:i:s' }}</dd>
       </div>
       <div>
-        <dt>آخر تعديل</dt><dd>{{ detail.updated_by.get_username|default:'—' }} · {{ detail.updated_at|date:'Y/m/d H:i:s' }}</dd>
+        <dt>آخر تعديل</dt><dd>{{ detail.updated_by.get_username|default:'—' }} · {{ detail.updated_at|date:'d/m/Y H:i:s' }}</dd>
       </div>
     </dl>
     <h3>المناطق والتخصصات</h3>
@@ -110,7 +110,7 @@
     <h3>سجل التغييرات</h3><p class="table-scroll-hint">آخر 30 عملية؛ تبقى جميع العمليات السابقة محفوظة في قاعدة البيانات.</p>
     <ol class="provider-events">
       {% for event in detail_events %}
-        <li><strong>{{ event.get_action_display }}</strong><span>{{ event.actor_name }} · {{ event.created_at|date:'Y/m/d H:i:s' }}</span></li>
+        <li><strong>{{ event.get_action_display }}</strong><span>{{ event.actor_name }} · {{ event.created_at|date:'d/m/Y H:i:s' }}</span></li>
       {% empty %}
         <li>لا توجد تغييرات مسجلة.</li>
       {% endfor %}

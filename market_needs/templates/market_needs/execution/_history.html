@@ -1,7 +1,7 @@
 {% for row in execution_history %}
   <details class="market-event">
     <summary>
-      <span>{{ row.event.action }}</span><time datetime="{{ row.event.created_at|date:'c' }}">{{ row.event.created_at|date:'Y/m/d H:i:s T' }}</time><bdi>{{ row.event.actor.get_full_name|default:row.event.actor.username|default:'حساب محذوف' }}</bdi>
+      <span>{{ row.event.action }}</span><time datetime="{{ row.event.created_at|date:'c' }}">{{ row.event.created_at|date:'d/m/Y H:i:s T' }}</time><bdi>{{ row.event.actor.get_full_name|default:row.event.actor.username|default:'حساب محذوف' }}</bdi>
     </summary>
     <div class="market-event-values">
       <div>

@@ -20,7 +20,7 @@
         </div>
         {% timezone "Asia/Riyadh" %}
           {% if state.date %}
-            <time datetime="{{ state.date|date:'c' }}" dir="ltr">{{ state.date|date:"Y/m/d H:i:s" }}</time><small>بتوقيت الرياض (UTC+3)</small>
+            <time datetime="{{ state.date|date:'c' }}" dir="ltr">{{ state.date|date:"d/m/Y H:i:s" }}</time><small>بتوقيت الرياض (UTC+3)</small>
           {% else %}
             <p class="muted">لم تدخل هذه الحالة بعد</p>
           {% endif %}

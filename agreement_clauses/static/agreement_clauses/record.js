@@ -10,7 +10,7 @@
     if (year < 1 || endYear > 9999) return "—";
     const leap = endYear % 4 === 0 && (endYear % 100 !== 0 || endYear % 400 === 0);
     const days = [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][endMonth - 1];
-    return [String(endYear).padStart(4, "0"), String(endMonth).padStart(2, "0"), String(Math.min(day, days)).padStart(2, "0")].join("-");
+    return [String(Math.min(day, days)).padStart(2, "0"), String(endMonth).padStart(2, "0"), String(endYear).padStart(4, "0")].join("/");
   };
 
   for (const section of document.querySelectorAll("[data-agreement-period]")) {
