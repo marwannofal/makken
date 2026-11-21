@@ -20,7 +20,7 @@
   padding: 26px;
   margin-bottom: 24px;
   min-width: 0;
-  box-shadow: 0 6px 25px #153a3c04;
+  box-shadow: 0 6px 25px #15303c04;
 }
 
 .card-heading {
@@ -517,7 +517,7 @@
   max-width: none;
   max-height: calc(100dvh - 36px);
   color: #15303c;
-  box-shadow: 0 25px 100px #103a3a33;
+  box-shadow: 0 25px 100px #102d3a33;
   overflow: auto;
 }
 
@@ -526,7 +526,7 @@
 }
 
 .partnership-dialog::backdrop {
-  background: #133d3b70;
+  background: #13303d70;
   backdrop-filter: blur(5px);
 }
 
@@ -718,7 +718,7 @@
   top: calc(100% + 5px);
   background: #fff;
   border: 1px solid #dce5e9;
-  box-shadow: 0 12px 35px #153a3c26;
+  box-shadow: 0 12px 35px #15303c26;
   border-radius: 12px;
   padding: 9px;
   min-width: 190px;

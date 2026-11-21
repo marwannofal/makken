@@ -398,7 +398,7 @@ h1 {
   border-radius: 22px;
   overflow: hidden;
   background: #0b4865;
-  box-shadow: 0 12px 35px #1a6b6610;
+  box-shadow: 0 12px 35px #1a516b10;
 }
 
 .welcome-copy {
@@ -482,7 +482,7 @@ h2 > span {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(270deg, #0b4865 0%, #0b656427 42%, #073c3b39 100%), linear-gradient(0deg, #064b4b9c, transparent 55%);
+  background: linear-gradient(270deg, #0b4865 0%, #0b486527 42%, #072b3c39 100%), linear-gradient(0deg, #06354b9c, transparent 55%);
 }
 
 .visual-caption {
@@ -562,7 +562,7 @@ h2 > span {
   max-width: none;
   max-height: none;
   border-radius: 20px 0 0 20px;
-  box-shadow: -20px 0 70px #153a3c26;
+  box-shadow: -20px 0 70px #15303c26;
   color: var(--ink);
 }
 
@@ -571,7 +571,7 @@ h2 > span {
 }
 
 .mobile-sidebar::backdrop {
-  background: #113c3b66;
+  background: #112e3c66;
   backdrop-filter: blur(3px);
 }
 
@@ -739,7 +739,7 @@ h2 > span {
     height: 190px;
   }
   .welcome-visual:after {
-    background: linear-gradient( 180deg, #0b4865 0%, #0b656420 55%, #064b4b80 100% );
+    background: linear-gradient( 180deg, #0b4865 0%, #0b486520 55%, #06354b80 100% );
   }
   .welcome-visual > img {
     object-position: center 48%;

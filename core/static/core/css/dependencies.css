@@ -8,13 +8,13 @@
   overflow: auto;
   color: #23404e;
   background: #fff;
-  box-shadow: 0 24px 90px rgb(19 66 68 / 20%);
+  box-shadow: 0 24px 90px rgb(19 52 68 / 20%);
   font-family: inherit;
   overflow-wrap: anywhere;
 }
 
 .dependency-dialog::backdrop {
-  background: rgb(17 45 48 / 48%);
+  background: rgb(17 38 48 / 48%);
   backdrop-filter: blur(4px);
 }
 

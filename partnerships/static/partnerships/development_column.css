@@ -84,7 +84,7 @@
 }
 
 .development-transition-button:hover .development-state-pill {
-  box-shadow: 0 0 0 3px #24b3af25;
+  box-shadow: 0 0 0 3px #005b8525;
 }
 
 .development-transition-button:focus-visible {

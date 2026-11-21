@@ -35,7 +35,7 @@
 
 .mk-export-button:hover {
   background:#e9f3f8;
-  box-shadow:0 3px 10px #155f6010
+  box-shadow:0 3px 10px #15486010
 }
 
 .mk-export-button[data-mk-format=pdf] {
@@ -77,14 +77,14 @@
   overflow:auto;
   color:#243c47;
   background:#fff;
-  box-shadow:0 25px 90px #143e4033;
+  box-shadow:0 25px 90px #14324033;
   direction:rtl;
   font-family:Cairo,sans-serif;
   text-align:right
 }
 
 .mk-export-dialog::backdrop {
-  background:#153f4666;
+  background:#15364666;
   backdrop-filter:blur(4px)
 }
 

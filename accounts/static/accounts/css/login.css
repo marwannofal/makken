@@ -136,7 +136,7 @@ label {
 .input-wrap input:focus {
   background: white;
   border-color: var(--primary-dark);
-  box-shadow: 0 0 0 3px rgb(36 179 175 / 15%);
+  box-shadow: 0 0 0 3px rgb(0 91 133 / 15%);
 }
 
 .input-wrap input[aria-invalid="true"] {
@@ -297,13 +297,13 @@ label {
   border: 0;
   border-radius: 12px;
   background: var(--primary);
-  color: #092633;
+  color: #ffffff;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 13px;
-  box-shadow: 0 8px 22px rgb(36 179 175 / 20%);
+  box-shadow: 0 8px 22px rgb(0 91 133 / 20%);
   transition: background .15s, color .15s, box-shadow .15s;
 }
 
@@ -391,7 +391,7 @@ button:focus-visible, .form-alert:focus-visible {
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: linear-gradient(180deg, rgb(5 48 46 / 13%) 30%, rgb(5 42 41 / 83%) 100%);
+  background: linear-gradient(180deg, rgb(5 34 48 / 13%) 30%, rgb(5 30 42 / 83%) 100%);
 }
 
 .visual-badge {
@@ -402,7 +402,7 @@ button:focus-visible, .form-alert:focus-visible {
   border: 1px solid rgb(255 255 255 / 40%);
   border-radius: 100px;
   padding: 8px 17px;
-  background: rgb(5 50 46 / 35%);
+  background: rgb(5 36 50 / 35%);
   font-size: 13px;
 }
 
@@ -452,7 +452,7 @@ button:focus-visible, .form-alert:focus-visible {
 
 @media (max-width: 760px) {
   body {
-    background: linear-gradient(rgb(6 61 57 / 38%), rgb(6 61 57 / 45%)), url("../images/login-img.png") center / cover fixed;
+    background: linear-gradient(rgb(6 44 61 / 38%), rgb(6 44 61 / 45%)), url("../images/login-img.png") center / cover fixed;
   }
   .login-layout {
     display: flex;
@@ -465,7 +465,7 @@ button:focus-visible, .form-alert:focus-visible {
     margin: auto;
     border-radius: 22px;
     padding: 0 26px;
-    box-shadow: 0 16px 60px rgb(0 43 40 / 20%);
+    box-shadow: 0 16px 60px rgb(0 29 43 / 20%);
   }
   .form-main {
     padding: 30px 0 20px;

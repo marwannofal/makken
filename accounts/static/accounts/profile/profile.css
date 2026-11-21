@@ -152,7 +152,7 @@
   border-radius: 18px;
   padding: 26px;
   min-width: 0;
-  box-shadow: 0 5px 22px #265f4a04;
+  box-shadow: 0 5px 22px #264d5f04;
 }
 
 .profile-card-heading {
@@ -379,7 +379,7 @@
   border: 1px solid #d8e3e8;
   border-radius: 12px;
   background: white;
-  box-shadow: 0 12px 35px #173f3020;
+  box-shadow: 0 12px 35px #17323f20;
   z-index: 8;
 }
 
@@ -558,7 +558,7 @@
 }
 
 .profile-dialog::backdrop {
-  background: #143e3970;
+  background: #14313e70;
   backdrop-filter: blur(4px);
 }
 

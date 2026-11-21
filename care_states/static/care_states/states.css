@@ -27,7 +27,7 @@
   border:1px solid var(--line);
   border-radius:19px;
   overflow:hidden;
-  box-shadow:0 7px 30px #174b4104
+  box-shadow:0 7px 30px #173b4b04
 }
 
 .states-card-header {
@@ -299,17 +299,17 @@
   margin:auto;
   padding:0;
   border-radius:22px;
-  box-shadow:0 0 0 100vmax #123d3c66;
+  box-shadow:0 0 0 100vmax #122f3d66;
   z-index:12
 }
 
 .color-dialog::backdrop {
-  background:#123d3c66;
+  background:#122f3d66;
   backdrop-filter:blur(4px)
 }
 
 [data-color-enhanced] .color-dialog {
-  box-shadow:0 24px 90px #0b403333
+  box-shadow:0 24px 90px #0b2f4033
 }
 
 .color-dialog-open {

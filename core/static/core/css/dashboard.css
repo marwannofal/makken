@@ -25,7 +25,7 @@
   height:210px;
   left:-80px;
   top:-90px;
-  border:32px solid #24b3af0c;
+  border:32px solid #005b850c;
   border-radius:50%
 }
 
@@ -180,7 +180,7 @@
   border-radius:18px;
   color:#23414f;
   text-decoration:none;
-  box-shadow:0 5px 18px #194c4b03;
+  box-shadow:0 5px 18px #193c4c03;
   transition:border-color .16s,transform .16s
 }
 
