@@ -48,7 +48,7 @@ def build_charts(report):
     charts=[]
     if report.market:
         summary=report.summary
-        charts.append(donut('funding-states','حالات بطاقات السوق','الحالة الحالية للبطاقات المنشأة ضمن الفترة المختارة.',[
+        charts.append(donut('funding-states','حالات بطاقات حاجة السوق','الحالة الحالية للبطاقات المنشأة ضمن الفترة المختارة.',[
             {'label':label,'value':summary[key],'href':link(report,'cards',state=key)} for key,label in STATE_LABELS.items()]))
         charts.append(bar_chart('region-cards','البطاقات حسب المنطقة','قد تظهر البطاقة المشتركة في أكثر من منطقة؛ لا تجمع هذه الأعداد لإيجاد الإجمالي الفريد.',[
             {'label':r['regions__name'],'value':r['cards'],'href':link(report,'cards',regions=[r['regions__pk']]),

@@ -147,7 +147,7 @@ def records(request,kind):
     if kind not in permissions:raise Http404
     if not permissions[kind]:return denied(request,'لا تملك صلاحية مصدر هذه البيانات.')
     error=not report.valid;query=report.needs
-    title={'cards':'بطاقات السوق المختارة','executions':'متابعة التنفيذ','donors':'الجهات الراعية الممولة',
+    title={'cards':'بطاقات حاجة السوق المختارة','executions':'متابعة التنفيذ','donors':'الجهات الراعية الممولة',
            'partners':'الجهات المرتبطة بالبطاقات','providers':'مزودو التدريب المسند إليهم'}[kind]
     state=request.GET.get('state','');funding=request.GET.get('funding','')
     execution=request.GET.get('execution','');bucket=request.GET.get('bucket','')

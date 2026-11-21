@@ -131,7 +131,7 @@ class DashboardTests(MarketFixtures,TestCase):
         self.login_as()
         with CaptureQueriesContext(connection) as queries:response=self.client.get('/')
         self.assertEqual(response.status_code,200)
-        self.assertContains(response,'مؤشرات بطاقات السوق والتمويل غير متاحة')
+        self.assertContains(response,'مؤشرات بطاقات حاجة السوق والتمويل غير متاحة')
         self.assertIsNone(response.context['dashboard'].summary)
         self.assertNotContains(response,'VISIBLE_OWN')
         self.assertFalse(any('FROM "market_needs_need"' in q['sql'] for q in queries))
