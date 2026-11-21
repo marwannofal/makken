@@ -1057,8 +1057,8 @@
 }
 
 .mk-cp-dialog {
-  width: min(860px, 95vw);
-  max-width: min(860px, 95vw);
+  width: min(1060px, 96vw) !important;
+  max-width: min(1060px, 96vw) !important;
 }
 
 .mk-cp-meta {
@@ -1270,14 +1270,67 @@
   margin-bottom: 10px;
 }
 
+.mk-cp-upload-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.mk-cp-upload-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 7px 14px;
+  border: 1.5px dashed #24b3af;
+  border-radius: 10px;
+  background: #f2fbf9;
+  color: #0f6b65;
+  font: 700 13px/1.5 Cairo, sans-serif;
+  cursor: pointer;
+  transition: background 0.14s ease, border-color 0.14s ease;
+}
+
+.mk-cp-upload-btn:hover {
+  background: #e2f6f2;
+  border-color: #158d89;
+}
+
+.mk-cp-upload-btn svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.mk-cp-upload-btn input[type="file"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.mk-cp-upload-status {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #4a6b68;
+}
+
 .mk-cp-team-row {
   display: grid;
-  grid-template-columns: 110px 115px minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) auto;
-  gap: 8px;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+  gap: 10px;
   align-items: center;
-  padding: 10px;
-  border: 1px solid #dfece9;
-  border-radius: 10px;
+  padding: 12px 14px;
+  border: 1px solid #d9eae6;
+  border-radius: 12px;
   background: #fbfefd;
 }
 
@@ -1285,18 +1338,26 @@
 .mk-cp-team-row select {
   width: 100%;
   min-width: 0;
-  height: 38px;
-  padding: 0 8px;
+  height: 42px;
+  padding: 0 12px;
   border: 1px solid #cfe1dd;
-  border-radius: 8px;
-  font: 600 12.5px/1.4 Cairo, sans-serif;
+  border-radius: 10px;
+  font: 600 13.5px/1.4 Cairo, sans-serif;
   color: #163d3b;
   background: #fff;
 }
 
+.mk-cp-team-row select {
+  padding-left: 34px;
+}
+
 .mk-cp-team-remove {
-  height: 36px;
-  padding: 0 10px;
+  grid-column: 4;
+  grid-row: 1 / span 2;
+  align-self: stretch;
+  min-width: 72px;
+  min-height: 38px;
+  padding: 0 12px;
   border: 1px solid #f2c9cd;
   border-radius: 8px;
   background: #fff5f5;
@@ -1311,6 +1372,11 @@
 
 @media (max-width: 780px) {
   .mk-cp-team-row {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
+  }
+  .mk-cp-team-remove {
+    grid-column: auto;
+    grid-row: auto;
+    height: 38px;
   }
 }

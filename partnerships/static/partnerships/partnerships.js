@@ -221,12 +221,22 @@
             evList.append(link);
           });
           if (evList.childNodes.length) evWrap.append(evList);
+          const uploadWrap = make('div', 'mk-cp-upload-wrap');
+          const uploadBtn = make('label', 'mk-cp-upload-btn');
+          uploadBtn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0-4 4m4-4 4 4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg><span>اختيار شواهد ومرفقات</span>';
           const fileInput = make('input', 'mk-cp-ev-input');
           fileInput.type = 'file';
           fileInput.multiple = true;
           fileInput.accept = '.pdf,.png,.jpg,.jpeg';
           fileInput.dataset.cpEvidenceFor = String(item.id);
-          evWrap.append(fileInput);
+          const uploadStatus = make('span', 'mk-cp-upload-status', 'لم يتم اختيار ملفات جديدة');
+          fileInput.addEventListener('change', () => {
+            const names = [...(fileInput.files || [])].map(f => f.name);
+            uploadStatus.textContent = names.length ? `تم اختيار (${names.length}): ${names.join('، ')}` : 'لم يتم اختيار ملفات جديدة';
+          });
+          uploadBtn.append(fileInput);
+          uploadWrap.append(uploadBtn, uploadStatus);
+          evWrap.append(uploadWrap);
 
           extras.append(notesWrap, evWrap);
           row.append(info, inputWrap, bar, extras);
