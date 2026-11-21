@@ -434,3 +434,9 @@
 .mail-card[hidden] {
   display: none !important;
 }
+
+.mail-pill.is-danger {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}

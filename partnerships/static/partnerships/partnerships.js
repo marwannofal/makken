@@ -796,7 +796,12 @@
           const mgrEl = $('[data-work-manager]', row);
           if (mgrEl) mgrEl.textContent = w.manager_name;
           const stEl = $('[data-work-status]', row);
-          if (stEl) stEl.textContent = `${w.status_display} (${w.progress}%)`;
+          if (stEl) {
+            stEl.replaceChildren(document.createTextNode(`${w.status_display} (${w.progress}%)`));
+            if (w.is_overdue) {
+              stEl.append(' ', make('span', 'subtle-badge is-overdue-badge', 'متأخرة'));
+            }
+          }
         }
         workDialog.close();
       } catch (err) {

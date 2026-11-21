@@ -1525,3 +1525,9 @@
   margin: 0;
   flex: 0 0 auto;
 }
+
+.is-overdue-badge {
+  background: #fee2e2 !important;
+  color: #b91c1c !important;
+  border: 1px solid #fecaca !important;
+}

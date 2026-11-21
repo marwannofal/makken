@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="{% static 'partnerships/partnerships.css' %}?v=20261121-blue14">
   <link rel="stylesheet" href="{% static 'partnerships/willingness_upload.css' %}?v=20261121-blue6">
   <link rel="stylesheet" href="{% static 'partnerships/willingness_clauses.css' %}?v=20261121-blue6">
-  <script src="{% static 'partnerships/partnerships.js' %}?v=20261121-9" defer></script>
+  <script src="{% static 'partnerships/partnerships.js' %}?v=20261121-10" defer></script>
   <script src="{% static 'partnerships/willingness_clauses.js' %}?v=20261121-dmy" defer></script>
   {% include "partnerships/_financial_assets.html" %}
   {% include "partnerships/_editor_fields_assets.html" %}
@@ -239,7 +239,7 @@
                         {% endfor %}
                       </td>
                       <td data-work-manager>{{ wk.manager.get_full_name|default:wk.manager.username }}</td>
-                      <td data-work-status>{{ wk.get_status_display }} ({{ wk.progress }}%)</td>
+                      <td data-work-status>{{ wk.get_status_display }} ({{ wk.progress }}%){% if wk.is_overdue %} <span class="subtle-badge is-overdue-badge">متأخرة</span>{% endif %}</td>
                       <td><button type="button" class="row-action" data-edit-work-url="{% url 'partnerships:work_edit' item.pk wk.pk %}" data-edit-work-row="{{ wk.pk }}">عرض / تعديل</button></td>
                     </tr>
                   {% endfor %}
@@ -338,8 +338,8 @@
           <select id="we-status" name="status" required></select>
         </div>
         <div class="partnership-field">
-          <label for="we-progress">نسبة الإنجاز (%) <span class="required">*</span></label>
-          <input type="number" id="we-progress" name="progress" min="0" max="100" step="1" dir="ltr" required>
+          <label for="we-progress">نسبة الإنجاز (%) <small>(تلقائي من بنود الاتفاقية)</small></label>
+          <input type="number" id="we-progress" name="progress" min="0" max="100" step="1" dir="ltr" readonly>
         </div>
       </div>
       <div class="partnership-field">

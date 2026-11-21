@@ -42,7 +42,7 @@
               {% empty %}
                 {{ row.employee.get_full_name|default:row.employee }}
               {% endfor %}
-              </td><td>{{ row.manager.get_full_name|default:row.manager }}</td><td><bdi>{{ row.due_on|date:"d/m/Y"|default:'—' }}</bdi></td><td><span class="mail-pill{% if row.status == 'complete' %} is-on{% endif %}">{{ row.get_status_display }}</span></td><td><bdi>{{ row.progress }}%</bdi></td>
+              </td><td>{{ row.manager.get_full_name|default:row.manager }}</td><td><bdi>{{ row.due_on|date:"d/m/Y"|default:'—' }}</bdi></td><td><span class="mail-pill{% if row.status == 'complete' %} is-on{% endif %}">{{ row.get_status_display }}</span>{% if row.is_overdue %} <span class="mail-pill is-danger">متأخرة</span>{% endif %}</td><td><bdi>{{ row.progress }}%</bdi></td>
             </tr>
           {% empty %}
             <tr>

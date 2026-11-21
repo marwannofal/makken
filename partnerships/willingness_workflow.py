@@ -456,5 +456,7 @@ def create_partnership_work(actor, cleaned_work, partnership):
         target_key=partnership.pk,
     )
     work.assignees.set(assignees)
+    from makken_mail.clause_sync import sync_single_work
+    sync_single_work(work, actor=actor)
     record_update(work, actor, 'created', None)
     return work

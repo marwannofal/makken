@@ -292,8 +292,12 @@ def work_index(request):
                     ids = scoped(apps.get_model(model)._base_manager.all(), request.user).order_by().values('pk')
                 visible |= Q(target_model=model, target_key__in=Subquery(ids))
         query = query.filter(visible).distinct()
+    from .clause_sync import is_work_overdue, riyadh_today
+    today = riyadh_today()
     status = request.GET.get('status', '')
-    if status in WorkStatus.values:
+    if status == 'overdue':
+        query = query.filter(due_on__lt=today, status__in=(WorkStatus.NEW, WorkStatus.RUNNING))
+    elif status in WorkStatus.values:
         query = query.filter(status=status)
     term = request.GET.get('q', '').strip()[:160]
     if term:
@@ -320,8 +324,10 @@ def work_index(request):
             linked = a_map.get(row.target_key)
         row.linked_partnership = linked
         row.linked_partnership_url = reverse('partnerships:edit', args=[linked.pk]) if linked else ''
+        row.is_overdue = is_work_overdue(row, today)
+    status_choices = [*WorkStatus.choices, ('overdue', 'متأخرة')]
     return page(request, 'work_list', section='work', rows=page_obj,
-                q=term, selected=status, statuses=WorkStatus.choices, paging=params.urlencode(),
+                q=term, selected=status, statuses=status_choices, paging=params.urlencode(),
                 can_create_work=can_create, can_view_stats=can_stats)
 
 

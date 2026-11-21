@@ -406,12 +406,16 @@ def editor(request, pk=None, initial_state=DevelopmentState.CAPABILITY):
     existing_works = []
     if show_edit_clauses and item and item.pk:
         from makken_mail.models import WorkAssignment
+        from makken_mail.clause_sync import is_work_overdue, riyadh_today
+        today_riyadh = riyadh_today()
         existing_works = list(
             WorkAssignment.objects.filter(target_model="partnerships.partnership", target_key=item.pk)
             .select_related("employee", "manager")
             .prefetch_related("assignees")
             .order_by("-pk")
         )
+        for _wk in existing_works:
+            _wk.is_overdue = is_work_overdue(_wk, today_riyadh)
         if work_form is None:
             work_form = PartnershipWorkForm(actor=request.user, prefix="work", optional=True)
     back_url = reverse("partnerships:willingness_index") if return_to == "willingness" else reverse("partnerships:capability_index")
@@ -946,6 +950,7 @@ def work_assignment_edit(request, pk, work_pk):
     from django.contrib.auth import get_user_model
     from django.db.models import F
     from access_control.regions import RegionalPolicy
+    from makken_mail.clause_sync import calculate_partnership_clause_progress, derive_status_and_progress, is_work_overdue
     from makken_mail.models import WorkAssignment, WorkHistory, WorkStatus
 
     User = get_user_model()
@@ -985,6 +990,8 @@ def work_assignment_edit(request, pk, work_pk):
             "status": assignment.status,
             "status_display": assignment.get_status_display(),
             "progress": assignment.progress,
+            "is_overdue": is_work_overdue(assignment),
+            "auto_synced": True,
             "due_on": assignment.due_on.isoformat() if assignment.due_on else "",
             "status_choices": [{"value": v, "label": lbl} for v, lbl in WorkStatus.choices],
             "users": [{"id": u.pk, "name": _display_name(u)} for u in allowed_users],
@@ -1020,21 +1027,13 @@ def work_assignment_edit(request, pk, work_pk):
     if manager_id in assignee_ids:
         return add_login_headers(JsonResponse({"error": "لا يمكن أن يكون المشرف / المدير ضمن الموظفين المسند إليهم."}, status=400))
 
-    status_val = (payload.get("status") or WorkStatus.NEW).strip()
-    if status_val not in WorkStatus.values:
-        return add_login_headers(JsonResponse({"error": "حالة المهمة غير صالحة."}, status=400))
-
-    try:
-        progress_val = int(payload.get("progress") if payload.get("progress") not in (None, "") else 0)
-    except (TypeError, ValueError):
-        return add_login_headers(JsonResponse({"error": "أدخل نسبة إنجاز صحيحة بين 0 و 100."}, status=400))
-    if not 0 <= progress_val <= 100:
-        return add_login_headers(JsonResponse({"error": "يجب أن تكون نسبة الإنجاز بين 0 و 100."}, status=400))
-
-    if status_val == WorkStatus.COMPLETE:
-        progress_val = 100
-    elif progress_val == 100:
-        status_val = WorkStatus.COMPLETE
+    requested_status = (payload.get("status") or "").strip()
+    if requested_status == WorkStatus.CANCELLED:
+        status_val = WorkStatus.CANCELLED
+        progress_val = min(wk.progress, 99)
+    else:
+        clause_pct = calculate_partnership_clause_progress(item.pk)
+        status_val, progress_val = derive_status_and_progress(clause_pct, WorkStatus.NEW)
 
     due_raw = (payload.get("due_on") or "").strip()
     due_val = None

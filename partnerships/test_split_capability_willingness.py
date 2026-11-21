@@ -266,7 +266,12 @@ class SplitCapabilityWillingnessPagesTests(TestCase):
                 self.assertEqual(p.name, f'جهة محدثة {state}')
 
     def test_existing_work_edit_opens_popup_and_updates_via_json_endpoint(self):
+        from agreement_clauses.models import AgreementClause, ClauseAssignment, Responsibility
         from makken_mail.models import WorkAssignment, WorkStatus
+        cl = AgreementClause.objects.create(name='بند اختباري للمهمة المنبثقة', is_active=True)
+        ClauseAssignment.objects.create(
+            clause=cl, partnership=self.p_will, responsibility=Responsibility.INSTITUTION, progress=65
+        )
         emp = User.objects.create_user('work_emp_popup', 'work_emp_popup@example.com', 'StrongPass123!')
         mgr = User.objects.create_user('work_mgr_popup', 'work_mgr_popup@example.com', 'StrongPass123!')
         wk = WorkAssignment.objects.create(
