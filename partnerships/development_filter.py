@@ -21,7 +21,7 @@ class DevelopmentFilterForm(forms.Form):
 
 
 class DevelopmentFilter:
-    def __init__(self, request, queryset):
+    def __init__(self, request, queryset, *, exact=False):
         self.form = DevelopmentFilterForm(request.GET)
         self.valid = self.form.is_valid()
         self.value = self.form.cleaned_data.get("development_state", "") if self.valid else ""
@@ -33,7 +33,7 @@ class DevelopmentFilter:
             selected = STATE_KEYS[self.value]
             # The willingness filter intentionally includes capable organizations.
             states = [selected]
-            if selected == DevelopmentState.WILLINGNESS:
+            if not exact and selected == DevelopmentState.WILLINGNESS:
                 states.append(DevelopmentState.CAPABILITY)
             self.queryset = queryset.filter(development_state_id__in=states)
         self.context = {

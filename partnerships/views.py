@@ -622,7 +622,7 @@ def index(request, fixed_state=None, read_only=False):
         development = None
         context["development_filter_active"] = False
     else:
-        development = DevelopmentFilter(request, query)
+        development = DevelopmentFilter(request, query, exact=read_only)
         context.update(development.context)
         if not development.valid:
             status = 400

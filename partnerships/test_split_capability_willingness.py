@@ -162,3 +162,8 @@ class SplitCapabilityWillingnessPagesTests(TestCase):
         self.assertNotContains(res, 'تحويل إلى رغبة')
         self.assertContains(res, 'مشاهدة')
         self.assertEqual(self.client.post(url, {'action': 'preview'}).status_code, 405)
+        will_only = self.client.get(url, {'development_state': 'رغبة'})
+        self.assertEqual(will_only.status_code, 200)
+        self.assertContains(will_only, self.p_will.name)
+        self.assertNotContains(will_only, self.p_cap.name)
+        self.assertNotContains(will_only, p_care.name)
