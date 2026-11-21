@@ -40,13 +40,3 @@
   {% include 'market_needs/_money.html' with value=need.unallocated_support %}
   لم يُوزّع على البنود بعد.</strong> يُحتسب في تمويل البطاقة، ولا يُنسب إلى بند معيّن دون تأكيد توزيع مستقل من جدول متابعة الجهات. المبالغ المتبقية للبنود تعرض المتبقي وفق التوزيع الموثق فقط.</p>
 {% endif %}
-<section class="detail-offerings" aria-label="بنود الاتفاقية">
-  <h3>بنود الاتفاقية المرتبطة بالحاجة</h3>
-  <ul>
-    {% for link in need.agreement_clause_links.all %}
-      <li>{{ link.clause.name }}</li>
-    {% empty %}
-      <li>لا توجد بنود اتفاقية مرتبطة بهذه البطاقة.</li>
-    {% endfor %}
-  </ul>
-</section>

@@ -4,7 +4,6 @@
 {% load static %}
 {% block extra_head %}
   {{ block.super }}
-  <script src="{% static 'agreement_clauses/program_reference.js' %}" defer></script>
 {% endblock %}
 {% block page_actions %}
   <a class="button button-secondary" href="{% url 'market_needs:index' %}">العودة للسجل</a>
@@ -14,7 +13,7 @@
   {% if need.approved_support %}
     <p class="feedback feedback-info"><strong>توجد مساهمات معتمدة. يُحفظ الأساس المالي ومعايير المطابقة؛ يمكنك تعديل البيانات الوصفية وحالة التفعيل.</strong></p>
   {% endif %}
-  <form method="post" data-need-editor data-financial-locked="{% if need.approved_support %}1{% else %}0{% endif %}" data-market-confirm="راجع بيانات الحاجة وبنود الصرف وبنود الاتفاقية والمجموع. هل تريد تأكيد حفظ البطاقة؟">
+  <form method="post" data-need-editor data-financial-locked="{% if need.approved_support %}1{% else %}0{% endif %}" data-market-confirm="راجع بيانات الحاجة وبنود الصرف والمجموع. هل تريد تأكيد حفظ البطاقة؟">
     {% csrf_token %}
     <input type="hidden" name="snapshot" value="{{ snapshot }}">{{ form.lines }}{{ form.dependencies_confirmed }}
     <section class="partnership-card">
@@ -90,18 +89,6 @@
         {% include "market_needs/_field.html" with field=form.requested_support %}
       </div>
       <p class="market-help"><strong>تُحسب نسبة الدعم واكتماله من إجمالي تكلفة الحاجة، وليس من حقل الدعم المطلوب.</strong></p>
-    </section>
-    <section class="partnership-card">
-      <header class="card-heading">
-        <div>
-          <p class="eyebrow mk-numbered-section-title">03 · بنود الاتفاقية</p><h2>البنود المرجعية لبطاقة الحاجة</h2><p>اختيار هذه البنود اختياري ولا يغيّر مبالغ التمويل أو نسب التغطية.</p>
-        </div>
-      </header>
-      <div class="partnership-form-grid">
-        <input type="hidden" name="agreement_clause_picker" value="1">
-        {% include "market_needs/_field.html" with field=form.agreement_clauses wide=True %}
-        <p class="field-help">بنود البرنامج المرجعية: <span data-program-clause-reference>—</span></p>
-      </div>
     </section>
     <div class="editor-actions">
       <button class="button button-primary" type="submit">
