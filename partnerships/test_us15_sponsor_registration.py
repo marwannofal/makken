@@ -381,5 +381,5 @@ class SponsorRegistrationUS15Tests(TestCase):
             'scope': 'local',
             'administrative_regions': [str(self.region_a.pk)],
         })
-        self.assertEqual(non_gov_res.status_code, 200)
+        self.assertEqual(non_gov_res.status_code, 400)
         self.assertIn('entity', non_gov_res.context['form'].errors)
