@@ -19,7 +19,7 @@ from agreement_clauses.models import (
 from entities.models import Entity
 from makken_mail.models import Delivery, EventRule, SMTPConfig
 from access_control.models import UserAccess
-        from makken_mail.worker import build_context
+from makken_mail.worker import build_context
 from partnerships.models import Partnership
 from regions.models import Region
 
