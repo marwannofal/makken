@@ -1,4 +1,4 @@
-/* Makken Accessibility Widget & Modes (RTL-first, brand #24B3AF, responsive, CSP-safe). */
+/* Makken Accessibility Widget & Modes (RTL-first, brand #005b85, responsive, CSP-safe). */
 
 /* 1. Floating circular trigger in bottom-left corner */
 .mk-a11y-fab {
@@ -11,7 +11,7 @@
   padding: 0;
   border: 2px solid #ffffff;
   border-radius: 50%;
-  background: #24b3af;
+  background: #005b85;
   color: #ffffff;
   display: inline-flex;
   align-items: center;
@@ -28,7 +28,7 @@
 }
 
 .mk-a11y-fab:focus-visible {
-  outline: 3px solid #0f5f58;
+  outline: 3px solid #003954;
   outline-offset: 3px;
 }
 
@@ -48,7 +48,7 @@
   height: 20px;
   padding: 0 5px;
   border-radius: 999px;
-  background: #0f5f58;
+  background: #003954;
   border: 2px solid #ffffff;
   color: #ffffff;
   font: 800 11px/16px Cairo, sans-serif;
@@ -199,7 +199,7 @@
   width: 24px;
   height: 24px;
   border-radius: 6px;
-  background: #147f7c;
+  background: #004769;
   color: #ffffff;
   flex-shrink: 0;
 }
@@ -256,7 +256,7 @@
 }
 
 .mk-a11y-profile-btn[aria-pressed="true"] {
-  background: #24b3af;
+  background: #005b85;
   border-color: #189591;
   color: #ffffff;
 }
@@ -304,10 +304,10 @@
 }
 
 .mk-a11y-tile[aria-pressed="true"] {
-  background: #24b3af;
-  border-color: #158d89;
+  background: #005b85;
+  border-color: #004769;
   color: #ffffff;
-  box-shadow: 0 4px 12px rgba(20, 127, 124, 0.22);
+  box-shadow: 0 4px 12px rgba(0, 71, 105, 0.22);
 }
 
 .mk-a11y-tile svg {
@@ -368,12 +368,12 @@
 
 .mk-a11y-level-btn:hover {
   background: #def3ef;
-  border-color: #24b3af;
+  border-color: #005b85;
 }
 
 .mk-a11y-level-btn[aria-pressed="true"] {
-  background: #24b3af;
-  border-color: #158d89;
+  background: #005b85;
+  border-color: #004769;
   color: #ffffff;
 }
 
@@ -446,7 +446,7 @@ html.mk-a11y-dyslexia-font body :not(.mk-a11y-drawer):not(.mk-a11y-drawer *) {
 
 /* Highlight Headings, Links, Buttons */
 html.mk-a11y-highlight-headings main :is(h1, h2, h3, h4, h5, h6) {
-  outline: 2px solid #24b3af !important;
+  outline: 2px solid #005b85 !important;
   outline-offset: 4px !important;
   background: #e6f8f5 !important;
   border-radius: 6px;
@@ -461,9 +461,9 @@ html.mk-a11y-highlight-links nav a {
 
 html.mk-a11y-highlight-buttons main button:not(.mk-a11y-fab),
 html.mk-a11y-highlight-buttons main a.button {
-  outline: 2px solid #0f5f58 !important;
+  outline: 2px solid #003954 !important;
   outline-offset: 2px !important;
-  box-shadow: 0 0 0 4px rgba(36, 179, 175, 0.28) !important;
+  box-shadow: 0 0 0 4px rgba(0, 91, 133, 0.28) !important;
 }
 
 /* Hide Images */
@@ -621,9 +621,9 @@ html.mk-a11y-cursor-white * {
   top: var(--mk-a11y-y, 50vh);
   height: 10px;
   transform: translateY(-50%);
-  background: rgba(36, 179, 175, 0.45);
-  border-top: 2px solid #0f5f58;
-  border-bottom: 2px solid #0f5f58;
+  background: rgba(0, 91, 133, 0.45);
+  border-top: 2px solid #003954;
+  border-bottom: 2px solid #003954;
   pointer-events: none;
   z-index: 940;
 }
@@ -671,7 +671,7 @@ html.mk-a11y-cursor-white * {
   max-width: min(520px, 90vw);
   padding: 10px 16px;
   border-radius: 12px;
-  background: #0f5f58;
+  background: #003954;
   color: #ffffff;
   font: 700 13.5px/1.6 Cairo, sans-serif;
   box-shadow: 0 10px 26px rgba(10, 44, 42, 0.3);

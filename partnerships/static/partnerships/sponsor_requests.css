@@ -31,7 +31,7 @@
   display: inline-block;
   padding: 5px 14px;
   border-radius: 999px;
-  background: #24b3af;
+  background: #005b85;
   color: #fff;
   font-size: 12px;
   font-weight: 700;
@@ -45,7 +45,7 @@
 }
 
 .pub-dot {
-  color: #24b3af;
+  color: #005b85;
 }
 
 .pub-brand p {
@@ -67,7 +67,7 @@
 }
 
 .pub-back-link:hover {
-  border-color: #24b3af;
+  border-color: #005b85;
 }
 
 .pub-card {
@@ -183,7 +183,7 @@
 }
 
 .pub-region-item input {
-  accent-color: #24b3af;
+  accent-color: #005b85;
   width: 17px;
   height: 17px;
   margin: 0;
@@ -241,7 +241,7 @@
 
 .pub-btn-primary {
   border: 0;
-  background: #24b3af;
+  background: #005b85;
   color: #fff;
 }
 

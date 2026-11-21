@@ -63,13 +63,13 @@
 :root .main-content .search-select-option[aria-pressed="true"],
 :root .main-content .search-select-option[aria-selected="true"] {
   background: #dff5f1 !important;
-  border-color: #24b3af !important;
+  border-color: #005b85 !important;
   color: #0b5550 !important;
   font-weight: 800 !important;
 }
 
 :root .main-content .search-select-option:focus-visible {
-  outline: 2px solid #24b3af;
+  outline: 2px solid #005b85;
   outline-offset: -2px;
 }
 
@@ -78,7 +78,7 @@
   height: 18px !important;
   min-width: 18px !important;
   min-height: 18px !important;
-  accent-color: #24b3af;
+  accent-color: #005b85;
 }
 
 :root .main-content .selected-summary {
@@ -115,7 +115,7 @@
   padding: 6px 14px;
   border: 0;
   border-radius: 10px;
-  background: #24b3af;
+  background: #005b85;
   color: #ffffff;
   font: 700 13.5px/1.5 Cairo, sans-serif;
   cursor: pointer;

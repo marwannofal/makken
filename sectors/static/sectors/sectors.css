@@ -84,10 +84,10 @@
   padding: 9px 12px;
   font-size: 10px;
   font-weight: 600;
-  background: #edf8f5;
+  background: #edf5fa;
   border: 1px solid transparent;
   border-radius: 9px;
-  color: #167d76;
+  color: #004769;
 }
 
 .sector-action svg {
@@ -96,7 +96,7 @@
 }
 
 .sector-action:hover {
-  border-color: #b1d7cc;
+  border-color: #8ab8cf;
 }
 
 .action-delete {
@@ -220,13 +220,13 @@
 }
 
 .active-option:has(input:checked) {
-  border-color: #80c6b7;
+  border-color: #8ab8cf;
   background: #eff9f4;
   color: #227b6a;
 }
 
 .active-option input {
-  accent-color: #188a7d;
+  accent-color: #004769;
   margin: 0;
   width: 17px;
   height: 17px;
@@ -445,7 +445,7 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 6px;
-  background: #edf8f5;
+  background: #edf5fa;
   border: 1px solid #dbede6;
   border-radius: 8px;
   padding: 5px 10px;
@@ -529,7 +529,7 @@
 }
 
 .multi-trigger[aria-expanded="true"] {
-  border-color: #24b3af;
+  border-color: #005b85;
   background: #f1fbf8;
 }
 
@@ -641,7 +641,7 @@
   gap: 5px;
   max-width: 100%;
   padding: 4px 9px 4px 4px;
-  background: #edf8f5;
+  background: #edf5fa;
   border: 1px solid #d6eae1;
   border-radius: 8px;
   color: #337b69;

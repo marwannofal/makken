@@ -16,8 +16,8 @@
   padding: 9px 12px;
   border: 1px solid transparent;
   border-radius: 9px;
-  background: #edf8f5;
-  color: #167d76;
+  background: #edf5fa;
+  color: #004769;
   font-size: medium;
   font-weight: 700;
   text-decoration: none;
@@ -36,7 +36,7 @@
 }
 
 .entities-table .entity-action:hover {
-  border-color: #b1d7cc;
+  border-color: #8ab8cf;
 }
 
 .entities-table .entity-action.action-delete {

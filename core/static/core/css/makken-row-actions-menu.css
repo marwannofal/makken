@@ -40,12 +40,12 @@
 
 .mk-actions-trigger[aria-expanded="true"] {
   background: #dff4f1;
-  border-color: #24b3af;
+  border-color: #005b85;
   color: #0d625e;
 }
 
 .mk-actions-trigger:focus-visible {
-  outline: 2px solid #24b3af;
+  outline: 2px solid #005b85;
   outline-offset: 2px;
 }
 
@@ -145,7 +145,7 @@
 
 :root .main-content .mk-actions-dropdown a:focus-visible,
 :root .main-content .mk-actions-dropdown button:focus-visible {
-  outline: 2px solid #24b3af;
+  outline: 2px solid #005b85;
   outline-offset: -2px;
 }
 

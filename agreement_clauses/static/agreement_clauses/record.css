@@ -28,7 +28,7 @@
   display: block;
   padding: .75rem;
   background: #e7f6f5;
-  color: #165e60;
+  color: #003954;
   border-radius: .75rem;
   min-block-size: 48px;
 }
@@ -45,7 +45,7 @@
 }
 
 .agreement-summary dt {
-  color: #165e60;
+  color: #003954;
   font-weight: 700;
 }
 
@@ -73,7 +73,7 @@
 .agreement-member legend, .agreement-renew summary {
   padding-inline: .25rem;
   font-weight: 700;
-  color: #165e60;
+  color: #003954;
 }
 
 .agreement-renew summary {

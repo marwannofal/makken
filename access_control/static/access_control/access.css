@@ -32,8 +32,8 @@
 
 .ac-tabs a[aria-current="page"] {
   color: #fff;
-  background: #24b3af;
-  border-color: #24b3af;
+  background: #005b85;
+  border-color: #005b85;
 }
 
 .ac-kpis {
@@ -201,7 +201,7 @@
 .ac-matrix input[type="checkbox"] {
   width: 20px;
   height: 20px;
-  accent-color: #24b3af;
+  accent-color: #005b85;
 }
 
 .ac-effective {

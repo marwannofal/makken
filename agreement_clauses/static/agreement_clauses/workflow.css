@@ -44,12 +44,12 @@
 .clause-edit > summary {
   cursor: pointer;
   font-weight: 700;
-  color: #165e60;
+  color: #003954;
   overflow-wrap: anywhere;
 }
 
 .clause-edit:target {
-  outline: 2px solid #24b3af;
+  outline: 2px solid #005b85;
 }
 
 @media (max-width: 480px) {

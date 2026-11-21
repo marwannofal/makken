@@ -59,11 +59,11 @@
 
 .mk-date-picker-btn:hover:not(:disabled) {
   background: #eaf7f5;
-  color: #147f7c;
+  color: #004769;
 }
 
 .mk-date-picker-btn:focus-visible {
-  outline: 2px solid #24b3af;
+  outline: 2px solid #005b85;
   outline-offset: 2px;
 }
 

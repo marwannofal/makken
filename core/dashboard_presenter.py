@@ -4,7 +4,7 @@ from urllib.parse import urlencode
 from django.urls import reverse
 from .dashboard_data import money, percent, STATE_LABELS, LEVEL_LABELS
 
-COLORS = ['#24B3AF','#E0AC50','#6F9AB9','#C76F72','#8F8CB1']
+COLORS = ['#005b85','#E0AC50','#6F9AB9','#C76F72','#8F8CB1']
 
 
 def link(report, kind, **extra):

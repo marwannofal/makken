@@ -58,7 +58,7 @@
 }
 
 .market-match-filters input[type=checkbox],.market-matches input[type=checkbox] {
-  accent-color:#24b3af;
+  accent-color:#005b85;
   width:17px;
   height:17px
 }
@@ -191,12 +191,12 @@ progress::-webkit-progress-bar {
 }
 
 progress::-webkit-progress-value {
-  background:#24b3af;
+  background:#005b85;
   border-radius:10px
 }
 
 progress::-moz-progress-bar {
-  background:#24b3af;
+  background:#005b85;
   border-radius:10px
 }
 
@@ -326,7 +326,7 @@ progress::-moz-progress-bar {
 }
 
 .market-edit-lines input[type=checkbox] {
-  accent-color:#24b3af;
+  accent-color:#005b85;
   width:17px;
   height:17px
 }
@@ -570,7 +570,7 @@ progress::-moz-progress-bar {
 }
 
 .market-upload-picker:focus-within {
-  outline:2px solid #24b3af;
+  outline:2px solid #005b85;
   outline-offset:3px
 }
 
@@ -664,7 +664,7 @@ progress::-moz-progress-bar {
 }
 
 .market-select .search-select-trigger:focus-visible {
-  outline:2px solid #24b3af;
+  outline:2px solid #005b85;
   outline-offset:3px
 }
 

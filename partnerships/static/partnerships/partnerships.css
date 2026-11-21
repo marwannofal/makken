@@ -138,7 +138,7 @@
 }
 
 .partnership-field input[type="radio"] {
-  accent-color: #24b3af;
+  accent-color: #005b85;
   width: 17px;
   height: 17px;
   flex-shrink: 0;
@@ -192,7 +192,7 @@
 
 .status-choices label:has(input:checked) {
   background: #ecf9f6;
-  border-color: #24b3af;
+  border-color: #005b85;
   color: #137f7b;
 }
 
@@ -282,7 +282,7 @@
 
 .register-table tbody tr.is-highlighted-row {
   background: #e6f7f5;
-  box-shadow: inset -4px 0 0 #24b3af;
+  box-shadow: inset -4px 0 0 #005b85;
   animation: mk-row-highlight-in 0.7s ease-out;
 }
 
@@ -421,7 +421,7 @@
 
 .tag {
   display: inline-block;
-  background: #edf8f5;
+  background: #edf5fa;
   color: #337972;
   border: 1px solid #dbede6;
   padding: 3px 9px;
@@ -764,7 +764,7 @@
   min-height: 16px !important;
   height: 16px;
   padding: 0 !important;
-  accent-color: #24b3af;
+  accent-color: #005b85;
 }
 
 .search-select-empty {
@@ -1021,7 +1021,7 @@
   border: 1px solid #9ddfd5;
   border-radius: 12px;
   background: #ebfaf7;
-  color: #0f5f58;
+  color: #003954;
   font-size: 13px;
   font-weight: 700;
   line-height: 1.75;
@@ -1139,9 +1139,9 @@
 }
 
 .mk-cp-input:focus {
-  outline: 2px solid #24b3af;
+  outline: 2px solid #005b85;
   outline-offset: 1px;
-  border-color: #24b3af;
+  border-color: #005b85;
 }
 
 .mk-cp-pct {
@@ -1157,7 +1157,7 @@
   border: 0;
   border-radius: 999px;
   background: #e5f1ef;
-  accent-color: #24b3af;
+  accent-color: #005b85;
   overflow: hidden;
 }
 
@@ -1167,12 +1167,12 @@
 }
 
 .mk-cp-progress::-webkit-progress-value {
-  background: #24b3af;
+  background: #005b85;
   border-radius: 999px;
 }
 
 .mk-cp-progress::-moz-progress-bar {
-  background: #24b3af;
+  background: #005b85;
   border-radius: 999px;
 }
 
@@ -1284,18 +1284,18 @@
   gap: 8px;
   min-height: 38px;
   padding: 7px 14px;
-  border: 1.5px dashed #24b3af;
+  border: 1.5px dashed #005b85;
   border-radius: 10px;
-  background: #f2fbf9;
-  color: #0f6b65;
+  background: #edf5fa;
+  color: #003954;
   font: 700 13px/1.5 Cairo, sans-serif;
   cursor: pointer;
   transition: background 0.14s ease, border-color 0.14s ease;
 }
 
 .mk-cp-upload-btn:hover {
-  background: #e2f6f2;
-  border-color: #158d89;
+  background: #dfeef7;
+  border-color: #004769;
 }
 
 .mk-cp-upload-btn svg {

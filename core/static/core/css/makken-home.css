@@ -1,5 +1,5 @@
 :root {
-  --primary: #24b3af;
+  --primary: #005b85;
   --ink: #153a3c;
   --muted: #74888b;
   --line: #e7efee;
@@ -298,7 +298,7 @@ button[hidden] {
 .breadcrumb-brand {
   font-size: 18px;
   font-weight: 800;
-  color: #1b8f8b;
+  color: #004769;
 }
 
 .breadcrumb-divider {

@@ -85,7 +85,7 @@
 }
 
 .mail-check input {
-  accent-color: #24b3af;
+  accent-color: #005b85;
   width: 18px;
   height: 18px;
 }
@@ -194,7 +194,7 @@
 }
 
 .mail-progress progress {
-  accent-color: #24b3af;
+  accent-color: #005b85;
   width: min(100%,260px);
   height: 12px;
 }
@@ -273,7 +273,7 @@
   width: 17px;
   height: 17px;
   min-height: 17px;
-  accent-color: #24b3af;
+  accent-color: #005b85;
   margin: 0;
 }
 
@@ -405,13 +405,13 @@
 }
 
 .mail-subtab:hover {
-  border-color: #24b3af;
+  border-color: #005b85;
   color: #167a77;
 }
 
 .mail-subtab.is-active {
-  background: #24b3af;
-  border-color: #24b3af;
+  background: #005b85;
+  border-color: #005b85;
   color: #ffffff;
 }
 

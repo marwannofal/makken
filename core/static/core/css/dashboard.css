@@ -185,7 +185,7 @@
 }
 
 .dash-metric[href]:hover {
-  border-color:#24b3af;
+  border-color:#005b85;
   transform:translateY(-2px)
 }
 
@@ -499,7 +499,7 @@
 .dash-track span {
   display:block;
   height:100%;
-  background:#24b3af;
+  background:#005b85;
   border-radius:inherit
 }
 

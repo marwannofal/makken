@@ -28,7 +28,7 @@ html.mk-values-open {
 
 .mk-cell-values-more:hover {
   background: #d8f2ef;
-  border-color: #24b3af;
+  border-color: #005b85;
 }
 
 .mk-cell-values-more svg {
@@ -201,7 +201,7 @@ html.mk-values-open {
 }
 
 .mk-values-search:focus {
-  border-color: #24b3af;
+  border-color: #005b85;
   outline: 3px solid #24b3af22;
   outline-offset: 1px;
 }
@@ -236,7 +236,7 @@ html.mk-values-open {
   padding: 8px 11px;
   border: 1px solid #d2eae4;
   border-radius: 9px;
-  background: #edf8f5;
+  background: #edf5fa;
   color: #276e65;
   font-size: 12px;
   font-weight: 600;
@@ -279,9 +279,9 @@ html.mk-values-open {
   width: 100%;
   min-height: 46px;
   padding: 10px 18px;
-  border: 1px solid #24b3af;
+  border: 1px solid #005b85;
   border-radius: 11px;
-  background: #24b3af;
+  background: #005b85;
   color: #fff;
   font-family: inherit;
   font-size: 14px;

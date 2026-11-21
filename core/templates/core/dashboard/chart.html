@@ -40,7 +40,7 @@
               {% endif %}
               </bdi>
             </div>
-            <svg class="dash-track" role="img" aria-label="{{ row.label }}: {{ row.display }} {{ chart.unit }}" viewBox="0 0 100 8" preserveAspectRatio="none"><rect width="100" height="8" rx="4" fill="#edf5f3"/><rect width="{{ row.width }}" height="8" rx="4" fill="#24B3AF"/></svg>
+            <svg class="dash-track" role="img" aria-label="{{ row.label }}: {{ row.display }} {{ chart.unit }}" viewBox="0 0 100 8" preserveAspectRatio="none"><rect width="100" height="8" rx="4" fill="#edf5f3"/><rect width="{{ row.width }}" height="8" rx="4" fill="#005b85"/></svg>
             {% if row.second_display %}
               <svg class="dash-track is-support" role="img" aria-label="الدعم المعتمد: {{ row.second_display }} ريال" viewBox="0 0 100 6" preserveAspectRatio="none"><rect width="100" height="6" rx="3" fill="#edf5f3"/><rect width="{{ row.second_width }}" height="6" rx="3" fill="#6F9AB9"/></svg><small class="dash-support-number">الدعم: <bdi>{{ row.second_display }}</bdi> ريال</small>
             {% endif %}

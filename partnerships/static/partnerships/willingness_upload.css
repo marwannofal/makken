@@ -66,7 +66,7 @@
   min-width: 160px;
   min-height: 44px;
   border-radius: 9px;
-  background: #24b3af;
+  background: #005b85;
   color: #fff;
   font-size: 11px;
   font-weight: 700;
@@ -130,7 +130,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 9px;
-  background: #edf8f5;
+  background: #edf5fa;
   color: #168a84;
   font-size: 10px;
   font-weight: 700;
@@ -202,7 +202,7 @@
   overflow: hidden;
   margin: 12px 0;
   background: #dbeee8;
-  accent-color: #24b3af;
+  accent-color: #005b85;
   direction: ltr;
 }
 
@@ -212,12 +212,12 @@
 }
 
 .willingness-upload-progress progress::-webkit-progress-value {
-  background: #24b3af;
+  background: #005b85;
   border-radius: 8px;
 }
 
 .willingness-upload-progress progress::-moz-progress-bar {
-  background: #24b3af;
+  background: #005b85;
   border-radius: 8px;
 }
 

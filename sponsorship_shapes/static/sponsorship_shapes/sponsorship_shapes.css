@@ -84,10 +84,10 @@
   padding: 9px 12px;
   font-size: 10px;
   font-weight: 600;
-  background: #edf8f5;
+  background: #edf5fa;
   border: 1px solid transparent;
   border-radius: 9px;
-  color: #167d76;
+  color: #004769;
 }
 
 .sponsorship-shape-action svg {
@@ -96,7 +96,7 @@
 }
 
 .sponsorship-shape-action:hover {
-  border-color: #b1d7cc;
+  border-color: #8ab8cf;
 }
 
 .action-delete {
@@ -220,13 +220,13 @@
 }
 
 .active-option:has(input:checked) {
-  border-color: #80c6b7;
+  border-color: #8ab8cf;
   background: #eff9f4;
   color: #227b6a;
 }
 
 .active-option input {
-  accent-color: #188a7d;
+  accent-color: #004769;
   margin: 0;
   width: 17px;
   height: 17px;

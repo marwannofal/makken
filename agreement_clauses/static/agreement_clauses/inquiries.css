@@ -27,7 +27,7 @@
 }
 
 .inquiry-field label {
-  color: #165e60;
+  color: #003954;
   font-weight: 700;
   font-size: .9rem;
 }
@@ -44,9 +44,9 @@
 }
 
 .inquiry-field input:focus, .inquiry-field select:focus {
-  outline: 2px solid #24b3af;
+  outline: 2px solid #005b85;
   outline-offset: 1px;
-  border-color: #24b3af;
+  border-color: #005b85;
 }
 
 .inquiry-field .errorlist {
@@ -72,7 +72,7 @@
 
 .inquiry-range-group legend {
   padding-inline: .35rem;
-  color: #165e60;
+  color: #003954;
   font-weight: 700;
   font-size: .9rem;
 }
@@ -106,7 +106,7 @@
   padding: .15rem .5rem;
   border-radius: 999px;
   background: #e7f6f5;
-  color: #165e60;
+  color: #003954;
   font-size: .8rem;
   font-weight: 700;
   direction: ltr;
@@ -120,7 +120,7 @@
 }
 
 .inquiry-meta-item strong {
-  color: #165e60;
+  color: #003954;
   font-weight: 700;
 }
 
@@ -136,13 +136,13 @@
   border-radius: 999px;
   background: #f1f8f8;
   border: 1px solid #d6e8e7;
-  color: #165e60;
+  color: #003954;
   font-size: .8rem;
 }
 
 .inquiry-tag-contact {
   background: #e7f6f5;
-  border-color: #24b3af;
+  border-color: #005b85;
 }
 
 .inquiry-progress-box {
@@ -154,7 +154,7 @@
 
 .inquiry-progress-value {
   font-weight: 800;
-  color: #165e60;
+  color: #003954;
   font-size: .95rem;
   direction: ltr;
   text-align: right;
@@ -171,7 +171,7 @@
 .inquiry-progress-bar > span {
   display: block;
   block-size: 100%;
-  background: #24b3af;
+  background: #005b85;
   border-radius: 999px;
 }
 

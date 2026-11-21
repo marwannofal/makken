@@ -1,7 +1,7 @@
 /* Sidebar */
 
 .sidebar {
-  background: #24b3af;
+  background: #005b85;
   color: #fff;
   border-color: rgb(255 255 255 / 25%);
 }
@@ -34,7 +34,7 @@
 }
 
 .sidebar .nav-link.is-active {
-  color: #24b3af;
+  color: #005b85;
   background: #fff;
 }
 
@@ -140,7 +140,7 @@
 }
 
 .sidebar .user-avatar {
-  color: #24b3af;
+  color: #005b85;
   background: #fff;
 }
 /* Logout */
@@ -152,7 +152,7 @@
 }
 
 .sidebar .logout-button:hover {
-  color: #24b3af;
+  color: #005b85;
   background: #fff;
   border-color: #fff;
 }
