@@ -16,15 +16,13 @@
       <caption class="visually-hidden">الجهات المرشحة ومستوياتها وتفاصيل الدعم</caption>
       <thead>
         <tr>
-          <th scope="col">اسم الجهة</th><th scope="col">الكيان / نوعه</th><th scope="col">نطاق الكيان</th><th scope="col">حالة التطور</th><th scope="col">حالة الرعاية / الجهة</th><th scope="col">قيمة الدعم</th><th scope="col">النسبة %</th><th scope="col">مستوى</th><th scope="col">تاريخ التعديل</th><th scope="col">المستخدم / التعديل</th>
+          <th scope="col">اسم الجهة</th><th scope="col">الكيان / نوعه</th><th scope="col">نطاق الكيان</th><th scope="col">حالة التطور</th><th scope="col">حالة الرعاية / الجهة</th><th scope="col">قيمة الدعم</th><th scope="col">النسبة %</th><th scope="col">مستوى</th><th scope="col">تاريخ التعديل</th><th scope="col">المستخدم / التعديل</th><th scope="col" class="action-cell">الإجراء</th>
         </tr>
       </thead>
       <tbody>
         {% for row in records %}
           <tr data-market-row data-url="?{{ filter_query }}&amp;record={{ row.record.pk }}&amp;operation=details">
-            <th scope="row"><a class="market-row-title" href="?{{ filter_query }}&amp;record={{ row.record.pk }}&amp;operation=details">{{ row.record.partnership.name }}</a>
-            {% include 'market_needs/_record_actions.html' %}
-            </th><td>{{ row.record.partnership.entity.name }}<small>{{ row.record.partnership.entity.get_entity_type_display }}
+            <th scope="row"><a class="market-row-title" href="?{{ filter_query }}&amp;record={{ row.record.pk }}&amp;operation=details">{{ row.record.partnership.name }}</a></th><td>{{ row.record.partnership.entity.name }}<small>{{ row.record.partnership.entity.get_entity_type_display }}
             {% if row.record.partnership.entity.branch %}
               / {{ row.record.partnership.entity.get_branch_display }}
             {% endif %}
@@ -51,11 +49,13 @@
             {% else %}
               النظام / مستخدم سابق غير معروف
             {% endif %}
+            </td><td class="action-cell">
+            {% include 'market_needs/_record_actions.html' %}
             </td>
           </tr>
         {% empty %}
           <tr>
-            <td colspan="10"><p class="empty-state">اختر جهات من نتائج المطابقة لبدء المتابعة.</p></td>
+            <td colspan="11"><p class="empty-state">اختر جهات من نتائج المطابقة لبدء المتابعة.</p></td>
           </tr>
         {% endfor %}
       </tbody>
