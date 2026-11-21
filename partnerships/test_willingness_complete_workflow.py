@@ -354,3 +354,13 @@ class WillingnessUnifiedWorkflowTests(TestCase):
         ca1.refresh_from_db()
         ca2.refresh_from_db()
         self.assertEqual((ca1.progress, ca2.progress), (50, 100))
+
+    def test_transition_note_removed_and_convert_action_in_row_actions(self):
+        self.client.force_login(self.admin)
+        self._create_capability('شراكة قدرة للتحويل من الإجراءات')
+        for route in ('partnerships:capability_index', 'partnerships:willingness_index'):
+            res = self.client.get(reverse(route))
+            self.assertEqual(res.status_code, 200)
+            self.assertNotContains(res, 'development-transition-note')
+            self.assertNotContains(res, 'اضغط على شارة «قدرة»')
+            self.assertContains(res, 'تحويل إلى رغبة')

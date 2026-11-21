@@ -84,7 +84,7 @@
       {% include "core/partials/record_count.html" with record_count=page_obj.paginator.count only %}
       </span>
     </header>
-    <p class="development-transition-note"><strong>لتغيير حالة تطور الجهة من «قدرة» إلى «رغبة»، اضغط على شارة «قدرة»، واختر نوع الاتفاق المبدئي وأرفق المستندات الداعمة، ثم احفظ التحويل. يُسجّل تاريخ ووقت الدخول إلى «رغبة» عند التأكيد، مع الاحتفاظ بتاريخ «قدرة». لا يمكن الضغط على «رغبة» لتغييرها أو الرجوع إلى «قدرة»، ولا تتغير هذه التواريخ عند تعديل بيانات الجهة.</strong></p><p class="table-scroll-hint">اسحب الجدول أفقيًا لعرض جميع الأعمدة عند الحاجة.</p>
+    <p class="table-scroll-hint">اسحب الجدول أفقيًا لعرض جميع الأعمدة عند الحاجة.</p>
     <div class="table-scroll">
       <table class="partnership-table register-table register-development-table">
         <caption class="visually-hidden">سجل الجهات والشراكات المحتملة</caption>
@@ -106,20 +106,7 @@
               {% if row.item.entity.branch %}
                 / {{ row.item.entity.get_branch_display }}
               {% endif %}
-              </small></td><td>{{ row.item.get_scope_display }}</td><td class="development-state-cell" data-development-cell>
-              {% if row.advance %}
-                {% allowed 'partnerships' 'change_status' row.item %}
-                  <form method="post" class="development-transition-form">
-                    {% csrf_token %}
-                    <input type="hidden" name="action" value="preview"><input type="hidden" name="token" value="{{ row.advance }}"><button type="submit" class="development-transition-button" data-development-transition aria-haspopup="dialog" aria-label="تغيير حالة تطور {{ row.item.name }} من قدرة إلى رغبة" title="اضغط للانتقال من قدرة إلى رغبة">{% development_pill row.item.development_state %}</button>
-                  </form>
-                {% elseallowed %}
-                  <span aria-disabled="true" class="development-transition-button" aria-label="تغيير حالة تطور {{ row.item.name }} من قدرة إلى رغبة" title="اضغط للانتقال من قدرة إلى رغبة">{% development_pill row.item.development_state %}</span>
-                {% endallowed %}
-              {% else %}
-                {% development_pill row.item.development_state %}
-              {% endif %}
-              </td><td><bdi dir="ltr">{{ row.item.phone }}</bdi></td><td><bdi>{{ row.item.email }}</bdi></td><td class="financial-capacity-cell" data-financial-capacity-cell>
+              </small></td><td>{{ row.item.get_scope_display }}</td><td class="development-state-cell" data-development-cell>{% development_pill row.item.development_state %}</td><td><bdi dir="ltr">{{ row.item.phone }}</bdi></td><td><bdi>{{ row.item.email }}</bdi></td><td class="financial-capacity-cell" data-financial-capacity-cell>
               {% include "partnerships/_financial_value.html" with amount=row.item.financial_capacity %}
               </td><td>
               {% allowed 'partnerships' 'change_status' row.item %}
@@ -144,6 +131,16 @@
               {% endallowed %}
               </td><td>
               <div class="row-actions">
+                {% if row.advance %}
+                  {% allowed 'partnerships' 'change_status' row.item %}
+                    <form method="post" class="development-transition-form">
+                      {% csrf_token %}
+                      <input type="hidden" name="action" value="preview">
+                      <input type="hidden" name="token" value="{{ row.advance }}">
+                      <button type="submit" class="row-action" data-development-transition aria-haspopup="dialog" aria-label="تحويل {{ row.item.name }} من قدرة إلى رغبة"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>تحويل إلى رغبة</button>
+                    </form>
+                  {% endallowed %}
+                {% endif %}
                 {% if row.item.development_state_id == 'willingness' %}
                   {% allowed 'partnerships' 'edit' row.item %}
                     <button type="button" class="row-action mk-cp-trigger" data-clauses-progress-trigger data-progress-url="{% url 'partnerships:clauses_progress' row.item.pk %}" aria-label="نسب إنجاز البنود لـ {{ row.item.name }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>نسب إنجاز البنود</button>
