@@ -454,7 +454,7 @@ def sponsor_request_queue(request):
         'avatar_initial': name[:1],
         'active_page': 'sponsor_requests',
         'page_heading': 'طلبات الرعاة الخارجيين - شراكات القدرة',
-        'requests_list': list(qs[:200]),
+        'rows': list(qs[:200]),
         'counts': counts,
         'selected_status': selected_status,
         'q': q,
