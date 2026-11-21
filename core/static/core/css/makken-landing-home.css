@@ -3,14 +3,14 @@
   position: relative;
   overflow: hidden;
   border-radius: 22px;
-  background: #081326;
+  background: linear-gradient(135deg, #005b85 0%, #003f5e 100%);
   color: #ffffff;
   min-height: calc(100vh - 170px);
   display: flex;
   align-items: center;
   padding: 64px 68px;
   box-shadow: 0 22px 60px rgba(4, 14, 30, 0.28);
-  border-top: 7px solid #1ed4b5;
+  border-top: 7px solid #ffffff;
 }
 
 .mk-hero-shapes {
@@ -30,7 +30,7 @@
   height: 260px;
   left: 58px;
   top: 74px;
-  background: #1b2f4d;
+  background: rgba(0, 36, 56, 0.42);
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
 }
 
@@ -39,8 +39,8 @@
   height: 132px;
   left: 56px;
   top: 204px;
-  background: #1ed4b5;
-  box-shadow: 0 16px 34px rgba(30, 212, 181, 0.25);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 16px 34px rgba(0, 30, 48, 0.22);
 }
 
 .mk-hero-circle.c-gold {
@@ -78,7 +78,7 @@
   margin: 0 0 22px;
   font-size: 20px;
   font-weight: 700;
-  color: #1ed4b5;
+  color: #ffffff;
   letter-spacing: 0.01em;
 }
 
@@ -124,8 +124,8 @@
   min-height: 52px;
   padding: 10px 20px;
   border-radius: 10px;
-  background: #1a2b44;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(0, 36, 56, 0.46);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
   font-size: 16px;
   font-weight: 700;
@@ -135,20 +135,20 @@
 
 .mk-hero-pill:hover {
   transform: translateY(-2px);
-  background: #223859;
+  background: rgba(0, 36, 56, 0.68);
   border-color: rgba(255, 255, 255, 0.18);
 }
 
 .mk-hero-pill.pill-partnerships {
-  color: #1ed4b5;
+  color: #ffffff;
 }
 
 .mk-hero-pill.pill-market {
-  color: #4ea8de;
+  color: #a6dcff;
 }
 
 .mk-hero-pill.pill-execution {
-  color: #f2b243;
+  color: #ffd166;
 }
 
 .mk-hero-footer-copy {
