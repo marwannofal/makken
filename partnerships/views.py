@@ -614,13 +614,25 @@ def index(request, fixed_state=None, read_only=False):
     query = _search(_query(request.user), q)
     if active in {"1", "0"}:
         query = query.filter(is_active=active == "1")
-    if fixed_state in {DevelopmentState.CAPABILITY, DevelopmentState.WILLINGNESS}:
-        if fixed_state == DevelopmentState.CAPABILITY:
-            query = query.filter(development_state_id=DevelopmentState.CAPABILITY)
-        else:
-            query = query.filter(development_state_id__in=[DevelopmentState.WILLINGNESS, DevelopmentState.CAPABILITY])
-        development = None
-        context["development_filter_active"] = False
+    if fixed_state == DevelopmentState.CAPABILITY:
+        query = query.filter(development_state_id=DevelopmentState.CAPABILITY)
+        development = DevelopmentFilter(request, query, exact=True, allowed_states=(DevelopmentState.CAPABILITY,))
+        context.update(development.context)
+        if not development.valid:
+            status = 400
+        query = development.queryset
+    elif fixed_state == DevelopmentState.WILLINGNESS:
+        query = query.filter(development_state_id__in=[DevelopmentState.WILLINGNESS, DevelopmentState.CAPABILITY])
+        development = DevelopmentFilter(
+            request,
+            query,
+            exact=True,
+            allowed_states=(DevelopmentState.CAPABILITY, DevelopmentState.WILLINGNESS),
+        )
+        context.update(development.context)
+        if not development.valid:
+            status = 400
+        query = development.queryset
     else:
         development = DevelopmentFilter(request, query, exact=read_only)
         context.update(development.context)
@@ -660,7 +672,7 @@ def index(request, fixed_state=None, read_only=False):
     if detail:
         from agreement_clauses.workflow import partnership_panel
         context["clause_panel"] = partnership_panel(detail)
-    context.update(rows=rows, page_obj=page, highlighted_pk=highlighted_pk, q=q, selected_status=active, pending=pending, detail=detail, history=_history(detail), result_query=result_query, list_url=reset_url + "?" + result_query, add_url=add_url, read_only=read_only, reset_url=reset_url, hide_development_filter=bool(fixed_state), show_agreement_number=(fixed_state == DevelopmentState.WILLINGNESS))
+    context.update(rows=rows, page_obj=page, highlighted_pk=highlighted_pk, q=q, selected_status=active, pending=pending, detail=detail, history=_history(detail), result_query=result_query, list_url=reset_url + "?" + result_query, add_url=add_url, read_only=read_only, reset_url=reset_url, hide_development_filter=False, show_agreement_number=(fixed_state == DevelopmentState.WILLINGNESS))
     return add_login_headers(render(request, "partnerships/index.html", context, status=status))
 
 

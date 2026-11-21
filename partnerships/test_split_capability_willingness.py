@@ -167,3 +167,27 @@ class SplitCapabilityWillingnessPagesTests(TestCase):
         self.assertContains(will_only, self.p_will.name)
         self.assertNotContains(will_only, self.p_cap.name)
         self.assertNotContains(will_only, p_care.name)
+
+    def test_capability_and_willingness_show_rule_scoped_development_state_filter(self):
+        self.client.force_login(self.admin, backend=AUTH_BACKEND)
+
+        cap_res = self.client.get(reverse('partnerships:capability_index'))
+        self.assertEqual(cap_res.status_code, 200)
+        cap_choices = [c[0] for c in cap_res.context['development_filter_form'].fields['development_state'].choices]
+        self.assertEqual(cap_choices, ['', 'قدرة'])
+
+        will_url = reverse('partnerships:willingness_index')
+        will_res = self.client.get(will_url)
+        self.assertEqual(will_res.status_code, 200)
+        will_choices = [c[0] for c in will_res.context['development_filter_form'].fields['development_state'].choices]
+        self.assertEqual(will_choices, ['', 'قدرة', 'رغبة'])
+
+        only_will = self.client.get(will_url, {'development_state': 'رغبة'})
+        self.assertEqual(only_will.status_code, 200)
+        self.assertContains(only_will, self.p_will.name)
+        self.assertNotContains(only_will, self.p_cap.name)
+
+        only_cap = self.client.get(will_url, {'development_state': 'قدرة'})
+        self.assertEqual(only_cap.status_code, 200)
+        self.assertContains(only_cap, self.p_cap.name)
+        self.assertNotContains(only_cap, self.p_will.name)

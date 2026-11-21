@@ -19,10 +19,19 @@ class DevelopmentFilterForm(forms.Form):
         }),
     )
 
+    def __init__(self, *args, allowed_states=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if allowed_states is not None:
+            allowed = set(allowed_states)
+            self.fields["development_state"].choices = [
+                ("", "جميع الحالات"),
+                *((label, label) for label, key in STATE_KEYS.items() if key in allowed),
+            ]
+
 
 class DevelopmentFilter:
-    def __init__(self, request, queryset, *, exact=False):
-        self.form = DevelopmentFilterForm(request.GET)
+    def __init__(self, request, queryset, *, exact=False, allowed_states=None):
+        self.form = DevelopmentFilterForm(request.GET, allowed_states=allowed_states)
         self.valid = self.form.is_valid()
         self.value = self.form.cleaned_data.get("development_state", "") if self.valid else ""
         self.params = {"development_state": self.value} if self.value else {}
@@ -31,7 +40,8 @@ class DevelopmentFilter:
             self.queryset = queryset.none()
         elif self.value:
             selected = STATE_KEYS[self.value]
-            # The willingness filter intentionally includes capable organizations.
+            # The default willingness filter on /partnerships/ includes capable organizations;
+            # exact=True filters strictly by the chosen state.
             states = [selected]
             if not exact and selected == DevelopmentState.WILLINGNESS:
                 states.append(DevelopmentState.CAPABILITY)
