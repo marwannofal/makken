@@ -115,8 +115,6 @@
       tools.className = 'mk-export-tools';
       tools.setAttribute('role', 'group');
       tools.setAttribute('aria-label', 'تصدير بيانات الجدول');
-      const label = document.createElement('span');
-      label.className = 'mk-export-label'; label.textContent = 'تصدير النتائج حسب الفلاتر'; tools.append(label);
       formats.forEach(format => {
         const button = document.createElement('button');
         button.type = 'button'; button.className = 'mk-export-button'; button.dataset.mkFormat = format;
@@ -124,9 +122,15 @@
         const text = document.createElement('span'); text.textContent = format === 'xlsx' ? 'تصدير Excel' : 'تصدير PDF'; button.append(text);
         button.addEventListener('click', () => download(button, table)); tools.append(button);
       });
-      const scroll = table.closest('.table-scroll,.table-wrapper,.states-table-wrapper,.table-responsive');
-      const anchor = scroll || table;
-      anchor.before(tools);
+      const card = table.closest('.states-card,.partnership-card');
+      const resultsEnd = card && !table.closest('dialog,template') ? card.querySelector(':scope > [data-mk-results-bar] > [data-mk-results-end]') : null;
+      if (resultsEnd) {
+        resultsEnd.append(tools);
+      } else {
+        const scroll = table.closest('.table-scroll,.table-wrapper,.states-table-wrapper,.table-responsive');
+        const anchor = scroll || table;
+        anchor.before(tools);
+      }
     });
   }
   window.MakkenTableExports = {refresh, downloadUrl: (button, url) => download(button, null, url)};
