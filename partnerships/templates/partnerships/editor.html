@@ -38,7 +38,7 @@
   <form method="post" id="partnership-form" data-partnership-form{% if is_will_create %} enctype="multipart/form-data"{% endif %}>
     {% csrf_token %}
     <input type="hidden" name="action" value="{% if is_will_create %}create_willingness{% else %}preview{% endif %}"><input type="hidden" name="snapshot" value="{{ snapshot }}">{{ form.offerings }}
-    <details class="mk-accordion" open>
+    <details class="mk-accordion"{% if not item or form.errors %} open{% endif %}>
       <summary>
         <div class="mk-acc-head">
           <h2 class="mk-acc-title">01 · معلومات الجهة والبيانات الأساسية</h2> <p class="mk-acc-subtitle">اسم الجهة وممثلها وبيانات التواصل والنطاق والمدة.</p>
@@ -107,7 +107,7 @@
         </div>
       </div>
     </details>
-    <details class="mk-accordion" open>
+    <details class="mk-accordion"{% if not item or form.offerings.errors %} open{% endif %}>
       <summary>
         <div class="mk-acc-head">
           <h2 class="mk-acc-title">02 · إدارة أشكال الرعاية للجهة</h2> <p class="mk-acc-subtitle">القطاعات والتخصصات المرتبطة وأشكال الرعاية.</p>
@@ -196,7 +196,7 @@
       </details>
       {% include "partnerships/_willingness_details_sections.html" with num_term="06" num_signatories="07" num_teams="08" num_content="09" open_details=False %}
     {% elif show_edit_clauses %}
-      <details class="mk-accordion" open>
+      <details class="mk-accordion"{% if clauses_error %} open{% endif %}>
         <summary>
           <div class="mk-acc-head">
             <h2 class="mk-acc-title">03 · بنود الاتفاقية ونسب الإنجاز</h2> <p class="mk-acc-subtitle">عدّل نسب الإنجاز (0% – 100%) أو المسؤولية أو أضف بنودًا جديدة، ثم احفظ الشراكة.</p>

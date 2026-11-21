@@ -225,6 +225,7 @@ class SplitCapabilityWillingnessPagesTests(TestCase):
                 html = res.content.decode('utf-8')
                 self.assertNotContains(res, 'حفظ الجهة')
                 self.assertIn('data-save-partnership', html)
+                self.assertNotIn('<details class="mk-accordion" open>', html)
                 if state == DevelopmentState.WILLINGNESS:
                     self.assertIsNone(re.search(r'<input[^>]*name="work-title"[^>]*\brequired\b', html))
                     self.assertIsNone(re.search(r'<select[^>]*name="work-manager"[^>]*\brequired\b', html))
