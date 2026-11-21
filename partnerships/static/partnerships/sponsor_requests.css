@@ -3,6 +3,8 @@
 .pub-body {
   margin: 0;
   min-height: 100vh;
+  overflow-x: hidden;
+  box-sizing: border-box;
   font-family: "Cairo", system-ui, -apple-system, sans-serif;
   background: linear-gradient(145deg, #edf9f8 0%, #f7fbfa 60%, #e4f4f2 100%);
   color: #164849;
@@ -85,11 +87,20 @@
 }
 
 .pub-hp {
-  position: absolute;
-  left: -9999px;
+  position: fixed;
+  top: 0;
+  inset-inline-start: 0;
   width: 1px;
   height: 1px;
+  opacity: 0;
+  pointer-events: none;
   overflow: hidden;
+}
+
+.pub-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
 .pub-grid {
