@@ -721,7 +721,7 @@ def clauses_progress(request, pk):
                 target_label=locked_item.name,
                 before={"clauses": [{"id": c["id"], "progress": c["before"]} for c in changed]},
                 after={"clauses": [{"id": c["id"], "progress": c["after"]} for c in changed]},
-                region_ids=regions_for(locked_item),
+                regions=regions_for(locked_item),
             )
 
     payload = _serialize_payload(item)
