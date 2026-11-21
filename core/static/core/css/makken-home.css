@@ -928,3 +928,19 @@ body.mk-sidebar-collapsed .topbar {
     display: none;
   }
 }
+
+
+/* Soft ocean-blue mist workspace background (balanced, not too white, not too dark) */
+body,
+.workspace {
+  background:
+    radial-gradient(ellipse at 12% 8%, rgba(0, 91, 133, 0.08), transparent 48%),
+    radial-gradient(ellipse at 88% 92%, rgba(0, 91, 133, 0.07), transparent 46%),
+    linear-gradient(155deg, #e8f1f7 0%, #f2f7fb 50%, #e4eff7 100%) !important;
+  background-attachment: fixed;
+}
+
+.topbar {
+  background: rgba(255, 255, 255, 0.86) !important;
+  backdrop-filter: blur(10px);
+}
