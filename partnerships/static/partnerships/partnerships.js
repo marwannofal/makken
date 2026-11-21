@@ -666,5 +666,154 @@
       $('[data-add-offering]').focus();
     }
   });
+  
+  // Inline popup editor for existing work assignments inside Section 04
+  const workDialog = $('#partnership-work-dialog');
+  if (workDialog) {
+    const weForm = $('[data-work-edit-form]', workDialog);
+    const weTitle = $('#we-title', workDialog);
+    const weAssignees = $('[data-we-assignees]', workDialog);
+    const weManager = $('#we-manager', workDialog);
+    const weStatus = $('#we-status', workDialog);
+    const weProgress = $('#we-progress', workDialog);
+    const weDue = $('#we-due', workDialog);
+    const weInstructions = $('#we-instructions', workDialog);
+    const weError = $('[data-we-error]', workDialog);
+    const weSubmit = $('[data-we-submit]', workDialog);
+    let activeWorkUrl = '';
+    let activeWorkRowId = '';
+
+    weStatus?.addEventListener('change', () => {
+      if (weStatus.value === 'complete') {
+        weProgress.value = '100';
+      } else if (Number(weProgress.value) >= 100) {
+        weProgress.value = weStatus.value === 'new' ? '0' : '90';
+      }
+    });
+    weProgress?.addEventListener('change', () => {
+      if (Number(weProgress.value) >= 100) {
+        weProgress.value = '100';
+        weStatus.value = 'complete';
+      } else if (weStatus.value === 'complete') {
+        weStatus.value = 'running';
+      }
+    });
+
+    $$('[data-edit-work-url]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        activeWorkUrl = btn.dataset.editWorkUrl;
+        activeWorkRowId = btn.dataset.editWorkRow;
+        weError.textContent = '';
+        weSubmit.disabled = true;
+        weSubmit.textContent = 'جار التحميل…';
+        show(workDialog);
+        try {
+          const res = await fetch(activeWorkUrl, {headers: {'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest'}});
+          const data = await res.json();
+          if (!res.ok || !data.ok) throw new Error(data.error || 'تعذّر تحميل بيانات المهمة.');
+          const w = data.work;
+          weTitle.value = w.title || '';
+          weInstructions.value = w.instructions || '';
+          weDue.value = w.due_on || '';
+          weProgress.value = String(w.progress ?? 0);
+
+          weStatus.replaceChildren();
+          (w.status_choices || []).forEach(ch => {
+            const opt = new Option(ch.label, ch.value, false, ch.value === w.status);
+            weStatus.append(opt);
+          });
+
+          weManager.replaceChildren();
+          weManager.append(new Option('اختر المشرف / المدير', ''));
+          (w.users || []).forEach(u => {
+            const opt = new Option(u.name, String(u.id), false, u.id === w.manager_id);
+            weManager.append(opt);
+          });
+
+          weAssignees.replaceChildren();
+          const selectedSet = new Set(w.assignee_ids || []);
+          (w.users || []).forEach(u => {
+            const lbl = make('label', 'work-assignee-check');
+            const cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.name = 'we_assignee';
+            cb.value = String(u.id);
+            cb.checked = selectedSet.has(u.id);
+            const sp = document.createElement('span');
+            sp.textContent = u.name;
+            lbl.append(cb, sp);
+            weAssignees.append(lbl);
+          });
+          weSubmit.disabled = false;
+          weSubmit.textContent = 'حفظ التعديلات';
+        } catch (err) {
+          weError.textContent = err.message || 'تعذّر تحميل بيانات المهمة.';
+          weSubmit.disabled = false;
+          weSubmit.textContent = 'حفظ التعديلات';
+        }
+      });
+    });
+
+    weForm?.addEventListener('submit', async event => {
+      event.preventDefault();
+      weError.textContent = '';
+      if (!weForm.reportValidity()) return;
+      const assigneeIds = $$('input[name="we_assignee"]:checked', weAssignees).map(cb => Number(cb.value));
+      if (!assigneeIds.length) {
+        weError.textContent = 'اختر موظفًا واحدًا على الأقل لإسناد المهمة.';
+        return;
+      }
+      const csrf = $('input[name="csrfmiddlewaretoken"]')?.value || '';
+      weSubmit.disabled = true;
+      weSubmit.textContent = 'جار الحفظ…';
+      try {
+        const res = await fetch(activeWorkUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': csrf,
+          },
+          body: JSON.stringify({
+            title: weTitle.value.trim(),
+            assignee_ids: assigneeIds,
+            manager_id: Number(weManager.value),
+            status: weStatus.value,
+            progress: Number(weProgress.value || 0),
+            due_on: weDue.value || '',
+            instructions: weInstructions.value || '',
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok) throw new Error(data.error || 'تعذّر حفظ التعديلات.');
+        const w = data.work;
+        const row = $(`tr[data-work-row="${activeWorkRowId}"]`);
+        if (row) {
+          const titleEl = $('[data-work-title]', row);
+          if (titleEl) titleEl.textContent = w.title;
+          const assEl = $('[data-work-assignees]', row);
+          if (assEl) {
+            assEl.replaceChildren();
+            (w.assignees_names || []).forEach(n => {
+              const badge = make('span', 'subtle-badge', n);
+              assEl.append(badge, ' ');
+            });
+          }
+          const mgrEl = $('[data-work-manager]', row);
+          if (mgrEl) mgrEl.textContent = w.manager_name;
+          const stEl = $('[data-work-status]', row);
+          if (stEl) stEl.textContent = `${w.status_display} (${w.progress}%)`;
+        }
+        workDialog.close();
+      } catch (err) {
+        weError.textContent = err.message || 'تعذّر حفظ التعديلات.';
+      } finally {
+        weSubmit.disabled = false;
+        weSubmit.textContent = 'حفظ التعديلات';
+      }
+    });
+  }
+
   renderRows();
 })();

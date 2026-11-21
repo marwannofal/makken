@@ -936,3 +936,142 @@ def download_clause_evidence(request, pk, evidence_id):
     response = FileResponse(source, as_attachment=True, filename=evidence.original_name, content_type=evidence.content_type)
     response["X-Content-Type-Options"] = "nosniff"
     return add_login_headers(response)
+
+
+@module_view('partnerships')
+@login_required(login_url="accounts:login")
+@require_http_methods(["GET", "POST"])
+def work_assignment_edit(request, pk, work_pk):
+    from datetime import date
+    from django.contrib.auth import get_user_model
+    from django.db.models import F
+    from access_control.regions import RegionalPolicy
+    from makken_mail.models import WorkAssignment, WorkHistory, WorkStatus
+
+    User = get_user_model()
+    item = get_object_or_404(_query(request.user), pk=pk)
+    wk = get_object_or_404(
+        WorkAssignment.objects.select_related("employee", "manager").prefetch_related("assignees"),
+        pk=work_pk,
+        target_model="partnerships.partnership",
+        target_key=item.pk,
+    )
+
+    users_qs = User.objects.filter(is_active=True).order_by("first_name", "last_name", "username")
+    if not request.user.is_superuser:
+        reg = RegionalPolicy(request.user)
+        if not reg.unrestricted:
+            users_qs = users_qs.filter(
+                Q(is_superuser=True)
+                | Q(access_profile__region_scope="all")
+                | Q(access_profile__allowed_regions__in=reg.ids)
+            ).distinct()
+    allowed_users = list(users_qs)
+    allowed_user_map = {u.pk: u for u in allowed_users}
+
+    def _display_name(u):
+        return (u.get_full_name() or "").strip() or u.username
+
+    def _serialize(assignment):
+        assignees = list(assignment.assignees.all()) or ([assignment.employee] if assignment.employee_id else [])
+        return {
+            "id": assignment.pk,
+            "title": assignment.title,
+            "instructions": assignment.instructions or "",
+            "assignee_ids": [u.pk for u in assignees],
+            "assignees_names": [_display_name(u) for u in assignees],
+            "manager_id": assignment.manager_id,
+            "manager_name": _display_name(assignment.manager),
+            "status": assignment.status,
+            "status_display": assignment.get_status_display(),
+            "progress": assignment.progress,
+            "due_on": assignment.due_on.isoformat() if assignment.due_on else "",
+            "status_choices": [{"value": v, "label": lbl} for v, lbl in WorkStatus.choices],
+            "users": [{"id": u.pk, "name": _display_name(u)} for u in allowed_users],
+        }
+
+    if request.method == "GET":
+        return add_login_headers(JsonResponse({"ok": True, "work": _serialize(wk)}))
+
+    try:
+        payload = json.loads(request.body.decode("utf-8")) if request.content_type and "json" in request.content_type else request.POST
+    except (ValueError, UnicodeDecodeError):
+        return add_login_headers(JsonResponse({"error": "بيانات الطلب غير صالحة."}, status=400))
+
+    title = (payload.get("title") or "").strip()
+    if not title:
+        return add_login_headers(JsonResponse({"error": "أدخل عنوان المهمة."}, status=400))
+    if len(title) > 160:
+        return add_login_headers(JsonResponse({"error": "عنوان المهمة أطول من الحد المسموح (160 حرفًا)."}, status=400))
+
+    raw_assignees = payload.get("assignee_ids") if isinstance(payload, dict) else request.POST.getlist("assignee_ids")
+    if not isinstance(raw_assignees, list) or not raw_assignees:
+        return add_login_headers(JsonResponse({"error": "اختر موظفًا واحدًا على الأقل لإسناد المهمة."}, status=400))
+    try:
+        assignee_ids = list(dict.fromkeys(int(x) for x in raw_assignees))
+        manager_id = int(payload.get("manager_id") or 0)
+    except (TypeError, ValueError):
+        return add_login_headers(JsonResponse({"error": "اختر موظفين ومشرفًا صالحين."}, status=400))
+
+    if any(uid not in allowed_user_map for uid in assignee_ids):
+        return add_login_headers(JsonResponse({"error": "أحد الموظفين المختارين غير متاح ضمن نطاقك."}, status=400))
+    if manager_id not in allowed_user_map:
+        return add_login_headers(JsonResponse({"error": "اختر المشرف / المدير من القائمة."}, status=400))
+    if manager_id in assignee_ids:
+        return add_login_headers(JsonResponse({"error": "لا يمكن أن يكون المشرف / المدير ضمن الموظفين المسند إليهم."}, status=400))
+
+    status_val = (payload.get("status") or WorkStatus.NEW).strip()
+    if status_val not in WorkStatus.values:
+        return add_login_headers(JsonResponse({"error": "حالة المهمة غير صالحة."}, status=400))
+
+    try:
+        progress_val = int(payload.get("progress") if payload.get("progress") not in (None, "") else 0)
+    except (TypeError, ValueError):
+        return add_login_headers(JsonResponse({"error": "أدخل نسبة إنجاز صحيحة بين 0 و 100."}, status=400))
+    if not 0 <= progress_val <= 100:
+        return add_login_headers(JsonResponse({"error": "يجب أن تكون نسبة الإنجاز بين 0 و 100."}, status=400))
+
+    if status_val == WorkStatus.COMPLETE:
+        progress_val = 100
+    elif progress_val == 100:
+        status_val = WorkStatus.COMPLETE
+
+    due_raw = (payload.get("due_on") or "").strip()
+    due_val = None
+    if due_raw:
+        try:
+            due_val = date.fromisoformat(due_raw)
+        except ValueError:
+            return add_login_headers(JsonResponse({"error": "صيغة تاريخ الاستحقاق غير صحيحة."}, status=400))
+
+    instructions = (payload.get("instructions") or "").strip()[:3000]
+
+    with regional_transaction(request.user) as region_policy:
+        require_write(request.user, item, policy=region_policy)
+        wk.title = title
+        wk.instructions = instructions
+        wk.employee_id = assignee_ids[0]
+        wk.manager_id = manager_id
+        wk.status = status_val
+        wk.progress = progress_val
+        wk.due_on = due_val
+        wk.revision = F("revision") + 1
+        wk.save()
+        wk.assignees.set(assignee_ids)
+        wk.refresh_from_db()
+        WorkHistory.objects.create(
+            assignment=wk,
+            actor=request.user,
+            action="updated",
+            snapshot={
+                "title": wk.title,
+                "status": wk.status,
+                "progress": wk.progress,
+                "manager": wk.manager_id,
+                "assignees": assignee_ids,
+                "due_on": wk.due_on.isoformat() if wk.due_on else "",
+            },
+            note="تحديث المهمة من صفحة تعديل الشراكة",
+        )
+
+    return add_login_headers(JsonResponse({"ok": True, "work": _serialize(wk)}))

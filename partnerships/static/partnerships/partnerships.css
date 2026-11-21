@@ -1497,3 +1497,31 @@
   min-width: 120px;
   padding: 9px 24px;
 }
+
+.work-assignees-box {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+  gap: 8px;
+  max-height: 170px;
+  overflow-y: auto;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+.work-assignee-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: #0f172a;
+  cursor: pointer;
+}
+.work-assignee-check input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #005b85;
+  margin: 0;
+  flex: 0 0 auto;
+}

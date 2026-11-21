@@ -263,3 +263,55 @@ class SplitCapabilityWillingnessPagesTests(TestCase):
                 self.assertTrue(conf_res['Location'].startswith(expected_list_url))
                 p.refresh_from_db()
                 self.assertEqual(p.name, f'جهة محدثة {state}')
+
+    def test_existing_work_edit_opens_popup_and_updates_via_json_endpoint(self):
+        from makken_mail.models import WorkAssignment, WorkStatus
+        emp = User.objects.create_user('work_emp_popup', 'work_emp_popup@example.com', 'StrongPass123!')
+        mgr = User.objects.create_user('work_mgr_popup', 'work_mgr_popup@example.com', 'StrongPass123!')
+        wk = WorkAssignment.objects.create(
+            title='متابعة شراكة أولية',
+            instructions='تعليمات أولية',
+            target_model='partnerships.partnership',
+            target_key=self.p_will.pk,
+            employee=emp,
+            manager=mgr,
+            created_by=self.admin,
+            status=WorkStatus.NEW,
+            progress=0,
+        )
+        wk.assignees.set([emp])
+
+        self.client.force_login(self.admin, backend=AUTH_BACKEND)
+        edit_url = reverse('partnerships:edit', args=[self.p_will.pk]) + '?from=willingness'
+        res = self.client.get(edit_url)
+        self.assertEqual(res.status_code, 200)
+        work_api_url = reverse('partnerships:work_edit', args=[self.p_will.pk, wk.pk])
+        self.assertContains(res, f'data-edit-work-url="{work_api_url}"')
+        self.assertNotContains(res, reverse('makken_mail:work_detail', args=[wk.pk]))
+
+        get_res = self.client.get(work_api_url)
+        self.assertEqual(get_res.status_code, 200)
+        self.assertEqual(get_res.json()['work']['title'], 'متابعة شراكة أولية')
+
+        post_res = self.client.post(
+            work_api_url,
+            data=json.dumps({
+                'title': 'متابعة شراكة محدثة',
+                'assignee_ids': [emp.pk],
+                'manager_id': mgr.pk,
+                'status': WorkStatus.RUNNING,
+                'progress': 65,
+                'due_on': '2026-12-31',
+                'instructions': 'تم تحديث التفاصيل من النافذة المنبثقة',
+            }),
+            content_type='application/json',
+        )
+        self.assertEqual(post_res.status_code, 200)
+        data = post_res.json()
+        self.assertTrue(data['ok'])
+        self.assertEqual(data['work']['title'], 'متابعة شراكة محدثة')
+        self.assertEqual(data['work']['progress'], 65)
+        wk.refresh_from_db()
+        self.assertEqual(wk.title, 'متابعة شراكة محدثة')
+        self.assertEqual(wk.status, WorkStatus.RUNNING)
+        self.assertEqual(wk.progress, 65)
