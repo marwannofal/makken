@@ -154,7 +154,6 @@
           <th scope="col">{{ report.group_column_header }}</th>
           <th scope="col">عدد الشراكات</th>
           <th scope="col">الشراكات النشطة</th>
-          <th scope="col">عدد الاتفاقيات</th>
           <th scope="col">المكتملة (100%)</th>
           <th scope="col">متوسط الإنجاز</th>
         </tr>
@@ -165,13 +164,12 @@
           <th scope="row">{{ grp.label }}</th>
           <td><strong><bdi>{{ grp.partnership_count }}</bdi></strong></td>
           <td><bdi>{{ grp.active_count }}</bdi></td>
-          <td><bdi>{{ grp.agreement_count }}</bdi></td>
           <td><bdi>{{ grp.completed_count }}</bdi></td>
           <td><span class="ach-pct"><bdi>{{ grp.avg_progress }}%</bdi></span></td>
         </tr>
         {% empty %}
         <tr>
-          <td colspan="6">لا توجد شراكات مطابقة لمعايير التقرير ضمن نطاقك.</td>
+          <td colspan="5">لا توجد شراكات مطابقة لمعايير التقرير ضمن نطاقك.</td>
         </tr>
         {% endfor %}
       </tbody>
