@@ -377,7 +377,7 @@ button:focus-visible, .form-alert:focus-visible {
   overflow: hidden;
   min-height: 100%;
   direction: rtl;
-  background: #0e4159 url("../images/login-img.png") center / cover no-repeat;
+  background: #0e4159 url("../images/login-img-2.jpg") center / cover no-repeat;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
