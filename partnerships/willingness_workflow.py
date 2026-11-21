@@ -273,8 +273,12 @@ class PartnershipWorkForm(forms.Form):
         widget=forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'),
     )
 
-    def __init__(self, *args, actor=None, **kwargs):
+    def __init__(self, *args, actor=None, optional=False, **kwargs):
         super().__init__(*args, **kwargs)
+        if optional:
+            for fname in ('title', 'assignees', 'manager'):
+                self.fields[fname].required = False
+                self.fields[fname].widget.attrs.pop('required', None)
         self.actor = actor
         users = active_users()
         if actor and not actor.is_superuser:

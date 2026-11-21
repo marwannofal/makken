@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="{% static 'partnerships/partnerships.css' %}?v=20261121-blue13">
   <link rel="stylesheet" href="{% static 'partnerships/willingness_upload.css' %}?v=20261121-blue6">
   <link rel="stylesheet" href="{% static 'partnerships/willingness_clauses.css' %}?v=20261121-blue6">
-  <script src="{% static 'partnerships/partnerships.js' %}?v=20261121-6" defer></script>
+  <script src="{% static 'partnerships/partnerships.js' %}?v=20261121-7" defer></script>
   <script src="{% static 'partnerships/willingness_clauses.js' %}?v=20261121-dmy" defer></script>
   {% include "partnerships/_financial_assets.html" %}
   {% include "partnerships/_editor_fields_assets.html" %}
@@ -122,7 +122,7 @@
           {{ form.offerings.errors }}<span data-offerings-error></span>
         </div>
         <div class="draft-notice" role="status">
-          تعديلات البنود تُحفظ نهائيًا مع زر «حفظ الجهة» أدناه.
+          تعديلات البنود تُحفظ نهائيًا مع زر «حفظ» أدناه.
         </div>
         <p class="table-scroll-hint">اسحب الجدول أفقيًا لعرض جميع الأعمدة عند الحاجة.</p>
         <div class="table-scroll">
@@ -248,7 +248,7 @@
             </div>
           {% endif %}
           <p class="field-help">إسناد مهمة جديدة (اختياري عند التعديل — املأ الحقول أدناه فقط لإضافة مهمة جديدة مع حفظ الشراكة):</p>
-          {% include "partnerships/_work_section.html" %}
+          {% include "partnerships/_work_section.html" with work_optional=True %}
         </div>
       </details>
       {% include "partnerships/_willingness_details_sections.html" with num_term="05" num_signatories="06" num_teams="07" num_content="08" open_details=False %}
@@ -258,7 +258,7 @@
       {% if is_will_create %}
         حفظ وإنشاء شراكة الرغبة
       {% else %}
-        حفظ الجهة
+        حفظ
       {% endif %}
       </button><a class="button button-secondary" href="{{ back_url|default:'/partnerships/capability/' }}">إغلاق</a>
     </div>

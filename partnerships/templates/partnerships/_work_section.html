@@ -1,17 +1,17 @@
 <div class="work-grid-2">
   <div class="partnership-field work-full">
-    <label for="{{ work_form.title.id_for_label }}">{{ work_form.title.label }} <span class="required" aria-hidden="true">*</span></label>
+    <label for="{{ work_form.title.id_for_label }}">{{ work_form.title.label }}{% if not work_optional %} <span class="required" aria-hidden="true">*</span>{% endif %}</label>
     {{ work_form.title }}
     <div class="field-error" id="work-title-errors" role="alert">{{ work_form.title.errors }}</div>
   </div>
   <div class="partnership-field">
-    <label for="{{ work_form.assignees.id_for_label }}">{{ work_form.assignees.label }} <span class="required" aria-hidden="true">*</span></label>
+    <label for="{{ work_form.assignees.id_for_label }}">{{ work_form.assignees.label }}{% if not work_optional %} <span class="required" aria-hidden="true">*</span>{% endif %}</label>
     {{ work_form.assignees }}
     <p class="field-help">{{ work_form.assignees.help_text }}</p>
     <div class="field-error" id="work-assignees-errors" role="alert">{{ work_form.assignees.errors }}</div>
   </div>
   <div class="partnership-field">
-    <label for="{{ work_form.manager.id_for_label }}">{{ work_form.manager.label }} <span class="required" aria-hidden="true">*</span></label>
+    <label for="{{ work_form.manager.id_for_label }}">{{ work_form.manager.label }}{% if not work_optional %} <span class="required" aria-hidden="true">*</span>{% endif %}</label>
     {{ work_form.manager }}
     <div class="field-error" id="work-manager-errors" role="alert">{{ work_form.manager.errors }}</div>
   </div>

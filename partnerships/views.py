@@ -413,7 +413,7 @@ def editor(request, pk=None, initial_state=DevelopmentState.CAPABILITY):
             .order_by("-pk")
         )
         if work_form is None:
-            work_form = PartnershipWorkForm(actor=request.user, prefix="work")
+            work_form = PartnershipWorkForm(actor=request.user, prefix="work", optional=True)
     back_url = reverse("partnerships:willingness_index") if return_to == "willingness" else reverse("partnerships:capability_index")
     context.update(
         existing_works=existing_works,

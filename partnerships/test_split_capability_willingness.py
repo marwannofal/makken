@@ -191,3 +191,75 @@ class SplitCapabilityWillingnessPagesTests(TestCase):
         self.assertEqual(only_cap.status_code, 200)
         self.assertContains(only_cap, self.p_cap.name)
         self.assertNotContains(only_cap, self.p_will.name)
+
+    def test_edit_capability_and_willingness_save_works_and_button_is_save(self):
+        import json, re
+        from partnerships.models import Partnership, PartnershipOffering, DevelopmentHistory, Scope
+        self.client.force_login(self.admin, backend=AUTH_BACKEND)
+
+        for state, from_param, expected_list_url in (
+            (DevelopmentState.CAPABILITY, 'capability', reverse('partnerships:capability_index')),
+            (DevelopmentState.WILLINGNESS, 'willingness', reverse('partnerships:willingness_index')),
+        ):
+            with self.subTest(state=state):
+                p = Partnership.objects.create(
+                    name=f'جهة تعديل {state}',
+                    representative='ممثل الجهة',
+                    phone_country='SA',
+                    phone='+966501234567',
+                    email=f'edit_{from_param}@example.com',
+                    entity=self.entity,
+                    scope=Scope.LOCAL,
+                    is_active=True,
+                    development_state_id=state,
+                )
+                DevelopmentHistory.objects.create(partnership=p, state_id=state)
+                off = PartnershipOffering.objects.create(
+                    partnership=p, sector=self.sector, sponsorship_shape=self.shape, is_active=True, position=0
+                )
+                off.specializations.set([self.spec])
+
+                edit_url = reverse('partnerships:edit', args=[p.pk]) + f'?from={from_param}'
+                res = self.client.get(edit_url)
+                self.assertEqual(res.status_code, 200)
+                html = res.content.decode('utf-8')
+                self.assertNotContains(res, 'حفظ الجهة')
+                self.assertIn('data-save-partnership', html)
+                if state == DevelopmentState.WILLINGNESS:
+                    self.assertIsNone(re.search(r'<input[^>]*name="work-title"[^>]*\brequired\b', html))
+                    self.assertIsNone(re.search(r'<select[^>]*name="work-manager"[^>]*\brequired\b', html))
+
+                snap = re.search(r'name="snapshot" value="([^"]+)"', html).group(1)
+                offerings_payload = json.dumps([
+                    {'sector': self.sector.pk, 'specializations': [self.spec.pk], 'shape': self.shape.pk, 'is_active': True}
+                ])
+                preview_post = {
+                    'action': 'preview',
+                    'snapshot': snap,
+                    'name': f'جهة محدثة {state}',
+                    'representative': 'ممثل محدث',
+                    'phone_country': 'SA',
+                    'phone': '0501234567',
+                    'email': f'updated_{from_param}@example.com',
+                    'financial_capacity': '50000.00',
+                    'entity_type': self.entity.entity_type,
+                    'entity': str(self.entity.pk),
+                    'scope': Scope.LOCAL,
+                    'is_active': '1',
+                    'offerings': offerings_payload,
+                }
+                if state == DevelopmentState.WILLINGNESS:
+                    preview_post['clauses_json'] = '[]'
+                    preview_post['teams_json'] = '[]'
+
+                prev_res = self.client.post(edit_url, preview_post)
+                self.assertEqual(prev_res.status_code, 200)
+                prev_html = prev_res.content.decode('utf-8')
+                token_m = re.search(r'name="token" value="([^"]+)"', prev_html)
+                self.assertIsNotNone(token_m, f'Preview confirmation dialog missing for {state}')
+
+                conf_res = self.client.post(edit_url, {'action': 'confirm', 'token': token_m.group(1)})
+                self.assertEqual(conf_res.status_code, 302)
+                self.assertTrue(conf_res['Location'].startswith(expected_list_url))
+                p.refresh_from_db()
+                self.assertEqual(p.name, f'جهة محدثة {state}')

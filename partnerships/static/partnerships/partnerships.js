@@ -652,11 +652,17 @@
     $('[data-offerings-empty]').hidden = rows.length > 0;
     if (rows.length) $('[data-offerings-error]').textContent = '';
   }
+  recordForm.addEventListener('invalid', event => {
+    const acc = event.target.closest('details.mk-accordion');
+    if (acc && !acc.open) acc.open = true;
+  }, true);
   recordForm.addEventListener('submit', event => {
     draftField.value = JSON.stringify(rows);
     if (!rows.length) {
       event.preventDefault();
-      $('[data-offerings-error]').textContent = 'أضف قطاعًا واحدًا على الأقل قبل حفظ الجهة.';
+      const acc = $('[data-add-offering]')?.closest('details.mk-accordion');
+      if (acc && !acc.open) acc.open = true;
+      $('[data-offerings-error]').textContent = 'أضف قطاعًا واحدًا على الأقل قبل الحفظ.';
       $('[data-add-offering]').focus();
     }
   });
