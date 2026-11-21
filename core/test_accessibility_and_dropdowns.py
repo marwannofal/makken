@@ -88,7 +88,7 @@ class AccessibilityAndDropdownsTests(TestCase):
         self.assertIn('left: 20px;', css)
         self.assertIn('bottom: 20px;', css)
         self.assertIn('border-radius: 50%;', css)
-        self.assertIn('#24b3af', css)
+        self.assertIn('#005b85', css)
         # All mode classes defined
         for cls in (
             'mk-a11y-readable-font', 'mk-a11y-dyslexia-font', 'mk-a11y-highlight-headings',
