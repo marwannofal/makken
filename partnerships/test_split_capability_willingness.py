@@ -288,6 +288,7 @@ class SplitCapabilityWillingnessPagesTests(TestCase):
         work_api_url = reverse('partnerships:work_edit', args=[self.p_will.pk, wk.pk])
         self.assertContains(res, f'data-edit-work-url="{work_api_url}"')
         self.assertNotContains(res, reverse('makken_mail:work_detail', args=[wk.pk]))
+        self.assertContains(res, 'id="we-assignees" name="assignee_ids" multiple data-market-select')
 
         get_res = self.client.get(work_api_url)
         self.assertEqual(get_res.status_code, 200)

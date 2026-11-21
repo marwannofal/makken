@@ -672,7 +672,7 @@
   if (workDialog) {
     const weForm = $('[data-work-edit-form]', workDialog);
     const weTitle = $('#we-title', workDialog);
-    const weAssignees = $('[data-we-assignees]', workDialog);
+    const weAssignees = $('#we-assignees', workDialog);
     const weManager = $('#we-manager', workDialog);
     const weStatus = $('#we-status', workDialog);
     const weProgress = $('#we-progress', workDialog);
@@ -733,17 +733,10 @@
           weAssignees.replaceChildren();
           const selectedSet = new Set(w.assignee_ids || []);
           (w.users || []).forEach(u => {
-            const lbl = make('label', 'work-assignee-check');
-            const cb = document.createElement('input');
-            cb.type = 'checkbox';
-            cb.name = 'we_assignee';
-            cb.value = String(u.id);
-            cb.checked = selectedSet.has(u.id);
-            const sp = document.createElement('span');
-            sp.textContent = u.name;
-            lbl.append(cb, sp);
-            weAssignees.append(lbl);
+            const opt = new Option(u.name, String(u.id), false, selectedSet.has(u.id));
+            weAssignees.append(opt);
           });
+          weAssignees.dispatchEvent(new Event('change', {bubbles: true}));
           weSubmit.disabled = false;
           weSubmit.textContent = 'حفظ التعديلات';
         } catch (err) {
@@ -758,7 +751,7 @@
       event.preventDefault();
       weError.textContent = '';
       if (!weForm.reportValidity()) return;
-      const assigneeIds = $$('input[name="we_assignee"]:checked', weAssignees).map(cb => Number(cb.value));
+      const assigneeIds = [...weAssignees.selectedOptions].map(opt => Number(opt.value)).filter(Boolean);
       if (!assigneeIds.length) {
         weError.textContent = 'اختر موظفًا واحدًا على الأقل لإسناد المهمة.';
         return;
