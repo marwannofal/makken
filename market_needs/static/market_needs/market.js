@@ -39,6 +39,7 @@
   const controls=new Map();
   function enhance(select) {
     if(controls.has(select)) return controls.get(select);
+    window.MakkenDropdowns?.unwrap?.(select);
     const wrapper=make('div','search-select market-select'), trigger=make('button','search-select-trigger market-select-trigger'), summary=make('span'),panel=make('div','search-select-panel'),search=make('input'),options=make('div','search-select-options'),tags=make('div','selected-summary'),error=make('p','field-error');
     select.after(wrapper);wrapper.append(trigger,panel,tags,error);trigger.type='button';trigger.append(summary);panel.hidden=true;panel.id='market-select-'+(++sequence);trigger.setAttribute('aria-controls',panel.id);trigger.setAttribute('aria-expanded','false');trigger.setAttribute('aria-haspopup','true');
     const label=select.labels[0]?.textContent.trim()||select.dataset.label||'الاختيارات';trigger.setAttribute('aria-label',label);search.type='search';search.placeholder='ابحث هنا…';search.autocomplete='off';search.setAttribute('aria-label','البحث في '+label);options.setAttribute('role','group');options.setAttribute('aria-label',label);panel.append(search,options);error.setAttribute('role','alert');select.classList.add('native-enhanced');select.tabIndex=-1;select.setAttribute('aria-hidden','true');

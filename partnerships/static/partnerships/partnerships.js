@@ -380,6 +380,7 @@
   const normal = value => value.normalize('NFKC').toLocaleLowerCase().replace(/[\u064b-\u065f\u0670]/g, '');
 
   function enhance(select, placeholder, labelFor = option => option.textContent) {
+    window.MakkenDropdowns?.unwrap?.(select);
     const wrapper = make('div', 'search-select');
     select.after(wrapper);
     const trigger = make('button', 'search-select-trigger');

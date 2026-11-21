@@ -17,6 +17,7 @@
     select.dataset.providerPicker = '1';
     const label = select.labels[0];
     const labelText = label?.textContent.trim() || 'الاختيارات';
+    window.MakkenDropdowns?.unwrap?.(select);
     const wrapper = create('div', 'search-select market-select');
     const trigger = create('button', 'search-select-trigger market-select-trigger');
     const summary = create('span');

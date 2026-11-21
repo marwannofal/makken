@@ -26,12 +26,34 @@
     return tokens.every((tok) => hay.includes(tok));
   }
 
+  function hasCustomPicker(select) {
+    if (!select) return false;
+    if (select.classList.contains('native-enhanced')) return true;
+    if (select.dataset.providerPicker) return true;
+    if (select.hasAttribute('data-market-select')) return true;
+    if (select.closest('.search-select, .market-select')) return true;
+    const next = select.nextElementSibling;
+    if (next && next.classList.contains('search-select')) return true;
+    if (select.parentElement && select.parentElement.querySelector(':scope > .search-select')) return true;
+    return false;
+  }
+
+  function unwrapSelect(select) {
+    if (!select) return;
+    const ctrl = enhanced.get(select);
+    if (ctrl) {
+      ctrl.destroy();
+      enhanced.delete(select);
+    }
+    select.classList.remove('mk-ss-native');
+  }
+
   function shouldEnhance(select) {
     if (!select || select.tagName !== 'SELECT') return false;
     if (enhanced.has(select)) return false;
-    if (select.hasAttribute('data-market-select')) return false;
+    if (hasCustomPicker(select)) return false;
     if (select.hasAttribute('data-no-search-select')) return false;
-    if (select.closest('.market-select, .mk-ss-wrap, #mk-a11y-drawer')) return false;
+    if (select.closest('.mk-ss-wrap, #mk-a11y-drawer')) return false;
     if (select.hidden || select.style.display === 'none') return false;
     return true;
   }
@@ -266,10 +288,14 @@
     });
 
     const mo = new MutationObserver(() => {
+      if (hasCustomPicker(select)) {
+        unwrapSelect(select);
+        return;
+      }
       updateTrigger();
       if (!panel.hidden) renderOptions();
     });
-    mo.observe(select, { childList: true, attributes: true, subtree: true, attributeFilter: ['disabled', 'selected', 'hidden'] });
+    mo.observe(select, { childList: true, attributes: true, subtree: true, attributeFilter: ['disabled', 'selected', 'hidden', 'class', 'data-provider-picker'] });
 
     const formEl = select.form;
     if (formEl) {
@@ -281,15 +307,29 @@
       });
     }
 
-    const ctrl = { open, close, updateTrigger, renderOptions };
+    function destroy() {
+      mo.disconnect();
+      if (openCtrl === ctrl) openCtrl = null;
+      wrap.remove();
+    }
+
+    const ctrl = { open, close, updateTrigger, renderOptions, destroy };
     enhanced.set(select, ctrl);
     updateTrigger();
   }
 
   function scan(root) {
     if (!root || !root.querySelectorAll) return;
-    root.querySelectorAll('select').forEach(enhanceSelect);
+    root.querySelectorAll('select').forEach((sel) => {
+      if (hasCustomPicker(sel)) {
+        unwrapSelect(sel);
+      } else {
+        enhanceSelect(sel);
+      }
+    });
   }
+
+  window.MakkenDropdowns = { unwrap: unwrapSelect, scan };
 
   document.addEventListener('click', (e) => {
     if (openCtrl && e.target.isConnected && !e.target.closest('.mk-ss-wrap')) {
@@ -309,6 +349,11 @@
       for (const m of mutations) {
         for (const node of m.addedNodes) {
           if (node.nodeType !== 1) continue;
+          if (node.classList && node.classList.contains('search-select')) {
+            const parentSelect = node.parentElement && node.parentElement.querySelector(':scope > select');
+            if (parentSelect) unwrapSelect(parentSelect);
+            continue;
+          }
           if (node.tagName === 'SELECT') enhanceSelect(node);
           else if (node.querySelectorAll) scan(node);
         }

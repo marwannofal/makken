@@ -118,3 +118,19 @@ class AccessibilityAndDropdownsTests(TestCase):
         self.assertIn('e.target.isConnected', mjs)
         self.assertIn('mk-multi-footer', mjs)
         self.assertIn('مسح التحديد', mjs)
+
+    def test_global_dropdowns_never_duplicate_custom_pickers(self):
+        base = Path(settings.BASE_DIR)
+        dd_js = (base / 'core' / 'static' / 'core' / 'js' / 'makken-dropdowns.js').read_text(encoding='utf-8')
+        self.assertIn('function hasCustomPicker(select)', dd_js)
+        self.assertIn('function unwrapSelect(select)', dd_js)
+        self.assertIn("select.classList.contains('native-enhanced')", dd_js)
+        self.assertIn('window.MakkenDropdowns = { unwrap: unwrapSelect, scan };', dd_js)
+
+        for rel in (
+            'partnerships/static/partnerships/partnerships.js',
+            'market_needs/static/market_needs/market.js',
+            'service_providers/static/service_providers/provider-selects.js',
+        ):
+            src = (base / rel).read_text(encoding='utf-8')
+            self.assertIn('MakkenDropdowns?.unwrap?.(select)', src, f'{rel} must unwrap global dropdown before enhancing')
