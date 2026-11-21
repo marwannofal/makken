@@ -302,7 +302,25 @@ def work_index(request):
     params.pop('page', None)
     can_create = request.user.is_superuser or policy.can('work_assignments', 'create')
     can_stats = request.user.is_superuser or policy.can('work_assignments', 'view')
-    return page(request, 'work_list', section='work', rows=Paginator(query, 20).get_page(request.GET.get('page')),
+    page_obj = Paginator(query, 20).get_page(request.GET.get('page'))
+    from partnerships.models import Partnership
+    from agreement_clauses.models import Agreement
+    p_ids = [r.target_key for r in page_obj if r.target_model == 'partnerships.partnership' and r.target_key]
+    a_ids = [r.target_key for r in page_obj if r.target_model == 'agreement_clauses.agreement' and r.target_key]
+    p_map = Partnership._base_manager.in_bulk(p_ids) if p_ids else {}
+    a_map = {
+        a.pk: a.partnership
+        for a in Agreement._base_manager.select_related('partnership').filter(pk__in=a_ids)
+    } if a_ids else {}
+    for row in page_obj:
+        linked = None
+        if row.target_model == 'partnerships.partnership' and row.target_key:
+            linked = p_map.get(row.target_key)
+        elif row.target_model == 'agreement_clauses.agreement' and row.target_key:
+            linked = a_map.get(row.target_key)
+        row.linked_partnership = linked
+        row.linked_partnership_url = reverse('partnerships:edit', args=[linked.pk]) if linked else ''
+    return page(request, 'work_list', section='work', rows=page_obj,
                 q=term, selected=status, statuses=WorkStatus.choices, paging=params.urlencode(),
                 can_create_work=can_create, can_view_stats=can_stats)
 

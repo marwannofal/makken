@@ -30,13 +30,13 @@
       <table class="partnership-table" data-no-export>
         <thead>
           <tr>
-            <th>العمل</th><th>الموظفون المسند إليهم</th><th>المدير</th><th>الاستحقاق</th><th>الحالة</th><th>الإنجاز</th>
+            <th>العمل</th><th>الشراكة التي سيتم العمل عليها</th><th>الموظفون المسند إليهم</th><th>المدير</th><th>الاستحقاق</th><th>الحالة</th><th>الإنجاز</th>
           </tr>
         </thead>
         <tbody>
           {% for row in rows %}
             <tr>
-              <th scope="row"><a href="{% url 'makken_mail:work_detail' row.pk %}">{{ row.title }}</a></th><td>
+              <th scope="row"><a href="{% url 'makken_mail:work_detail' row.pk %}">{{ row.title }}</a></th><td>{% if row.linked_partnership %}<a href="{{ row.linked_partnership_url }}">{{ row.linked_partnership.name }}</a>{% else %}—{% endif %}</td><td>
               {% for person in row.assignees.all %}
                 <span class="tag">{{ person.get_full_name|default:person }}</span>
               {% empty %}
@@ -46,7 +46,7 @@
             </tr>
           {% empty %}
             <tr>
-              <td colspan="6">لا توجد أعمال مطابقة ضمن نطاقك.</td>
+              <td colspan="7">لا توجد أعمال مطابقة ضمن نطاقك.</td>
             </tr>
           {% endfor %}
         </tbody>

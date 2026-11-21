@@ -110,7 +110,10 @@ class WorkAssignmentsUS04US05Tests(TestCase):
 
         # Secondary assignee (emp2) can view and update progress
         self.client.force_login(self.emp2, backend='accounts.backends.EmailOrUsernameBackend')
-        self.assertContains(self.client.get(reverse('makken_mail:work_index')), work.title)
+        idx_res = self.client.get(reverse('makken_mail:work_index'))
+        self.assertContains(idx_res, work.title)
+        self.assertContains(idx_res, 'الشراكة التي سيتم العمل عليها')
+        self.assertContains(idx_res, self.partner_riyadh.name)
         prog_res = self.client.post(reverse('makken_mail:work_detail', args=[work.pk]), {
             'revision': str(work.revision),
             'status': 'running',
