@@ -207,7 +207,51 @@
           {% include "partnerships/_clauses_section.html" with allow_progress=True section_id="edit" %}
         </div>
       </details>
-      {% include "partnerships/_willingness_details_sections.html" with num_term="04" num_signatories="05" num_teams="06" num_content="07" open_details=False %}
+      <details class="mk-accordion" {% if work_form and work_form.errors %}open{% endif %}>
+        <summary>
+          <div class="mk-acc-head">
+            <h2 class="mk-acc-title">04 · إسناد المهام</h2> <p class="mk-acc-subtitle">عرض المهام المسندة لهذه الشراكة، أو إسناد مهمة جديدة مرتبطة بها مباشرة عند الحفظ.</p>
+          </div>
+          <span class="mk-acc-meta"> <span class="subtle-badge">المهام المسندة: {{ existing_works|length }}</span> <svg class="mk-acc-arrow" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg> </span>
+        </summary>
+        <div class="mk-acc-body">
+          {% if existing_works %}
+            <div class="table-scroll" tabindex="0" aria-label="المهام المسندة لهذه الشراكة">
+              <table class="partnership-table">
+                <thead>
+                  <tr>
+                    <th scope="col">عنوان المهمة</th>
+                    <th scope="col">الموظفون المسند إليهم</th>
+                    <th scope="col">المشرف / المدير</th>
+                    <th scope="col">الحالة والإنجاز</th>
+                    <th scope="col">الإجراء</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for wk in existing_works %}
+                    <tr>
+                      <th scope="row"><bdi>{{ wk.title }}</bdi></th>
+                      <td>
+                        {% for person in wk.assignees.all %}
+                          <span class="subtle-badge">{{ person.get_full_name|default:person.username }}</span>
+                        {% empty %}
+                          <span class="subtle-badge">{{ wk.employee.get_full_name|default:wk.employee.username }}</span>
+                        {% endfor %}
+                      </td>
+                      <td>{{ wk.manager.get_full_name|default:wk.manager.username }}</td>
+                      <td>{{ wk.get_status_display }} ({{ wk.progress }}%)</td>
+                      <td><a class="row-action" href="{% url 'makken_mail:work_detail' wk.pk %}">عرض / تعديل</a></td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% endif %}
+          <p class="field-help">إسناد مهمة جديدة (اختياري عند التعديل — املأ الحقول أدناه فقط لإضافة مهمة جديدة مع حفظ الشراكة):</p>
+          {% include "partnerships/_work_section.html" %}
+        </div>
+      </details>
+      {% include "partnerships/_willingness_details_sections.html" with num_term="05" num_signatories="06" num_teams="07" num_content="08" open_details=False %}
     {% endif %}
     <div class="editor-actions" style="margin-top:18px;">
       <button class="button button-primary" type="submit" data-save-partnership>

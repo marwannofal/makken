@@ -112,6 +112,7 @@ class Partnership(models.Model):
         limit_choices_to={"kind": "status"},
         verbose_name="حالة الشراكة",
     )
+<<<<<<< ours
     responsible_employee = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -120,6 +121,8 @@ class Partnership(models.Model):
         related_name="responsible_partnerships",
         verbose_name="الموظف المسؤول عن الاتفاقية",
     )
+=======
+>>>>>>> theirs
     objective = models.TextField("هدف الشراكة", max_length=2000, blank=True, default="")
     announcement = models.TextField("خبر عن الشراكة", max_length=2000, blank=True, default="")
     audience = models.TextField("الفئات المستهدفة", max_length=2000, blank=True, default="")

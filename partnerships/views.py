@@ -193,6 +193,25 @@ def _save(payload, user):
             save_partnership_clauses(item, payload["clauses"], user, allow_progress=True)
         if "teams" in payload and payload["teams"] is not None:
             save_partnership_teams(item, payload["teams"])
+        if payload.get("work"):
+            from datetime import date as _date
+            from django.contrib.auth import get_user_model
+            _User = get_user_model()
+            wdata = payload["work"]
+            assignees = list(_User.objects.filter(pk__in=wdata.get("assignees", []), is_active=True))
+            manager = _User.objects.filter(pk=wdata.get("manager"), is_active=True).first()
+            if assignees and manager:
+                create_partnership_work(
+                    user,
+                    {
+                        "title": wdata["title"],
+                        "instructions": wdata.get("instructions", ""),
+                        "assignees": assignees,
+                        "manager": manager,
+                        "due_on": _date.fromisoformat(wdata["due_on"]) if wdata.get("due_on") else None,
+                    },
+                    item,
+                )
         return item
 
 
@@ -322,7 +341,26 @@ def editor(request, pk=None, initial_state=DevelopmentState.CAPABILITY):
                             parsed_teams = parse_teams_payload(teams_json)
                         except django_forms.ValidationError as exc:
                             teams_error = " ".join(exc.messages)
-                    if form.is_valid() and details_valid and not clauses_error and not teams_error:
+                    work_valid = True
+                    work_payload = None
+                    if show_edit_clauses:
+                        has_work_input = any(
+                            (request.POST.get(k) or "").strip()
+                            for k in ("work-title", "work-manager", "work-due_on", "work-instructions")
+                        ) or bool(request.POST.getlist("work-assignees"))
+                        if has_work_input:
+                            work_form = PartnershipWorkForm(request.POST, actor=request.user, prefix="work")
+                            work_valid = work_form.is_valid()
+                            if work_valid:
+                                wc = work_form.cleaned_data
+                                work_payload = {
+                                    "title": wc["title"],
+                                    "instructions": wc.get("instructions") or "",
+                                    "assignees": [u.pk for u in wc["assignees"]],
+                                    "manager": wc["manager"].pk,
+                                    "due_on": wc["due_on"].isoformat() if wc.get("due_on") else "",
+                                }
+                    if form.is_valid() and details_valid and work_valid and not clauses_error and not teams_error:
                         ensure_allowed(item, "edit", form.cleaned_data["is_active"] == "1")
                         data = _serialized(form.cleaned_data)
                         token_data = {**original, "kind": "save", "data": data, "catalog": _fingerprint(data)}
@@ -330,6 +368,8 @@ def editor(request, pk=None, initial_state=DevelopmentState.CAPABILITY):
                             token_data["clauses"] = parsed_clauses
                             token_data["details"] = serialize_details(details_form.cleaned_data)
                             token_data["teams"] = parsed_teams
+                            if work_payload:
+                                token_data["work"] = work_payload
                         token = _sign(token_data, request.user)
                         pending = {"title": "تأكيد تعديل الجهة" if item else "تأكيد إضافة الجهة", "name": data["name"], "token": token, "action": "save", "button": "تأكيد الحفظ", "financial_capacity": data["financial_capacity"],
                                    "partnership_date": form.cleaned_data["partnership_date"], "starts_on": form.cleaned_data["starts_on"], "ends_on": form.cleaned_data["ends_on"]}
@@ -366,8 +406,20 @@ def editor(request, pk=None, initial_state=DevelopmentState.CAPABILITY):
             drafts = []
     except (ValueError, TypeError):
         drafts = []
+    existing_works = []
+    if show_edit_clauses and item and item.pk:
+        from makken_mail.models import WorkAssignment
+        existing_works = list(
+            WorkAssignment.objects.filter(target_model="partnerships.partnership", target_key=item.pk)
+            .select_related("employee", "manager")
+            .prefetch_related("assignees")
+            .order_by("-pk")
+        )
+        if work_form is None:
+            work_form = PartnershipWorkForm(actor=request.user, prefix="work")
     back_url = reverse("partnerships:willingness_index") if return_to == "willingness" else reverse("partnerships:capability_index")
     context.update(
+        existing_works=existing_works,
         item=item,
         form=form,
         snapshot=snapshot,
