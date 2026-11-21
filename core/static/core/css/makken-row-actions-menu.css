@@ -27,21 +27,21 @@
   border: 1px solid transparent;
   border-radius: 10px;
   background: transparent;
-  color: #1f4f4d;
+  color: #1f404f;
   cursor: pointer;
   transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
 .mk-actions-trigger:hover {
-  background: #eaf7f5;
-  border-color: #cde8e4;
-  color: #0e6f6a;
+  background: #eaf3f7;
+  border-color: #cddfe8;
+  color: #0e506f;
 }
 
 .mk-actions-trigger[aria-expanded="true"] {
-  background: #dff4f1;
+  background: #dfedf4;
   border-color: #005b85;
-  color: #0d625e;
+  color: #0d4762;
 }
 
 .mk-actions-trigger:focus-visible {
@@ -64,10 +64,10 @@
   min-width: 185px;
   max-width: 260px;
   padding: 8px;
-  border: 1px solid #dfece9;
+  border: 1px solid #dfe8ec;
   border-radius: 16px;
   background: #ffffff;
-  box-shadow: 0 14px 36px rgba(18, 61, 60, 0.16);
+  box-shadow: 0 14px 36px rgba(18, 47, 61, 0.16);
   z-index: 80;
   display: flex;
   flex-direction: column;
@@ -125,7 +125,7 @@
   border-radius: 10px !important;
   background: transparent !important;
   box-shadow: none !important;
-  color: #166a62 !important;
+  color: #164f6a !important;
   font-family: inherit;
   font-size: 13.5px !important;
   font-weight: 700 !important;
@@ -139,8 +139,8 @@
 
 :root .main-content .mk-actions-dropdown a:hover,
 :root .main-content .mk-actions-dropdown button:hover {
-  background: #edf9f6 !important;
-  color: #0e544e !important;
+  background: #edf5f9 !important;
+  color: #0e3e54 !important;
 }
 
 :root .main-content .mk-actions-dropdown a:focus-visible,
@@ -199,7 +199,7 @@
     display: block;
     position: fixed;
     inset: 0;
-    background: rgba(15, 48, 46, 0.36);
+    background: rgba(15, 38, 48, 0.36);
     backdrop-filter: blur(2px);
     z-index: 115;
   }
@@ -216,7 +216,7 @@
     overflow-y: auto;
     padding: 12px;
     border-radius: 18px;
-    box-shadow: 0 20px 60px rgba(12, 48, 46, 0.28);
+    box-shadow: 0 20px 60px rgba(12, 37, 48, 0.28);
     z-index: 120;
     gap: 6px;
   }

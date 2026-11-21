@@ -30,11 +30,11 @@
 
 .sidebar .profile-sidebar-link[aria-current="page"] {
   background: #fff;
-  color: #168b87;
+  color: #16668b;
 }
 
 .sidebar .profile-sidebar-link[aria-current="page"] .user-name, .sidebar .profile-sidebar-link[aria-current="page"] .user-email {
-  color: #168b87;
+  color: #16668b;
 }
 
 .sidebar .profile-sidebar-link[aria-current="page"] .user-avatar {

@@ -6,7 +6,7 @@
   width: min(520px, calc(100vw - 32px));
   max-height: calc(100dvh - 32px);
   overflow: auto;
-  color: #234b4e;
+  color: #23404e;
   background: #fff;
   box-shadow: 0 24px 90px rgb(19 66 68 / 20%);
   font-family: inherit;
@@ -40,7 +40,7 @@
   height: 52px;
   border-radius: 16px;
   background: #edf5fa;
-  color: #158b88;
+  color: #15668b;
 }
 
 .dependency-dialog svg {
@@ -56,7 +56,7 @@
 .dependency-eyebrow {
   font-size: 12px;
   font-weight: 700;
-  color: #158b88;
+  color: #15668b;
   margin: 20px 0 6px;
 }
 
@@ -80,8 +80,8 @@
 }
 
 .dependency-links li {
-  background: #f1f8f7;
-  border: 1px solid #dcecea;
+  background: #f1f6f8;
+  border: 1px solid #dce7ec;
   border-radius: 10px;
   padding: 7px 12px;
   font-size: 13px;
@@ -89,16 +89,16 @@
 }
 
 .dependency-note {
-  background: #f6faf9;
+  background: #f6f9fa;
   border-radius: 12px;
   padding: 14px;
   font-size: 13px;
-  color: #577477;
+  color: #576d77;
 }
 
 .dependency-note strong {
   display: block;
-  color: #234b4e;
+  color: #23404e;
 }
 
 .dependency-actions {
@@ -114,7 +114,7 @@
 }
 
 .dependency-dialog :focus-visible {
-  outline: 3px solid #167d7a;
+  outline: 3px solid #165c7d;
   outline-offset: 3px;
 }
 

@@ -6,8 +6,8 @@
   overflow-x: hidden;
   box-sizing: border-box;
   font-family: "Cairo", system-ui, -apple-system, sans-serif;
-  background: linear-gradient(145deg, #edf9f8 0%, #f7fbfa 60%, #e4f4f2 100%);
-  color: #164849;
+  background: linear-gradient(145deg, #edf5f9 0%, #f7fafb 60%, #e4eff4 100%);
+  color: #163949;
 }
 
 .pub-shell {
@@ -43,7 +43,7 @@
 .pub-brand h1 {
   margin: 0 0 8px;
   font-size: 28px;
-  color: #124c4e;
+  color: #123b4e;
 }
 
 .pub-dot {
@@ -52,7 +52,7 @@
 
 .pub-brand p {
   margin: 0;
-  color: #4b6e70;
+  color: #4b6470;
   font-size: 14px;
   line-height: 1.9;
 }
@@ -60,9 +60,9 @@
 .pub-back-link {
   padding: 10px 16px;
   border-radius: 12px;
-  border: 1px solid #cce3e0;
+  border: 1px solid #ccdce3;
   background: #fff;
-  color: #146a68;
+  color: #144f6a;
   text-decoration: none;
   font-size: 13px;
   font-weight: 700;
@@ -74,16 +74,16 @@
 
 .pub-card {
   background: #fff;
-  border: 1px solid #dcebe8;
+  border: 1px solid #dce6eb;
   border-radius: 22px;
   padding: 28px;
-  box-shadow: 0 12px 36px rgba(17, 87, 86, 0.06);
+  box-shadow: 0 12px 36px rgba(17, 65, 87, 0.06);
 }
 
 .pub-card h2 {
   margin: 0 0 20px;
   font-size: 19px;
-  color: #15595b;
+  color: #15455b;
 }
 
 .pub-hp {
@@ -119,7 +119,7 @@
 .pub-field label {
   font-size: 13px;
   font-weight: 700;
-  color: #255759;
+  color: #254959;
 }
 
 .pub-field .req {
@@ -130,12 +130,12 @@
 .pub-field input, .pub-field select, .pub-field textarea {
   width: 100%;
   box-sizing: border-box;
-  border: 1px solid #cfe3e0;
+  border: 1px solid #cfdde3;
   border-radius: 11px;
   padding: 10px 13px;
   font-family: inherit;
   font-size: 14px;
-  color: #194c4d;
+  color: #193d4d;
   background: #fff;
 }
 
@@ -157,21 +157,21 @@
 .pub-regions {
   margin: 20px 0;
   padding: 16px;
-  border: 1px solid #d7eae7;
+  border: 1px solid #d7e4ea;
   border-radius: 14px;
-  background: #f8fcfb;
+  background: #f8fbfc;
 }
 
 .pub-regions legend {
   font-size: 13px;
   font-weight: 700;
-  color: #1f595b;
+  color: #1f485b;
   padding: 0 6px;
 }
 
 .pub-regions legend small {
   font-weight: 500;
-  color: #5b7c7d;
+  color: #5b727d;
 }
 
 .pub-region-grid {
@@ -187,7 +187,7 @@
   gap: 8px;
   padding: 8px 10px;
   border-radius: 10px;
-  border: 1px solid #dfeeec;
+  border: 1px solid #dfe9ee;
   background: #fff;
   font-size: 13px;
   cursor: pointer;
@@ -257,20 +257,20 @@
 }
 
 .pub-btn-primary:hover {
-  background: #1c9b97;
+  background: #1c739b;
 }
 
 .pub-btn-secondary {
-  border: 1px solid #cbe2df;
+  border: 1px solid #cbdbe2;
   background: #fff;
-  color: #1b5c5e;
+  color: #1b495e;
 }
 
 .pub-footer {
   text-align: center;
   margin-top: 24px;
   font-size: 12px;
-  color: #617f81;
+  color: #617781;
 }
 
 .pub-thanks-shell {
@@ -300,20 +300,20 @@
   padding: 14px 18px;
   max-width: 300px;
   border-radius: 14px;
-  background: #eff9f8;
-  border: 1px solid #cde9e5;
+  background: #eff6f9;
+  border: 1px solid #cde0e9;
 }
 
 .pub-ref span {
   display: block;
   font-size: 12px;
-  color: #547678;
+  color: #546d78;
 }
 
 .pub-ref strong {
   display: block;
   font-size: 20px;
-  color: #146360;
+  color: #144a63;
   margin-top: 4px;
 }
 /* Admin Review Queue */
@@ -338,7 +338,7 @@
 
 .sr-kpi {
   padding: 16px;
-  border: 1px solid #dcebe6;
+  border: 1px solid #dce6eb;
   border-radius: 16px;
   background: #fff;
 }
@@ -347,20 +347,20 @@
   display: block;
   font-size: 12px;
   font-weight: 700;
-  color: #567774;
+  color: #566d77;
   margin-bottom: 6px;
 }
 
 .sr-kpi strong {
   display: block;
   font-size: 26px;
-  color: #195e5c;
+  color: #19485e;
   font-variant-numeric: tabular-nums;
 }
 
 .sr-kpi.is-new {
-  background: #eff9f8;
-  border-color: #c8eae6;
+  background: #eff6f9;
+  border-color: #c8dfea;
 }
 
 .sr-kpi.is-approved {
@@ -418,7 +418,7 @@
 }
 
 .sr-link {
-  color: #157774;
+  color: #155877;
   font-weight: 700;
   text-decoration: none;
 }
@@ -440,8 +440,8 @@
 }
 
 .sr-pill.is-new {
-  background: #e6f7f5;
-  color: #137470;
+  background: #e6f2f7;
+  color: #135574;
 }
 
 .sr-pill.is-approved {
@@ -464,13 +464,13 @@
 .sr-detail-grid > div {
   padding: 12px 14px;
   border-radius: 12px;
-  background: #f8fbfa;
-  border: 1px solid #e3efec;
+  background: #f8fafb;
+  border: 1px solid #e3ebef;
 }
 
 .sr-detail-grid dt {
   font-size: 12px;
-  color: #5b7b7c;
+  color: #5b727c;
   margin-bottom: 4px;
 }
 
@@ -478,7 +478,7 @@
   margin: 0;
   font-size: 14px;
   font-weight: 700;
-  color: #164f51;
+  color: #163e51;
   overflow-wrap: anywhere;
 }
 
@@ -486,8 +486,8 @@
   margin-top: 18px;
   padding: 14px 16px;
   border-radius: 12px;
-  border: 1px solid #dcebe8;
-  background: #f8fcfb;
+  border: 1px solid #dce6eb;
+  background: #f8fbfc;
 }
 
 .sr-reject-box {
@@ -515,7 +515,7 @@
 
 .sr-desc {
   font-size: 13px;
-  color: #4d6f70;
+  color: #4d6570;
   line-height: 1.9;
   margin: 0 0 16px;
 }
@@ -550,10 +550,10 @@
 }
 
 .pub-offerings {
-  border: 1px solid #d7e7e4;
+  border: 1px solid #d7e2e7;
   border-radius: 14px;
   padding: 16px;
-  background: #fbfefd;
+  background: #fbfdfe;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -570,7 +570,7 @@
 .pub-offerings-head h3 {
   margin: 0 0 4px;
   font-size: 16px;
-  color: #103a38;
+  color: #102d3a;
 }
 
 .pub-btn-outline {
@@ -597,7 +597,7 @@
 .pub-offerings-empty {
   margin: 0;
   font-size: 13.5px;
-  color: #5b7875;
+  color: #5b6f78;
 }
 
 .pub-offering-row {
@@ -606,7 +606,7 @@
   align-items: center;
   gap: 12px;
   padding: 10px 14px;
-  border: 1px solid #d8eae6;
+  border: 1px solid #d8e4ea;
   border-radius: 10px;
   background: #fff;
 }
@@ -619,7 +619,7 @@
 
 .pub-offering-specs {
   font-size: 12.5px;
-  color: #466664;
+  color: #465c66;
 }
 
 .pub-offering-remove {
@@ -637,11 +637,11 @@
   border-radius: 16px;
   padding: 0;
   width: min(560px, 94vw);
-  box-shadow: 0 24px 64px rgba(15, 53, 51, 0.22);
+  box-shadow: 0 24px 64px rgba(15, 41, 53, 0.22);
 }
 
 .pub-dialog::backdrop {
-  background: rgba(15, 40, 39, 0.45);
+  background: rgba(15, 32, 40, 0.45);
 }
 
 .pub-dialog-card {
@@ -660,13 +660,13 @@
 .pub-dialog-head h3 {
   margin: 0;
   font-size: 18px;
-  color: #103a38;
+  color: #102d3a;
 }
 
 .pub-dialog-close {
   width: 34px;
   height: 34px;
-  border: 1px solid #d7e7e4;
+  border: 1px solid #d7e2e7;
   border-radius: 10px;
   background: #fff;
   font-size: 20px;
@@ -686,9 +686,9 @@
   max-height: 180px;
   overflow-y: auto;
   padding: 10px;
-  border: 1px solid #d7e7e4;
+  border: 1px solid #d7e2e7;
   border-radius: 10px;
-  background: #fbfefd;
+  background: #fbfdfe;
 }
 
 .pub-toast {

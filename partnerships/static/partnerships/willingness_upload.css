@@ -16,7 +16,7 @@
   margin-bottom: 9px;
   font-size: 12px;
   font-weight: 700;
-  color: #274c4f;
+  color: #27424f;
 }
 
 .willingness-field > label > span {
@@ -27,9 +27,9 @@
   width: 100%;
   height: 48px;
   box-sizing: border-box;
-  border: 1px solid #d7e6e2;
+  border: 1px solid #d7e1e6;
   border-radius: 11px;
-  color: #274c4f;
+  color: #27424f;
   font: inherit;
   font-size: 12px;
   appearance: none;
@@ -40,22 +40,22 @@
 
 .willingness-upload-box {
   padding: 20px 16px 16px;
-  border: 1px dashed #91cbc2;
+  border: 1px dashed #91b9cb;
   border-radius: 13px;
-  background: #f4fbf9;
+  background: #f4f9fb;
   text-align: center;
 }
 
 .willingness-upload-box > svg {
   width: 28px;
   height: 28px;
-  color: #159d97;
+  color: #15729d;
 }
 
 .willingness-upload-box > p {
   margin: 9px 0 13px;
   font-size: 12px;
-  color: #476e67;
+  color: #47626e;
 }
 
 .willingness-picker {
@@ -86,7 +86,7 @@
 }
 
 .willingness-picker:focus-within {
-  outline: 3px solid #12817e;
+  outline: 3px solid #125e81;
   outline-offset: 3px;
 }
 
@@ -98,7 +98,7 @@
   font-size: 10px;
   margin: 12px 0 0;
   line-height: 1.9;
-  color: #748c86;
+  color: #74848c;
 }
 
 .willingness-selected-files {
@@ -118,7 +118,7 @@
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
-  border: 1px solid #e0ece7;
+  border: 1px solid #e0e8ec;
   border-radius: 10px;
   min-width: 0;
 }
@@ -131,7 +131,7 @@
   justify-content: center;
   border-radius: 9px;
   background: #edf5fa;
-  color: #168a84;
+  color: #16658a;
   font-size: 10px;
   font-weight: 700;
   flex-shrink: 0;
@@ -144,7 +144,7 @@
 
 .willingness-queue-info bdi {
   display: block;
-  color: #355d57;
+  color: #35505d;
   font-size: 11px;
   font-weight: 600;
   overflow-wrap: anywhere;
@@ -153,7 +153,7 @@
 .willingness-queue-info small {
   display: block;
   margin-top: 4px;
-  color: #7b9389;
+  color: #7b8b93;
   font-size: 10px;
 }
 
@@ -174,8 +174,8 @@
 .willingness-upload-progress {
   margin-top: 16px;
   padding: 14px;
-  background: #f1faf7;
-  border: 1px solid #d5eae2;
+  background: #f1f7fa;
+  border: 1px solid #d5e3ea;
   border-radius: 11px;
 }
 
@@ -189,7 +189,7 @@
   justify-content: space-between;
   gap: 10px;
   font-size: 11px;
-  color: #3c746a;
+  color: #3c6274;
 }
 
 .willingness-upload-progress progress {
@@ -201,13 +201,13 @@
   border-radius: 8px;
   overflow: hidden;
   margin: 12px 0;
-  background: #dbeee8;
+  background: #dbe8ee;
   accent-color: #005b85;
   direction: ltr;
 }
 
 .willingness-upload-progress progress::-webkit-progress-bar {
-  background: #dbeee8;
+  background: #dbe8ee;
   border-radius: 8px;
 }
 
@@ -224,7 +224,7 @@
 .willingness-upload-progress > p {
   margin: 0;
   font-size: 10px;
-  color: #789387;
+  color: #788a93;
   line-height: 1.9;
 }
 
@@ -245,13 +245,13 @@
 .willingness-support-section {
   margin: 24px 0;
   padding-top: 24px;
-  border-top: 1px solid #e3ede7;
+  border-top: 1px solid #e3eaed;
 }
 
 .willingness-support-section h3 {
   margin: 0;
   font-size: 15px;
-  color: #274c4f;
+  color: #27424f;
   line-height: 1.9;
 }
 
@@ -262,17 +262,17 @@
   gap: 12px;
   font-size: 11px;
   padding: 12px 14px;
-  background: #f3f9f7;
+  background: #f3f7f9;
   border-radius: 10px;
   margin: 16px 0;
 }
 
 .willingness-agreement-summary > span {
-  color: #7a938b;
+  color: #7a8b93;
 }
 
 .willingness-agreement-summary > strong {
-  color: #316c60;
+  color: #31596c;
   font-weight: 700;
 }
 
@@ -289,7 +289,7 @@
   gap: 10px;
   min-width: 0;
   padding: 14px;
-  border: 1px solid #dfece6;
+  border: 1px solid #dfe8ec;
   border-radius: 12px;
   background: #fff;
 }
@@ -302,8 +302,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: #eaf8f4;
-  color: #18877d;
+  background: #eaf4f8;
+  color: #186487;
   flex-shrink: 0;
 }
 
@@ -330,7 +330,7 @@
 .willingness-file-name {
   display: block;
   overflow-wrap: anywhere;
-  color: #365f58;
+  color: #36525f;
   font-size: 11px;
   font-weight: 700;
   line-height: 1.9;
@@ -338,7 +338,7 @@
 
 .willingness-file-info p {
   margin: 5px 0 0;
-  color: #85988f;
+  color: #859298;
   font-size: 9px;
   line-height: 1.9;
 }
@@ -353,7 +353,7 @@
   min-height: 44px;
   border-radius: 9px;
   font-size: 9px;
-  color: #16857f;
+  color: #166285;
   background: #f0f9f5;
   flex-shrink: 0;
 }

@@ -27,7 +27,7 @@
 .agreement-output {
   display: block;
   padding: .75rem;
-  background: #e7f6f5;
+  background: #e7f1f6;
   color: #003954;
   border-radius: .75rem;
   min-block-size: 48px;
@@ -38,8 +38,8 @@
 }
 
 .agreement-summary > div, .agreement-card-row, .agreement-member, .agreement-renew {
-  background: #f5faf9;
-  border: 1px solid #d6e8e7;
+  background: #f5f8fa;
+  border: 1px solid #d6e2e8;
   padding: .875rem;
   border-radius: .75rem;
 }
@@ -55,7 +55,7 @@
 }
 
 .agreement-summary .agreement-highlight {
-  background: #e7f6f5;
+  background: #e7f1f6;
 }
 
 .agreement-prose dd {

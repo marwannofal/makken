@@ -56,8 +56,8 @@
   display:flex;
   align-items:center;
   gap:7px;
-  background:#f3f8f7;
-  color:#6b8581;
+  background:#f3f6f8;
+  color:#6b7d85;
   font-size:10px;
   border-radius:8px;
   padding:8px 11px;
@@ -78,8 +78,8 @@
 }
 
 .states-table thead {
-  background:#e8f7f4;
-  color:#237874
+  background:#e8f2f7;
+  color:#235d78
 }
 
 .states-table th,.states-table td {
@@ -101,11 +101,11 @@
 }
 
 .states-table tbody tr {
-  border-bottom:1px solid #edf2f1
+  border-bottom:1px solid #edf0f2
 }
 
 .states-table tbody tr:nth-child(even) {
-  background:#fafcfc
+  background:#fafbfc
 }
 
 .states-table tbody tr:last-child {
@@ -153,7 +153,7 @@
   font-size:11px;
   font-weight:500;
   letter-spacing:.035em;
-  color:#6c8582
+  color:#6c7d85
 }
 
 .action-cell {
@@ -165,7 +165,7 @@
   align-items:center;
   justify-content:center;
   gap:7px;
-  color:#147b76;
+  color:#145a7b;
   background:#edf5fa;
   border-radius:9px;
   min-height:44px;
@@ -182,7 +182,7 @@
 }
 
 .edit-color:hover {
-  background:#d9f1eb
+  background:#d9e9f1
 }
 
 .states-card-footer {
@@ -191,7 +191,7 @@
   gap:9px;
   padding:17px 30px;
   border-top:1px solid var(--line);
-  color:#879b97
+  color:#87959b
 }
 
 .states-card-footer svg {
@@ -232,7 +232,7 @@
 }
 
 .button-primary:hover {
-  background:#1eaaa5
+  background:#1e7eaa
 }
 
 .button-primary:disabled {
@@ -241,12 +241,12 @@
 
 .button-secondary {
   background:white;
-  border-color:#dce8e5;
-  color:#62807b
+  border-color:#dce4e8;
+  color:#627680
 }
 
 .button-secondary:hover {
-  background:#f1f8f6
+  background:#f1f6f8
 }
 
 .close-page {
@@ -276,9 +276,9 @@
 }
 
 .feedback-info {
-  background:#edf8f7;
-  border-color:#d4e9e6;
-  color:#286d67
+  background:#edf5f8;
+  border-color:#d4e2e9;
+  color:#28576d
 }
 
 .color-dialog:not([open]) {
@@ -288,7 +288,7 @@
 .color-dialog {
   font-family:inherit;
   color:var(--ink);
-  border:1px solid #edf3f1;
+  border:1px solid #edf1f3;
   background:white;
   width:min(470px,calc(100vw - 32px));
   max-width:none;
@@ -333,8 +333,8 @@
   justify-content:center;
   width:48px;
   height:48px;
-  background:#e6f7f2;
-  color:#148782;
+  background:#e6f2f7;
+  color:#146387;
   border-radius:15px
 }
 
@@ -345,12 +345,12 @@
 
 .dialog-close {
   border:0;
-  color:#859c96
+  color:#85959c
 }
 
 .dialog-eyebrow {
   font-size:10px;
-  color:#6f9890;
+  color:#6f8b98;
   font-weight:600;
   margin:0 0 7px
 }
@@ -365,7 +365,7 @@
 
 .dialog-description {
   font-size:12px;
-  color:#789087;
+  color:#788890;
   line-height:2;
   margin:0 0 24px
 }
@@ -393,7 +393,7 @@
   width:100%;
   height:48px;
   cursor:pointer;
-  border:1px solid #dce8e4;
+  border:1px solid #dce4e8;
   border-radius:10px;
   padding:5px;
   background:white
@@ -417,8 +417,8 @@
   display:block;
   width:100%;
   height:48px;
-  border:1px solid #dce8e4;
-  background:#fbfdfc;
+  border:1px solid #dce4e8;
+  background:#fbfcfd;
   border-radius:10px;
   padding:10px 13px;
   font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
@@ -430,7 +430,7 @@
 
 .field-help {
   font-size:10px;
-  color:#859990;
+  color:#859399;
   line-height:2;
   margin:12px 0 26px
 }
@@ -461,12 +461,12 @@
   border:1px solid var(--line);
   border-radius:12px;
   padding:18px 10px;
-  background:#fafcfb
+  background:#fafbfc
 }
 
 .comparison-item>span {
   font-size:10px;
-  color:#739189
+  color:#738791
 }
 
 .comparison-swatch {
@@ -476,18 +476,18 @@
 }
 
 .new-color {
-  border-color:#bce2d9;
-  background:#f1faf7
+  border-color:#bcd6e2;
+  background:#f1f7fa
 }
 
 .comparison-arrow {
-  color:#88a69d;
+  color:#889ca6;
   width:22px
 }
 
 .confirmation-hint {
   font-size:10px;
-  color:#849990;
+  color:#849299;
   text-align:center;
   line-height:2;
   margin:18px 0 0

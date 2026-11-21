@@ -1,9 +1,9 @@
 :root {
   --primary: #005b85;
-  --ink: #153a3c;
-  --muted: #74888b;
-  --line: #e7efee;
-  --surface: #f5f9f8;
+  --ink: #15303c;
+  --muted: #74848b;
+  --line: #e7ecef;
+  --surface: #f5f8f9;
   --sidebar-width: 280px;
   font-family: "Cairo", sans-serif;
   color: var(--ink);
@@ -66,12 +66,12 @@ button[hidden] {
 }
 
 :focus-visible {
-  outline: 3px solid #12817e;
+  outline: 3px solid #125e81;
   outline-offset: 4px;
 }
 
 ::selection {
-  background: #c6eeeb;
+  background: #c6e1ee;
 }
 
 .skip-link {
@@ -147,7 +147,7 @@ button[hidden] {
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.025em;
-  color: #8a999b;
+  color: #8a969b;
   margin: 0 16px 16px;
 }
 
@@ -161,18 +161,18 @@ button[hidden] {
   font-size: 14px;
   font-weight: 600;
   margin-bottom: 8px;
-  color: #637e80;
+  color: #637780;
   transition: background 0.16s, color 0.16s;
 }
 
 .nav-link:hover {
-  background: #f1f8f7;
-  color: #167d7a;
+  background: #f1f6f8;
+  color: #165c7d;
 }
 
 .nav-link.is-active {
-  color: #107571;
-  background: #e6f7f4;
+  color: #105575;
+  background: #e6f2f7;
 }
 
 .nav-dot {
@@ -211,8 +211,8 @@ button[hidden] {
   height: 42px;
   flex-shrink: 0;
   border-radius: 14px;
-  background: #e9f5f3;
-  color: #167b77;
+  background: #e9f1f5;
+  color: #165b7b;
   font-size: 18px;
   font-weight: 700;
 }
@@ -248,20 +248,20 @@ button[hidden] {
   justify-content: center;
   gap: 10px;
   background: #fff;
-  border: 1px solid #dbe8e6;
+  border: 1px solid #dbe4e8;
   border-radius: 11px;
   min-height: 47px;
   padding: 10px 14px;
-  color: #587377;
+  color: #586d77;
   font-size: 13px;
   font-weight: 600;
   transition: background 0.16s, border-color 0.16s;
 }
 
 .logout-button:hover {
-  background: #eef8f6;
-  border-color: #afd9d4;
-  color: #116f6b;
+  background: #eef5f8;
+  border-color: #afccd9;
+  color: #11516f;
 }
 
 .logout-button svg {
@@ -302,7 +302,7 @@ button[hidden] {
 }
 
 .breadcrumb-divider {
-  color: #c4d1d0;
+  color: #c4cdd1;
   font-weight: 400;
 }
 
@@ -313,7 +313,7 @@ button[hidden] {
   gap: 9px;
   min-width: 0;
   max-width: 40%;
-  color: #607c7d;
+  color: #60747d;
 }
 
 .account-chip > span:last-child {
@@ -328,7 +328,7 @@ button[hidden] {
   border-radius: 50%;
   background: var(--primary);
   flex-shrink: 0;
-  box-shadow: 0 0 0 4px #e9f7f4;
+  box-shadow: 0 0 0 4px #e9f3f7;
 }
 
 .main-content {
@@ -351,7 +351,7 @@ button[hidden] {
 .eyebrow {
   margin: 0 0 7px;
   font-size: 11px;
-  color: #6f9391;
+  color: #6f8893;
   font-weight: 600;
 }
 
@@ -382,7 +382,7 @@ h1 {
   border-radius: 9px;
   padding: 8px 12px;
   white-space: nowrap;
-  color: #668582;
+  color: #667b85;
   font-size: 10px;
 }
 
@@ -397,7 +397,7 @@ h1 {
   min-height: 390px;
   border-radius: 22px;
   overflow: hidden;
-  background: #0b6564;
+  background: #0b4865;
   box-shadow: 0 12px 35px #1a6b6610;
 }
 
@@ -417,13 +417,13 @@ h1 {
   gap: 8px;
   font-size: 10px;
   font-weight: 600;
-  color: #e2f7f4;
+  color: #e2f0f7;
 }
 
 .welcome-label > span {
   width: 6px;
   height: 6px;
-  background: #6ee1d0;
+  background: #6ebde1;
   border-radius: 50%;
 }
 
@@ -436,12 +436,12 @@ h2 {
 }
 
 h2 > span {
-  color: #85e3d4;
+  color: #85c5e3;
 }
 
 .welcome-copy > p {
   font-size: 12px;
-  color: #e0f0ee;
+  color: #e0ebf0;
   line-height: 2.2;
   margin: 0;
   max-width: 310px;
@@ -454,13 +454,13 @@ h2 > span {
   align-items: center;
   gap: 10px;
   font-size: 9px;
-  color: #d6eae7;
+  color: #d6e4ea;
 }
 
 .note-line {
   width: 25px;
   height: 1px;
-  background: #70c9bd;
+  background: #70adc9;
 }
 
 .welcome-visual {
@@ -482,7 +482,7 @@ h2 > span {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(270deg, #0b6564 0%, #0b656427 42%, #073c3b39 100%), linear-gradient(0deg, #064b4b9c, transparent 55%);
+  background: linear-gradient(270deg, #0b4865 0%, #0b656427 42%, #073c3b39 100%), linear-gradient(0deg, #064b4b9c, transparent 55%);
 }
 
 .visual-caption {
@@ -493,7 +493,7 @@ h2 > span {
   color: white;
   font-size: 11px;
   font-weight: 500;
-  border-inline-start: 2px solid #8ee7d7;
+  border-inline-start: 2px solid #8ecbe7;
   padding-inline-start: 10px;
 }
 
@@ -515,14 +515,14 @@ h2 > span {
 
 .workspace-note p {
   margin: 0;
-  color: #8a9d9b;
+  color: #8a979d;
   font-size: 11px;
 }
 
 .site-footer {
   padding: 23px 32px;
   text-align: center;
-  color: #8c9c9e;
+  color: #8c989e;
   font-size: 10px;
   line-height: 2;
 }
@@ -535,12 +535,12 @@ h2 > span {
   justify-content: center;
   border: 1px solid var(--line);
   border-radius: 11px;
-  color: #3e7371;
+  color: #3e6273;
   background: #fff;
 }
 
 .icon-button:hover {
-  background: #eaf7f4;
+  background: #eaf3f7;
 }
 
 .menu-toggle {
@@ -739,7 +739,7 @@ h2 > span {
     height: 190px;
   }
   .welcome-visual:after {
-    background: linear-gradient( 180deg, #0b6564 0%, #0b656420 55%, #064b4b80 100% );
+    background: linear-gradient( 180deg, #0b4865 0%, #0b656420 55%, #064b4b80 100% );
   }
   .welcome-visual > img {
     object-position: center 48%;

@@ -19,7 +19,7 @@
   font-size: var(--makken-table-label-size);
   font-weight: 700;
   line-height: 1.8;
-  color: #486f6b;
+  color: #48636f;
   white-space: normal;
   overflow-wrap: anywhere;
   flex-wrap: wrap;
@@ -45,7 +45,7 @@
   font-size: var(--makken-table-label-size);
   font-weight: 500;
   line-height: 1.9;
-  color: #627d79;
+  color: #62747d;
 }
 
 :root .main-content .states-card-footer {

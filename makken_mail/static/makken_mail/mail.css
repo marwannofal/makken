@@ -22,7 +22,7 @@
 }
 
 .mail-card a:not(.button) {
-  color: #167974;
+  color: #165a79;
 }
 
 .mail-grid {
@@ -78,8 +78,8 @@
   gap: 9px;
   padding: 10px 12px;
   min-height: 46px;
-  background: #f2f9f8;
-  border: 1px solid #dcece9;
+  background: #f2f7f9;
+  border: 1px solid #dce7ec;
   border-radius: 10px;
   font-weight: 700;
 }
@@ -123,7 +123,7 @@
 }
 
 .mail-caption {
-  color: #4d6e70;
+  color: #4d6570;
   font-size: 13px;
   line-height: 1.9;
 }
@@ -135,10 +135,10 @@
   gap: 10px 16px;
   margin-bottom: 18px;
   padding: 16px;
-  background: #edf9f8;
-  border: 1px solid #d5ece9;
+  background: #edf5f9;
+  border: 1px solid #d5e5ec;
   border-radius: 14px;
-  color: #23585a;
+  color: #23495a;
 }
 
 .mail-notice span {
@@ -150,8 +150,8 @@
   display: inline-flex;
   padding: 6px 10px;
   border-radius: 8px;
-  background: #edf3f2;
-  color: #3e5d5f;
+  background: #edf1f3;
+  color: #3e555f;
   font-size: 12px;
   font-weight: 700;
 }
@@ -172,7 +172,7 @@
 }
 
 .mail-details dt {
-  color: #4d6e70;
+  color: #4d6570;
   font-size: 13px;
   font-weight: 700;
 }
@@ -259,12 +259,12 @@
   gap: 8px;
   min-height: 46px;
   padding: 0 12px;
-  border: 1px solid #dcece9;
+  border: 1px solid #dce7ec;
   border-radius: 10px;
-  background: #f2f9f8;
+  background: #f2f7f9;
   font-size: 13px;
   font-weight: 700;
-  color: #245759;
+  color: #244859;
   cursor: pointer;
   margin: 0;
 }
@@ -302,9 +302,9 @@
 
 .work-kpi {
   padding: 16px 14px;
-  border: 1px solid #dcebe6;
+  border: 1px solid #dce6eb;
   border-radius: 14px;
-  background: #f8fbfa;
+  background: #f8fafb;
   min-width: 0;
 }
 
@@ -312,7 +312,7 @@
   display: block;
   font-size: 12px;
   font-weight: 700;
-  color: #567774;
+  color: #566d77;
   margin-bottom: 6px;
 }
 
@@ -320,14 +320,14 @@
   display: block;
   font-size: 24px;
   line-height: 1.4;
-  color: #195e5c;
+  color: #19485e;
   font-variant-numeric: tabular-nums;
 }
 
 .work-kpi small {
   display: block;
   font-size: 11px;
-  color: #6c8784;
+  color: #6c7e87;
   margin-top: 4px;
   line-height: 1.7;
 }
@@ -359,13 +359,13 @@
   display: block;
   font-size: 11px;
   font-weight: 500;
-  color: #6e8885;
+  color: #6e8088;
   margin-top: 2px;
 }
 
 .work-stats-table tfoot th, .work-stats-table tfoot td {
-  background: #f0f9f7;
-  border-top: 2px solid #cfe7e3;
+  background: #f0f6f9;
+  border-top: 2px solid #cfdfe7;
 }
 
 @media (max-width: 1000px) {
@@ -393,10 +393,10 @@
   gap: 8px;
   min-height: 46px;
   padding: 0 18px;
-  border: 1px solid #d5e8e5;
+  border: 1px solid #d5e2e8;
   border-radius: 12px;
   background: #ffffff;
-  color: #255a5c;
+  color: #254b5c;
   font-family: inherit;
   font-size: 14px;
   font-weight: 700;
@@ -406,7 +406,7 @@
 
 .mail-subtab:hover {
   border-color: #005b85;
-  color: #167a77;
+  color: #165a7a;
 }
 
 .mail-subtab.is-active {
@@ -422,8 +422,8 @@
   padding: 2px 8px;
   border-radius: 999px;
   font-size: 12px;
-  background: #edf7f6;
-  color: #176e6b;
+  background: #edf4f7;
+  color: #17526e;
 }
 
 .mail-subtab.is-active .mail-subtab-count {

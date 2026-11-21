@@ -3,7 +3,7 @@
   padding: 26px;
   min-width: 0;
   background: #fff;
-  border: 1px solid #e1ece9;
+  border: 1px solid #e1e9ec;
   border-radius: 20px;
   box-shadow: 0 6px 25px #153a3c04;
 }
@@ -24,7 +24,7 @@
   margin-bottom: 9px;
   font-size: 12px;
   font-weight: 700;
-  color: #274c4f;
+  color: #27424f;
 }
 
 .settings-filters-input-wrap {
@@ -35,7 +35,7 @@
   height: 48px;
   min-width: 0;
   background: #fff;
-  border: 1px solid #d7e6e2;
+  border: 1px solid #d7e1e6;
   border-radius: 11px;
 }
 
@@ -43,7 +43,7 @@
   width: 18px;
   height: 18px;
   flex-shrink: 0;
-  color: #7c9795;
+  color: #7c8e97;
 }
 
 .settings-filters #settings-filter-q {
@@ -54,7 +54,7 @@
   border: 0;
   border-radius: 9px;
   background: transparent;
-  color: #274c4f;
+  color: #27424f;
   font: inherit;
   font-size: 13px;
 }
@@ -65,9 +65,9 @@
   height: 48px;
   min-height: 48px;
   padding: 0 13px 0 40px;
-  border: 1px solid #d7e6e2;
+  border: 1px solid #d7e1e6;
   border-radius: 11px;
-  color: #274c4f;
+  color: #27424f;
   font: inherit;
   font-size: 13px;
   appearance: none;
@@ -89,14 +89,14 @@
 
 .settings-filters-summary {
   margin: 16px 0 0;
-  color: #70878a;
+  color: #70828a;
   font-size: 11px;
   line-height: 1.9;
   overflow-wrap: anywhere;
 }
 
 .settings-filters-summary strong {
-  color: #27635c;
+  color: #275063;
 }
 
 @media (max-width: 1100px) {

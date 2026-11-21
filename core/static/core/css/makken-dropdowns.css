@@ -4,14 +4,14 @@
 :root .main-content .market-select-trigger {
   font-size: 14px !important;
   font-weight: 700 !important;
-  color: #163d3b !important;
+  color: #16313d !important;
 }
 
 :root .main-content .search-select-panel {
   padding: 10px !important;
-  border: 1px solid #cde2de !important;
+  border: 1px solid #cddbe2 !important;
   border-radius: 14px !important;
-  box-shadow: 0 14px 36px rgba(15, 64, 62, 0.16) !important;
+  box-shadow: 0 14px 36px rgba(15, 48, 64, 0.16) !important;
   z-index: 70 !important;
 }
 
@@ -22,8 +22,8 @@
   padding: 0 14px !important;
   font-size: 14px !important;
   font-weight: 600 !important;
-  color: #163d3b !important;
-  border: 1px solid #b8d8d3 !important;
+  color: #16313d !important;
+  border: 1px solid #b8ced8 !important;
   border-radius: 10px !important;
 }
 
@@ -45,7 +45,7 @@
   border: 1px solid transparent !important;
   border-radius: 10px !important;
   background: #ffffff !important;
-  color: #163d3b !important;
+  color: #16313d !important;
   font-size: 15px !important;
   font-weight: 700 !important;
   line-height: 1.65 !important;
@@ -55,16 +55,16 @@
 }
 
 :root .main-content .search-select-option:hover {
-  background: #eaf8f5 !important;
-  border-color: #bfe7e1 !important;
-  color: #0d5e59 !important;
+  background: #eaf4f8 !important;
+  border-color: #bfdae7 !important;
+  color: #0d445e !important;
 }
 
 :root .main-content .search-select-option[aria-pressed="true"],
 :root .main-content .search-select-option[aria-selected="true"] {
-  background: #dff5f1 !important;
+  background: #dfeef5 !important;
   border-color: #005b85 !important;
-  color: #0b5550 !important;
+  color: #0b3e55 !important;
   font-weight: 800 !important;
 }
 
@@ -85,7 +85,7 @@
   margin-top: 8px;
   font-size: 13px !important;
   font-weight: 700 !important;
-  color: #156d67 !important;
+  color: #15516d !important;
   line-height: 1.8 !important;
 }
 
@@ -93,7 +93,7 @@
 :root .main-content .search-select-empty {
   font-size: 13.5px !important;
   font-weight: 600 !important;
-  color: #5b7977 !important;
+  color: #5b6f79 !important;
   padding: 12px !important;
   text-align: center;
 }
@@ -106,7 +106,7 @@
   gap: 8px;
   margin-top: 8px;
   padding-top: 8px;
-  border-top: 1px solid #e1efec;
+  border-top: 1px solid #e1ebef;
 }
 
 .mk-multi-done {
@@ -123,30 +123,30 @@
 }
 
 .mk-multi-done:hover {
-  background: #1a9b97;
+  background: #1a729b;
 }
 
 .mk-multi-clear {
   min-height: 38px;
   padding: 6px 12px;
-  border: 1px solid #d2e4e0;
+  border: 1px solid #d2dee4;
   border-radius: 10px;
   background: #ffffff;
-  color: #3d6360;
+  color: #3d5763;
   font: 700 13px/1.5 Cairo, sans-serif;
   cursor: pointer;
 }
 
 .mk-multi-clear:hover {
-  background: #f3faf8;
-  color: #164946;
+  background: #f3f8fa;
+  color: #163949;
 }
 
 /* Native <select> and <option> readability */
 :root .main-content select:not(.native-enhanced) {
   font-size: 14px;
   font-weight: 700;
-  color: #163d3b;
+  color: #16313d;
 }
 
 :root .main-content select option {

@@ -11,7 +11,7 @@
 
 .mk-export-label {
   margin-inline-end:auto;
-  color:#587977;
+  color:#586f79;
   font-size:12px;
   font-weight:600
 }
@@ -27,14 +27,14 @@
   border:1px solid #005b85;
   border-radius:11px;
   background:#fff;
-  color:#107b77;
+  color:#10597b;
   font:700 13px/1.8 Cairo,sans-serif;
   cursor:pointer;
   transition:background .16s,box-shadow .16s
 }
 
 .mk-export-button:hover {
-  background:#e9f8f5;
+  background:#e9f3f8;
   box-shadow:0 3px 10px #155f6010
 }
 
@@ -44,7 +44,7 @@
 }
 
 .mk-export-button[data-mk-format=pdf]:hover {
-  background:#199e9b
+  background:#19749e
 }
 
 .mk-export-button svg {
@@ -64,18 +64,18 @@
 }
 
 .mk-export-button:focus-visible,.mk-export-dialog button:focus-visible {
-  outline:3px solid #167a77;
+  outline:3px solid #165a7a;
   outline-offset:3px
 }
 
 .mk-export-dialog {
-  border:1px solid #dcece7;
+  border:1px solid #dce7ec;
   border-radius:22px;
   padding:26px;
   width:min(480px,calc(100vw - 28px));
   max-height:calc(100dvh - 36px);
   overflow:auto;
-  color:#244647;
+  color:#243c47;
   background:#fff;
   box-shadow:0 25px 90px #143e4033;
   direction:rtl;
@@ -91,12 +91,12 @@
 .mk-export-dialog h2 {
   margin:14px 0 8px;
   font:800 20px/1.7 Cairo,sans-serif;
-  color:#155f60
+  color:#154860
 }
 
 .mk-export-dialog p {
   margin:0;
-  color:#587977;
+  color:#586f79;
   font-size:14px;
   line-height:1.9;
   overflow-wrap:anywhere
@@ -108,8 +108,8 @@
   width:58px;
   height:58px;
   border-radius:17px;
-  background:#e5f7f3;
-  color:#16847f
+  background:#e5f1f7;
+  color:#166184
 }
 
 .mk-export-icon svg {
@@ -138,7 +138,7 @@
 }
 
 .mk-export-progress::-webkit-progress-bar {
-  background:#e4f2ed;
+  background:#e4eef2;
   border-radius:99px
 }
 

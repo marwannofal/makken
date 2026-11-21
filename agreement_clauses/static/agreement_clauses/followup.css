@@ -13,7 +13,7 @@
 }
 
 .followup-meta > div {
-  background: #e7f6f5;
+  background: #e7f1f6;
   border-radius: .75rem;
   padding: .75rem;
 }
@@ -55,7 +55,7 @@
   margin-inline-end: .5rem;
   border: 0;
   border-radius: .35rem;
-  background: #e7f6f5;
+  background: #e7f1f6;
   color: #003954;
   font: inherit;
 }
@@ -66,8 +66,8 @@
 }
 
 .followup-update {
-  background: #f5faf9;
-  border: 1px solid #d6e8e7;
+  background: #f5f8fa;
+  border: 1px solid #d6e2e8;
   border-radius: .75rem;
   padding: .875rem;
 }
@@ -109,7 +109,7 @@
 
 .followup-files small {
   display: block;
-  color: #496f6b;
+  color: #49636f;
 }
 
 .followup-pagination {

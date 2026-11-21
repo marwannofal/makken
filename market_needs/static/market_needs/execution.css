@@ -1,5 +1,5 @@
 .execution-intro {
-  color:#466663;
+  color:#465c66;
   line-height:1.9;
   margin:0 0 18px
 }
@@ -19,11 +19,11 @@
 .execution-filters input,.execution-filters select,.execution-save-grid select,.execution-save-grid textarea {
   width:100%;
   min-height:48px;
-  border:1px solid #d5e5e3;
+  border:1px solid #d5e0e5;
   border-radius:12px;
   padding:11px 13px;
   background:#fff;
-  color:#254b48;
+  color:#253f4b;
   font:inherit;
   box-sizing:border-box
 }
@@ -46,8 +46,8 @@
   font-size:13px;
   font-weight:800;
   white-space:nowrap;
-  background:#edf3f3;
-  color:#4c6664
+  background:#edf1f3;
+  color:#4c5e66
 }
 
 .execution-running {
@@ -56,22 +56,22 @@
 }
 
 .execution-complete {
-  background:#dcf4ec;
-  color:#166649
+  background:#dcecf4;
+  color:#164d66
 }
 
 .execution-development {
   display:inline-flex;
   padding:7px 12px;
   border-radius:99px;
-  background:var(--state-color,#e5f6f3);
-  color:#122b29;
+  background:var(--state-color,#e5f1f6);
+  color:#12232b;
   font-weight:800
 }
 
 .execution-number {
   display:block;
-  color:#6c8582;
+  color:#6c7d85;
   font-size:12px;
   font-weight:500;
   margin-top:5px
@@ -113,11 +113,11 @@
 }
 
 .execution-selected button {
-  border:1px solid #cbe7df;
+  border:1px solid #cbdee7;
   border-radius:12px;
   padding:8px 12px;
-  background:#eff9f6;
-  color:#245d53;
+  background:#eff6f9;
+  color:#244b5d;
   font:inherit;
   cursor:pointer
 }
@@ -131,7 +131,7 @@
 }
 
 .execution-saved li {
-  border:1px solid #deebe7;
+  border:1px solid #dee7eb;
   border-radius:12px;
   padding:14px;
   display:grid;
@@ -139,7 +139,7 @@
 }
 
 .execution-saved small {
-  color:#607b75;
+  color:#60727b;
   line-height:1.8
 }
 

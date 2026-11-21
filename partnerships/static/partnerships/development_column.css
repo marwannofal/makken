@@ -88,7 +88,7 @@
 }
 
 .development-transition-button:focus-visible {
-  outline: 3px solid #12817e;
+  outline: 3px solid #125e81;
   outline-offset: 3px;
 }
 
@@ -99,11 +99,11 @@
 .development-transition-note {
   margin: 0 0 18px;
   padding: 13px 16px;
-  border: 1px solid #d7eae5;
+  border: 1px solid #d7e4ea;
   border-inline-start: 3px solid #005b85;
   border-radius: 10px;
-  background: #f3faf8;
-  color: #3a6662;
+  background: #f3f8fa;
+  color: #3a5866;
   font-size: 11px;
   line-height: 2;
 }

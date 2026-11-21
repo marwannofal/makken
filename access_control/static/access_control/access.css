@@ -20,9 +20,9 @@
 
 .ac-tabs a {
   padding: 12px 18px;
-  border: 1px solid #dceae9;
+  border: 1px solid #dce6ea;
   border-radius: 12px;
-  color: #527477;
+  color: #526b77;
   background: #fff;
   font-size: 14px;
   font-weight: 700;
@@ -44,7 +44,7 @@
 }
 
 .ac-kpis > div {
-  border: 1px solid #e0edeb;
+  border: 1px solid #e0e9ed;
   border-radius: 18px;
   background: #fff;
   padding: 20px;
@@ -54,12 +54,12 @@
 
 .ac-kpis span {
   font-size: 13px;
-  color: #688487;
+  color: #687d87;
 }
 
 .ac-kpis strong {
   font-size: 30px;
-  color: #168f8b;
+  color: #16698f;
 }
 
 .ac-grid {
@@ -102,10 +102,10 @@
   max-width: 100%;
   font: inherit;
   font-size: 14px;
-  border: 1px solid #d6e5e3;
+  border: 1px solid #d6e0e5;
   border-radius: 11px;
   background-color: #fff;
-  color: #244b4f;
+  color: #24414f;
   padding: 11px 13px;
   outline-offset: 3px;
 }
@@ -147,16 +147,16 @@
 
 .ac-note {
   padding: 16px 18px;
-  background: #f2f9f7;
-  border: 1px solid #e1efeb;
+  background: #f2f7f9;
+  border: 1px solid #e1ebef;
   border-radius: 12px;
   line-height: 1.9;
-  color: #567779;
+  color: #566e79;
   font-size: 13px;
 }
 
 .ac-note strong {
-  color: #245f5e;
+  color: #244c5f;
 }
 
 .ac-save, .ac-bulk {
@@ -206,14 +206,14 @@
 
 .ac-effective {
   display: block;
-  color: #7b8587;
+  color: #7b8387;
   font-weight: 700;
   font-size: 12px;
   margin-top: 8px;
 }
 
 .ac-effective.is-granted {
-  color: #168a71;
+  color: #16658a;
 }
 
 .ac-matrix small {
@@ -222,7 +222,7 @@
   display: block;
   max-width: 180px;
   overflow-wrap: anywhere;
-  color: #7c9192;
+  color: #7c8b92;
 }
 
 .ac-matrix .ac-check {
@@ -247,7 +247,7 @@
 
 .ac-admin-label {
   display: block;
-  color: #168f8b;
+  color: #16698f;
 }
 
 .ac-pagination {
@@ -269,8 +269,8 @@
 .ac-user-links a {
   padding: 10px 14px;
   border-radius: 10px;
-  background: #eff8f7;
-  color: #167f7b;
+  background: #eff5f8;
+  color: #165e7f;
 }
 
 .ac-audit-values {
@@ -293,7 +293,7 @@
 }
 
 .ac-workspace :focus-visible, .ac-tabs :focus-visible {
-  outline: 3px solid #167d7a;
+  outline: 3px solid #165c7d;
   outline-offset: 3px;
 }
 

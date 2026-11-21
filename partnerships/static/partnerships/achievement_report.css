@@ -52,7 +52,7 @@
 
 .ach-kpi {
   padding: 18px 16px;
-  border: 1px solid #dcebe6;
+  border: 1px solid #dce6eb;
   border-radius: 16px;
   background: #ffffff;
   min-width: 0;
@@ -62,7 +62,7 @@
   display: block;
   font-size: 13px;
   font-weight: 700;
-  color: #567774;
+  color: #566d77;
   margin-bottom: 6px;
 }
 
@@ -70,20 +70,20 @@
   display: block;
   font-size: 26px;
   line-height: 1.4;
-  color: #195e5c;
+  color: #19485e;
   font-variant-numeric: tabular-nums;
 }
 
 .ach-kpi small {
   display: block;
   font-size: 12px;
-  color: #6b8683;
+  color: #6b7d86;
   margin-top: 4px;
 }
 
 .ach-kpi.is-accent {
-  background: #eff9f8;
-  border-color: #c8eae6;
+  background: #eff6f9;
+  border-color: #c8dfea;
 }
 
 .ach-kpi.is-complete {
@@ -103,7 +103,7 @@
 }
 
 .ach-link {
-  color: #157774;
+  color: #155877;
   font-weight: 700;
   text-decoration: none;
 }
@@ -123,13 +123,13 @@
   font-size: 12px;
   font-weight: 700;
   line-height: 1.5;
-  background: #edf3f2;
-  color: #4b696b;
+  background: #edf1f3;
+  color: #4b616b;
 }
 
 .ach-status.is-active {
-  background: #e6f7f5;
-  color: #137470;
+  background: #e6f2f7;
+  color: #135574;
 }
 
 .ach-pct {
@@ -137,8 +137,8 @@
   padding: 4px 10px;
   border-radius: 8px;
   font-weight: 700;
-  background: #eef6f5;
-  color: #195e5c;
+  background: #eef3f6;
+  color: #19485e;
   font-variant-numeric: tabular-nums;
 }
 
@@ -148,8 +148,8 @@
 }
 
 .ach-detail-table tfoot th, .ach-detail-table tfoot td {
-  background: #f0f9f7;
-  border-top: 2px solid #cfe7e3;
+  background: #f0f6f9;
+  border-top: 2px solid #cfdfe7;
 }
 
 @media (max-width: 1100px) {

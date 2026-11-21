@@ -16,7 +16,7 @@
 
 .activity-date-range {
   grid-column:1/-1;
-  border:1px solid #e0eeec;
+  border:1px solid #e0eaee;
   border-radius:12px;
   padding:16px;
   min-width:0;
@@ -26,7 +26,7 @@
 .activity-date-range legend {
   font-weight:700;
   font-size:13px;
-  color:#527477;
+  color:#526b77;
   padding-inline:8px
 }
 
@@ -77,7 +77,7 @@
 
 .activity-table small {
   display:block;
-  color:#688487;
+  color:#687d87;
   margin-top:7px;
   font-size:12px
 }
@@ -87,11 +87,11 @@
 }
 
 .activity-table tr[data-activity-url]:hover {
-  background:#f0faf9
+  background:#f0f7fa
 }
 
 .activity-table tr[data-activity-url]:focus-visible {
-  outline:3px solid #167d7a;
+  outline:3px solid #165c7d;
   outline-offset:-3px
 }
 
@@ -105,8 +105,8 @@
   display:inline-flex;
   padding:6px 12px;
   border-radius:9px;
-  background:#e8f7f6;
-  color:#136c69;
+  background:#e8f2f7;
+  color:#13506c;
   font-weight:800;
   font-size:12px
 }
@@ -129,7 +129,7 @@
 .activity-scope-note,.activity-detail-note {
   font-size:12px;
   line-height:1.9;
-  color:#688487
+  color:#687d87
 }
 
 .activity-dialog {
@@ -147,8 +147,8 @@
 
 .activity-detail-grid>div {
   padding:16px;
-  background:#f3f9f8;
-  border:1px solid #e0eeec;
+  background:#f3f7f9;
+  border:1px solid #e0eaee;
   border-radius:12px;
   min-width:0;
   overflow-wrap:anywhere
@@ -156,13 +156,13 @@
 
 .activity-detail-grid dt {
   font-size:12px;
-  color:#688487;
+  color:#687d87;
   margin-bottom:8px
 }
 
 .activity-detail-grid dd {
   margin:0;
-  color:#244b4f;
+  color:#24414f;
   font-weight:700
 }
 

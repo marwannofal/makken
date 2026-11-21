@@ -1,10 +1,10 @@
 :root {
   color-scheme: light;
   --primary: #005b85;
-  --ink: #214e50;
-  --muted: #5b7375;
-  --line: #dcece9;
-  --soft: #eef9f7;
+  --ink: #214150;
+  --muted: #5b6d75;
+  --line: #dce7ec;
+  --soft: #eef6f9;
 }
 
 * {
@@ -17,7 +17,7 @@
 
 body {
   margin: 0;
-  background: #f3f8f7;
+  background: #f3f6f8;
   color: var(--ink);
   font-family: Cairo, Tahoma, Arial, sans-serif;
   line-height: 1.85;
@@ -32,7 +32,7 @@ body::before {
 }
 
 a {
-  color: #147d79;
+  color: #145c7d;
 }
 
 button, input {
@@ -44,7 +44,7 @@ a, button, input {
 }
 
 :focus-visible {
-  outline: 3px solid #116d6a;
+  outline: 3px solid #11506d;
   outline-offset: 4px;
 }
 
@@ -101,7 +101,7 @@ a, button, input {
   font-size: 14px;
   font-weight: 700;
   white-space: nowrap;
-  color: #167e7b;
+  color: #165d7e;
 }
 
 .error-visual {
@@ -133,7 +133,7 @@ a, button, input {
   display: grid;
   place-items: center;
   background: #fff;
-  border: 1px solid #ccebe5;
+  border: 1px solid #cce1eb;
   border-radius: 16px;
   transform: rotate(8deg);
 }
@@ -152,14 +152,14 @@ a, button, input {
   line-height: 1.2;
   font-weight: 800;
   letter-spacing: 2px;
-  color: #159692;
+  color: #156d96;
 }
 
 .eyebrow {
   text-align: center;
   font-size: 12px;
   font-weight: 700;
-  color: #178580;
+  color: #176285;
   margin: 0 0 4px;
 }
 
@@ -184,7 +184,7 @@ h1 {
   align-items: center;
   gap: 18px;
   background: var(--soft);
-  border: 1px solid #d8eee8;
+  border: 1px solid #d8e7ee;
   padding: 16px 18px;
   border-radius: 16px;
 }
@@ -240,12 +240,12 @@ progress {
   height: 6px;
   border-radius: 20px;
   overflow: hidden;
-  background: #d2e8e3;
+  background: #d2e1e8;
   display: block;
 }
 
 progress::-webkit-progress-bar {
-  background: #d2e8e3;
+  background: #d2e1e8;
   border-radius: 20px;
 }
 
@@ -270,7 +270,7 @@ progress::-moz-progress-bar {
 }
 
 .auto-choice input {
-  accent-color: #168b87;
+  accent-color: #16668b;
   width: 18px;
   height: 18px;
   flex-shrink: 0;
@@ -323,19 +323,19 @@ progress::-moz-progress-bar {
 }
 
 .button-primary:hover:not(:disabled) {
-  background: #178e8a;
+  background: #17688e;
 }
 
 .button:disabled {
   cursor: wait;
-  background: #d8e8e5;
-  color: #55716e;
-  border-color: #d8e8e5;
+  background: #d8e3e8;
+  color: #556871;
+  border-color: #d8e3e8;
 }
 
 .button-secondary {
   border-color: var(--line);
-  color: #167c78;
+  color: #165c7c;
   background: #fff;
 }
 
@@ -361,7 +361,7 @@ progress::-moz-progress-bar {
 }
 
 .help-panel li::marker {
-  color: #1faaa5;
+  color: #1f7eaa;
 }
 
 .error-reference {
@@ -371,7 +371,7 @@ progress::-moz-progress-bar {
   gap: 5px;
   margin: 20px 0 0;
   font-size: 11px;
-  color: #718683;
+  color: #717f86;
 }
 
 .noscript-note {
@@ -383,7 +383,7 @@ progress::-moz-progress-bar {
 
 footer {
   text-align: center;
-  color: #6c807d;
+  color: #6c7a80;
   font-size: 11px;
   padding: 20px 8px 0;
 }

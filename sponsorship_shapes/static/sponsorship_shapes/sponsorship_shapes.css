@@ -59,8 +59,8 @@
 }
 
 .status-inactive {
-  background: #f0f3f3;
-  color: #758683;
+  background: #f0f2f3;
+  color: #758186;
 }
 
 .sponsorship-shape-status:hover {
@@ -111,7 +111,7 @@
 .sponsorship_shapes-empty {
   text-align: center;
   padding: 36px 12px;
-  color: #819b91;
+  color: #81939b;
 }
 
 .sponsorship_shapes-empty > svg {
@@ -123,7 +123,7 @@
 .sponsorship_shapes-empty strong {
   display: block;
   font-size: 15px;
-  color: #446f62;
+  color: #44616f;
 }
 
 .sponsorship_shapes-empty p {
@@ -141,7 +141,7 @@
 
 .sponsorship_shapes-pagination > span {
   font-size: 11px;
-  color: #769187;
+  color: #768891;
 }
 
 .sponsorship-shape-field {
@@ -151,7 +151,7 @@
 .sponsorship-shape-field > label, .sponsorship-shape-status-field legend {
   font-size: 12px;
   font-weight: 700;
-  color: #355e53;
+  color: #35515e;
 }
 
 .sponsorship-shape-field > label > span {
@@ -161,8 +161,8 @@
 .sponsorship-shape-field input {
   width: 100%;
   min-height: 48px;
-  border: 1px solid #dce8e4;
-  background: #fbfdfc;
+  border: 1px solid #dce4e8;
+  background: #fbfcfd;
   border-radius: 10px;
   margin-top: 10px;
   padding: 10px 13px;
@@ -171,7 +171,7 @@
 }
 
 .sponsorship-shape-field input::placeholder {
-  color: #9aaea5;
+  color: #9aa8ae;
 }
 
 .sponsorship-shape-field .field-help {
@@ -210,7 +210,7 @@
   display: flex;
   align-items: center;
   gap: 9px;
-  border: 1px solid #dfe9e4;
+  border: 1px solid #dfe6e9;
   min-height: 48px;
   border-radius: 10px;
   padding: 10px 13px;
@@ -222,7 +222,7 @@
 .active-option:has(input:checked) {
   border-color: #8ab8cf;
   background: #eff9f4;
-  color: #227b6a;
+  color: #225f7b;
 }
 
 .active-option input {
@@ -234,7 +234,7 @@
 
 .confirmation-record {
   margin: 20px 0;
-  border: 1px solid #e0ece5;
+  border: 1px solid #e0e8ec;
   background: #f8fcf9;
   border-radius: 13px;
   padding: 7px 18px;
@@ -249,12 +249,12 @@
 }
 
 .confirmation-record > div + div {
-  border-top: 1px solid #e4ece7;
+  border-top: 1px solid #e4e9ec;
 }
 
 .confirmation-record dt {
   font-size: 10px;
-  color: #7b9487;
+  color: #7b8c94;
   flex-shrink: 0;
 }
 
@@ -278,7 +278,7 @@
 
 .confirmation-record del {
   font-size: 10px;
-  color: #94a59c;
+  color: #94a0a5;
   font-weight: 400;
   overflow-wrap: anywhere;
   max-width: 100%;
@@ -447,13 +447,13 @@
   margin: 0;
   font-size: 11px;
   line-height: 2;
-  color: #6d8b80;
+  color: #6d818b;
   white-space: pre-line;
   overflow-wrap: anywhere;
 }
 
 .empty-description {
-  color: #99aaa2;
+  color: #99a5aa;
 }
 
 .employment-label {
@@ -463,10 +463,10 @@
   min-width: 46px;
   min-height: 32px;
   padding: 4px 10px;
-  border: 1px solid #e3eae6;
+  border: 1px solid #e3e8ea;
   border-radius: 8px;
-  background: #f4f7f5;
-  color: #82958b;
+  background: #f4f6f7;
+  color: #828f95;
   font-size: 11px;
   font-weight: 600;
 }
@@ -487,8 +487,8 @@
   width: 100%;
   min-height: 120px;
   resize: vertical;
-  border: 1px solid #dce8e4;
-  background: #fbfdfc;
+  border: 1px solid #dce4e8;
+  background: #fbfcfd;
   border-radius: 10px;
   padding: 11px 13px;
   margin-top: 10px;
@@ -500,7 +500,7 @@
 .optional-label {
   font-size: 10px !important;
   font-weight: 400;
-  color: #93a69b !important;
+  color: #93a0a6 !important;
   margin-inline-start: 5px;
 }
 
@@ -566,7 +566,7 @@
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     padding: 21px;
     gap: 17px;
-    border-bottom: 1px solid #e5eee8;
+    border-bottom: 1px solid #e5ebee;
   }
   .sponsorship_shapes-table tbody > tr[data-sponsorship-shape-row] > th {
     grid-column: 1/-1;
@@ -586,7 +586,7 @@
   .sponsorship_shapes-table tbody > tr[data-sponsorship-shape-row] > td::before {
     content: attr(data-label);
     font-size: 10px;
-    color: #81968a;
+    color: #818f96;
   }
   .sponsorship_shapes-table tbody > tr[data-sponsorship-shape-row] > .shape-description-cell {
     grid-column: 1/-1;

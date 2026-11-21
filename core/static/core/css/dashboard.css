@@ -10,9 +10,9 @@
   align-items:center;
   gap:24px;
   padding:30px;
-  border:1px solid #dbecea;
+  border:1px solid #dbe7ec;
   border-radius:24px;
-  background:linear-gradient(120deg,#fff 15%,#edf9f8);
+  background:linear-gradient(120deg,#fff 15%,#edf5f9);
   overflow:hidden;
   margin-bottom:24px
 }
@@ -32,17 +32,17 @@
 .dash-hero h1 {
   font-size:clamp(26px,3vw,38px);
   margin:8px 0 12px;
-  color:#17494c
+  color:#173b4c
 }
 
 .dash-hero p {
   margin:0;
   line-height:1.9;
-  color:#668183
+  color:#667a83
 }
 
 .dash-hero .eyebrow {
-  color:#168d88;
+  color:#16678d;
   font-weight:800
 }
 
@@ -50,7 +50,7 @@
   font-size:12px;
   display:block;
   margin-top:12px;
-  color:#6b8688
+  color:#6b7f88
 }
 
 .dash-hero-actions {
@@ -67,7 +67,7 @@
 .dash-page .card-heading h2,.dash-section-heading h2 {
   font-size:clamp(19px,2vw,24px);
   font-weight:800;
-  color:#244b4f
+  color:#24414f
 }
 
 .dash-section-heading {
@@ -79,7 +79,7 @@
 }
 
 .dash-section-heading .eyebrow {
-  color:#168f8b;
+  color:#16698f;
   margin:0;
   font-size:12px
 }
@@ -134,7 +134,7 @@
 .dash-filter-note {
   grid-column:1/-1;
   margin:0;
-  color:#678386;
+  color:#677c86;
   font-size:12px;
   line-height:1.8
 }
@@ -142,16 +142,16 @@
 .dash-caption {
   font-size:12px;
   line-height:1.9;
-  color:#678386;
+  color:#677c86;
   margin:8px 0 16px
 }
 
 .dash-notice {
   padding:15px 18px;
-  border:1px solid #dcece8;
-  background:#f4faf8;
+  border:1px solid #dce7ec;
+  background:#f4f8fa;
   border-radius:12px;
-  color:#527476;
+  color:#526b76;
   line-height:1.9;
   font-size:12px;
   margin:16px 0
@@ -176,9 +176,9 @@
   min-width:0;
   padding:22px;
   background:#fff;
-  border:1px solid #dfedeb;
+  border:1px solid #dfe9ed;
   border-radius:18px;
-  color:#234c4f;
+  color:#23414f;
   text-decoration:none;
   box-shadow:0 5px 18px #194c4b03;
   transition:border-color .16s,transform .16s
@@ -199,12 +199,12 @@
   font-size:clamp(26px,2.5vw,36px);
   font-weight:800;
   line-height:1.4;
-  color:#168f8b;
+  color:#16698f;
   font-variant-numeric:tabular-nums
 }
 
 .dash-metric small {
-  color:#71898b;
+  color:#71838b;
   font-size:11px;
   line-height:1.9
 }
@@ -216,8 +216,8 @@
   align-items:center;
   justify-content:center;
   border-radius:10px;
-  background:#e9f7f5;
-  color:#168e88
+  background:#e9f3f7;
+  color:#16688e
 }
 
 .dash-metric-icon svg {
@@ -229,7 +229,7 @@
 }
 
 .dash-finance {
-  background:linear-gradient(125deg,#165f60,#168d89);
+  background:linear-gradient(125deg,#164960,#16678d);
   color:#fff;
   border-radius:22px;
   padding:26px;
@@ -263,7 +263,7 @@
 
 .dash-money>span {
   font-size:12px;
-  color:#e3f3f0;
+  color:#e3eef3;
   display:block;
   line-height:1.8
 }
@@ -285,7 +285,7 @@
 
 .dash-money small {
   font-size:11px;
-  color:#daefec;
+  color:#dae8ef;
   line-height:1.8;
   display:block
 }
@@ -304,14 +304,14 @@
 .dash-finance-bottom progress {
   flex:1;
   min-width:100px;
-  accent-color:#c9f3ec;
+  accent-color:#c9e6f3;
   height:10px
 }
 
 .dash-finance-bottom p {
   margin:0;
   line-height:1.9;
-  color:#e2f3f0
+  color:#e2eef3
 }
 
 .dash-charts {
@@ -336,10 +336,10 @@
   display:inline-flex;
   gap:6px;
   align-items:center;
-  border:1px solid #d5e8e5;
+  border:1px solid #d5e2e8;
   border-radius:10px;
   background:#fff;
-  color:#168781;
+  color:#166387;
   padding:8px 10px;
   cursor:pointer;
   font:inherit;
@@ -396,12 +396,12 @@
 
 .dash-donut strong {
   font-size:30px;
-  color:#244b4f
+  color:#24414f
 }
 
 .dash-donut span {
   font-size:11px;
-  color:#71898b
+  color:#71838b
 }
 
 .dash-legend {
@@ -418,7 +418,7 @@
   gap:9px;
   padding:10px 0;
   font-size:12px;
-  color:#4d6b6e
+  color:#4d646e
 }
 
 .dash-legend a {
@@ -440,7 +440,7 @@
   display:block;
   font-size:10px;
   font-weight:400;
-  color:#7d9193
+  color:#7d8c93
 }
 
 .dash-legend-dot {
@@ -455,7 +455,7 @@
   overflow:auto;
   padding-inline-end:7px;
   scrollbar-width:thin;
-  scrollbar-color:#baded8 transparent
+  scrollbar-color:#bad3de transparent
 }
 
 .dash-bar-row {
@@ -473,7 +473,7 @@
 }
 
 .dash-bar-label a {
-  color:#32696a;
+  color:#32586a;
   text-decoration:none
 }
 
@@ -484,14 +484,14 @@
 .dash-bar-label bdi {
   font-weight:700;
   flex-shrink:0;
-  color:#244b4f
+  color:#24414f
 }
 
 .dash-track {
   display:block;
   width:100%;
   height:8px;
-  background:#edf5f3;
+  background:#edf2f5;
   border-radius:8px;
   overflow:hidden
 }
@@ -526,7 +526,7 @@
   justify-content:center;
   flex-direction:column;
   gap:12px;
-  color:#7b9292;
+  color:#7b8b92;
   text-align:center;
   font-size:12px;
   line-height:1.8
@@ -535,13 +535,13 @@
 .dash-chart-empty svg {
   width:40px;
   height:40px;
-  stroke:#96beb8;
+  stroke:#96b1be;
   stroke-width:1.5;
   fill:none
 }
 
 .dash-chart-empty strong {
-  color:#577b7a;
+  color:#57707b;
   font-size:14px
 }
 
@@ -571,13 +571,13 @@
 
 .dash-page .partnership-table small {
   display:block;
-  color:#78908e;
+  color:#788890;
   font-size:11px;
   margin-top:7px
 }
 
 .dash-table-link {
-  color:#168b84;
+  color:#16668b;
   text-decoration:none;
   font-weight:700;
   font-size:12px;
@@ -599,17 +599,17 @@
 
 .dash-unavailable {
   padding:20px;
-  border:1px dashed #cfdfdc;
+  border:1px dashed #cfdadf;
   border-radius:16px;
-  background:#f7fbfa;
-  color:#71898b;
+  background:#f7fafb;
+  color:#71838b;
   line-height:1.9;
   margin:16px 0
 }
 
 .dash-unavailable strong {
   display:block;
-  color:#466b6b
+  color:#465f6b
 }
 
 .dash-chart-dialog {
@@ -627,7 +627,7 @@
 }
 
 .dash-page :focus-visible {
-  outline:3px solid #167d7a;
+  outline:3px solid #165c7d;
   outline-offset:3px
 }
 
@@ -642,31 +642,31 @@
   gap:14px;
   justify-content:space-between;
   padding:14px 0;
-  border-bottom:1px solid #edf3f1;
+  border-bottom:1px solid #edf1f3;
   font-size:12px;
   line-height:1.9
 }
 
 .dash-activity a {
-  color:#246e6c;
+  color:#24576e;
   text-decoration:none;
   font-weight:700
 }
 
 .dash-activity small {
   display:block;
-  color:#7b9192
+  color:#7b8b92
 }
 
 .dash-activity time {
   white-space:nowrap;
-  color:#728a8a;
+  color:#72828a;
   font-size:11px
 }
 
 .dash-footer-note {
   font-size:12px;
-  color:#6b8586;
+  color:#6b7d86;
   line-height:2;
   padding:18px 0
 }

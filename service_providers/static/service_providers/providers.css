@@ -45,7 +45,7 @@
 .provider-status-field legend {
   font-size: 12px;
   font-weight: 700;
-  color: #355e53;
+  color: #35515e;
   margin-bottom: 12px;
 }
 
@@ -134,7 +134,7 @@
 .provider-name {
   font-weight: 700;
   overflow-wrap: anywhere;
-  color: #245f5a;
+  color: #244c5f;
 }
 
 .provider-register .tag {
@@ -146,10 +146,10 @@
 .provider-help {
   font-size: 14px;
   line-height: 1.9;
-  background: #f0f8f6;
+  background: #f0f5f8;
   padding: 15px 17px;
   border-radius: 12px;
-  color: #496f6b;
+  color: #49636f;
   margin-block: 20px;
 }
 
@@ -188,7 +188,7 @@
 }
 
 .provider-details > div {
-  border: 1px solid #e0ece5;
+  border: 1px solid #e0e8ec;
   border-radius: 11px;
   background: #f8fcfa;
   padding: 13px;
@@ -197,7 +197,7 @@
 
 .provider-details dt {
   font-size: 12px;
-  color: #6b8581;
+  color: #6b7d85;
 }
 
 .provider-details dd {
@@ -215,7 +215,7 @@
 
 .provider-events li {
   padding: 12px;
-  background: #f6faf8;
+  background: #f6f9fa;
   border-radius: 9px;
   margin-bottom: 8px;
   display: flex;
@@ -226,12 +226,12 @@
 }
 
 .provider-events span {
-  color: #6b8581;
+  color: #6b7d85;
 }
 
 .provider-review-name {
   padding: 15px;
-  background: #f0f8f6;
+  background: #f0f5f8;
   border-radius: 10px;
   overflow-wrap: anywhere;
   font-weight: 700;
@@ -239,8 +239,8 @@
 
 .provider-readonly {
   padding: 11px 13px;
-  background: #f4f8f6;
-  border: 1px solid #d7e6e2;
+  background: #f4f7f8;
+  border: 1px solid #d7e1e6;
   border-radius: 10px;
   margin: 0;
 }
@@ -265,7 +265,7 @@
 .provider-empty {
   padding: 25px !important;
   text-align: center !important;
-  color: #718783;
+  color: #718087;
 }
 
 .provider-register .row-action, .provider-coverage-table .row-action {

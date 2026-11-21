@@ -17,14 +17,14 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 10px 28px rgba(15, 95, 88, 0.34);
+  box-shadow: 0 10px 28px rgba(15, 70, 95, 0.34);
   transition: transform 0.16s ease, background 0.16s ease, box-shadow 0.16s ease;
 }
 
 .mk-a11y-fab:hover {
-  background: #179a96;
+  background: #17719a;
   transform: scale(1.06);
-  box-shadow: 0 14px 34px rgba(15, 95, 88, 0.42);
+  box-shadow: 0 14px 34px rgba(15, 70, 95, 0.42);
 }
 
 .mk-a11y-fab:focus-visible {
@@ -64,7 +64,7 @@
   position: fixed;
   inset: 0;
   z-index: 970;
-  background: rgba(12, 46, 44, 0.42);
+  background: rgba(12, 35, 46, 0.42);
   backdrop-filter: blur(2px);
 }
 
@@ -81,12 +81,12 @@
   height: 100dvh;
   display: flex;
   flex-direction: column;
-  background: #f7fbfa;
-  color: #143d3b;
+  background: #f7fafb;
+  color: #14303d;
   direction: rtl;
   font-family: Cairo, system-ui, -apple-system, sans-serif;
-  box-shadow: 12px 0 44px rgba(10, 44, 42, 0.24);
-  border-right: 1px solid #d7e8e5;
+  box-shadow: 12px 0 44px rgba(10, 33, 44, 0.24);
+  border-right: 1px solid #d7e3e8;
   animation: mk-a11y-slide-in 0.2s ease-out;
 }
 
@@ -111,7 +111,7 @@
   justify-content: space-between;
   gap: 10px;
   padding: 14px 16px;
-  background: linear-gradient(135deg, #117a76 0%, #1ba7a3 100%);
+  background: linear-gradient(135deg, #11597a 0%, #1b7ba7 100%);
   color: #ffffff;
   flex-shrink: 0;
 }
@@ -168,7 +168,7 @@
   flex: 0 0 auto;
   flex-shrink: 0;
   background: #ffffff;
-  border: 1px solid #dfece9;
+  border: 1px solid #dfe8ec;
   border-radius: 14px;
 }
 
@@ -182,14 +182,14 @@
   padding: 12px 14px;
   border: 0;
   background: #ffffff;
-  color: #104946;
+  color: #103749;
   font: 800 14.5px/1.5 Cairo, sans-serif;
   text-align: right;
   cursor: pointer;
 }
 
 .mk-a11y-section-toggle:hover {
-  background: #f2faf8;
+  background: #f2f7fa;
 }
 
 .mk-a11y-section-icon {
@@ -240,10 +240,10 @@
   align-items: center;
   gap: 12px;
   padding: 11px 14px;
-  border: 1.5px solid #e1efec;
+  border: 1.5px solid #e1ebef;
   border-radius: 12px;
-  background: #f6fbfa;
-  color: #154542;
+  background: #f6f9fb;
+  color: #153645;
   font: 700 14px/1.5 Cairo, sans-serif;
   text-align: right;
   cursor: pointer;
@@ -251,13 +251,13 @@
 }
 
 .mk-a11y-profile-btn:hover {
-  background: #e9f7f4;
-  border-color: #9ddfd5;
+  background: #e9f3f7;
+  border-color: #9dcadf;
 }
 
 .mk-a11y-profile-btn[aria-pressed="true"] {
   background: #005b85;
-  border-color: #189591;
+  border-color: #186d95;
   color: #ffffff;
 }
 
@@ -288,10 +288,10 @@
   gap: 7px;
   min-height: 78px;
   padding: 10px 8px;
-  border: 1.5px solid #e1efec;
+  border: 1.5px solid #e1ebef;
   border-radius: 12px;
-  background: #f6fbfa;
-  color: #154542;
+  background: #f6f9fb;
+  color: #153645;
   font: 700 13px/1.45 Cairo, sans-serif;
   text-align: center;
   cursor: pointer;
@@ -299,8 +299,8 @@
 }
 
 .mk-a11y-tile:hover {
-  background: #e9f7f4;
-  border-color: #9ddfd5;
+  background: #e9f3f7;
+  border-color: #9dcadf;
 }
 
 .mk-a11y-tile[aria-pressed="true"] {
@@ -323,9 +323,9 @@
 /* Stepped sliders (+ / ++ / +++) */
 .mk-a11y-stepper {
   padding: 11px 12px;
-  border: 1px solid #e1efec;
+  border: 1px solid #e1ebef;
   border-radius: 12px;
-  background: #fbfefd;
+  background: #fbfdfe;
 }
 
 .mk-a11y-stepper-head {
@@ -335,14 +335,14 @@
   margin-bottom: 9px;
   font-size: 13.5px;
   font-weight: 800;
-  color: #144946;
+  color: #143849;
 }
 
 .mk-a11y-stepper-head svg {
   width: 18px;
   height: 18px;
   fill: none;
-  stroke: #189591;
+  stroke: #186d95;
   stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -357,17 +357,17 @@
 .mk-a11y-level-btn {
   appearance: none;
   min-height: 36px;
-  border: 1.5px solid #d5e8e4;
+  border: 1.5px solid #d5e2e8;
   border-radius: 999px;
-  background: #eef8f6;
-  color: #14635e;
+  background: #eef5f8;
+  color: #144a63;
   font: 800 14px/1 Cairo, sans-serif;
   cursor: pointer;
   transition: background 0.14s ease, border-color 0.14s ease, color 0.14s ease;
 }
 
 .mk-a11y-level-btn:hover {
-  background: #def3ef;
+  background: #deecf3;
   border-color: #005b85;
 }
 
@@ -380,7 +380,7 @@
 /* Footer Help */
 .mk-a11y-footer {
   padding: 10px 14px;
-  background: #105e5a;
+  background: #10455e;
   color: #ffffff;
   flex-shrink: 0;
 }
@@ -448,7 +448,7 @@ html.mk-a11y-dyslexia-font body :not(.mk-a11y-drawer):not(.mk-a11y-drawer *) {
 html.mk-a11y-highlight-headings main :is(h1, h2, h3, h4, h5, h6) {
   outline: 2px solid #005b85 !important;
   outline-offset: 4px !important;
-  background: #e6f8f5 !important;
+  background: #e6f2f8 !important;
   border-radius: 6px;
 }
 
@@ -550,18 +550,18 @@ html.mk-a11y-space-3 main {
 html.mk-a11y-dark-contrast body,
 html.mk-a11y-dark-contrast .workspace,
 html.mk-a11y-dark-contrast .main-content {
-  background: #0b1414 !important;
-  color: #f3faf9 !important;
+  background: #0b1114 !important;
+  color: #f3f8fa !important;
 }
 
 html.mk-a11y-dark-contrast .main-content :is(.partnership-card, .states-card, .settings-filters-card, .mk-results-bar, .topbar, table, thead, tbody, tr, td, th, input, select, textarea) {
-  background: #132222 !important;
-  color: #f3faf9 !important;
-  border-color: #2c4a48 !important;
+  background: #131d22 !important;
+  color: #f3f8fa !important;
+  border-color: #2c404a !important;
 }
 
 html.mk-a11y-dark-contrast .main-content a {
-  color: #67ebe6 !important;
+  color: #67c1eb !important;
 }
 
 html.mk-a11y-light-contrast body,
@@ -649,7 +649,7 @@ html.mk-a11y-cursor-white * {
   right: 0;
   top: 0;
   height: max(0px, calc(var(--mk-a11y-y, 50vh) - 65px));
-  background: rgba(10, 32, 31, 0.56);
+  background: rgba(10, 25, 32, 0.56);
 }
 
 .mk-a11y-mask-bottom {
@@ -658,7 +658,7 @@ html.mk-a11y-cursor-white * {
   right: 0;
   bottom: 0;
   top: calc(var(--mk-a11y-y, 50vh) + 65px);
-  background: rgba(10, 32, 31, 0.56);
+  background: rgba(10, 25, 32, 0.56);
 }
 
 /* Live Tooltip Pill when "التلميحات" is enabled */
@@ -674,7 +674,7 @@ html.mk-a11y-cursor-white * {
   background: #003954;
   color: #ffffff;
   font: 700 13.5px/1.6 Cairo, sans-serif;
-  box-shadow: 0 10px 26px rgba(10, 44, 42, 0.3);
+  box-shadow: 0 10px 26px rgba(10, 33, 44, 0.3);
   pointer-events: none;
 }
 

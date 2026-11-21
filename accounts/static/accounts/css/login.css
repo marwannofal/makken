@@ -1,9 +1,9 @@
 :root {
   --primary: #005b85;
   --primary-dark: #003954;
-  --ink: #183b3a;
-  --muted: #667b7a;
-  --border: #d8e5e3;
+  --ink: #18303b;
+  --muted: #66747b;
+  --border: #d8e1e5;
   --danger: #b42318;
 }
 
@@ -18,7 +18,7 @@
 body {
   margin: 0;
   color: var(--ink);
-  background: #e7f4f1;
+  background: #e7f0f4;
   font-family: "Cairo", Tahoma, Arial, sans-serif;
   line-height: 1.65;
 }
@@ -76,8 +76,8 @@ button {
 .eyebrow {
   display: inline-block;
   color: var(--primary-dark);
-  background: #edf9f7;
-  border: 1px solid #d4eeea;
+  background: #edf5f9;
+  border: 1px solid #d4e6ee;
   padding: 3px 13px;
   border-radius: 100px;
   font-size: 12px;
@@ -117,7 +117,7 @@ label {
   min-height: 57px;
   border: 1px solid var(--border);
   border-radius: 12px;
-  background: #fafcfb;
+  background: #fafbfc;
   color: var(--ink);
   padding: 13px 48px;
   font-size: 14px;
@@ -127,7 +127,7 @@ label {
 }
 
 .input-wrap input::placeholder {
-  color: #647a77;
+  color: #64737a;
   opacity: 1;
   font-size: 12px;
   text-align: end;
@@ -150,7 +150,7 @@ label {
   inset-inline-start: 17px;
   top: 18px;
   pointer-events: none;
-  stroke: #668c87;
+  stroke: #66808c;
   stroke-width: 1.65;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -165,13 +165,13 @@ label {
   background: transparent;
   border: 0;
   border-radius: 8px;
-  color: #567b77;
+  color: #566f7b;
   display: grid;
   place-items: center;
 }
 
 .password-toggle:hover {
-  background: #eaf5f2;
+  background: #eaf2f5;
   color: var(--primary-dark);
 }
 
@@ -245,7 +245,7 @@ label {
   height: 21px;
   margin: 0;
   flex-shrink: 0;
-  border: 1.5px solid #789a95;
+  border: 1.5px solid #788f9a;
   border-radius: 6px;
   background: white;
   display: grid;
@@ -258,7 +258,7 @@ label {
   content: "";
   width: 5px;
   height: 10px;
-  border: solid #093330;
+  border: solid #092633;
   border-width: 0 2px 2px 0;
   transform: translateY(-1px) rotate(45deg) scale(0);
 }
@@ -277,7 +277,7 @@ label {
 }
 
 .remember-checkbox:focus-visible {
-  outline: 3px solid #0b6663;
+  outline: 3px solid #0b4966;
   outline-offset: 4px;
 }
 
@@ -297,7 +297,7 @@ label {
   border: 0;
   border-radius: 12px;
   background: var(--primary);
-  color: #093330;
+  color: #092633;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -326,7 +326,7 @@ label {
 }
 
 button:focus-visible, .form-alert:focus-visible {
-  outline: 3px solid #0b6663;
+  outline: 3px solid #0b4966;
   outline-offset: 4px;
 }
 
@@ -363,7 +363,7 @@ button:focus-visible, .form-alert:focus-visible {
 .footer {
   padding: 18px 0 23px;
   text-align: center;
-  color: #627b77;
+  color: #62737b;
 }
 
 .footer p {
@@ -377,7 +377,7 @@ button:focus-visible, .form-alert:focus-visible {
   overflow: hidden;
   min-height: 100%;
   direction: rtl;
-  background: #0e5958 url("../images/login-img.png") center / cover no-repeat;
+  background: #0e4159 url("../images/login-img.png") center / cover no-repeat;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -435,7 +435,7 @@ button:focus-visible, .form-alert:focus-visible {
 .visual-copy p {
   margin: 0;
   font-size: 16px;
-  color: #e4efed;
+  color: #e4ecef;
 }
 
 @media (max-width: 1000px) {

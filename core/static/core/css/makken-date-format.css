@@ -34,7 +34,7 @@
 }
 
 .mk-date-field > input.mk-date-display::placeholder {
-  color: #7c9795;
+  color: #7c8e97;
   letter-spacing: 0.03em;
 }
 
@@ -52,13 +52,13 @@
   border: 0;
   border-radius: 8px;
   background: transparent;
-  color: #274c4f;
+  color: #27424f;
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease;
 }
 
 .mk-date-picker-btn:hover:not(:disabled) {
-  background: #eaf7f5;
+  background: #eaf3f7;
   color: #004769;
 }
 

@@ -13,10 +13,10 @@ html.mk-values-open {
   max-width: 100%;
   padding: 5px 11px;
   margin: 2px 0;
-  border: 1px solid #bee9e5;
+  border: 1px solid #bedbe9;
   border-radius: 9px;
-  background: #e9f8f6;
-  color: #107976;
+  background: #e9f3f8;
+  color: #105879;
   font-family: inherit;
   font-size: 12px;
   font-weight: 700;
@@ -27,7 +27,7 @@ html.mk-values-open {
 }
 
 .mk-cell-values-more:hover {
-  background: #d8f2ef;
+  background: #d8eaf2;
   border-color: #005b85;
 }
 
@@ -59,8 +59,8 @@ html.mk-values-open {
   display: inline-block;
   padding: 3px 8px;
   border-radius: 7px;
-  color: #326d69;
-  background: #edf8f6;
+  color: #325a6d;
+  background: #edf5f8;
   font-size: 11px;
   line-height: 1.8;
   overflow-wrap: anywhere;
@@ -79,9 +79,9 @@ html.mk-values-open {
   margin: auto;
   padding: 0;
   overflow: auto;
-  border: 1px solid #e5efed;
+  border: 1px solid #e5ecef;
   border-radius: 22px;
-  color: #194b48;
+  color: #193b4b;
   background: #fff;
   box-shadow: 0 24px 90px #0b403333;
   font-family: inherit;
@@ -113,8 +113,8 @@ html.mk-values-open {
   width: 48px;
   height: 48px;
   border-radius: 15px;
-  background: #e6f7f2;
-  color: #148782;
+  background: #e6f2f7;
+  color: #146387;
 }
 
 .mk-values-symbol svg, .mk-values-close svg {
@@ -135,26 +135,26 @@ html.mk-values-open {
   padding: 8px;
   border: 1px solid transparent;
   border-radius: 11px;
-  color: #6f8983;
+  color: #6f8189;
   background: transparent;
   cursor: pointer;
 }
 
 .mk-values-close:hover {
-  color: #157d77;
-  background: #eff8f5;
+  color: #155c7d;
+  background: #eff5f8;
 }
 
 .mk-values-eyebrow {
   margin: 0 0 7px;
-  color: #6f9890;
+  color: #6f8b98;
   font-size: 11px;
   font-weight: 700;
 }
 
 .mk-values-title {
   margin: 0 0 8px;
-  color: #194b48;
+  color: #193b4b;
   font-size: 22px;
   font-weight: 800;
   line-height: 1.7;
@@ -163,7 +163,7 @@ html.mk-values-open {
 
 .mk-values-description {
   margin: 0 0 20px;
-  color: #688880;
+  color: #687e88;
   font-size: 13px;
   line-height: 1.9;
   overflow-wrap: anywhere;
@@ -172,7 +172,7 @@ html.mk-values-open {
 .mk-values-search-label {
   display: block;
   margin: 0 0 8px;
-  color: #315f58;
+  color: #31505f;
   font-size: 12px;
   font-weight: 700;
 }
@@ -183,11 +183,11 @@ html.mk-values-open {
   width: 100%;
   min-width: 0;
   height: 46px;
-  border: 1px solid #d6e7e2;
+  border: 1px solid #d6e2e7;
   border-radius: 11px;
   padding: 10px 13px;
-  background: #fbfdfc;
-  color: #194b48;
+  background: #fbfcfd;
+  color: #193b4b;
   font-family: inherit;
   font-size: 13px;
   text-align: right;
@@ -195,7 +195,7 @@ html.mk-values-open {
 }
 
 .mk-values-search::placeholder {
-  color: #829a94;
+  color: #82929a;
   opacity: 1;
   text-align: right;
 }
@@ -208,7 +208,7 @@ html.mk-values-open {
 
 .mk-values-count {
   margin: 12px 0;
-  color: #66877e;
+  color: #667d87;
   font-size: 12px;
   line-height: 1.8;
 }
@@ -225,7 +225,7 @@ html.mk-values-open {
   padding: 2px;
   list-style: none;
   scrollbar-width: thin;
-  scrollbar-color: #b5d8d1 transparent;
+  scrollbar-color: #b5cdd8 transparent;
 }
 
 .mk-values-item {
@@ -234,10 +234,10 @@ html.mk-values-open {
   box-sizing: border-box;
   margin: 0;
   padding: 8px 11px;
-  border: 1px solid #d2eae4;
+  border: 1px solid #d2e2ea;
   border-radius: 9px;
   background: #edf5fa;
-  color: #276e65;
+  color: #27586e;
   font-size: 12px;
   font-weight: 600;
   line-height: 1.9;
@@ -245,9 +245,9 @@ html.mk-values-open {
 }
 
 .mk-values-item-inactive {
-  color: #697f78;
-  background: #f2f5f3;
-  border-color: #e1e8e4;
+  color: #69787f;
+  background: #f2f4f5;
+  border-color: #e1e6e8;
 }
 
 .mk-values-item a {
@@ -262,10 +262,10 @@ html.mk-values-open {
 
 .mk-values-empty {
   padding: 18px;
-  border: 1px dashed #d6e7e0;
+  border: 1px dashed #d6e2e7;
   border-radius: 10px;
   background: #fafdfb;
-  color: #6b887d;
+  color: #6b7f88;
   font-size: 13px;
   line-height: 1.9;
   text-align: center;
@@ -290,12 +290,12 @@ html.mk-values-open {
 }
 
 .mk-values-done:hover {
-  background: #1c9d99;
-  border-color: #1c9d99;
+  background: #1c749d;
+  border-color: #1c749d;
 }
 
 .mk-cell-values-more:focus-visible, .mk-values-close:focus-visible, .mk-values-done:focus-visible {
-  outline: 3px solid #087a75;
+  outline: 3px solid #08567a;
   outline-offset: 3px;
 }
 

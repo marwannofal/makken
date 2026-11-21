@@ -85,11 +85,11 @@
 .market-match-filters .status-choices label:has(input[name="states"]:checked) {
   border-color: transparent;
   background: transparent;
-  box-shadow: 0 0 0 2px #137f7b, inset 0 0 0 2px rgb(255 255 255 / 85%);
+  box-shadow: 0 0 0 2px #135d7f, inset 0 0 0 2px rgb(255 255 255 / 85%);
 }
 
 .market-match-filters .status-choices label:has(input[name="states"]:focus-visible) {
-  outline: 3px solid #137f7b;
+  outline: 3px solid #135d7f;
   outline-offset: 4px;
 }
 
@@ -112,11 +112,11 @@
 
 .market-help {
   padding:14px 16px;
-  background:#f1f9f7;
+  background:#f1f6f9;
   border-radius:11px;
   font-size:11px;
   line-height:2;
-  color:#496f6b;
+  color:#49636f;
   margin:18px 0
 }
 
@@ -146,9 +146,9 @@
 }
 
 .market-summary>div {
-  border:1px solid #dcebe6;
+  border:1px solid #dce6eb;
   border-radius:14px;
-  background:#f8fbfa;
+  background:#f8fafb;
   padding:17px 14px;
   min-width:0
 }
@@ -156,13 +156,13 @@
 .market-summary>div>span {
   display:block;
   font-size:10px;
-  color:#63827b;
+  color:#637882;
   margin-bottom:10px
 }
 
 .market-summary strong {
   font-size:clamp(13px,1.35vw,20px);
-  color:#205c58;
+  color:#20495c;
   display:block
 }
 
@@ -182,12 +182,12 @@ progress {
   height:7px;
   border:0;
   border-radius:10px;
-  background:#e2eee9;
+  background:#e2eaee;
   overflow:hidden
 }
 
 progress::-webkit-progress-bar {
-  background:#e2eee9
+  background:#e2eaee
 }
 
 progress::-webkit-progress-value {
@@ -207,8 +207,8 @@ progress::-moz-progress-bar {
   white-space:nowrap;
   font-size:10px;
   font-weight:700;
-  color:#547875;
-  background:#edf3f1
+  color:#546d78;
+  background:#edf1f3
 }
 
 .state-working {
@@ -247,7 +247,7 @@ progress::-moz-progress-bar {
 }
 
 .market-register tbody tr:hover {
-  background:#f5fbf9
+  background:#f5f9fb
 }
 
 .market-register .row-actions {
@@ -272,7 +272,7 @@ progress::-moz-progress-bar {
 .market-match-reasons {
   padding-inline-start:18px;
   font-size:11px;
-  color:#4a6d65;
+  color:#4a626d;
   line-height:1.9
 }
 
@@ -311,13 +311,13 @@ progress::-moz-progress-bar {
 .market-edit-lines select,.market-edit-lines input:not([type=checkbox]) {
   width:100%;
   height:48px;
-  border:1px solid #d7e6e2;
+  border:1px solid #d7e1e6;
   border-radius:11px;
   font:inherit;
   font-size:12px;
   padding:10px 13px;
   min-width:140px;
-  color:#274c4f;
+  color:#27424f;
   background-color:#fff
 }
 
@@ -332,8 +332,8 @@ progress::-moz-progress-bar {
 }
 
 .market-edit-lines tr.is-excluded {
-  background:#f5f7f6;
-  color:#7d918b
+  background:#f5f6f7;
+  color:#7d8b91
 }
 
 .market-edit-lines tfoot td,.market-expense-table tfoot td,.market-expense-table tfoot th {
@@ -347,8 +347,8 @@ progress::-moz-progress-bar {
   align-items:center;
   gap:16px;
   padding:20px;
-  background:#eaf8f4;
-  border:1px solid #d8ede5;
+  background:#eaf4f8;
+  border:1px solid #d8e6ed;
   border-radius:12px;
   margin:20px 0;
   font-size:13px
@@ -359,7 +359,7 @@ progress::-moz-progress-bar {
   gap:8px;
   align-items:center;
   font-size:21px;
-  color:#167e75
+  color:#165d7e
 }
 
 .market-total img {
@@ -384,12 +384,12 @@ progress::-moz-progress-bar {
 }
 
 .partnership-field input[readonly] {
-  background:#f3f7f6;
-  color:#587b71
+  background:#f3f6f7;
+  color:#58707b
 }
 
 .market-card-fold,.market-event {
-  border:1px solid #dfebe6;
+  border:1px solid #dfe7eb;
   border-radius:12px;
   margin-top:18px;
   padding:14px
@@ -397,7 +397,7 @@ progress::-moz-progress-bar {
 
 .market-card-fold>summary,.market-event>summary {
   cursor:pointer;
-  color:#33766b;
+  color:#336176;
   font-size:12px;
   font-weight:700;
   line-height:1.9
@@ -422,7 +422,7 @@ progress::-moz-progress-bar {
 }
 
 .market-event {
-  background:#f9fbfa
+  background:#f9fafb
 }
 
 .market-event>summary {
@@ -449,7 +449,7 @@ progress::-moz-progress-bar {
 .market-event time,.market-event bdi {
   font-size:10px;
   font-weight:400;
-  color:#6a867e
+  color:#6a7d86
 }
 
 .market-event-values {
@@ -474,7 +474,7 @@ progress::-moz-progress-bar {
 }
 
 .market-event-values dt {
-  color:#769087
+  color:#768890
 }
 
 .market-event-values dd {
@@ -504,13 +504,13 @@ progress::-moz-progress-bar {
   align-items:center;
   gap:10px;
   padding:12px;
-  border:1px solid #dceae4;
+  border:1px solid #dce6ea;
   border-radius:10px;
-  background:#f7fbf9;
+  background:#f7fafb;
   margin-top:7px;
   font-size:11px;
   max-width:100%;
-  color:#34786e
+  color:#346278
 }
 
 .market-file>svg {
@@ -527,12 +527,12 @@ progress::-moz-progress-bar {
 .market-file small {
   display:block;
   font-size:9px;
-  color:#7b918b;
+  color:#7b8a91;
   margin-top:3px
 }
 
 .market-sponsor-detail {
-  border:1px solid #dfebe6;
+  border:1px solid #dfe7eb;
   padding:16px;
   border-radius:12px;
   margin-top:12px;
@@ -541,15 +541,15 @@ progress::-moz-progress-bar {
 
 .market-upload-picker {
   position:relative;
-  border:1px dashed #9dcfc4;
+  border:1px dashed #9dbfcf;
   border-radius:12px;
   padding:20px 12px;
   display:flex;
   align-items:center;
   justify-content:center;
   gap:10px;
-  color:#257f74;
-  background:#f1faf7;
+  color:#25627f;
+  background:#f1f7fa;
   font-size:12px;
   cursor:pointer;
   min-height:75px
@@ -580,7 +580,7 @@ progress::-moz-progress-bar {
   gap:8px;
   justify-content:space-between;
   padding:10px;
-  border:1px solid #e3ece7;
+  border:1px solid #e3e9ec;
   border-radius:9px;
   font-size:11px;
   margin-top:7px
@@ -593,7 +593,7 @@ progress::-moz-progress-bar {
 
 .market-upload-list small {
   display:block;
-  color:#779087;
+  color:#778890;
   margin-top:3px
 }
 
@@ -611,7 +611,7 @@ progress::-moz-progress-bar {
 .market-upload-progress {
   margin-top:16px;
   font-size:11px;
-  color:#357c70
+  color:#35667c
 }
 
 .market-upload-progress p {
@@ -659,8 +659,8 @@ progress::-moz-progress-bar {
 }
 
 .market-select .search-select-option[aria-pressed=true] {
-  background:#eaf8f3;
-  color:#147c74
+  background:#eaf4f8;
+  color:#145b7c
 }
 
 .market-select .search-select-trigger:focus-visible {
@@ -687,7 +687,7 @@ progress::-moz-progress-bar {
 
 .market-select-options-empty {
   font-size:11px;
-  color:#789187;
+  color:#788991;
   padding:8px
 }
 
@@ -861,17 +861,17 @@ progress::-moz-progress-bar {
   min-height:48px;
   box-sizing:border-box;
   width:100%;
-  border:1px solid #d7e6e2;
+  border:1px solid #d7e1e6;
   border-radius:11px;
   padding:11px 13px;
   background:#fff;
-  color:#274c4f;
+  color:#27424f;
   font:inherit
 }
 
 .market-funding-dialog input[readonly] {
-  background:#f1f7f6;
-  color:#436563
+  background:#f1f5f7;
+  color:#435a65
 }
 
 .market-record-detail .market-development-history {
@@ -897,8 +897,8 @@ progress::-moz-progress-bar {
   font-size:11px;
   font-weight:700;
   white-space:nowrap;
-  background:#edf5f4;
-  color:#315c58
+  background:#edf2f5;
+  color:#314e5c
 }
 
 .market-level.level-bronze {
@@ -917,8 +917,8 @@ progress::-moz-progress-bar {
 }
 
 .market-level.level-strategic {
-  background:#e0f4f2;
-  color:#126b66
+  background:#e0eef4;
+  color:#124f6b
 }
 
 .market-followup {
