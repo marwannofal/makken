@@ -207,7 +207,7 @@ class PartnershipReminderTests(TestCase):
         access.allowed_regions.add(self.region)
 
         # signed_on=2026-01-18 + 12 months => calculated_expiry=2027-01-18 (exactly 2 months from NOW=2026-11-18)
-        item = self.partner(ends_on=None)
+        item = self.partner()
         Partnership.objects.filter(pk=item.pk).update(signed_on=date(2026, 1, 18), duration_months=12, ends_on=None)
         item.refresh_from_db()
         self.assertIsNone(item.ends_on)
