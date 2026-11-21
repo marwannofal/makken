@@ -195,9 +195,7 @@ class FundingMigrationTests(MarketFixtures, TransactionTestCase):
         self.setUpTestData()
         # The fixture is saved while the migration executor has removed
         # later agreement-clause tables. Do not attach clauses to this fixture.
-        from unittest.mock import patch
-        with patch('market_needs.services.need_names', return_value=[]), patch('market_needs.services.save_links'):
-            need = self.create_need()
+        need = self.create_need()
         org=self.organization(state='care'); entered=org.development_state_at
         old=executor.loader.project_state([('market_needs','0001_initial'),('levels','0002_funding_key')]).apps
         decided=timezone.now()-timedelta(days=3)
