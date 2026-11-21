@@ -179,6 +179,7 @@ class FundingDetailsTests(MarketFixtures, TestCase):
         html=response.content.decode();positions=[html.index(f'<th scope="col">{text}</th>') for text in headers]
         self.assertEqual(positions,sorted(positions));self.assertContains(response,need.number)
         response=self.client.get(f'/market-needs/{need.pk}/sponsors/')
+        self.assertNotContains(response, 'إسناد متابعة البطاقة')
         for label in ['الكيان / نوعه','نطاق الكيان','مستوى','تاريخ التعديل','المستخدم / التعديل']:
             self.assertContains(response,f'<th scope="col">{label}</th>',html=True)
 
