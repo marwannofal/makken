@@ -149,6 +149,7 @@ class PublicSponsorRegistrationForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['entity'].queryset = Entity.objects.filter(is_active=True).order_by('name')
         self.fields['entity'].empty_label = 'اختر الكيان'
+        self.fields['entity'].required = False
         self.fields['administrative_regions'].queryset = Region.objects.filter(is_active=True).order_by('name')
         self.fields['sector'].queryset = Sector.objects.filter(is_active=True).order_by('name')
         self.fields['sector'].empty_label = 'اختر القطاع (اختياري)'
@@ -236,6 +237,18 @@ class PublicSponsorRegistrationForm(forms.ModelForm):
             self.add_error('administrative_regions', 'اختر منطقة إدارية واحدة على الأقل للشراكة المحلية.')
         entity = cleaned.get('entity')
         entity_type = cleaned.get('entity_type')
+        if entity_type == EntityType.GOVERNMENT:
+            gov = Entity.objects.filter(is_active=True, entity_type=EntityType.GOVERNMENT).order_by('id').first()
+            if gov is None:
+                self.add_error('entity_type', 'فعّل كيانًا حكوميًا في إدارة الكيانات قبل حفظ جهة حكومية.')
+            else:
+                cleaned['entity'] = gov
+                entity = gov
+        elif entity_type == EntityType.NON_GOVERNMENT:
+            if not entity:
+                self.add_error('entity', 'اختر الكيان.')
+        elif not entity:
+            self.add_error('entity_type', 'اختر نوع الكيان.')
         if entity and entity_type and entity.entity_type != entity_type:
             self.add_error('entity', 'الكيان المختار لا يطابق نوع الكيان المحدد.')
         return cleaned

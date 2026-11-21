@@ -350,3 +350,36 @@ class SponsorRegistrationUS15Tests(TestCase):
         self.assertContains(res, 'accounts/images/header-logo.svg')
         self.assertContains(res, '<div class="pub-phone-row" dir="ltr">')
         self.assertNotContains(res, 'العودة لتسجيل الدخول')
+
+    def test_public_register_hides_entity_until_non_government_and_auto_resolves_government(self):
+        url = reverse('partnerships:public_sponsor_register')
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, 'data-pub-entity-field hidden')
+
+        gov_res = self.client.post(url, {
+            'name': 'جهة حكومية تلقائية',
+            'representative': 'خالد',
+            'phone_country': 'SA',
+            'phone': '0501234567',
+            'email': 'govauto@example.com',
+            'entity_type': 'government',
+            'scope': 'local',
+            'administrative_regions': [str(self.region_a.pk)],
+        })
+        self.assertEqual(gov_res.status_code, 302)
+        req = SponsorRegistrationRequest.objects.get(name='جهة حكومية تلقائية')
+        self.assertEqual(req.entity.entity_type, 'government')
+
+        non_gov_res = self.client.post(url, {
+            'name': 'جهة خاصة بدون كيان',
+            'representative': 'سالم',
+            'phone_country': 'SA',
+            'phone': '0507654321',
+            'email': 'nongov@example.com',
+            'entity_type': 'non_government',
+            'scope': 'local',
+            'administrative_regions': [str(self.region_a.pk)],
+        })
+        self.assertEqual(non_gov_res.status_code, 200)
+        self.assertIn('entity', non_gov_res.context['form'].errors)

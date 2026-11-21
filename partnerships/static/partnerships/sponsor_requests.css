@@ -1030,3 +1030,7 @@
     grid-template-columns: 128px minmax(0, 1fr) !important;
   }
 }
+
+.pub-field[hidden] {
+  display: none !important;
+}

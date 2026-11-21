@@ -17,26 +17,37 @@
   const specsById = new Map((catalog.specializations || []).map((sp) => [String(sp.id), sp]));
   const shapesById = new Map((catalog.shapes || []).map((sh) => [String(sh.id), sh]));
 
-  // 1. Cascading نوع الكيان -> الكيان
+  // 1. Cascading نوع الكيان -> الكيان (show الكيان ONLY when غير حكومي, matching قدرة)
   const typeSelect = form.querySelector('#id_entity_type');
   const entitySelect = form.querySelector('#id_entity');
+  const entityField = form.querySelector('[data-pub-entity-field]');
 
   function populateEntities(selectedType, keepValue) {
     if (!entitySelect) return;
+    const isNonGov = selectedType === 'non_government';
+    if (entityField) {
+      entityField.hidden = !isNonGov;
+    }
     const currentVal = keepValue !== undefined ? String(keepValue || '') : String(entitySelect.value || '');
     const matching = (catalog.entities || []).filter((e) => !selectedType || e.entity_type === selectedType);
     entitySelect.innerHTML = '';
     const placeholder = document.createElement('option');
     placeholder.value = '';
-    placeholder.textContent = selectedType ? 'اختر الكيان' : 'اختر نوع الكيان أولًا';
+    placeholder.textContent = isNonGov ? 'اختر الكيان' : 'اختر نوع الكيان أولًا';
     entitySelect.appendChild(placeholder);
     for (const ent of matching) {
       const opt = document.createElement('option');
       opt.value = String(ent.id);
       opt.textContent = ent.name;
-      if (String(ent.id) === currentVal) opt.selected = true;
+      if (isNonGov && String(ent.id) === currentVal) opt.selected = true;
       entitySelect.appendChild(opt);
     }
+    if (selectedType === 'government' && matching.length) {
+      entitySelect.value = String(matching[0].id);
+    } else if (!isNonGov) {
+      entitySelect.value = '';
+    }
+    entitySelect.dispatchEvent(new Event('change', { bubbles: true }));
   }
 
   if (typeSelect && entitySelect) {
