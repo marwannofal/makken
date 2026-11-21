@@ -298,3 +298,59 @@ class WillingnessUnifiedWorkflowTests(TestCase):
             self.assertEqual(res.status_code, 200)
             self.assertContains(res, 'data-offering-toast')
             self.assertContains(res, 'partnerships.js?v=20261121-6')
+
+    def test_quick_clauses_progress_modal_endpoint_and_button(self):
+        self.client.force_login(self.admin)
+        cap = self._create_capability('شراكة قدرة بدون زر إنجاز')
+        will = self._create_capability('شراكة رغبة لتعديل الإنجاز')
+        will.development_state_id = DevelopmentState.WILLINGNESS
+        will.save(update_fields=['development_state'])
+        ca1 = ClauseAssignment.objects.create(
+            partnership=will, agreement=None, clause=self.clause_1,
+            responsibility=Responsibility.SHARED, progress=10, updated_by=self.admin,
+        )
+        ca2 = ClauseAssignment.objects.create(
+            partnership=will, agreement=None, clause=self.clause_2,
+            responsibility=Responsibility.INSTITUTION, progress=30, updated_by=self.admin,
+        )
+
+        # Button appears for willingness row, NOT for capability row
+        list_res = self.client.get(reverse('partnerships:willingness_index'))
+        self.assertEqual(list_res.status_code, 200)
+        self.assertContains(list_res, reverse('partnerships:clauses_progress', kwargs={'pk': will.pk}))
+        self.assertNotContains(list_res, reverse('partnerships:clauses_progress', kwargs={'pk': cap.pk}))
+        self.assertContains(list_res, 'نسب إنجاز البنود')
+
+        # Capability partnership rejected on endpoint
+        cap_res = self.client.get(reverse('partnerships:clauses_progress', kwargs={'pk': cap.pk}))
+        self.assertEqual(cap_res.status_code, 400)
+
+        # GET returns clauses & overall average (20%)
+        url = reverse('partnerships:clauses_progress', kwargs={'pk': will.pk})
+        get_res = self.client.get(url)
+        self.assertEqual(get_res.status_code, 200)
+        data = get_res.json()
+        self.assertEqual(len(data['clauses']), 2)
+        self.assertEqual(data['overall_display'], '20%')
+
+        # Invalid percentage (>100) rejected cleanly
+        bad = self.client.post(
+            url,
+            data=json.dumps({'items': [{'id': ca1.pk, 'progress': 120}]}),
+            content_type='application/json',
+        )
+        self.assertEqual(bad.status_code, 400)
+
+        # Valid POST saves atomically and returns updated overall (75%) + formal Arabic toast message
+        ok = self.client.post(
+            url,
+            data=json.dumps({'items': [{'id': ca1.pk, 'progress': 50}, {'id': ca2.pk, 'progress': 100}]}),
+            content_type='application/json',
+        )
+        self.assertEqual(ok.status_code, 200)
+        ok_data = ok.json()
+        self.assertEqual(ok_data['overall_display'], '75%')
+        self.assertIn('تم حفظ نسب إنجاز بنود الشراكة بنجاح', ok_data['message'])
+        ca1.refresh_from_db()
+        ca2.refresh_from_db()
+        self.assertEqual((ca1.progress, ca2.progress), (50, 100))

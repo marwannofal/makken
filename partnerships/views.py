@@ -620,3 +620,110 @@ def capability_index(request):
 @require_http_methods(["GET", "POST"])
 def willingness_index(request):
     return index(request, fixed_state=DevelopmentState.WILLINGNESS)
+
+
+@module_view('partnerships')
+@login_required(login_url="accounts:login")
+@require_http_methods(["GET", "POST"])
+def clauses_progress(request, pk):
+    from access_control.activity_capture import emit, regions_for
+    from agreement_clauses.models import ClauseAssignment, mean_progress
+
+    item = get_object_or_404(_query(request.user), pk=pk)
+    if item.development_state_id != DevelopmentState.WILLINGNESS:
+        return add_login_headers(
+            JsonResponse({"error": "تعديل نسب إنجاز البنود متاح لشراكات الرغبة فقط."}, status=400)
+        )
+
+    def _serialize_payload(partnership):
+        rows = list(
+            ClauseAssignment.objects.select_related("clause")
+            .filter(partnership=partnership, agreement__isnull=True)
+            .order_by("id")
+        )
+        overall = mean_progress([r.progress for r in rows])
+        overall_str = "—" if overall is None else (f"{overall:g}%" if overall == int(overall) else f"{overall:.2f}%")
+        return {
+            "partnership_id": partnership.pk,
+            "partnership_name": partnership.name,
+            "agreement_number": partnership.agreement_number or "—",
+            "overall_progress": float(overall) if overall is not None else None,
+            "overall_display": overall_str,
+            "clauses": [
+                {
+                    "id": r.pk,
+                    "clause_id": r.clause_id,
+                    "name": r.clause.name,
+                    "responsibility": r.responsibility,
+                    "responsibility_label": r.get_responsibility_display(),
+                    "progress": r.progress,
+                }
+                for r in rows
+            ],
+        }
+
+    if request.method == "GET":
+        return add_login_headers(JsonResponse(_serialize_payload(item)))
+
+    try:
+        body = json.loads((request.body or b"{}").decode("utf-8"))
+    except (ValueError, UnicodeDecodeError):
+        return add_login_headers(JsonResponse({"error": "بيانات الطلب غير صالحة."}, status=400))
+
+    raw_items = body.get("items")
+    if not isinstance(raw_items, list):
+        return add_login_headers(JsonResponse({"error": "قائمة البنود غير صالحة."}, status=400))
+
+    updates = {}
+    for entry in raw_items:
+        if not isinstance(entry, dict):
+            return add_login_headers(JsonResponse({"error": "تنسيق البند غير صالح."}, status=400))
+        try:
+            assignment_id = int(entry.get("id"))
+            progress_val = int(entry.get("progress"))
+        except (TypeError, ValueError):
+            return add_login_headers(JsonResponse({"error": "أدخل نسبة إنجاز صحيحة بين 0 و100 لكل بند."}, status=400))
+        if progress_val < 0 or progress_val > 100:
+            return add_login_headers(JsonResponse({"error": "يجب أن تكون نسبة الإنجاز بين 0% و100%."}, status=400))
+        updates[assignment_id] = progress_val
+
+    with regional_transaction(request.user) as region_policy:
+        locked_item = Partnership.objects.select_for_update().filter(pk=item.pk).first()
+        if not locked_item:
+            return add_login_headers(JsonResponse({"error": "الشراكة غير موجودة."}, status=404))
+        require_write(request.user, locked_item, policy=region_policy)
+        assignments = {
+            r.pk: r
+            for r in ClauseAssignment.objects.select_for_update().filter(
+                partnership=locked_item, agreement__isnull=True
+            )
+        }
+        changed = []
+        for aid, new_prog in updates.items():
+            row = assignments.get(aid)
+            if row is None:
+                return add_login_headers(JsonResponse({"error": "أحد البنود المحددة غير مرتبط بهذه الشراكة."}, status=400))
+            if row.progress != new_prog:
+                old_prog = row.progress
+                row.progress = new_prog
+                row.version += 1
+                row.updated_by = request.user
+                row.save(update_fields=["progress", "version", "updated_by", "updated_at"])
+                changed.append({"id": aid, "before": old_prog, "after": new_prog})
+        if changed:
+            emit(
+                actor=request.user,
+                module="partnerships",
+                action="update",
+                description="تحديث نسب إنجاز بنود الشراكة",
+                target_model="partnerships.partnership",
+                target_key=str(locked_item.pk),
+                target_label=locked_item.name,
+                before={"clauses": [{"id": c["id"], "progress": c["before"]} for c in changed]},
+                after={"clauses": [{"id": c["id"], "progress": c["after"]} for c in changed]},
+                region_ids=regions_for(locked_item),
+            )
+
+    payload = _serialize_payload(item)
+    payload["message"] = "تم حفظ نسب إنجاز بنود الشراكة بنجاح. يمكنك متابعة التعديل أو إغلاق النافذة."
+    return add_login_headers(JsonResponse(payload))

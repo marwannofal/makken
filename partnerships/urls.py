@@ -24,6 +24,7 @@ urlpatterns += [
     path("requests/", sponsor_request_queue, name="sponsor_requests"),
     path("requests/<int:request_id>/", sponsor_request_review, name="sponsor_request_review"),
     path("<int:pk>/clauses/", workflow, name="clauses"),
+    path("<int:pk>/clauses-progress/", views.clauses_progress, name="clauses_progress"),
     path("<int:pk>/agreements/<int:agreement_id>/", workflow, name="agreement"),
     path("<int:pk>/agreements/<int:agreement_id>/details/", agreement_details, name="agreement_details"),
     path("<int:pk>/agreements/<int:agreement_id>/evidence/<int:attachment_id>/download/",

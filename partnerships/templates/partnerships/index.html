@@ -4,12 +4,36 @@
 {% load static partnership_states %}
 {% block title %}
   {{ page_heading }} | مكّن
+  <dialog id="clauses-progress-dialog" class="partnership-dialog mk-cp-dialog" aria-labelledby="clauses-progress-title">
+    <form class="dialog-body" data-cp-form>
+      {% csrf_token %}
+      <div class="dialog-top">
+        <span class="dialog-symbol"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
+        <button type="button" class="icon-button" data-dismiss-dialog aria-label="إغلاق" autofocus><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+      </div>
+      <h2 id="clauses-progress-title">نسب إنجاز بنود الشراكة</h2>
+      <div class="mk-cp-meta">
+        <span class="mk-cp-partner" data-cp-partner></span>
+        <span class="subtle-badge">نسبة إنجاز الشراكة: <strong data-cp-overall>—</strong></span>
+      </div>
+      <div class="mk-offering-toast" data-cp-toast role="status" aria-live="polite" hidden>
+        <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5"/></svg>
+        <span data-cp-toast-text></span>
+      </div>
+      <p class="field-error" data-cp-error role="alert"></p>
+      <div class="mk-cp-list" data-cp-list></div>
+      <div class="dialog-actions">
+        <button class="button button-primary" type="submit" data-cp-save>حفظ نسب الإنجاز</button>
+        <button class="button button-secondary" type="button" data-dismiss-dialog>إغلاق</button>
+      </div>
+    </form>
+  </dialog>
 {% endblock %}
 {% block extra_head %}
   <link rel="stylesheet" href="{% static 'partnerships/willingness_upload.css' %}?v=20261017-1">
   <link rel="stylesheet" href="{% static 'care_states/states.css' %}?v=20261015-1">
-  <link rel="stylesheet" href="{% static 'partnerships/partnerships.css' %}?v=20261121-5">
-  <script src="{% static 'partnerships/partnerships.js' %}?v=20261121-5" defer></script>
+  <link rel="stylesheet" href="{% static 'partnerships/partnerships.css' %}?v=20261121-7">
+  <script src="{% static 'partnerships/partnerships.js' %}?v=20261121-7" defer></script>
   {% include "partnerships/_financial_assets.html" %}
   {% include "partnerships/_development_filter_assets.html" %}
   <script src="{% static 'partnerships/willingness_upload.js' %}?v=20261120-1" defer></script>
@@ -120,6 +144,11 @@
               {% endallowed %}
               </td><td>
               <div class="row-actions">
+                {% if row.item.development_state_id == 'willingness' %}
+                  {% allowed 'partnerships' 'edit' row.item %}
+                    <button type="button" class="row-action mk-cp-trigger" data-clauses-progress-trigger data-progress-url="{% url 'partnerships:clauses_progress' row.item.pk %}" aria-label="نسب إنجاز البنود لـ {{ row.item.name }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>نسب إنجاز البنود</button>
+                  {% endallowed %}
+                {% endif %}
                 {% allowed 'partnerships' 'edit' row.item %}
                   <a class="row-action" href="{% url 'partnerships:edit' row.item.pk %}{% if show_agreement_number %}?from=willingness{% endif %}" aria-label="تعديل {{ row.item.name }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m16 4 4 4M4 20l5-1L20 8a2.8 2.8 0 0 0-4-4L5 15Z"/></svg>تعديل</a>
                 {% endallowed %}

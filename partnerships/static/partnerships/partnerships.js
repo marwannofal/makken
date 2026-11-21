@@ -38,6 +38,142 @@
     highlightedRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
+  const cpDialog = $('#clauses-progress-dialog');
+  if (cpDialog) {
+    const cpForm = $('[data-cp-form]', cpDialog);
+    const cpPartner = $('[data-cp-partner]', cpDialog);
+    const cpOverall = $('[data-cp-overall]', cpDialog);
+    const cpList = $('[data-cp-list]', cpDialog);
+    const cpError = $('[data-cp-error]', cpDialog);
+    const cpToast = $('[data-cp-toast]', cpDialog);
+    const cpToastText = $('[data-cp-toast-text]', cpDialog);
+    const cpSaveBtn = $('[data-cp-save]', cpDialog);
+    let cpUrl = '';
+    let cpToastTimer = null;
+
+    function hideCpToast() {
+      if (cpToastTimer) {
+        clearTimeout(cpToastTimer);
+        cpToastTimer = null;
+      }
+      cpToast.hidden = true;
+    }
+
+    function showCpToast(message) {
+      hideCpToast();
+      cpToastText.textContent = message;
+      cpToast.hidden = false;
+      cpDialog.scrollTop = 0;
+      cpToastTimer = setTimeout(() => {
+        cpToast.hidden = true;
+        cpToastTimer = null;
+      }, 5000);
+    }
+
+    function renderCpClauses(data) {
+      cpPartner.textContent = data.agreement_number && data.agreement_number !== '—'
+        ? `${data.partnership_name} (${data.agreement_number})`
+        : data.partnership_name;
+      cpOverall.textContent = data.overall_display || '—';
+      cpList.replaceChildren();
+      const items = Array.isArray(data.clauses) ? data.clauses : [];
+      if (!items.length) {
+        cpList.append(make('div', 'mk-cp-empty', 'لا توجد بنود اتفاقية مسندة لهذه الشراكة بعد.'));
+        cpSaveBtn.disabled = true;
+        return;
+      }
+      cpSaveBtn.disabled = false;
+      items.forEach(item => {
+        const row = make('div', 'mk-cp-row');
+        const info = make('div', 'mk-cp-info');
+        info.append(
+          make('span', 'mk-cp-clause-name', item.name),
+          make('span', 'mk-cp-resp', `المسؤولية: ${item.responsibility_label}`)
+        );
+        const inputWrap = make('div', 'mk-cp-input-wrap');
+        const input = make('input', 'mk-cp-input');
+        input.type = 'number';
+        input.min = '0';
+        input.max = '100';
+        input.step = '1';
+        input.required = true;
+        input.value = String(item.progress ?? 0);
+        input.dataset.cpAssignmentId = String(item.id);
+        input.setAttribute('aria-label', `نسبة إنجاز ${item.name}`);
+        inputWrap.append(input, make('span', 'mk-cp-pct', '%'));
+
+        const bar = make('progress', 'mk-cp-progress');
+        bar.max = 100;
+        bar.value = Math.max(0, Math.min(100, Number(item.progress) || 0));
+
+        input.addEventListener('input', () => {
+          bar.value = Math.max(0, Math.min(100, Number(input.value) || 0));
+        });
+
+        row.append(info, inputWrap, bar);
+        cpList.append(row);
+      });
+    }
+
+    cpDialog.addEventListener('close', hideCpToast);
+
+    $$('[data-clauses-progress-trigger]').forEach(btn => {
+      btn.addEventListener('click', async event => {
+        event.stopPropagation();
+        cpUrl = btn.dataset.progressUrl || '';
+        if (!cpUrl) return;
+        hideCpToast();
+        cpError.textContent = '';
+        cpPartner.textContent = 'جارٍ تحميل البنود…';
+        cpOverall.textContent = '—';
+        cpList.replaceChildren(make('div', 'mk-cp-empty', 'جارٍ تحميل بنود الشراكة…'));
+        cpSaveBtn.disabled = true;
+        show(cpDialog);
+        try {
+          const res = await fetch(cpUrl, {credentials: 'same-origin', headers: {'X-Requested-With': 'XMLHttpRequest'}});
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'تعذّر تحميل بنود الشراكة.');
+          renderCpClauses(data);
+        } catch (err) {
+          cpError.textContent = err.message || 'تعذّر تحميل بنود الشراكة.';
+          cpList.replaceChildren();
+        }
+      });
+    });
+
+    cpForm.addEventListener('submit', async event => {
+      event.preventDefault();
+      if (!cpUrl || !cpForm.reportValidity()) return;
+      cpError.textContent = '';
+      const inputs = $$('[data-cp-assignment-id]', cpList);
+      const items = inputs.map(inp => ({id: Number(inp.dataset.cpAssignmentId), progress: Number(inp.value)}));
+      const csrf = $('input[name=csrfmiddlewaretoken]', cpForm)?.value || '';
+      cpSaveBtn.disabled = true;
+      cpSaveBtn.textContent = 'جارٍ الحفظ…';
+      try {
+        const res = await fetch(cpUrl, {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrf,
+            'X-Requested-With': 'XMLHttpRequest',
+          },
+          body: JSON.stringify({items}),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'تعذّر حفظ نسب الإنجاز.');
+        renderCpClauses(data);
+        showCpToast(data.message || 'تم حفظ نسب إنجاز بنود الشراكة بنجاح. يمكنك متابعة التعديل أو إغلاق النافذة.');
+      } catch (err) {
+        cpError.textContent = err.message || 'تعذّر حفظ نسب الإنجاز.';
+      } finally {
+        cpSaveBtn.disabled = !$$('[data-cp-assignment-id]', cpList).length;
+        cpSaveBtn.textContent = 'حفظ نسب الإنجاز';
+      }
+    });
+  }
+
   const source = $('#partnership-catalog');
   if (!source) return;
   const catalog = JSON.parse(source.textContent);
