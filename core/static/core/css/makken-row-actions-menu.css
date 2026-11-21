@@ -1,0 +1,247 @@
+/* Makken unified three-dots (⋮) row actions menu across all tables (RTL-first, responsive, CSP-safe). */
+
+:root .main-content table th.action-cell,
+:root .main-content table td.action-cell,
+:root .main-content table td.mk-actions-cell {
+  width: 64px;
+  min-width: 64px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.mk-actions-menu {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mk-actions-trigger {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: #1f4f4d;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.mk-actions-trigger:hover {
+  background: #eaf7f5;
+  border-color: #cde8e4;
+  color: #0e6f6a;
+}
+
+.mk-actions-trigger[aria-expanded="true"] {
+  background: #dff4f1;
+  border-color: #24b3af;
+  color: #0d625e;
+}
+
+.mk-actions-trigger:focus-visible {
+  outline: 2px solid #24b3af;
+  outline-offset: 2px;
+}
+
+.mk-actions-trigger svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+  stroke: none;
+  pointer-events: none;
+}
+
+.mk-actions-dropdown {
+  position: absolute;
+  inset-inline-end: 0;
+  top: calc(100% + 6px);
+  min-width: 185px;
+  max-width: 260px;
+  padding: 8px;
+  border: 1px solid #dfece9;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 14px 36px rgba(18, 61, 60, 0.16);
+  z-index: 80;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: right;
+  direction: rtl;
+  animation: mk-menu-pop 0.14s ease-out;
+}
+
+.mk-actions-dropdown[hidden] {
+  display: none !important;
+}
+
+.mk-actions-dropdown.is-dropup {
+  top: auto;
+  bottom: calc(100% + 6px);
+}
+
+/* Keep open row and card above neighboring rows without clipping */
+:root .main-content table tr.mk-has-open-menu {
+  position: relative;
+  z-index: 45;
+}
+
+:root .main-content .states-card:has(.mk-actions-menu.is-open),
+:root .main-content .partnership-card:has(.mk-actions-menu.is-open) {
+  overflow: visible !important;
+}
+
+:root .main-content .table-scroll.mk-scroll-unclipped {
+  overflow: visible !important;
+}
+
+/* Normalize every moved action link, button, or form inside the dropdown */
+.mk-actions-dropdown > form {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+:root .main-content .mk-actions-dropdown a,
+:root .main-content .mk-actions-dropdown button {
+  appearance: none;
+  box-sizing: border-box;
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  width: 100% !important;
+  min-height: 40px;
+  padding: 8px 12px !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 10px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #166a62 !important;
+  font-family: inherit;
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  line-height: 1.5;
+  text-align: right;
+  text-decoration: none !important;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.14s ease, color 0.14s ease;
+}
+
+:root .main-content .mk-actions-dropdown a:hover,
+:root .main-content .mk-actions-dropdown button:hover {
+  background: #edf9f6 !important;
+  color: #0e544e !important;
+}
+
+:root .main-content .mk-actions-dropdown a:focus-visible,
+:root .main-content .mk-actions-dropdown button:focus-visible {
+  outline: 2px solid #24b3af;
+  outline-offset: -2px;
+}
+
+:root .main-content .mk-actions-dropdown a svg,
+:root .main-content .mk-actions-dropdown button svg {
+  width: 17px !important;
+  height: 17px !important;
+  min-width: 17px;
+  min-height: 17px;
+  flex-shrink: 0;
+}
+
+/* Danger / delete items */
+:root .main-content .mk-actions-dropdown .delete-action,
+:root .main-content .mk-actions-dropdown .action-delete,
+:root .main-content .mk-actions-dropdown [class*="delete"] {
+  color: #ba3b46 !important;
+}
+
+:root .main-content .mk-actions-dropdown .delete-action:hover,
+:root .main-content .mk-actions-dropdown .action-delete:hover,
+:root .main-content .mk-actions-dropdown [class*="delete"]:hover {
+  background: #fef2f2 !important;
+  color: #991b1b !important;
+}
+
+/* Status pills if any are inside row-actions (e.g. market_needs) */
+:root .main-content .mk-actions-dropdown .record-status {
+  justify-content: flex-start;
+  border-radius: 10px !important;
+}
+
+.mk-actions-backdrop {
+  display: none;
+}
+
+@keyframes mk-menu-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Mobile responsive: bottom action sheet with backdrop (zero clipping, touch-friendly) */
+@media (max-width: 640px) {
+  .mk-actions-backdrop.is-open {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 48, 46, 0.36);
+    backdrop-filter: blur(2px);
+    z-index: 115;
+  }
+
+  .mk-actions-dropdown {
+    position: fixed !important;
+    inset-inline: 12px !important;
+    bottom: 12px !important;
+    top: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    width: auto !important;
+    max-height: 70vh;
+    overflow-y: auto;
+    padding: 12px;
+    border-radius: 18px;
+    box-shadow: 0 20px 60px rgba(12, 48, 46, 0.28);
+    z-index: 120;
+    gap: 6px;
+  }
+
+  :root .main-content .mk-actions-dropdown a,
+  :root .main-content .mk-actions-dropdown button {
+    min-height: 46px;
+    padding: 10px 14px !important;
+    font-size: 14.5px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-actions-trigger,
+  .mk-actions-dropdown,
+  :root .main-content .mk-actions-dropdown a,
+  :root .main-content .mk-actions-dropdown button {
+    transition: none;
+    animation: none;
+  }
+}
+
+@media print {
+  .mk-actions-menu,
+  .mk-actions-backdrop {
+    display: none !important;
+  }
+}

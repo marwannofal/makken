@@ -1,0 +1,245 @@
+(() => {
+  'use strict';
+  if (window.MakkenRowActionsMenu) return;
+
+  const DOTS_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>';
+  const ACTION_CONTAINER_SELECTOR = [
+    'table tbody td .row-actions',
+    'table tbody td .level-row-actions',
+    'table tbody td .entity-row-actions',
+    'table tbody td .region-row-actions',
+    'table tbody td .sector-row-actions',
+    'table tbody td .specialization-row-actions',
+    'table tbody td .expense-item-row-actions',
+    'table tbody td .program-row-actions',
+    'table tbody td .sponsorship-shape-row-actions',
+  ].join(', ');
+
+  let openMenu = null;
+  let backdrop = null;
+
+  function ensureBackdrop() {
+    if (backdrop) return backdrop;
+    backdrop = document.createElement('div');
+    backdrop.className = 'mk-actions-backdrop';
+    backdrop.setAttribute('aria-hidden', 'true');
+    backdrop.addEventListener('click', closeOpenMenu);
+    document.body.append(backdrop);
+    return backdrop;
+  }
+
+  function closeOpenMenu(returnFocus = false) {
+    if (!openMenu) return;
+    const {wrapper, trigger, dropdown, row, scroll} = openMenu;
+    dropdown.hidden = true;
+    dropdown.classList.remove('is-dropup');
+    wrapper.classList.remove('is-open');
+    trigger.setAttribute('aria-expanded', 'false');
+    if (row) row.classList.remove('mk-has-open-menu');
+    if (scroll) scroll.classList.remove('mk-scroll-unclipped');
+    if (backdrop) backdrop.classList.remove('is-open');
+    openMenu = null;
+    if (returnFocus && trigger.isConnected) {
+      trigger.focus({preventScroll: true});
+    }
+  }
+
+  function toggleMenu(entry) {
+    if (openMenu && openMenu.wrapper === entry.wrapper) {
+      closeOpenMenu(false);
+      return;
+    }
+    closeOpenMenu(false);
+    const {wrapper, trigger, dropdown, row, scroll} = entry;
+
+    // Flip upward if near the bottom of the viewport or in the last 2 rows of a 3+ row table
+    const tbody = row?.closest('tbody');
+    const allRows = tbody ? [...tbody.rows] : [];
+    const rowIndex = row ? allRows.indexOf(row) : -1;
+    const rect = trigger.getBoundingClientRect();
+    const nearViewportBottom = window.innerHeight - rect.bottom < 220;
+    const isBottomRow = allRows.length >= 3 && rowIndex >= allRows.length - 2;
+    dropdown.classList.toggle('is-dropup', nearViewportBottom || isBottomRow);
+
+    if (scroll && scroll.scrollWidth <= scroll.clientWidth + 2) {
+      scroll.classList.add('mk-scroll-unclipped');
+    }
+
+    dropdown.hidden = false;
+    wrapper.classList.add('is-open');
+    trigger.setAttribute('aria-expanded', 'true');
+    if (row) row.classList.add('mk-has-open-menu');
+    ensureBackdrop().classList.add('is-open');
+    openMenu = entry;
+  }
+
+  function collectActionNodes(container) {
+    return [...container.children].filter(node => {
+      if (node.matches('a, button, form')) return true;
+      return false;
+    });
+  }
+
+  function wrapContainer(container) {
+    if (!container || container.dataset.mkMenuEnhanced === '1') return;
+    if (container.closest('dialog, template, [data-ac-matrix], .mk-actions-menu')) return;
+
+    const nodes = collectActionNodes(container);
+    if (!nodes.length) return;
+
+    container.dataset.mkMenuEnhanced = '1';
+    const td = container.closest('td');
+    if (td) td.classList.add('mk-actions-cell');
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'mk-actions-menu';
+
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'mk-actions-trigger';
+    trigger.setAttribute('aria-haspopup', 'menu');
+    trigger.setAttribute('aria-expanded', 'false');
+    trigger.setAttribute('aria-label', 'خيارات الإجراء');
+    trigger.title = 'خيارات الإجراء';
+    trigger.innerHTML = DOTS_SVG;
+
+    const dropdown = document.createElement('div');
+    dropdown.className = 'mk-actions-dropdown';
+    dropdown.setAttribute('role', 'menu');
+    dropdown.hidden = true;
+
+    // Move live DOM nodes (preserving all event listeners, CSRF tokens, and form behavior)
+    nodes.forEach(node => {
+      node.setAttribute('role', 'menuitem');
+      dropdown.append(node);
+    });
+
+    wrapper.append(trigger, dropdown);
+    container.replaceWith(wrapper);
+
+    const entry = {
+      wrapper,
+      trigger,
+      dropdown,
+      row: wrapper.closest('tr'),
+      scroll: wrapper.closest('.table-scroll, .table-wrapper, .states-table-wrapper, .table-responsive'),
+    };
+
+    trigger.addEventListener('click', event => {
+      event.preventDefault();
+      event.stopPropagation();
+      toggleMenu(entry);
+    });
+
+    dropdown.addEventListener('click', event => {
+      event.stopPropagation();
+      const clickedAction = event.target.closest('a, button');
+      if (clickedAction) {
+        // Close menu cleanly after triggering link/modal/form action
+        closeOpenMenu(false);
+      }
+    });
+  }
+
+  function enhanceDirectActionCell(td) {
+    if (!td || td.dataset.mkMenuEnhanced === '1') return;
+    if (td.closest('dialog, template, [data-ac-matrix]')) return;
+    if (td.querySelector('.mk-actions-menu')) return;
+    const nodes = collectActionNodes(td);
+    if (!nodes.length) return;
+
+    td.dataset.mkMenuEnhanced = '1';
+    td.classList.add('mk-actions-cell');
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'mk-actions-menu';
+
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'mk-actions-trigger';
+    trigger.setAttribute('aria-haspopup', 'menu');
+    trigger.setAttribute('aria-expanded', 'false');
+    trigger.setAttribute('aria-label', 'خيارات الإجراء');
+    trigger.title = 'خيارات الإجراء';
+    trigger.innerHTML = DOTS_SVG;
+
+    const dropdown = document.createElement('div');
+    dropdown.className = 'mk-actions-dropdown';
+    dropdown.setAttribute('role', 'menu');
+    dropdown.hidden = true;
+
+    nodes.forEach(node => {
+      node.setAttribute('role', 'menuitem');
+      dropdown.append(node);
+    });
+
+    wrapper.append(trigger, dropdown);
+    td.append(wrapper);
+
+    const entry = {
+      wrapper,
+      trigger,
+      dropdown,
+      row: wrapper.closest('tr'),
+      scroll: wrapper.closest('.table-scroll, .table-wrapper, .states-table-wrapper, .table-responsive'),
+    };
+
+    trigger.addEventListener('click', event => {
+      event.preventDefault();
+      event.stopPropagation();
+      toggleMenu(entry);
+    });
+
+    dropdown.addEventListener('click', event => {
+      event.stopPropagation();
+      const clickedAction = event.target.closest('a, button');
+      if (clickedAction) {
+        closeOpenMenu(false);
+      }
+    });
+  }
+
+  function enhanceAll(root = document) {
+    const main = root.querySelector?.('#main-content') || root;
+    if (!main || !main.querySelectorAll) return;
+    main.querySelectorAll(ACTION_CONTAINER_SELECTOR).forEach(wrapContainer);
+    main.querySelectorAll('table tbody td.action-cell').forEach(enhanceDirectActionCell);
+  }
+
+  document.addEventListener('click', event => {
+    if (openMenu && !openMenu.wrapper.contains(event.target)) {
+      closeOpenMenu(false);
+    }
+  });
+
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && openMenu) {
+      event.preventDefault();
+      closeOpenMenu(true);
+    }
+  });
+
+  window.addEventListener('resize', () => closeOpenMenu(false));
+
+  window.MakkenRowActionsMenu = {enhanceAll, closeOpenMenu};
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => enhanceAll(document));
+  } else {
+    enhanceAll(document);
+  }
+
+  let queued = false;
+  new MutationObserver(records => {
+    if (queued) return;
+    const relevant = records.some(r => [...r.addedNodes].some(
+      n => n.nodeType === 1 && (n.matches?.('tr, td, .row-actions') || n.querySelector?.('.row-actions, td.action-cell'))
+    ));
+    if (!relevant) return;
+    queued = true;
+    requestAnimationFrame(() => {
+      queued = false;
+      enhanceAll(document);
+    });
+  }).observe(document.documentElement, {childList: true, subtree: true});
+})();
