@@ -29,6 +29,7 @@
       <thead>
         <tr>
           <th scope="col">الإدارة أو الوحدة</th>
+          <th scope="col">نوع الإدارة</th>
           <th scope="col">حالة السجل</th>
           <th scope="col" class="action-cell">الإجراء</th>
         </tr>
@@ -37,6 +38,7 @@
         {% for entry in row_items %}
           <tr>
             <th scope="row"><bdi class="level-name">{{ entry.item.name }}</bdi></th>
+            <td><span class="subtle-badge">{{ entry.item.get_kind_display }}</span></td>
             <td>
               {% if can_toggle %}
                 <form method="post" action="{% url 'accounts:departments' %}">
@@ -67,7 +69,7 @@
           </tr>
         {% empty %}
           <tr>
-            <td colspan="3">
+            <td colspan="4">
               <div class="levels-empty">
                 <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 21h18M5 21V6l7-3 7 3v15M9 9h1m4 0h1m-6 4h1m4 0h1M10 21v-5h4v5"/></svg>
                 {% if settings_filter_active %}

@@ -26,9 +26,10 @@ PERMISSIONS = {'add': 'create', 'edit': 'edit', 'toggle': 'change_status', 'dele
 class DepartmentForm(forms.ModelForm):
     class Meta:
         model = Department
-        fields = ['name']
+        fields = ['name', 'kind']
         widgets = {
             'name': forms.TextInput(attrs={'maxlength': '200', 'placeholder': 'أدخل اسم الإدارة أو الوحدة', 'autofocus': True}),
+            'kind': forms.Select(),
         }
 
     def clean_name(self):

@@ -3,9 +3,20 @@ from django.db import models
 from expense_items.models import normalize_name, validate_name
 
 
+class DepartmentKind(models.TextChoices):
+    DEPARTMENT = 'department', 'إدارات المؤسسة'
+    UNIT = 'unit', 'وحدات المؤسسة'
+
+
 class Department(models.Model):
     name = models.CharField('اسم الإدارة أو الوحدة', max_length=200, validators=[validate_name])
     name_key = models.CharField(max_length=600, editable=False)
+    kind = models.CharField(
+        'نوع الإدارة',
+        max_length=16,
+        choices=DepartmentKind.choices,
+        default=DepartmentKind.DEPARTMENT,
+    )
     is_active = models.BooleanField('نشط', default=True)
     revision = models.PositiveIntegerField(default=1, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)

@@ -206,6 +206,7 @@ def build_achievement_report(actor, params):
         'administrative_regions',
         'offerings__sector',
         'offerings__specializations',
+        'partnership_status',
         'agreements__details__status',
     )
 
@@ -228,7 +229,8 @@ def build_achievement_report(actor, params):
     elif selected_status.startswith('dev:'):
         qs = qs.filter(development_state_id=selected_status.split(':', 1)[1])
     elif selected_status.startswith('agr:'):
-        qs = qs.filter(agreements__details__status_id=int(selected_status.split(':', 1)[1]))
+        sid = int(selected_status.split(':', 1)[1])
+        qs = qs.filter(Q(partnership_status_id=sid) | Q(agreements__details__status_id=sid))
     if q:
         qs = qs.filter(Q(name__icontains=q) | Q(representative__icontains=q))
 
@@ -274,9 +276,12 @@ def build_achievement_report(actor, params):
             sp.name for o in p.offerings.all() for sp in o.specializations.all()
         })
         agr_status_names = sorted({
-            agr.details.status.name
-            for agr in agreements
-            if getattr(agr, 'details', None) and agr.details.status_id
+            *([p.partnership_status.name] if p.partnership_status_id else []),
+            *(
+                agr.details.status.name
+                for agr in agreements
+                if getattr(agr, 'details', None) and agr.details.status_id
+            ),
         })
         dev_label = p.development_state.get_state_display() if p.development_state_id else '—'
         active_label = 'نشطة' if p.is_active else 'غير نشطة'

@@ -103,6 +103,23 @@ class Partnership(models.Model):
     signed_on = models.DateField("تاريخ التوقيع (بداية الشراكة)", null=True, blank=True)
     duration_months = models.PositiveSmallIntegerField("مدة الاتفاقية (بالأشهر)", null=True, blank=True, validators=[MinValueValidator(1), MaxValueValidator(600)])
     renewal_rule = models.CharField("نوع التجديد", max_length=16, choices=RenewalRule.choices, blank=True, default="")
+    partnership_status = models.ForeignKey(
+        "agreement_clauses.AgreementOption",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="status_partnerships",
+        limit_choices_to={"kind": "status"},
+        verbose_name="حالة الشراكة",
+    )
+    responsible_employee = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="responsible_partnerships",
+        verbose_name="الموظف المسؤول عن الاتفاقية",
+    )
     objective = models.TextField("هدف الشراكة", max_length=2000, blank=True, default="")
     announcement = models.TextField("خبر عن الشراكة", max_length=2000, blank=True, default="")
     audience = models.TextField("الفئات المستهدفة", max_length=2000, blank=True, default="")

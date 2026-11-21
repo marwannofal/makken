@@ -49,6 +49,7 @@ from .willingness_workflow import (
     parse_teams_payload,
     save_partnership_clauses,
     save_partnership_departments,
+    sync_responsible_employee_work,
     save_partnership_teams,
     serialize_details,
 )
@@ -185,6 +186,7 @@ def _save(payload, user):
             apply_willingness_details(item, payload["details"])
             item.save()
             save_partnership_departments(item, payload["details"])
+            sync_responsible_employee_work(item, user)
         if item.development_state_id == DevelopmentState.WILLINGNESS:
             item.ensure_agreement_number()
         if "clauses" in payload and payload["clauses"] is not None:
@@ -289,6 +291,7 @@ def editor(request, pk=None, initial_state=DevelopmentState.CAPABILITY):
                         save_partnership_clauses(new_item, parsed_clauses, request.user, allow_progress=False)
                         save_partnership_teams(new_item, parsed_teams)
                         create_partnership_work(request.user, work_form.cleaned_data, new_item)
+                        sync_responsible_employee_work(new_item, request.user)
                     messages.success(request, "تم إنشاء الشراكة في حالة رغبة وحفظ المرفقات وبنود الاتفاقية وإسناد العمل بنجاح.")
                     return add_login_headers(_redirect_to_list_with_highlight(request, new_item, return_to="willingness"))
                 else:
@@ -502,6 +505,7 @@ def index(request, fixed_state=None):
                         save_partnership_clauses(item, parsed_clauses, request.user, allow_progress=False)
                         save_partnership_teams(item, parsed_teams)
                         create_partnership_work(request.user, work_form.cleaned_data, item)
+                        sync_responsible_employee_work(item, request.user)
                         message = "تم حفظ المرفقات وبنود الاتفاقية وإسناد العمل وتحويل الجهة إلى رغبة بنجاح."
                     elif data["operation"] == "delete":
                         item.delete()

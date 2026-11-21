@@ -40,6 +40,20 @@
         </div>
       </div>
       <div class="partnership-field">
+        <label for="{{ details_form.partnership_status.id_for_label }}">{{ details_form.partnership_status.label }}</label> {{ details_form.partnership_status }}
+        <p class="field-help">يمكنك إضافة أو تعديل الحالات من <a href="{% url 'agreement_clauses:references' %}?kind=status" target="_blank" rel="noopener">قائمة حالات الشراكة</a>.</p>
+        <div class="field-error" role="alert">
+          {{ details_form.partnership_status.errors }}
+        </div>
+      </div>
+      <div class="partnership-field">
+        <label for="{{ details_form.responsible_employee.id_for_label }}">{{ details_form.responsible_employee.label }}</label> {{ details_form.responsible_employee }}
+        <p class="field-help">يُربط الموظف المسؤول تلقائيًا بالشراكة لتنبيهه ومتابعتها.</p>
+        <div class="field-error" role="alert">
+          {{ details_form.responsible_employee.errors }}
+        </div>
+      </div>
+      <div class="partnership-field">
         <label for="{{ details_form.signing_region.id_for_label }}">{{ details_form.signing_region.label }}</label> {{ details_form.signing_region }}
         <div class="field-error" role="alert">
           {{ details_form.signing_region.errors }}

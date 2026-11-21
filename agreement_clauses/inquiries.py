@@ -289,7 +289,7 @@ def apply_inquiry_filters(queryset, cleaned):
         ).filter(
             Q(employee=employee) | Q(manager=employee) | Q(assignees=employee)
         )
-        queryset = queryset.filter(Exists(emp_work))
+        queryset = queryset.filter(Exists(emp_work) | Q(responsible_employee=employee))
 
     clause_stats = (
         ClauseAssignment.objects.filter(partnership_id=OuterRef('pk'), agreement__isnull=True)
@@ -347,6 +347,8 @@ def _serialize_row(partnership, works_by_pk):
         'departments': list(partnership.concerned_departments.all()),
         'partnership_type': partnership.partnership_type.name if partnership.partnership_type else (partnership.get_preliminary_agreement_type_display() if partnership.preliminary_agreement_type else ''),
         'classification': partnership.agreement_classification.name if partnership.agreement_classification else '',
+        'partnership_status': partnership.partnership_status.name if partnership.partnership_status else '',
+        'responsible_employee': (partnership.responsible_employee.get_full_name() or partnership.responsible_employee.get_username()) if partnership.responsible_employee else '',
         'teams': teams,
         'contacts': contacts,
         'representatives': reps,
@@ -408,7 +410,7 @@ def agreement_inquiries(request):
     }
 
     ordered = filtered.select_related(
-        'entity', 'partnership_type', 'agreement_classification', 'signing_region'
+        'entity', 'partnership_type', 'partnership_status', 'responsible_employee', 'agreement_classification', 'signing_region'
     ).prefetch_related(
         'administrative_regions',
         'concerned_departments',
@@ -428,7 +430,7 @@ def agreement_inquiries(request):
     if detail_id := request.GET.get('detail', '').strip():
         if detail_id.isascii() and detail_id.isdigit() and len(detail_id) < 19:
             detail_obj = get_object_or_404(
-                base.select_related('entity', 'partnership_type', 'agreement_classification', 'signing_region').prefetch_related(
+                base.select_related('entity', 'partnership_type', 'partnership_status', 'responsible_employee', 'agreement_classification', 'signing_region').prefetch_related(
                     'administrative_regions',
                     'concerned_departments',
                     'team_members',

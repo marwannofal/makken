@@ -7,7 +7,7 @@ from django.core.validators import validate_email
 from django.db.models import Q
 
 from accounts.models import Department
-from agreement_clauses.models import AgreementClassification, AgreementClause, ClauseAssignment, Responsibility
+from agreement_clauses.models import AgreementClassification, AgreementClause, AgreementOption, ClauseAssignment, OptionKind, Responsibility
 from makken_mail.forms import PeopleField, PersonField, SELECT, active_users
 from makken_mail.models import WorkAssignment
 from makken_mail.work import record_update
@@ -31,6 +31,8 @@ DETAIL_FIELDS = (
     'signed_on',
     'duration_months',
     'renewal_rule',
+    'partnership_status',
+    'responsible_employee',
     'agreement_classification',
     'concerned_departments',
     'headquarters_city',
@@ -41,6 +43,11 @@ DETAIL_FIELDS = (
     'audience',
     'expected_results',
 )
+
+
+class DepartmentMultiField(forms.ModelMultipleChoiceField):
+    def label_from_instance(self, obj):
+        return f'{obj.name} ({obj.get_kind_display()})'
 
 
 class WillingnessDetailsForm(forms.Form):
@@ -57,9 +64,11 @@ class WillingnessDetailsForm(forms.Form):
     duration_months = forms.IntegerField(label='مدة الاتفاقية (بالأشهر)', min_value=1, max_value=600, required=False, widget=forms.NumberInput(attrs={'min': '1', 'max': '600', 'placeholder': 'مثال: 12 أو 24', 'data-duration-months': ''}))
     partnership_type = forms.ModelChoiceField(label='نوع الشراكة', queryset=PartnershipType.objects.none(), required=False, empty_label='اختر نوع الشراكة')
     renewal_rule = forms.ChoiceField(label='نوع التجديد', choices=[('', 'اختر نوع التجديد'), *RenewalRule.choices], required=False)
+    partnership_status = forms.ModelChoiceField(label='حالة الشراكة', queryset=AgreementOption.objects.none(), required=False, empty_label='اختر حالة الشراكة')
+    responsible_employee = PersonField(label='الموظف المسؤول عن الاتفاقية (الإدارة العامة للتشاركية)', queryset=User.objects.none(), required=False, empty_label='اختر الموظف المسؤول')
     signing_region = forms.ModelChoiceField(label='منطقة التوقيع', queryset=Region.objects.none(), required=False, empty_label='اختر منطقة التوقيع')
     agreement_classification = forms.ModelChoiceField(label='تصنيف الاتفاقية', queryset=AgreementClassification.objects.none(), required=False, empty_label='اختر تصنيف الاتفاقية')
-    concerned_departments = forms.ModelMultipleChoiceField(label='الإدارة المعنية', queryset=Department.objects.none(), required=False, widget=forms.SelectMultiple(attrs={**SELECT, 'data-label': 'الإدارة المعنية'}), help_text='يمكنك اختيار إدارة واحدة أو أكثر.')
+    concerned_departments = DepartmentMultiField(label='الإدارة المعنية', queryset=Department.objects.none(), required=False, widget=forms.SelectMultiple(attrs={**SELECT, 'data-label': 'الإدارة المعنية'}), help_text='يمكنك اختيار إدارة واحدة أو أكثر (تُعرض مع نوعها: إدارات المؤسسة / وحدات المؤسسة).')
     headquarters_city = forms.CharField(label='عنوان الجهة (مدينة المقر)', max_length=120, required=False, widget=forms.TextInput(attrs={'placeholder': 'أدخل مدينة المقر'}))
     signing_city = forms.CharField(label='مدينة التوقيع', max_length=120, required=False, widget=forms.TextInput(attrs={'placeholder': 'أدخل مدينة التوقيع'}))
 
@@ -68,8 +77,12 @@ class WillingnessDetailsForm(forms.Form):
         cur_type_id = partnership.partnership_type_id if partnership and partnership.pk else None
         cur_reg_id = partnership.signing_region_id if partnership and partnership.pk else None
         cur_cls_id = partnership.agreement_classification_id if partnership and partnership.pk else None
+        cur_status_id = partnership.partnership_status_id if partnership and partnership.pk else None
+        cur_emp_id = partnership.responsible_employee_id if partnership and partnership.pk else None
         cur_dept_ids = list(partnership.concerned_departments.values_list('pk', flat=True)) if partnership and partnership.pk else []
         self.fields['partnership_type'].queryset = PartnershipType.objects.filter(Q(is_active=True) | Q(pk=cur_type_id)).order_by('id')
+        self.fields['partnership_status'].queryset = AgreementOption.objects.filter(kind=OptionKind.STATUS).filter(Q(is_active=True) | Q(pk=cur_status_id)).order_by('id')
+        self.fields['responsible_employee'].queryset = User.objects.filter(Q(is_active=True) | Q(pk=cur_emp_id)).order_by('first_name', 'last_name', 'username')
         self.fields['signing_region'].queryset = Region.objects.filter(Q(is_active=True) | Q(pk=cur_reg_id)).order_by('id')
         self.fields['agreement_classification'].queryset = AgreementClassification.objects.filter(Q(is_active=True) | Q(pk=cur_cls_id)).order_by('id')
         self.fields['concerned_departments'].queryset = Department.objects.filter(Q(is_active=True) | Q(pk__in=cur_dept_ids)).order_by('id')
@@ -86,7 +99,7 @@ def details_initial(partnership):
     for field in DETAIL_FIELDS:
         if field == 'concerned_departments':
             out[field] = list(partnership.concerned_departments.values_list('pk', flat=True))
-        elif field in {'partnership_type', 'signing_region', 'agreement_classification'}:
+        elif field in {'partnership_type', 'partnership_status', 'responsible_employee', 'signing_region', 'agreement_classification'}:
             out[field] = getattr(partnership, f'{field}_id')
         else:
             val = getattr(partnership, field)
@@ -104,7 +117,7 @@ def serialize_details(cleaned):
             out[field] = val if val is not None else None
         elif field == 'concerned_departments':
             out[field] = [d.pk if hasattr(d, 'pk') else int(d) for d in (val or [])]
-        elif field in {'partnership_type', 'signing_region', 'agreement_classification'}:
+        elif field in {'partnership_type', 'partnership_status', 'responsible_employee', 'signing_region', 'agreement_classification'}:
             out[field] = val.pk if hasattr(val, 'pk') else (int(val) if val else None)
         else:
             out[field] = val or ''
@@ -128,6 +141,12 @@ def apply_willingness_details(partnership, cleaned_or_serialized, *, skip_partne
         if field == 'agreement_classification':
             partnership.agreement_classification_id = val.pk if hasattr(val, 'pk') else (int(val) if val else None)
             continue
+        if field == 'partnership_status':
+            partnership.partnership_status_id = val.pk if hasattr(val, 'pk') else (int(val) if val else None)
+            continue
+        if field == 'responsible_employee':
+            partnership.responsible_employee_id = val.pk if hasattr(val, 'pk') else (int(val) if val else None)
+            continue
         if field == 'signed_on':
             if isinstance(val, str):
                 val = date.fromisoformat(val) if val else None
@@ -139,6 +158,43 @@ def apply_willingness_details(partnership, cleaned_or_serialized, *, skip_partne
         else:
             val = (val or '').strip()
         setattr(partnership, field, val)
+    # Keep starts_on/ends_on synchronized with signed_on + calculated_expiry when term dates are unset
+    expiry = partnership.calculated_expiry
+    if partnership.signed_on and expiry and (not partnership.ends_on or not partnership.starts_on):
+        partnership.starts_on = partnership.signed_on
+        partnership.ends_on = expiry
+
+
+def sync_responsible_employee_work(partnership, actor):
+    """Ensure an open WorkAssignment links partnership.responsible_employee to this partnership."""
+    emp = partnership.responsible_employee if partnership and partnership.pk else None
+    if not emp or not emp.is_active:
+        return None
+    existing = WorkAssignment.objects.filter(
+        target_model='partnerships.partnership',
+        target_key=partnership.pk,
+    ).filter(Q(employee_id=emp.pk) | Q(assignees__id=emp.pk)).first()
+    if existing:
+        return existing
+    manager = actor if actor and actor.pk and actor.pk != emp.pk else (
+        User.objects.filter(is_active=True, is_superuser=True).exclude(pk=emp.pk).order_by('pk').first()
+        or User.objects.filter(is_active=True, is_staff=True).exclude(pk=emp.pk).order_by('pk').first()
+    )
+    if not manager:
+        return None
+    work = WorkAssignment.objects.create(
+        created_by=actor if actor and actor.pk else manager,
+        title=f'متابعة الشراكة: {partnership.name}'[:160],
+        instructions='تم إنشاء هذا الإسناد تلقائيًا عند تحديد الموظف المسؤول عن الاتفاقية.',
+        employee=emp,
+        manager=manager,
+        due_on=partnership.calculated_expiry or partnership.ends_on,
+        target_model='partnerships.partnership',
+        target_key=partnership.pk,
+    )
+    work.assignees.set([emp])
+    record_update(work, actor if actor and actor.pk else manager, 'created', None)
+    return work
 
 
 def save_partnership_departments(partnership, cleaned_or_serialized):
