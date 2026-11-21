@@ -157,7 +157,15 @@
       cpPartner.textContent = data.agreement_number && data.agreement_number !== '—'
         ? `${data.partnership_name} (${data.agreement_number})`
         : data.partnership_name;
+      function paintOverallBadge(valText) {
+        const pill = cpDialog.querySelector('[data-cp-overall-pill]');
+        if (!pill) return;
+        const num = parseFloat(String(valText || '0').replace(/[^0-9.]/g, '')) || 0;
+        pill.classList.toggle('is-high', num >= 50);
+        pill.classList.toggle('is-low', num < 50);
+      }
       cpOverall.textContent = data.overall_display || '—';
+      paintOverallBadge(cpOverall.textContent);
       if (data.followup_updated_at_display) {
         cpUpdatedAt.textContent = data.followup_updated_at_display;
         cpUpdatedBy.textContent = data.followup_updated_by_name || '';
@@ -203,6 +211,13 @@
           bar.value = Math.max(0, Math.min(100, Number(item.progress) || 0));
           input.addEventListener('input', () => {
             bar.value = Math.max(0, Math.min(100, Number(input.value) || 0));
+            const allInputs = [...cpList.querySelectorAll('input[data-cp-assignment-id]')];
+            if (allInputs.length) {
+              const avg = allInputs.reduce((s, el) => s + Math.max(0, Math.min(100, Number(el.value) || 0)), 0) / allInputs.length;
+              const formatted = (Number.isInteger(avg) ? String(avg) : avg.toFixed(2).replace(/\.00$/, '')) + '%';
+              cpOverall.textContent = formatted;
+              paintOverallBadge(formatted);
+            }
           });
 
           const extras = make('div', 'mk-cp-extras');

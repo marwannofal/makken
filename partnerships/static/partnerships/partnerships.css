@@ -1432,3 +1432,50 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+/* Bigger, bold, color-coded overall progress & last-updated pills */
+.mk-cp-badges {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.mk-cp-pill-overall {
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  padding: 10px 18px !important;
+  border-radius: 12px !important;
+  border-width: 1.5px !important;
+  border-style: solid !important;
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+
+.mk-cp-pill-overall strong {
+  font-size: 18px;
+  font-weight: 900;
+  margin-inline-start: 4px;
+}
+
+.mk-cp-pill-overall.is-low {
+  background: #feeceb !important;
+  border-color: #f3a6a2 !important;
+  color: #b42318 !important;
+}
+
+.mk-cp-pill-overall.is-high {
+  background: #e6f7ee !important;
+  border-color: #6bc497 !important;
+  color: #146c43 !important;
+}
+
+.mk-cp-pill-updated {
+  font-size: 14.5px !important;
+  font-weight: 700 !important;
+  padding: 10px 16px !important;
+  border-radius: 12px !important;
+  background: #e4f1f8 !important;
+  border: 1.5px solid #8ebcd4 !important;
+  color: #003954 !important;
+}
