@@ -119,7 +119,7 @@ class AgreementInquiryForm(forms.Form):
         label='سنة الشراكة',
         required=False,
         max_length=10,
-        widget=forms.TextInput(attrs={'inputmode': 'numeric', 'placeholder': 'مثال: 2026', 'dir': 'ltr'}),
+        widget=forms.NumberInput(attrs={'min': '1900', 'max': '2100', 'step': '1', 'inputmode': 'numeric', 'placeholder': 'مثال: 2026', 'dir': 'ltr'}),
     )
     region = forms.ModelChoiceField(
         label='المنطقة',
@@ -170,13 +170,13 @@ class AgreementInquiryForm(forms.Form):
         label='نسبة الإنجاز من (%)',
         required=False,
         max_length=10,
-        widget=forms.TextInput(attrs={'inputmode': 'decimal', 'placeholder': '0', 'dir': 'ltr'}),
+        widget=forms.NumberInput(attrs={'min': '0', 'max': '100', 'step': 'any', 'inputmode': 'decimal', 'placeholder': '0', 'dir': 'ltr'}),
     )
     progress_max = forms.CharField(
         label='نسبة الإنجاز إلى (%)',
         required=False,
         max_length=10,
-        widget=forms.TextInput(attrs={'inputmode': 'decimal', 'placeholder': '100', 'dir': 'ltr'}),
+        widget=forms.NumberInput(attrs={'min': '0', 'max': '100', 'step': 'any', 'inputmode': 'decimal', 'placeholder': '100', 'dir': 'ltr'}),
     )
 
     def __init__(self, *args, regions, departments, employees, **kwargs):
@@ -390,7 +390,7 @@ def agreement_inquiries(request):
         filtered = apply_inquiry_filters(base, {})
 
     # Compute KPI statistics across ALL matching partnerships (US-18 stats for year, region, employee, etc.)
-    stat_rows = list(filtered.values_list('pk', 'clause_count_ann', 'clause_sum_ann'))
+    stat_rows = [] if filter_error else list(filtered.values_list('pk', 'clause_count_ann', 'clause_sum_ann'))
     total_count = len(stat_rows)
     total_clauses = sum((c or 0) for _, c, _ in stat_rows)
     pct_values = [mean_progress(s or 0, c or 0) for _, c, s in stat_rows if c]

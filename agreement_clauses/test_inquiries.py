@@ -156,3 +156,13 @@ class UnifiedPartnershipInquiryUS18Tests(TestCase):
         self.assertContains(d, 'id="inquiry-detail"')
         self.assertContains(d, 'د. ماجد الدوسري')
         self.assertNotContains(d, 'بطاقة المتابعة')
+
+    def test_invalid_numeric_filters_return_400_instead_of_500(self):
+        self.client.force_login(self.admin)
+        url = reverse('partnerships:agreement_inquiries')
+        res = self.client.get(url, {'progress_min': '1', 'progress_max': '/'})
+        self.assertEqual(res.status_code, 400)
+        self.assertTrue(res.context['filter_error'])
+        res_yr = self.client.get(url, {'year': 'abc'})
+        self.assertEqual(res_yr.status_code, 400)
+        self.assertContains(res_yr, 'type="number"', status_code=400)

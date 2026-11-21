@@ -28,7 +28,7 @@
         <h2 id="inquiry-filters-heading">معايير البحث والتصفية</h2> <p class="muted">تُطبّق جميع المعايير المحددة معًا (تقاطع الشروط) ضمن نطاق المناطق المسموح لك بها.</p>
       </div>
     </header>
-    <form method="get" action="{% url 'partnerships:agreement_inquiries' %}" class="inquiry-form" role="search" novalidate>
+    <form method="get" action="{% url 'partnerships:agreement_inquiries' %}" class="inquiry-form" role="search">
       <div class="inquiry-grid">
         <div class="inquiry-field">
           <label for="{{ form.q.id_for_label }}">{{ form.q.label }}</label> {{ form.q }} {{ form.q.errors }}
