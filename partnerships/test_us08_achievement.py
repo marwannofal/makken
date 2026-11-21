@@ -113,6 +113,7 @@ class PartnershipAchievementUS08Tests(TestCase):
         res = self.client.get(url)
         self.assertEqual(res.status_code, 200)
         self.assertNotContains(res, '<th scope="col">عدد الاتفاقيات</th>', html=True)
+        self.assertNotContains(res, '<th scope="col">الاتفاقيات</th>', html=True)
         rep = res.context['report']
         self.assertEqual(rep['totals']['partnership_count'], 2)
         self.assertEqual(rep['totals']['completed_count'], 1)

@@ -197,7 +197,6 @@
           <th scope="col">القطاعات</th>
           <th scope="col">الأنشطة / التخصصات</th>
           <th scope="col">الحالة</th>
-          <th scope="col">الاتفاقيات</th>
           <th scope="col">البنود</th>
           <th scope="col">نسبة الإنجاز</th>
         </tr>
@@ -216,13 +215,12 @@
             <span class="ach-status{% if row.is_active %} is-active{% endif %}">{{ row.status_label }}</span>
             {% if row.agreement_statuses_label != '—' %}<small>{{ row.agreement_statuses_label }}</small>{% endif %}
           </td>
-          <td><bdi>{{ row.agreement_count }}</bdi></td>
           <td><bdi>{{ row.clause_count }}</bdi></td>
           <td><span class="ach-pct{% if row.progress >= 100 %} is-full{% endif %}"><bdi>{{ row.progress }}%</bdi></span></td>
         </tr>
         {% empty %}
         <tr>
-          <td colspan="9">لا توجد شراكات مطابقة لمعايير التقرير ضمن نطاقك.</td>
+          <td colspan="8">لا توجد شراكات مطابقة لمعايير التقرير ضمن نطاقك.</td>
         </tr>
         {% endfor %}
       </tbody>
@@ -230,7 +228,6 @@
       <tfoot>
         <tr>
           <th scope="row" colspan="6">الإجمالي / المتوسط العام</th>
-          <td><strong><bdi>{{ report.totals.agreement_count }}</bdi></strong></td>
           <td><strong><bdi>{{ report.totals.clause_count }}</bdi></strong></td>
           <td><strong><bdi>{{ report.totals.avg_progress }}%</bdi></strong></td>
         </tr>
