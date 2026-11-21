@@ -224,7 +224,7 @@
                     <th scope="col">الموظفون المسند إليهم</th>
                     <th scope="col">المشرف / المدير</th>
                     <th scope="col">الحالة والإنجاز</th>
-                    <th scope="col">الإجراء</th>
+                    {% if can_edit_work %}<th scope="col">الإجراء</th>{% endif %}
                   </tr>
                 </thead>
                 <tbody>
@@ -240,15 +240,19 @@
                       </td>
                       <td data-work-manager>{{ wk.manager.get_full_name|default:wk.manager.username }}</td>
                       <td data-work-status>{{ wk.get_status_display }} ({{ wk.progress }}%){% if wk.is_overdue %} <span class="subtle-badge is-overdue-badge">متأخرة</span>{% endif %}</td>
-                      <td><button type="button" class="row-action" data-edit-work-url="{% url 'partnerships:work_edit' item.pk wk.pk %}" data-edit-work-row="{{ wk.pk }}">عرض / تعديل</button></td>
+                      {% if can_edit_work %}<td><button type="button" class="row-action" data-edit-work-url="{% url 'partnerships:work_edit' item.pk wk.pk %}" data-edit-work-row="{{ wk.pk }}">عرض / تعديل</button></td>{% endif %}
                     </tr>
                   {% endfor %}
                 </tbody>
               </table>
             </div>
+          {% elif not can_create_work %}
+            <p class="field-help">لا توجد مهام مسندة لهذه الشراكة حاليًا.</p>
           {% endif %}
-          <p class="field-help">إسناد مهمة جديدة (اختياري عند التعديل — املأ الحقول أدناه فقط لإضافة مهمة جديدة مع حفظ الشراكة):</p>
-          {% include "partnerships/_work_section.html" with work_optional=True %}
+          {% if can_create_work %}
+            <p class="field-help">إسناد مهمة جديدة (اختياري عند التعديل — املأ الحقول أدناه فقط لإضافة مهمة جديدة مع حفظ الشراكة):</p>
+            {% include "partnerships/_work_section.html" with work_optional=True %}
+          {% endif %}
         </div>
       </details>
       {% include "partnerships/_willingness_details_sections.html" with num_term="05" num_signatories="06" num_teams="07" num_content="08" open_details=False %}
@@ -313,6 +317,7 @@
       </div>
     </div>
   </dialog>
+  {% if can_edit_work %}
   <dialog id="partnership-work-dialog" class="partnership-dialog offering-dialog" aria-labelledby="work-dialog-title">
     <form class="dialog-body" data-work-edit-form>
       <div class="dialog-top">
@@ -357,6 +362,7 @@
       </div>
     </form>
   </dialog>
+  {% endif %}
   {{ catalog|json_script:"partnership-catalog" }}{{ drafts|json_script:"partnership-drafts" }}{{ clause_catalog_data|json_script:"clause-catalog-data" }}
   {% include "partnerships/_dialogs.html" %}
 {% endblock %}

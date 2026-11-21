@@ -238,6 +238,10 @@ def editor(request, pk=None, initial_state=DevelopmentState.CAPABILITY):
         else ("إضافة جهة لسجل الشراكات المحتملة التي لها الرغبة" if is_will_create else "إضافة جهة لسجل الشراكات المحتملة التي لها القدرة")
     )
     active_nav = "partnerships_willingness" if is_will_create else "partnership_editor"
+    from access_control.policy import for_request as _policy_for_request
+    _req_policy = _policy_for_request(request)
+    can_create_work = bool(request.user.is_superuser or _req_policy.can("work_assignments", "create"))
+    can_edit_work = bool(request.user.is_superuser or _req_policy.can("work_assignments", "edit"))
     context = _base(request, heading, active_nav)
     status, pending = 200, None
     return_to = "willingness" if (request.GET.get("from") == "willingness" or is_will_create or (item and item.development_state_id == DevelopmentState.WILLINGNESS)) else "capability"
@@ -340,7 +344,7 @@ def editor(request, pk=None, initial_state=DevelopmentState.CAPABILITY):
                             teams_error = " ".join(exc.messages)
                     work_valid = True
                     work_payload = None
-                    if show_edit_clauses:
+                    if show_edit_clauses and can_create_work:
                         has_work_input = any(
                             (request.POST.get(k) or "").strip()
                             for k in ("work-title", "work-manager", "work-due_on", "work-instructions")
@@ -416,11 +420,13 @@ def editor(request, pk=None, initial_state=DevelopmentState.CAPABILITY):
         )
         for _wk in existing_works:
             _wk.is_overdue = is_work_overdue(_wk, today_riyadh)
-        if work_form is None:
+        if work_form is None and can_create_work:
             work_form = PartnershipWorkForm(actor=request.user, prefix="work", optional=True)
     back_url = reverse("partnerships:willingness_index") if return_to == "willingness" else reverse("partnerships:capability_index")
     context.update(
         existing_works=existing_works,
+        can_create_work=can_create_work,
+        can_edit_work=can_edit_work,
         item=item,
         form=form,
         snapshot=snapshot,
@@ -946,6 +952,9 @@ def download_clause_evidence(request, pk, evidence_id):
 @login_required(login_url="accounts:login")
 @require_http_methods(["GET", "POST"])
 def work_assignment_edit(request, pk, work_pk):
+    from access_control.policy import for_request as _policy_for_request
+    if not (request.user.is_superuser or _policy_for_request(request).can("work_assignments", "edit")):
+        return add_login_headers(JsonResponse({"error": "لا تملك صلاحية تعديل المهام المسندة."}, status=403))
     from datetime import date
     from django.contrib.auth import get_user_model
     from django.db.models import F

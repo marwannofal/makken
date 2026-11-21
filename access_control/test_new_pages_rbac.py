@@ -54,3 +54,60 @@ class NewPagesRBACTests(TestCase):
                 )
                 self.assertEqual(self.client.get(url).status_code, 200)
                 override.delete()
+
+    def test_sidebar_hides_work_stats_without_work_assignments_permission(self):
+        res = self.client.get(reverse('makken_mail:work_index'))
+        self.assertEqual(res.status_code, 200)
+        self.assertNotContains(res, reverse('makken_mail:work_stats'))
+        self.assertNotContains(res, 'إحصائيات المهام')
+
+        ov = PermissionOverride.objects.create(
+            user=self.user, module_id='work_assignments', operation='view', effect='grant'
+        )
+        res2 = self.client.get(reverse('makken_mail:work_index'))
+        self.assertEqual(res2.status_code, 200)
+        self.assertContains(res2, reverse('makken_mail:work_stats'))
+        ov.delete()
+
+    def test_willingness_editor_locks_section_04_for_users_without_work_assignments_edit(self):
+        from care_states.models import DevelopmentState
+        from entities.models import Entity
+        from makken_mail.models import WorkAssignment, WorkStatus
+        from partnerships.models import Partnership
+
+        ent = Entity.objects.create(name='جهة صلاحية المهام', entity_type='government', is_active=True)
+        p = Partnership.objects.create(
+            name='شراكة رغبة مقيدة المهام',
+            representative='ممثل',
+            phone='+966501112299',
+            email='lock_work@example.com',
+            entity=ent,
+            scope='local',
+            development_state_id=DevelopmentState.WILLINGNESS,
+        )
+        mgr = User.objects.create_user('lock_mgr', 'lock_mgr@makken.test', 'StrongPass!2026')
+        wk = WorkAssignment.objects.create(
+            title='مهمة مقيدة',
+            target_model='partnerships.partnership',
+            target_key=p.pk,
+            employee=self.user,
+            manager=mgr,
+            created_by=mgr,
+            status=WorkStatus.NEW,
+            progress=0,
+        )
+        wk.assignees.set([self.user])
+
+        PermissionOverride.objects.create(user=self.user, module_id='partnerships', operation='view', effect='grant')
+        PermissionOverride.objects.create(user=self.user, module_id='partnerships', operation='edit', effect='grant')
+
+        edit_url = reverse('partnerships:edit', args=[p.pk]) + '?from=willingness'
+        res = self.client.get(edit_url)
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, 'مهمة مقيدة')
+        self.assertNotContains(res, 'data-edit-work-url=')
+        self.assertNotContains(res, 'name="work-title"')
+
+        api_url = reverse('partnerships:work_edit', args=[p.pk, wk.pk])
+        self.assertEqual(self.client.get(api_url).status_code, 403)
+        self.assertEqual(self.client.post(api_url, {'title': 'محاولة تعديل'}).status_code, 403)
