@@ -37,7 +37,7 @@ class Migration(migrations.Migration):
             name='AgreementOption',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('kind', models.CharField(choices=[('entity', 'أنواع الجهات'), ('status', 'حالات الاتفاقية'), ('partnership_type', 'أنواع الشراكة'), ('classification', 'تصنيفات الاتفاقية'), ('department', 'الإدارات والوحدات'), ('city', 'المدن السعودية')], max_length=20, verbose_name='القائمة')),
+                ('kind', models.CharField(choices=[('entity', 'أنواع الجهات'), ('status', 'إدارة حالات الشراكة'), ('partnership_type', 'أنواع الشراكة'), ('classification', 'تصنيفات الاتفاقية'), ('department', 'الإدارات والوحدات'), ('city', 'المدن السعودية')], max_length=20, verbose_name='القائمة')),
                 ('name', models.CharField(max_length=160, validators=[expense_items.models.validate_name], verbose_name='الاسم')),
                 ('department_type', models.CharField(blank=True, choices=[('unit', 'وحدة من وحدات المؤسسة'), ('department', 'إدارة من إدارات المؤسسة')], max_length=12, verbose_name='نوع الإدارة')),
                 ('is_active', models.BooleanField(default=True, verbose_name='نشط')),

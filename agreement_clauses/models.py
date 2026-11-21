@@ -61,7 +61,7 @@ class Agreement(models.Model):
 
 class OptionKind(models.TextChoices):
     ENTITY = "entity", "أنواع الجهات"
-    STATUS = "status", "حالات الاتفاقية"
+    STATUS = "status", "إدارة حالات الشراكة"
     PARTNERSHIP_TYPE = "partnership_type", "أنواع الشراكة"
     CLASSIFICATION = "classification", "تصنيفات الاتفاقية"
     DEPARTMENT = "department", "الإدارات والوحدات"

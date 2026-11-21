@@ -1,7 +1,7 @@
 {% extends "core/makken_base.html" %}
 {% load access_tags static %}
 {% block title %}
-  حالات الاتفاقية | مكّن
+  إدارة حالات الشراكة | مكّن
 {% endblock %}
 {% block extra_head %}
   <link rel="stylesheet" href="{% static 'care_states/states.css' %}?v=20261121-blue6">
@@ -11,7 +11,7 @@
 {% block content %}
   <section class="page-introduction levels-introduction" aria-labelledby="page-heading">
     <div>
-      <p class="eyebrow">الإعدادات</p> <h1 id="page-heading">حالات الاتفاقية</h1> <p class="page-description">إدارة حالات الاتفاقية وحالة تفعيلها في مكان واحد.</p>
+      <p class="eyebrow">الإعدادات</p> <h1 id="page-heading">إدارة حالات الشراكة</h1> <p class="page-description">إدارة إدارة حالات الشراكة وحالة تفعيلها في مكان واحد.</p>
     </div>
     {% if can_add %}
       <a href="?{% if settings_filter_query %}{{ settings_filter_query }}&amp;{% endif %}edit=new" class="button button-primary add-level"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>إضافة حالة اتفاقية</a>
@@ -31,14 +31,14 @@
   <section class="states-card levels-card" aria-labelledby="table-heading">
     <header class="states-card-header">
       <div>
-        <h2 id="table-heading">قائمة حالات الاتفاقية</h2> <p>أضف حالات الاتفاقية، وعدّل بياناتها أو حالة تفعيلها.</p>
+        <h2 id="table-heading">قائمة إدارة حالات الشراكة</h2> <p>أضف حالات الاتفاقية، وعدّل بياناتها أو حالة تفعيلها.</p>
       </div>
       <span class="fixed-tag">
       {% include "core/partials/record_count.html" with record_count=page_obj.paginator.count only %}
       </span>
     </header>
     <table class="states-table levels-table">
-      <caption class="visually-hidden">قائمة حالات الاتفاقية وحالة تفعيل كل حالة</caption>
+      <caption class="visually-hidden">قائمة إدارة حالات الشراكة وحالة تفعيل كل حالة</caption>
       <thead>
         <tr>
           <th scope="col">حالة الاتفاقية</th> <th scope="col">حالة السجل</th> <th scope="col" class="action-cell">الإجراء</th>
@@ -103,7 +103,7 @@
     </div>
   </section>
   {% if page_obj.paginator.num_pages > 1 %}
-    <nav class="levels-pagination" aria-label="صفحات حالات الاتفاقية">
+    <nav class="levels-pagination" aria-label="صفحات إدارة حالات الشراكة">
       {% if page_obj.has_previous %}
         <a class="button button-secondary" href="?q={{ settings_filter_q|urlencode }}&amp;status={{ settings_filter_status|urlencode }}&amp;page={{ page_obj.previous_page_number }}">السابق</a>
       {% endif %}
@@ -124,7 +124,7 @@
         <div class="dialog-heading">
           <span class="dialog-icon"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg></span> <a class="icon-button dialog-close" href="{% url 'agreement_clauses:references' %}{% if settings_filter_query %}?{{ settings_filter_query }}{% endif %}" aria-label="إغلاق"><svg aria-hidden="true"><use href="#icon-close"></use></svg></a>
         </div>
-        <p class="dialog-eyebrow">إدارة حالات الاتفاقية</p> <h2 id="editor-title">
+        <p class="dialog-eyebrow">إدارة إدارة حالات الشراكة</p> <h2 id="editor-title">
         {% if operation == 'edit' %}
           تعديل حالة الاتفاقية
         {% else %}

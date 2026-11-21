@@ -82,7 +82,7 @@ def reference_catalog(request):
                         item.save()
                 if status == 200:
                     emit(actor=request.user, module='agreement_clauses', action={'add': 'create', 'edit': 'update', 'toggle': 'status'}[operation],
-                         description='تحديث حالات الاتفاقية', target_model='agreement_clauses.agreementoption',
+                         description='تحديث إدارة حالات الشراكة', target_model='agreement_clauses.agreementoption',
                          target_key=str(item.pk), target_label=item.name, scope='global', live=False)
                     messages.success(request, 'تم حفظ حالة الاتفاقية.')
                     return add_login_headers(redirect(target_url(kind)))
@@ -134,7 +134,7 @@ def reference_catalog(request):
         for row in page_obj
     ]
     context = {
-        'page_heading': 'حالات الاتفاقية', 'active_page': 'agreement_statuses',
+        'page_heading': 'إدارة حالات الشراكة', 'active_page': 'agreement_statuses',
         'display_name': name, 'avatar_initial': name[:1], 'kind': kind,
         'kinds': [(OptionKind.STATUS, OptionKind.STATUS.label)],
         'rows': [(r['item'], r['toggle_snapshot']) for r in row_items],
