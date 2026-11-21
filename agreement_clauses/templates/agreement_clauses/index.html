@@ -144,7 +144,7 @@
         </div>
       {% endif %}
       <div class="expense-item-field">
-        <label for="expense-item-name">بند الاتفاقية <span aria-hidden="true">*</span></label>{{ editor_form.name }}<p id="name-help" class="field-help">اسم واضح وفريد، بحد أقصى 200 حرف.</p>
+        <label for="expense-item-name">بند الاتفاقية <span class="required" aria-hidden="true">*</span></label>{{ editor_form.name }}<p id="name-help" class="field-help">اسم واضح وفريد، بحد أقصى 200 حرف.</p>
         <div id="name-error" class="field-error" role="alert">
           {{ editor_form.name.errors }}
         </div>

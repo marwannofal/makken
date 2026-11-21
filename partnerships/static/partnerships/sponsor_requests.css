@@ -112,7 +112,8 @@
 }
 
 .pub-field .req {
-  color: #c0392b;
+  color: #dc2626;
+  font-weight: 700;
 }
 
 .pub-field input, .pub-field select, .pub-field textarea {

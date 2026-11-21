@@ -771,3 +771,11 @@ h2 > span {
     scroll-behavior: auto !important;
   }
 }
+
+.required,
+.req,
+label > span[aria-hidden="true"],
+legend > span[aria-hidden="true"] {
+  color: #dc2626;
+  font-weight: 700;
+}

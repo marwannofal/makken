@@ -151,7 +151,8 @@
 }
 
 .required {
-  color: #b44848;
+  color: #dc2626;
+  font-weight: 700;
 }
 
 .field-help {

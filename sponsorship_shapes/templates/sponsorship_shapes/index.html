@@ -156,7 +156,7 @@
         </div>
       {% endif %}
       <div class="sponsorship-shape-field">
-        <label for="sponsorship-shape-name">شكل الرعاية <span aria-hidden="true">*</span></label>{{ editor_form.name }}<p id="name-help" class="field-help">اسم واضح وفريد، بحد أقصى 200 حرف.</p>
+        <label for="sponsorship-shape-name">شكل الرعاية <span class="required" aria-hidden="true">*</span></label>{{ editor_form.name }}<p id="name-help" class="field-help">اسم واضح وفريد، بحد أقصى 200 حرف.</p>
         <div id="name-error" class="field-error" role="alert">
           {{ editor_form.name.errors }}
         </div>
@@ -168,7 +168,7 @@
         </div>
       </div>
       <fieldset class="sponsorship-shape-status-field employment-field">
-        <legend>هل الرعاية توظيف؟ <span aria-hidden="true">*</span></legend>
+        <legend>هل الرعاية توظيف؟ <span class="required" aria-hidden="true">*</span></legend>
         <div class="active-options">
           {% for radio in editor_form.is_employment %}
             <label class="active-option">{{ radio.tag }}<span>{{ radio.choice_label }}</span></label>

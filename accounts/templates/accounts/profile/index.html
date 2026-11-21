@@ -61,7 +61,7 @@
           {% include 'accounts/profile/_field.html' with field=detail_form.email wide=True %}
           {% include 'accounts/profile/_field.html' with field=detail_form.email_confirm wide=True help='عند تغيير البريد، أعد كتابته هنا وأدخل كلمة المرور الحالية.' %}
           <div class="profile-field profile-field-wide">
-            <label for="{{ detail_form.phone.id_for_label }}">رقم الهاتف <span aria-hidden="true">*</span></label>
+            <label for="{{ detail_form.phone.id_for_label }}">رقم الهاتف <span class="required" aria-hidden="true">*</span></label>
             <div class="profile-phone-control">
               <div class="profile-country-control">
                 <label class="profile-sr-only" for="{{ detail_form.phone_country.id_for_label }}">رمز الدولة</label>{{ detail_form.phone_country }}

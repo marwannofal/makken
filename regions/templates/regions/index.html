@@ -144,7 +144,7 @@
         </div>
       {% endif %}
       <div class="region-field">
-        <label for="region-name">اسم المنطقة <span aria-hidden="true">*</span></label>{{ editor_form.name }}<p id="name-help" class="field-help">اسم واضح وفريد، بحد أقصى 100 حرف.</p>
+        <label for="region-name">اسم المنطقة <span class="required" aria-hidden="true">*</span></label>{{ editor_form.name }}<p id="name-help" class="field-help">اسم واضح وفريد، بحد أقصى 100 حرف.</p>
         <div id="name-error" class="field-error" role="alert">
           {{ editor_form.name.errors }}
         </div>

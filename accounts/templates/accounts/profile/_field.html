@@ -1,7 +1,7 @@
 <div class="profile-field{% if wide %} profile-field-wide{% endif %}">
   <label for="{{ field.id_for_label }}">{{ field.label }}
   {% if field.field.required %}
-    <span aria-hidden="true">*</span>
+    <span class="required" aria-hidden="true">*</span>
   {% endif %}
   </label>
   {% if field.field.widget.input_type == 'password' %}

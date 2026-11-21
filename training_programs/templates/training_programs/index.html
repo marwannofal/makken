@@ -173,19 +173,19 @@
         </div>
       {% endif %}
       <div class="program-field">
-        <label for="program-name">البرنامج التدريبي <span aria-hidden="true">*</span></label>{{ editor_form.name }}<p id="name-help" class="field-help">اسم واضح وفريد، بحد أقصى 200 حرف.</p>
+        <label for="program-name">البرنامج التدريبي <span class="required" aria-hidden="true">*</span></label>{{ editor_form.name }}<p id="name-help" class="field-help">اسم واضح وفريد، بحد أقصى 200 حرف.</p>
         <div id="name-error" class="field-error" role="alert">
           {{ editor_form.name.errors }}
         </div>
       </div>
       <div class="program-field category-field">
-        <label for="program-category">تصنيف البرامج <span aria-hidden="true">*</span></label>{{ editor_form.category }}<p class="field-help">اختر تصنيفًا واحدًا من التصنيفات المعتمدة.</p>
+        <label for="program-category">تصنيف البرامج <span class="required" aria-hidden="true">*</span></label>{{ editor_form.category }}<p class="field-help">اختر تصنيفًا واحدًا من التصنيفات المعتمدة.</p>
         <div id="category-error" class="field-error" role="alert">
           {{ editor_form.category.errors }}
         </div>
       </div>
       <div class="program-field multi-field">
-        <label id="expenses-label" for="program-expense-items">بنود الصرف <span aria-hidden="true">*</span></label> {{ editor_form.expense_items }}
+        <label id="expenses-label" for="program-expense-items">بنود الصرف <span class="required" aria-hidden="true">*</span></label> {{ editor_form.expense_items }}
         <div class="multi-select" data-multi-select hidden>
           <button type="button" class="multi-trigger" data-multi-trigger aria-expanded="false" aria-controls="expense_items-panel" aria-labelledby="expenses-label expenses-summary" aria-describedby="expenses-help expenses-error"><span id="expenses-summary" data-multi-summary>اختر بنود الصرف</span><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
           <div class="multi-panel" id="expense_items-panel" hidden>
@@ -211,7 +211,7 @@
         </div>
       </div>
       <fieldset class="program-types-field">
-        <legend>نوع التدريب للبرنامج <span aria-hidden="true">*</span></legend>
+        <legend>نوع التدريب للبرنامج <span class="required" aria-hidden="true">*</span></legend>
         <div class="active-options type-options">
           {% for radio in editor_form.training_types %}
             <label class="active-option">{{ radio.tag }}<span>{{ radio.choice_label }}</span></label>

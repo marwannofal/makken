@@ -156,13 +156,13 @@
         </div>
       {% endif %}
       <div class="sector-field">
-        <label for="sector-name">اسم القطاع <span aria-hidden="true">*</span></label>{{ editor_form.name }}<p id="name-help" class="field-help">اسم واضح وفريد، بحد أقصى 200 حرف.</p>
+        <label for="sector-name">اسم القطاع <span class="required" aria-hidden="true">*</span></label>{{ editor_form.name }}<p id="name-help" class="field-help">اسم واضح وفريد، بحد أقصى 200 حرف.</p>
         <div id="name-error" class="field-error" role="alert">
           {{ editor_form.name.errors }}
         </div>
       </div>
       <div class="sector-field multi-field">
-        <label for="sector-specializations">التخصصات / المهن <span aria-hidden="true">*</span></label> {{ editor_form.specializations }}
+        <label for="sector-specializations">التخصصات / المهن <span class="required" aria-hidden="true">*</span></label> {{ editor_form.specializations }}
         <div class="multi-select" data-multi-select hidden>
           <button type="button" class="multi-trigger" data-multi-trigger aria-expanded="false" aria-controls="specializations-panel" aria-describedby="specializations-help specializations-error"><span data-multi-summary>اختر التخصصات</span><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
           <div class="multi-panel" id="specializations-panel" hidden>

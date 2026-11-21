@@ -41,7 +41,7 @@
               {% if checkbox != 'checkbox' %}
                 <label for="{{ field.id_for_label }}">{{ field.label }}
                 {% if field.field.required %}
-                  <span aria-hidden="true">*</span>
+                  <span class="required" aria-hidden="true">*</span>
                 {% endif %}
                 </label>
               {% endif %}

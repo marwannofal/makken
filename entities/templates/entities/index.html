@@ -146,20 +146,20 @@
         </div>
       {% endif %}
       <div class="entity-field">
-        <label for="entity-type">الكيان <span aria-hidden="true">*</span></label>{{ editor_form.entity_type }}
+        <label for="entity-type">الكيان <span class="required" aria-hidden="true">*</span></label>{{ editor_form.entity_type }}
         <div id="type-error" class="field-error" role="alert">
           {{ editor_form.entity_type.errors }}
         </div>
       </div>
       <div class="entity-field" id="entity-branch-field"{% if not editor_form.show_branch %} hidden{% endif %}>
-        <label for="entity-branch">فرع الكيان <span aria-hidden="true">*</span></label>{{ editor_form.branch }}
+        <label for="entity-branch">فرع الكيان <span class="required" aria-hidden="true">*</span></label>{{ editor_form.branch }}
         <div id="branch-error" class="field-error" role="alert">
           {{ editor_form.branch.errors }}
         </div>
       </div>
       {% guarded_status 'entities' %}
         <fieldset class="entity-status-field">
-          <legend>حالة السجل <span aria-hidden="true">*</span></legend>
+          <legend>حالة السجل <span class="required" aria-hidden="true">*</span></legend>
           <div class="active-options">
             {% for radio in editor_form.is_active %}
               <label class="active-option">{{ radio.tag }}<span>{{ radio.choice_label }}</span></label>
