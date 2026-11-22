@@ -4,6 +4,7 @@
   if (!editor) return;
   const form = editor.querySelector("form");
   const select = form.elements.namedItem("expense_items");
+  window.MakkenDropdowns?.unwrap?.(select);
   const multi = editor.querySelector("[data-multi-select]");
   const trigger = multi.querySelector("[data-multi-trigger]");
   const panel = multi.querySelector(".multi-panel");

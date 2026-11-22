@@ -137,3 +137,15 @@ class AccessibilityAndDropdownsTests(TestCase):
         ):
             src = (base / rel).read_text(encoding='utf-8')
             self.assertIn('MakkenDropdowns?.unwrap?.(select)', src, f'{rel} must unwrap global dropdown before enhancing')
+
+    def test_makken_dropdowns_skips_custom_multi_select_pickers_sitewide(self):
+        from pathlib import Path
+        js = Path('core/static/core/js/makken-dropdowns.js').read_text(encoding='utf-8')
+        self.assertIn('.multi-select', js)
+        self.assertIn('[data-multi-select]', js)
+        self.assertIn('.multi-field', js)
+        for custom_js in (
+            'sectors/static/sectors/sectors.js',
+            'training_programs/static/training_programs/training_programs.js',
+        ):
+            self.assertIn('MakkenDropdowns?.unwrap', Path(custom_js).read_text(encoding='utf-8'))

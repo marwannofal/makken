@@ -31,10 +31,10 @@
     if (select.classList.contains('native-enhanced')) return true;
     if (select.dataset.providerPicker) return true;
     if (select.hasAttribute('data-market-select')) return true;
-    if (select.closest('.search-select, .market-select')) return true;
+    if (select.closest('.search-select, .market-select, .multi-select, .multi-field')) return true;
     const next = select.nextElementSibling;
-    if (next && next.classList.contains('search-select')) return true;
-    if (select.parentElement && select.parentElement.querySelector(':scope > .search-select')) return true;
+    if (next && (next.classList.contains('search-select') || next.classList.contains('multi-select') || next.hasAttribute('data-multi-select'))) return true;
+    if (select.parentElement && select.parentElement.querySelector(':scope > .search-select, :scope > .multi-select, :scope > [data-multi-select]')) return true;
     return false;
   }
 
@@ -349,7 +349,7 @@
       for (const m of mutations) {
         for (const node of m.addedNodes) {
           if (node.nodeType !== 1) continue;
-          if (node.classList && node.classList.contains('search-select')) {
+          if (node.classList && (node.classList.contains('search-select') || node.classList.contains('multi-select') || node.hasAttribute('data-multi-select'))) {
             const parentSelect = node.parentElement && node.parentElement.querySelector(':scope > select');
             if (parentSelect) unwrapSelect(parentSelect);
             continue;
