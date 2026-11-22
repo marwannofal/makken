@@ -176,7 +176,20 @@ dialog.detail-dialog,
   color: #1f4456 !important;
 }
 
+.detail-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid #d5e6f0;
+}
+
 .detail-dialog-actions .detail-close-btn {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: 120px;
+  padding: 9px 24px !important;
   background: #005b85 !important;
   color: #ffffff !important;
   border-color: #005b85 !important;

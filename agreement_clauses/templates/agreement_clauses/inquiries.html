@@ -420,11 +420,8 @@
             </dl>
           </div>
         {% endif %}
-        <div class="dialog-actions" style="margin-top:16px;">
-          {% if can_edit %}
-            <a class="button button-primary" href="{% url 'partnerships:edit' detail_row.partnership.pk %}">تعديل الشراكة</a>
-          {% endif %}
-          <a class="button button-secondary" href="?{{ filter_query }}">إغلاق</a>
+        <div class="dialog-actions detail-dialog-actions">
+          <a class="button button-secondary detail-close-btn" href="?{{ filter_query }}">إغلاق</a>
         </div>
       </div>
     </dialog>

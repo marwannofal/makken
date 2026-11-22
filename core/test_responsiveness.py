@@ -176,3 +176,24 @@ class SiteWideResponsivenessTests(TestCase):
         self.assertEqual(res.content.decode("utf-8").count("makken-detail-dialogs.css"), 1)
         csp = res.get("Content-Security-Policy", "")
         self.assertNotIn("unsafe-inline", csp)
+
+    def test_inquiries_detail_modal_is_view_only_with_compact_close_button(self):
+        from care_states.models import DevelopmentState
+        from entities.models import Entity
+        from partnerships.models import Partnership
+
+        ent = Entity.objects.create(name="جهة استعلامات تفاصيل", entity_type="government", is_active=True)
+        p = Partnership.objects.create(
+            name="شراكة استعلامات تفاصيل",
+            representative="ممثل الاستعلامات",
+            phone="+966501234888",
+            email="inq_detail@example.com",
+            entity=ent,
+            scope="local",
+            development_state_id=DevelopmentState.WILLINGNESS,
+        )
+        res = self.client.get(reverse("partnerships:agreement_inquiries"), {"detail": str(p.pk)})
+        self.assertEqual(res.status_code, 200)
+        self.assertNotContains(res, "تعديل الشراكة")
+        self.assertContains(res, "detail-dialog-actions")
+        self.assertContains(res, "detail-close-btn")
