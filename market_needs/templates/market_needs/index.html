@@ -46,7 +46,7 @@
         </thead>
         <tbody>
           {% for row in rows %}
-            <tr data-market-row data-url="?{{ filter_query }}&amp;page={{ page_obj.number }}&amp;detail={{ row.need.pk }}">
+            <tr data-market-row{% if highlighted_pk and row.need.pk == highlighted_pk %} class="is-highlighted-row" data-highlighted-row{% endif %} data-url="?{{ filter_query }}&amp;page={{ page_obj.number }}&amp;detail={{ row.need.pk }}">
               <th scope="row"><a class="market-row-title" href="?{{ filter_query }}&amp;page={{ page_obj.number }}&amp;detail={{ row.need.pk }}">{{ row.need.title }}</a>
               {% if not row.need.region_writable %}
                 <small class="muted">مشترك · عرض فقط</small>

@@ -114,6 +114,9 @@ def catalog(need):
     }
 
 
+HIGHLIGHT_SESSION_KEY = "market_needs_highlighted_pk"
+
+
 @module_view('market_needs')
 @login_required(login_url="accounts:login")
 @require_http_methods(["GET", "POST"])
@@ -131,7 +134,8 @@ def editor(request, pk=None):
             form = NeedForm(request.POST, instance=need, actor=request.user)
             saved = services.save_need(request.POST, request.user, pk, payload["version"], payload["nonce"])
             messages.success(request, "تم حفظ بطاقة حاجة السوق بنجاح.")
-            return add_login_headers(redirect("market_needs:followup", pk=saved.pk))
+            request.session[HIGHLIGHT_SESSION_KEY] = saved.pk
+            return add_login_headers(redirect("market_needs:index"))
         except DependencyBlocked as exc:
             context.update(blocked_context(exc))
             status = 409
@@ -200,7 +204,14 @@ def index(request):
         if word in {"موقوف", "inactive"}:
             search |= Q(is_active=False)
         items = items.filter(search)
-    page = Paginator(items.distinct(), 15).get_page(request.GET.get("page"))
+    distinct_items = items.distinct()
+    highlighted_pk = request.session.pop(HIGHLIGHT_SESSION_KEY, None) if request.method == "GET" else None
+    page_number = request.GET.get("page")
+    if highlighted_pk and not page_number:
+        ordered_pks = list(distinct_items.values_list("pk", flat=True))
+        if highlighted_pk in ordered_pks:
+            page_number = (ordered_pks.index(highlighted_pk) // 15) + 1
+    page = Paginator(distinct_items, 15).get_page(page_number)
     rows = [{"need": need, "toggle": token(request, need, "toggle"), "delete": token(request, need, "delete")} for need in page]
     detail = None
     if request.GET.get("detail", "").isascii() and request.GET.get("detail", "").isdigit():
@@ -209,7 +220,7 @@ def index(request):
         funding_details(detail)
         context["history_page"] = Paginator(regional_history(detail.events, request.user).select_related("actor"), 20).get_page(request.GET.get("history_page"))
         context["history_query"] = urlencode({"q": q, "active": active, "state": state, "page": page.number, "detail": detail.pk})
-    context.update(rows=rows, page_obj=page, q=q, selected_active=active, selected_state=state, state_choices=NeedStatus.choices,
+    context.update(rows=rows, page_obj=page, highlighted_pk=highlighted_pk, q=q, selected_active=active, selected_state=state, state_choices=NeedStatus.choices,
                    detail=detail, filter_query=urlencode({"q": q, "active": active, "state": state}))
     return add_login_headers(render(request, "market_needs/index.html", context, status=status))
 

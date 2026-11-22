@@ -409,3 +409,12 @@ class ViewSecurityTests(MarketFixtures,TestCase):
     def test_escaping_user_content(self):
         need=self.create_need();Need.objects.filter(pk=need.pk).update(title='<script>alert(1)</script>')
         response=self.client.get('/market-needs/');self.assertContains(response,'&lt;script&gt;');self.assertNotContains(response,'<script>alert(1)</script>')
+
+    def test_editor_save_redirects_to_index_with_highlight(self):
+        get_resp = self.client.get(reverse('market_needs:create'))
+        self.assertEqual(get_resp.status_code, 200)
+        payload = self.data(snapshot=get_resp.context['snapshot'], search_criteria_present='1', search_states=['capability'], search_scopes=['local'])
+        post_resp = self.client.post(reverse('market_needs:create'), payload)
+        self.assertRedirects(post_resp, reverse('market_needs:index'), fetch_redirect_response=False)
+        list_resp = self.client.get(reverse('market_needs:index'))
+        self.assertContains(list_resp, 'class="is-highlighted-row"')
