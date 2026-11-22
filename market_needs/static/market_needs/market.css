@@ -1066,3 +1066,71 @@ progress::-moz-progress-bar {
   font-size: 13px;
   color: #0f2b3a;
 }
+
+/* Section 03 side-by-side search criteria cards */
+.market-criteria-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: stretch;
+  margin-bottom: 14px;
+}
+
+.market-criteria-card {
+  margin: 0;
+  padding: 16px 18px;
+  border: 1px solid #d6e4ec;
+  border-radius: 14px;
+  background: #f8fbfd;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.market-criteria-card > legend {
+  float: right;
+  width: 100%;
+  margin: 0 0 2px;
+  padding: 0;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0f2b3a;
+}
+
+.market-criteria-card .status-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.market-criteria-card .status-choices label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 8px 14px;
+  background: #ffffff;
+  border: 1px solid #d3e1e9;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.market-criteria-card .status-choices label:hover {
+  border-color: #005b85;
+  background: #f2f8fc;
+}
+
+.market-criteria-card .status-choices label:has(input:checked) {
+  border-color: #005b85;
+  background: #ebf5fb;
+  box-shadow: 0 0 0 2px rgba(0, 91, 133, 0.12);
+}
+
+@media (max-width: 820px) {
+  .market-criteria-grid {
+    grid-template-columns: 1fr;
+  }
+}

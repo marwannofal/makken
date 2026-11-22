@@ -134,8 +134,8 @@
         </span>
       </summary>
       <div class="mk-acc-body">
-        <div class="partnership-form-grid">
-          <fieldset class="partnership-field market-wide">
+        <div class="market-criteria-grid">
+          <fieldset class="partnership-field market-criteria-card">
             <legend>سيتم البحث في المنظمات <span class="required" aria-hidden="true">*</span></legend>
             <div class="status-choices">
               {% for option in state_options %}
@@ -144,7 +144,7 @@
             </div>
             <div class="field-error" id="error-search_states" role="alert">{{ form.search_states.errors }}</div>
           </fieldset>
-          <fieldset class="partnership-field market-wide">
+          <fieldset class="partnership-field market-criteria-card">
             <legend>سيتم البحث في نطاق الكيان <span class="required" aria-hidden="true">*</span></legend>
             <div class="status-choices">
               {% for checkbox in form.search_scopes %}
