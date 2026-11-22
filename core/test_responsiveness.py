@@ -213,3 +213,4 @@ class SiteWideResponsivenessTests(TestCase):
         self.assertNotIn('<details class="mk-accordion" open>', html)
         self.assertContains(res, "01 · بطاقة الحاجة والبيانات الأساسية")
         self.assertContains(res, "02 · البرنامج التدريبي وبنود الصرف")
+        self.assertContains(res, "willingness_clauses.css")
