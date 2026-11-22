@@ -126,7 +126,8 @@
       $('#id_beneficiaries').readOnly=true;$('#id_requested_support').readOnly=true;
       $$('[data-expense]',tbody).forEach(row=>{$('input[type=checkbox]',row).disabled=true;$('[data-amount]',row).readOnly=true;const select=$('select',row);select.dataset.marketLocked='1';controls.get(select)?.update();});
     }
-    syncEditor=()=>{calculate();const rows=collect(),error=$('[data-line-error]');if(!rows.length||rows.some(r=>!r.shape||cents(r.amount)===null||cents(r.amount)<=0n||cents(r.amount)>99999999999999n)){error.textContent='اختر بندًا واحدًا على الأقل، وحدد شكل الرعاية ومبلغًا موجبًا بمنزلتين عشريتين وبصيغة صحيحة لكل بند.';error.scrollIntoView({block:'center'});return false;}if(rows.reduce((sum,r)=>sum+cents(r.amount),0n)>99999999999999n){error.textContent='مجموع البنود يتجاوز الحد المالي المسموح.';return false;}error.textContent='';return true;};
+    editor.addEventListener('invalid',e=>{const acc=e.target.closest('details.mk-accordion');if(acc&&!acc.open)acc.open=true;},true);
+    syncEditor=()=>{calculate();const rows=collect(),error=$('[data-line-error]');if(!rows.length||rows.some(r=>!r.shape||cents(r.amount)===null||cents(r.amount)<=0n||cents(r.amount)>99999999999999n)){const acc=error.closest('details.mk-accordion');if(acc&&!acc.open)acc.open=true;error.textContent='اختر بندًا واحدًا على الأقل، وحدد شكل الرعاية ومبلغًا موجبًا بمنزلتين عشريتين وبصيغة صحيحة لكل بند.';error.scrollIntoView({block:'center'});return false;}if(rows.reduce((sum,r)=>sum+cents(r.amount),0n)>99999999999999n){error.textContent='مجموع البنود يتجاوز الحد المالي المسموح.';return false;}error.textContent='';return true;};
   }
 
   const followup=$('[data-followup-form]'), followupDialog=$('#market-followup-dialog');let uploads=[];

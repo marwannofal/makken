@@ -204,3 +204,12 @@ class SiteWideResponsivenessTests(TestCase):
         self.assertContains(res, "M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z")
         self.assertContains(res, "m16 4 4 4M4 20l5-1L20 8a2.8 2.8 0 0 0-4-4L5 15Z")
         self.assertNotContains(res, ">عرض التفاصيل<")
+
+    def test_market_needs_new_page_uses_collapsed_mk_accordions_matching_capability(self):
+        res = self.client.get(reverse("market_needs:create"))
+        self.assertEqual(res.status_code, 200)
+        html = res.content.decode("utf-8")
+        self.assertEqual(html.count('<details class="mk-accordion">'), 2)
+        self.assertNotIn('<details class="mk-accordion" open>', html)
+        self.assertContains(res, "01 · بطاقة الحاجة والبيانات الأساسية")
+        self.assertContains(res, "02 · البرنامج التدريبي وبنود الصرف")
