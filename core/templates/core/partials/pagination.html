@@ -1,0 +1,45 @@
+{% if page_obj and page_obj.paginator.count %}
+  <div class="mk-pagination-wrap">
+    <nav class="pagination mk-pagination" data-page-key="{{ page_param }}" aria-label="{{ aria_label }}">
+      {% if prev_url %}
+        <a class="mk-pg-pill mk-pg-prev" href="{{ prev_url }}" rel="prev"><span class="mk-pg-arrow" aria-hidden="true">→</span><span>السابق</span></a>
+      {% else %}
+        <span class="mk-pg-pill mk-pg-prev is-disabled" aria-disabled="true"><span class="mk-pg-arrow" aria-hidden="true">→</span><span>السابق</span></span>
+      {% endif %}
+      <div class="mk-pg-numbers">
+        {% for item in page_items %}
+          {% if item.type == "ellipsis" %}
+            <span class="mk-pg-ellipsis" aria-hidden="true">…</span>
+          {% elif item.current %}
+            <span class="mk-pg-num is-current" aria-current="page"><bdi>{{ item.number }}</bdi></span>
+          {% else %}
+            <a class="mk-pg-num" href="{{ item.url }}"><bdi>{{ item.number }}</bdi></a>
+          {% endif %}
+        {% endfor %}
+      </div>
+      {% if next_url %}
+        <a class="mk-pg-pill mk-pg-next" href="{{ next_url }}" rel="next"><span>التالي</span><span class="mk-pg-arrow" aria-hidden="true">←</span></a>
+      {% else %}
+        <span class="mk-pg-pill mk-pg-next is-disabled" aria-disabled="true"><span>التالي</span><span class="mk-pg-arrow" aria-hidden="true">←</span></span>
+      {% endif %}
+    </nav>
+    <div class="mk-pagination-meta">
+      <span class="mk-pg-summary">عرض <bdi>{{ page_obj.start_index }}–{{ page_obj.end_index }}</bdi> من <bdi>{{ page_obj.paginator.count }}</bdi> سجل</span>
+      {% if per_page_param %}
+        <div class="mk-per-page-form">
+          <label class="mk-per-page-label">
+            <span>عدد السجلات</span>
+            <select class="mk-per-page-select" data-mk-per-page-select data-no-search-select aria-label="عدد السجلات">
+              {% if current_per_page not in size_choices %}
+                <option value="" selected disabled>{{ current_per_page }}</option>
+              {% endif %}
+              {% for opt in size_options %}
+                <option value="{{ opt.size }}" data-url="{{ opt.url }}"{% if opt.selected %} selected{% endif %}>{{ opt.size }}</option>
+              {% endfor %}
+            </select>
+          </label>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{% endif %}

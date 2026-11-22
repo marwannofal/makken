@@ -2,6 +2,7 @@
 from decimal import Decimal
 
 from django.core.paginator import Paginator
+from core.pagination import resolve_page_size
 from django.db.models import Q
 from django.shortcuts import render
 from django.views.decorators.http import require_GET
@@ -365,8 +366,8 @@ def build_achievement_report(actor, params):
 def partnership_achievement_report(request):
     report = build_achievement_report(request.user, request.GET)
     is_export = '_mk_export' in request.GET
-    groups_per_page = max(1, len(report['groups'])) if is_export else 15
-    rows_per_page = max(1, len(report['rows'])) if is_export else 15
+    groups_per_page = max(1, len(report['groups'])) if is_export else resolve_page_size(request, 15, param='group_per_page')
+    rows_per_page = max(1, len(report['rows'])) if is_export else resolve_page_size(request, 15, param='per_page')
     groups_page_obj = Paginator(report['groups'], groups_per_page).get_page(request.GET.get('group_page'))
     rows_page_obj = Paginator(report['rows'], rows_per_page).get_page(request.GET.get('page'))
 

@@ -9,6 +9,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core import signing
 from django.core.paginator import Paginator
+from core.pagination import resolve_page_size
 from django.db import IntegrityError, transaction
 from django.db.models.deletion import ProtectedError, RestrictedError
 from django.shortcuts import redirect, render
@@ -215,7 +216,7 @@ def index(request):
         context["error"], status = str(exc), 409
     except (IntegrityError, ProtectedError, RestrictedError):
         context["error"], status = "تعذّر تنفيذ الطلب. الاسم مستخدم بالفعل أو تغيّرت البيانات. لم يُحفظ أي تغيير.", 409
-    page = Paginator(_makken_settings_apply(request, TrainingProgram.objects.prefetch_related("expense_items", "agreement_clause_links__clause").all()), 10).get_page(request.GET.get("page"))
+    page = Paginator(_makken_settings_apply(request, TrainingProgram.objects.prefetch_related("expense_items", "agreement_clause_links__clause").all()), resolve_page_size(request, 10)).get_page(request.GET.get("page"))
     rows = []
     for item in page:
         rows.append({"id": item.pk, "name": item.name, "is_active": item.is_active, "category_label": item.get_category_display(),

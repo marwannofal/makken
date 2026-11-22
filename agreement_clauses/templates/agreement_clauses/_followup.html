@@ -1,3 +1,4 @@
+{% load makken_pagination %}
 {% load tz %}
 <section class="partnership-card clause-card" id="agreement-updates">
   <header class="card-heading">
@@ -45,13 +46,7 @@
       <p class="feedback feedback-info">لا توجد تحديثات متابعة حتى الآن.</p>
     {% endfor %}
   </div>
-  {% if entries_page.has_other_pages %}
-  <nav class="market-page-actions followup-pagination" aria-label="صفحات سجل المتابعة">
-    {% if entries_page.has_previous %}<a class="button button-secondary" href="?updates={{ entries_page.previous_page_number }}#agreement-updates">السابق</a>{% endif %}
-    <span class="subtle-badge">صفحة {{ entries_page.number }} من {{ entries_page.paginator.num_pages }}</span>
-    {% if entries_page.has_next %}<a class="button button-secondary" href="?updates={{ entries_page.next_page_number }}#agreement-updates">التالي</a>{% endif %}
-  </nav>
-  {% endif %}
+  {% makken_pagination entries_page page_param="updates" aria_label="صفحات سجل المتابعة" anchor="#agreement-updates" %}
 </section>
 <div id="agreement-teams">
   <section class="partnership-card clause-card">

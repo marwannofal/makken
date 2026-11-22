@@ -5,6 +5,7 @@ from urllib.parse import urlencode
 from django import forms
 from django.contrib.auth import get_user_model
 from django.core.paginator import Paginator
+from core.pagination import resolve_page_size
 from django.db.models import Count, Exists, OuterRef, Prefetch, Q, Subquery, Sum
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_GET
@@ -417,7 +418,7 @@ def agreement_inquiries(request):
         Prefetch('agreement_clause_assignments', queryset=ClauseAssignment.objects.filter(agreement__isnull=True).select_related('clause').order_by('id')),
     ).order_by('-pk')
 
-    page_obj = Paginator(ordered, PAGE_SIZE).get_page(request.GET.get('page'))
+    page_obj = Paginator(ordered, resolve_page_size(request, PAGE_SIZE)).get_page(request.GET.get('page'))
     page_ids = [p.pk for p in page_obj]
     works_by_pk = {}
     for w in WorkAssignment.objects.filter(target_model='partnerships.partnership', target_key__in=page_ids).select_related('employee', 'manager').prefetch_related('assignees'):

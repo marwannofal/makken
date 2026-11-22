@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
+from core.pagination import resolve_page_size
 from django.db.models import Q, F, Exists, OuterRef
 from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import render
@@ -187,7 +188,7 @@ def records(request,kind):
     if kind in {'cards','executions'}:query=query.select_related('sector','specialization','program')
     if kind=='executions':query=query.select_related('execution')
     if kind=='partners':query=query.select_related('development_state')
-    page=Paginator(query.order_by('-pk'),25).get_page(request.GET.get('page'))
+    page=Paginator(query.order_by('-pk'), resolve_page_size(request, 25)).get_page(request.GET.get('page'))
     params=request.GET.copy();params.pop('page',None)
     for row in page:
         if kind in {'cards','executions'}:

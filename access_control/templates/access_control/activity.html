@@ -1,4 +1,5 @@
 {% extends 'access_control/base.html' %}
+{% load makken_pagination %}
 {% load static tz %}
 {% block title %}
   سجل نشاط المستخدمين | مكّن
@@ -99,17 +100,7 @@
         </tbody>
       </table>
     </div>
-    {% if page_obj.paginator.num_pages > 1 %}
-      <nav class="ac-pagination" aria-label="صفحات سجل النشاط">
-        {% if page_obj.has_previous %}
-          <a class="button button-secondary" href="?{{ pagination_query }}&amp;page={{ page_obj.previous_page_number }}">السابق</a>
-        {% endif %}
-        <span>صفحة {{ page_obj.number }} من {{ page_obj.paginator.num_pages }}</span>
-        {% if page_obj.has_next %}
-          <a class="button button-secondary" href="?{{ pagination_query }}&amp;page={{ page_obj.next_page_number }}">التالي</a>
-        {% endif %}
-      </nav>
-    {% endif %}
+    {% makken_pagination page_obj aria_label="صفحات سجل النشاط" %}
   </section>
   <dialog id="activity-detail" class="partnership-dialog activity-dialog" aria-labelledby="activity-detail-title">
     <div class="dialog-body">

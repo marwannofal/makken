@@ -4,6 +4,7 @@ from uuid import UUID, uuid4
 from django import forms
 from django.core import signing
 from django.core.paginator import Paginator
+from core.pagination import resolve_page_size
 from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_GET
@@ -175,7 +176,7 @@ def followup_context(request, partnership, agreement, children, *, bound_followu
         'details': details,
         'teams': [(label, agreement.members.filter(side=side)) for side, label in TeamSide.choices],
         'team_forms': (bound_teams if bound_teams is not None else team_forms(agreement)) if editing_teams else [],
-        'entries_page': Paginator(entries, 10).get_page(request.GET.get('updates')),
+        'entries_page': Paginator(entries, resolve_page_size(request, 10, param='updates_per_page')).get_page(request.GET.get('updates')),
         'followup_updated_at': updated_at, 'followup_updated_by': updated_by,
         'can_edit_followup': can_edit, 'can_download_evidence': policy.can('partnerships', 'export'),
         'editing_teams': editing_teams,

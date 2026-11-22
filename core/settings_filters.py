@@ -39,6 +39,9 @@ def context(request):
     page = request.GET.get("page", "")
     if page.isascii() and page.isdecimal() and len(page) <= 9 and int(page) > 1:
         params["page"] = page
+    per_page = request.GET.get("per_page", "").strip()
+    if per_page in {"10", "20", "50", "100"}:
+        params["per_page"] = per_page
     return {"settings_filter_q": q, "settings_filter_status": status, "settings_filter_active": bool(q or status), "settings_filter_query": urlencode(params)}
 
 

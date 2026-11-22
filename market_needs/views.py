@@ -14,6 +14,7 @@ from django.contrib.auth.decorators import login_required
 from django.core import signing
 from django.core.exceptions import RequestDataTooBig, TooManyFilesSent
 from django.core.paginator import Paginator
+from core.pagination import resolve_page_size
 from django.db import IntegrityError, OperationalError
 from django.db.models import Count, Q, F, FloatField, Value
 from django.db.models.functions import Cast, Round
@@ -210,11 +211,12 @@ def index(request):
     distinct_items = items.distinct()
     highlighted_pk = request.session.pop(HIGHLIGHT_SESSION_KEY, None) if request.method == "GET" else None
     page_number = request.GET.get("page")
+    per_page = resolve_page_size(request, 15)
     if highlighted_pk and not page_number:
         ordered_pks = list(distinct_items.values_list("pk", flat=True))
         if highlighted_pk in ordered_pks:
-            page_number = (ordered_pks.index(highlighted_pk) // 15) + 1
-    page = Paginator(distinct_items, 15).get_page(page_number)
+            page_number = (ordered_pks.index(highlighted_pk) // per_page) + 1
+    page = Paginator(distinct_items, per_page).get_page(page_number)
     rows = [{"need": need, "toggle": token(request, need, "toggle"), "delete": token(request, need, "delete")} for need in page]
     detail = None
     if request.GET.get("detail", "").isascii() and request.GET.get("detail", "").isdigit():
@@ -283,8 +285,8 @@ def followup(request, pk):
         status = 400
     # Search is a read-only GET. It never creates candidates or advances states.
     queryset = candidates(need, filters.cleaned_data, actor=request.user) if valid_filters else candidates(need, actor=request.user).none()
-    page = Paginator(queryset, 10).get_page(request.GET.get("page"))
-    record_page = Paginator(sponsorship_query(need, request.user), 25).get_page(request.GET.get("followup_page"))
+    page = Paginator(queryset, resolve_page_size(request, 10)).get_page(request.GET.get("page"))
+    record_page = Paginator(sponsorship_query(need, request.user), resolve_page_size(request, 25, param="followup_per_page")).get_page(request.GET.get("followup_page"))
     rows = [{"record": row, "notes_token": token(request, need, "notes", row), "approve_token": token(request, need, "approve", row), "reject_token": token(request, need, "reject", row), "allocate_token": token(request, need, "allocate", row)} for row in record_page]
     from partnerships.models import Partnership
     from access_control.regions import can_write

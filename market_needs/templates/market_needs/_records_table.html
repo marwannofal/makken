@@ -1,3 +1,4 @@
+{% load makken_pagination %}
 {% load access_tags %}
 {# MAKKEN ACCESS UI v1 #}
 {% load partnership_states %}
@@ -61,16 +62,5 @@
       </tbody>
     </table>
   </div>
-  <footer class="table-footer">
-    <span>عرض {{ record_page.start_index }}–{{ record_page.end_index }} من {{ record_page.paginator.count }}</span>
-    <nav class="pagination" aria-label="صفحات متابعة الجهات">
-      {% if record_page.has_previous %}
-        <a class="button button-secondary" href="?{{ filter_query }}&amp;followup_page={{ record_page.previous_page_number }}#market-followup-records">السابق</a>
-      {% endif %}
-      <span>{{ record_page.number }} / {{ record_page.paginator.num_pages }}</span>
-      {% if record_page.has_next %}
-        <a class="button button-secondary" href="?{{ filter_query }}&amp;followup_page={{ record_page.next_page_number }}#market-followup-records">التالي</a>
-      {% endif %}
-    </nav>
-  </footer>
+  {% makken_pagination record_page page_param="followup_page" aria_label="صفحات متابعة الجهات" anchor="#market-followup-records" %}
 </section>

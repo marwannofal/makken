@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
+from core.pagination import resolve_page_size
 from django.db import transaction
 from django.db.models import Count, Q
 from django.http import Http404, JsonResponse
@@ -54,7 +55,7 @@ def index(request):
              if (not query or query.casefold() in (code + ' ' + entry.label).casefold()) and
              (not category or entry.category == category)]
     rules = EventRule.objects.filter(pk__in=codes).annotate(total=Count('recipients')).order_by('-enabled', 'code')
-    paginated = Paginator(rules, 20).get_page(request.GET.get('page'))
+    paginated = Paginator(rules, resolve_page_size(request, 20)).get_page(request.GET.get('page'))
     for rule in paginated:
         rule.label = CATALOG[rule.code].label
     users = User.objects.order_by('first_name', 'last_name', User.USERNAME_FIELD).only('first_name', 'last_name', User.USERNAME_FIELD)
@@ -256,7 +257,7 @@ def deliveries(request):
     query = Delivery.objects.select_related('recipient', 'rule')
     if selected in DeliveryStatus.values:
         query = query.filter(status=selected)
-    paginated = Paginator(query, 25).get_page(request.GET.get('page'))
+    paginated = Paginator(query, resolve_page_size(request, 25)).get_page(request.GET.get('page'))
     for row in paginated:
         row.label = CATALOG[row.rule_id].label if row.rule_id in CATALOG else row.rule_id
         row.reason_label = REASONS.get(row.reason, '')
@@ -306,7 +307,7 @@ def work_index(request):
     params.pop('page', None)
     can_create = request.user.is_superuser or policy.can('work_assignments', 'create')
     can_stats = request.user.is_superuser or policy.can('work_assignments', 'view')
-    page_obj = Paginator(query, 20).get_page(request.GET.get('page'))
+    page_obj = Paginator(query, resolve_page_size(request, 20)).get_page(request.GET.get('page'))
     from partnerships.models import Partnership
     from agreement_clauses.models import Agreement
     p_ids = [r.target_key for r in page_obj if r.target_model == 'partnerships.partnership' and r.target_key]
@@ -450,7 +451,7 @@ def work_detail(request, pk):
         else:
             messages.success(request, 'تم حفظ متابعة العمل.')
             return redirect('makken_mail:work_detail', pk=pk)
-    history = Paginator(work.history.select_related('actor'), 20).get_page(request.GET.get('page'))
+    history = Paginator(work.history.select_related('actor'), resolve_page_size(request, 20)).get_page(request.GET.get('page'))
     for row in history:
         row.label = {'created': 'إسناد العمل', 'reassigned': 'تغيير الإسناد', 'progress': 'تحديث التقدم',
                      'edited': 'تعديل التفاصيل'}[row.action]

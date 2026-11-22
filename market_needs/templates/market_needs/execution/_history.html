@@ -1,3 +1,4 @@
+{% load makken_pagination %}
 {% for row in execution_history %}
   <details class="market-event">
     <summary>
@@ -47,12 +48,4 @@
 {% empty %}
   <p class="muted">لا توجد تغييرات تنفيذ مسجلة بعد.</p>
 {% endfor %}
-<nav class="pagination" aria-label="صفحات سجل التنفيذ">
-  {% if history_page.has_previous %}
-    <a class="button button-secondary" href="?{{ history_query }}&amp;history_page={{ history_page.previous_page_number }}">أحدث</a>
-  {% endif %}
-  <span>صفحة {{ history_page.number }} / {{ history_page.paginator.num_pages }}</span>
-  {% if history_page.has_next %}
-    <a class="button button-secondary" href="?{{ history_query }}&amp;history_page={{ history_page.next_page_number }}">أقدم</a>
-  {% endif %}
-</nav>
+{% makken_pagination history_page page_param="history_page" per_page_param="" aria_label="صفحات سجل التنفيذ" %}

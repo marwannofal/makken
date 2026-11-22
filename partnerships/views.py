@@ -14,6 +14,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core import signing
 from django.core.paginator import Paginator
+from core.pagination import resolve_page_size
 from django.db import IntegrityError, transaction
 from django.db.models import Q, Prefetch
 from django.db.models.deletion import ProtectedError
@@ -654,11 +655,12 @@ def _render_index(request, fixed_state=None, read_only=False):
     query = financial.queryset
     highlighted_pk = request.session.pop(HIGHLIGHT_SESSION_KEY, None) if request.method == "GET" else None
     page_number = request.GET.get("page")
+    per_page = resolve_page_size(request, 15)
     if highlighted_pk and not page_number:
         ordered_pks = list(query.values_list("pk", flat=True))
         if highlighted_pk in ordered_pks:
-            page_number = (ordered_pks.index(highlighted_pk) // 15) + 1
-    page = Paginator(query, 15).get_page(page_number)
+            page_number = (ordered_pks.index(highlighted_pk) // per_page) + 1
+    page = Paginator(query, per_page).get_page(page_number)
     rows = []
     for item in page:
         token = {"kind": "row", "id": item.pk, "version": item.version}

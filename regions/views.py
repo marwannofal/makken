@@ -7,6 +7,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core import signing
 from django.core.paginator import Paginator
+from core.pagination import resolve_page_size
 from django.db import IntegrityError, transaction
 from django.db.models.deletion import ProtectedError, RestrictedError
 from django.shortcuts import redirect, render
@@ -144,7 +145,7 @@ def index(request):
         context["error"], status = "انتهت صلاحية الطلب أو تغيّر محتواه. أعد فتح الصفحة وحاول مجددًا.", 400
     except (IntegrityError, ProtectedError, RestrictedError):
         context["error"], status = "تعذّر تنفيذ الطلب. الاسم مستخدم بالفعل أو المنطقة مرتبطة بسجلات أخرى. راجع القائمة وحاول مجددًا.", 409
-    page = Paginator(_makken_settings_apply(request, scoped(Region.objects.all(), request.user)), 10).get_page(request.GET.get("page"))
+    page = Paginator(_makken_settings_apply(request, scoped(Region.objects.all(), request.user)), resolve_page_size(request, 10)).get_page(request.GET.get("page"))
     rows = []
     for item in page:
         rows.append({"id": item.pk, "name": item.name, "is_active": item.is_active, "edit_snapshot": _snapshot(item, "edit", request.user), "toggle_snapshot": _snapshot(item, "toggle", request.user), "delete_snapshot": _snapshot(item, "delete", request.user)})

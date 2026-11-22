@@ -1,4 +1,5 @@
 from django.core.paginator import Paginator
+from core.pagination import resolve_page_size
 from django.db.models import Q, Max
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_GET
@@ -65,7 +66,7 @@ def activity(request):
         # A malformed filter must never silently export an unfiltered report.
         return add_login_headers(render(request, 'access_control/activity.html',
             {**base(request), 'form':form, 'rows':[], 'filter_error':True}, status=400))
-    page = Paginator(events.prefetch_related('region_snapshots'), 25).get_page(request.GET.get('page'))
+    page = Paginator(events.prefetch_related('region_snapshots'), resolve_page_size(request, 25)).get_page(request.GET.get('page'))
     params = request.GET.copy()
     for key in ['page','_mk_export','_mk_table']:
         params.pop(key, None)

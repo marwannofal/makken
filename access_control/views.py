@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model,update_session_auth_hash
 from django.contrib.auth.models import Group,Permission
 from django.core import signing
 from django.core.paginator import Paginator
+from core.pagination import resolve_page_size
 from django.db import IntegrityError,OperationalError
 from django.db.models import Q,Count,Prefetch
 from django.http import JsonResponse
@@ -98,7 +99,7 @@ def index(request):
         users=users.filter(condition).distinct()
     if status in {'1','0'}:users=users.filter(is_active=status=='1')
     if numeric_id(role) is not None:users=users.filter(groups__makken_role__pk=numeric_id(role))
-    page=Paginator(users,15).get_page(request.GET.get('page'))
+    page=Paginator(users, resolve_page_size(request, 15)).get_page(request.GET.get('page'))
     from .employee_agreements import employee_agreement_counts
     page_users=list(page)
     agr_counts=employee_agreement_counts(page_users)
@@ -176,7 +177,7 @@ def roles(request):
     context=base(request,'roles');q=request.GET.get('q','').strip()[:200]
     items=RoleProfile.objects.select_related('group').annotate(user_count=Count('group__user')).order_by('group__name')
     if q:items=items.filter(Q(group__name__icontains=q)|Q(description__icontains=q))
-    page=Paginator(items,15).get_page(request.GET.get('page'))
+    page=Paginator(items, resolve_page_size(request, 15)).get_page(request.GET.get('page'))
     context.update(rows=[{'role':role,'delete_token':token(request,'role','delete',role),'duplicate_token':token(request,'role','duplicate',role)} for role in page],page_obj=page,q=q)
     return finish(request,'roles.html',context)
 
@@ -196,7 +197,7 @@ def role_editor(request,pk=None):
         except services.InvalidForm as error:form=error.form;status=400
         except (services.Conflict,signing.BadSignature,IntegrityError,OperationalError) as error:context['error']=str(error) if isinstance(error,services.Conflict) else 'تعذّر الحفظ. الاسم مكرر أو انتهت صلاحية النموذج.';status=409
     users=role.group.user_set.order_by('username') if role else get_user_model().objects.none()
-    context.update(form=form,role=role,matrix_rows=matrix(form,role=True),operations=Operation.choices,assigned_users=Paginator(users,15).get_page(request.GET.get('users_page')))
+    context.update(form=form,role=role,matrix_rows=matrix(form,role=True),operations=Operation.choices,assigned_users=Paginator(users, resolve_page_size(request, 15, param='users_per_page')).get_page(request.GET.get('users_page')))
     return finish(request,'role_editor.html',context,status)
 
 
@@ -223,7 +224,7 @@ def logs(request):
     if action:events=events.filter(action=action)
     if numeric_id(target) is not None:events=events.filter(target_user_id=numeric_id(target))
     if numeric_id(actor) is not None:events=events.filter(actor_id=numeric_id(actor))
-    page=Paginator(events,20).get_page(request.GET.get('page'))
+    page=Paginator(events, resolve_page_size(request, 20)).get_page(request.GET.get('page'))
     context.update(page_obj=page,q=q,selected_action=action,actions=SecurityAudit.objects.order_by('action').values_list('action',flat=True).distinct(),target_filter=target,actor_filter=actor)
     return finish(request,'logs.html',context)
 

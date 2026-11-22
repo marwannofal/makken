@@ -4,6 +4,7 @@ from urllib.parse import urlencode
 from django.contrib import messages
 from django.core import signing
 from django.core.paginator import Paginator
+from core.pagination import resolve_page_size
 from django.db import IntegrityError, OperationalError
 from django.db.models import Q
 from django.http import Http404
@@ -90,7 +91,7 @@ def list_context(request, assignment=False):
         except forms.ValidationError:
             pass
         items = items.filter(condition)
-    page = Paginator(items.distinct().order_by("-pk"), 15).get_page(request.GET.get("page"))
+    page = Paginator(items.distinct().order_by("-pk"), resolve_page_size(request, 15)).get_page(request.GET.get("page"))
     for item in page:
         item.execution_permission = "edit" if hasattr(item, "execution") else "create"
     detail = None
@@ -183,8 +184,8 @@ def assignment(request, pk):
         p_query = p_query.filter(Q(name__icontains=word) | Q(email__icontains=word) | Q(coverage__region__name__icontains=word) | Q(coverage__specializations__name__icontains=word)).distinct()
     for word in employer_q.split()[:12]:
         e_query = e_query.filter(Q(name__icontains=word) | Q(email__icontains=word) | Q(phone__icontains=word) | Q(entity__name__icontains=word) | Q(entity__branch__icontains=word))
-    p_page = Paginator(p_query, 10).get_page(request.GET.get("provider_page"))
-    e_page = Paginator(e_query, 10).get_page(request.GET.get("employer_page"))
+    p_page = Paginator(p_query, resolve_page_size(request, 10, param="provider_per_page")).get_page(request.GET.get("provider_page"))
+    e_page = Paginator(e_query, resolve_page_size(request, 10, param="employer_per_page")).get_page(request.GET.get("employer_page"))
     def candidate_row(item, kind):
         params = request.GET.copy()
         for key in ("candidate", "kind", "_mk_export", "_mk_table"):

@@ -1,4 +1,5 @@
 {% extends "core/makken_base.html" %}
+{% load makken_pagination %}
 {% load access_tags %}
 {# MAKKEN ACCESS UI v1 #}
 {% load static partnership_states tz %}
@@ -164,18 +165,7 @@
         </tbody>
       </table>
     </div>
-    <footer class="table-footer">
-      <span>عرض {{ page_obj.start_index }}–{{ page_obj.end_index }} من {{ page_obj.paginator.count }}</span>
-      <nav class="pagination" aria-label="صفحات سجل الشراكات">
-        {% if page_obj.has_previous %}
-          <a class="button button-secondary" href="?{{ financial_pagination_query }}&amp;page={{ page_obj.previous_page_number }}">السابق</a>
-        {% endif %}
-        <span>{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
-        {% if page_obj.has_next %}
-          <a class="button button-secondary" href="?{{ financial_pagination_query }}&amp;page={{ page_obj.next_page_number }}">التالي</a>
-        {% endif %}
-      </nav>
-    </footer>
+    {% makken_pagination page_obj aria_label="صفحات سجل الشراكات" %}
   </section>
   {% if detail %}
     <dialog id="partnership-detail" class="partnership-dialog detail-dialog" aria-labelledby="detail-title" open data-server-dialog data-close-url="{{ list_url }}">

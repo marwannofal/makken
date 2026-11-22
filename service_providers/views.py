@@ -10,6 +10,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core import signing
 from django.core.paginator import Paginator
+from core.pagination import resolve_page_size
 from django.db import IntegrityError
 from django.db.models import Q, Prefetch
 from django.db.models.deletion import ProtectedError
@@ -89,7 +90,7 @@ def list_context(request):
                         match |= Q(**{field + "__in": values})
                 providers = providers.filter(match)
             providers = providers.distinct()
-    page = Paginator(providers, 10).get_page(request.GET.get("page"))
+    page = Paginator(providers, resolve_page_size(request, 10)).get_page(request.GET.get("page"))
     for item in page:
         item.row_token = token({"operation": "row", "id": item.pk, "version": item.version}, request.user)
         item.specialty_names = list(dict.fromkeys(s.name for row in item.coverage.all() for s in row.specializations.all()))

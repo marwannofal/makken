@@ -3,6 +3,7 @@ from urllib.parse import urlencode
 from django.contrib import messages
 from django.core import signing
 from django.core.paginator import Paginator
+from core.pagination import resolve_page_size
 from django.db import IntegrityError, transaction
 from django.db.models.deletion import ProtectedError
 from django.shortcuts import get_object_or_404, redirect, render
@@ -115,7 +116,7 @@ def reference_catalog(request):
     elif status_filter == '0':
         filtered = filtered.filter(is_active=False)
 
-    page_obj = Paginator(filtered, 20).get_page(request.GET.get('page'))
+    page_obj = Paginator(filtered, resolve_page_size(request, 20)).get_page(request.GET.get('page'))
     filter_params = {}
     if q:
         filter_params['q'] = q
