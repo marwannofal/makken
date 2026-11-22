@@ -69,6 +69,21 @@
       <div class="mk-acc-body">
         <div class="partnership-form-grid">
           {% include "market_needs/_field.html" with field=form.program wide=True %}
+          {% if not need.approved_support %}
+            {% if not need %}
+              {% allowed 'market_needs' 'create' %}
+                <div class="partnership-field wide-field" data-clear-program-wrap hidden>
+                  <button type="button" class="button button-secondary" data-clear-program>إزالة البرنامج التدريبي المختار</button>
+                </div>
+              {% endallowed %}
+            {% else %}
+              {% allowed 'market_needs' 'edit' %}
+                <div class="partnership-field wide-field" data-clear-program-wrap hidden>
+                  <button type="button" class="button button-secondary" data-clear-program>إزالة البرنامج التدريبي المختار</button>
+                </div>
+              {% endallowed %}
+            {% endif %}
+          {% endif %}
           <div class="partnership-field">
             <label for="market-category">تصنيف البرنامج</label><input id="market-category" readonly>
           </div>
@@ -81,7 +96,7 @@
         </div>
         <p class="table-scroll-hint">كل بند مشمول يحتاج شكل رعاية ومبلغًا أكبر من صفر. حصة البند = مبلغه ÷ مجموع البنود × 100.</p>
         <div class="table-scroll" tabindex="0" aria-label="جدول يمكن تمريره أفقيًا">
-          <table class="partnership-table market-edit-lines">
+          <table class="partnership-table market-edit-lines" data-no-export>
             <caption class="visually-hidden">تحديد بنود صرف الحاجة</caption>
             <thead>
               <tr>

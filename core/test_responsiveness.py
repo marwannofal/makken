@@ -214,3 +214,5 @@ class SiteWideResponsivenessTests(TestCase):
         self.assertContains(res, "01 · بطاقة الحاجة والبيانات الأساسية")
         self.assertContains(res, "02 · البرنامج التدريبي وبنود الصرف")
         self.assertContains(res, "willingness_clauses.css")
+        self.assertContains(res, 'class="partnership-table market-edit-lines" data-no-export')
+        self.assertContains(res, "data-clear-program")
