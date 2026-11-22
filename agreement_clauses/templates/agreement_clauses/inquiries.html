@@ -211,9 +211,9 @@
               {% endif %}
               </td> <td>
               <div class="row-actions">
-                <a class="row-action" href="?{% if filter_query %}{{ filter_query }}&amp;{% endif %}detail={{ row.partnership.pk }}">عرض التفاصيل</a>
+                <a class="row-action mk-view-action" href="?{% if filter_query %}{{ filter_query }}&amp;{% endif %}detail={{ row.partnership.pk }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg><span>مشاهدة</span></a>
                 {% if can_edit %}
-                  <a class="row-action" href="{% url 'partnerships:edit' row.partnership.pk %}">تعديل</a>
+                  <a class="row-action" href="{% url 'partnerships:edit' row.partnership.pk %}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m16 4 4 4M4 20l5-1L20 8a2.8 2.8 0 0 0-4-4L5 15Z"/></svg><span>تعديل</span></a>
                 {% endif %}
               </div>
               </td>

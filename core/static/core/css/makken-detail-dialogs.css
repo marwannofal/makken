@@ -196,8 +196,11 @@ dialog.detail-dialog,
   font-weight: 700 !important;
 }
 
-.detail-dialog-actions .detail-close-btn:hover {
+.detail-dialog-actions .detail-close-btn:hover,
+.detail-dialog-actions .detail-close-btn:focus-visible {
   background: #004566 !important;
+  color: #ffffff !important;
+  border-color: #004566 !important;
 }
 
 /* Responsive detail grid breakpoints */

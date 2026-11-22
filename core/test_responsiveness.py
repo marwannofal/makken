@@ -136,6 +136,8 @@ class SiteWideResponsivenessTests(TestCase):
         self.assertIn("font-size: 12.5px !important;", css)
         self.assertIn("font-size: 14.5px !important;", css)
         self.assertIn("border-inline-start: 3.5px solid #005b85;", css)
+        self.assertIn(".detail-dialog-actions .detail-close-btn:hover", css)
+        self.assertIn("color: #ffffff !important;", css)
         self.assertIn("grid-template-columns: repeat(2, minmax(0, 1fr)) !important;", css)
         self.assertIn("grid-template-columns: 1fr !important;", css)
 
@@ -197,3 +199,8 @@ class SiteWideResponsivenessTests(TestCase):
         self.assertNotContains(res, "تعديل الشراكة")
         self.assertContains(res, "detail-dialog-actions")
         self.assertContains(res, "detail-close-btn")
+        self.assertContains(res, "<span>مشاهدة</span>")
+        self.assertContains(res, "<span>تعديل</span>")
+        self.assertContains(res, "M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z")
+        self.assertContains(res, "m16 4 4 4M4 20l5-1L20 8a2.8 2.8 0 0 0-4-4L5 15Z")
+        self.assertNotContains(res, ">عرض التفاصيل<")
