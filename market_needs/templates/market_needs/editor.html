@@ -5,9 +5,7 @@
 {% block extra_head %}
   {{ block.super }}
 {% endblock %}
-{% block page_actions %}
-  <a class="button button-secondary" href="{% url 'market_needs:index' %}">العودة للسجل</a>
-{% endblock %}
+{% block page_actions %}{% endblock %}
 {% block market_content %}
   <noscript><p class="feedback feedback-info">يتطلب إعداد بنود الصرف واستخدام القوائم القابلة للبحث تفعيل JavaScript.</p></noscript>
   {% if need.approved_support %}
@@ -68,22 +66,27 @@
       </summary>
       <div class="mk-acc-body">
         <div class="partnership-form-grid">
-          {% include "market_needs/_field.html" with field=form.program wide=True %}
-          {% if not need.approved_support %}
-            {% if not need %}
-              {% allowed 'market_needs' 'create' %}
-                <div class="partnership-field wide-field" data-clear-program-wrap hidden>
-                  <button type="button" class="button button-secondary" data-clear-program>إزالة البرنامج التدريبي المختار</button>
-                </div>
-              {% endallowed %}
-            {% else %}
-              {% allowed 'market_needs' 'edit' %}
-                <div class="partnership-field wide-field" data-clear-program-wrap hidden>
-                  <button type="button" class="button button-secondary" data-clear-program>إزالة البرنامج التدريبي المختار</button>
-                </div>
-              {% endallowed %}
-            {% endif %}
-          {% endif %}
+          <div class="partnership-field market-wide market-program-row">
+            <label for="{{ form.program.id_for_label }}">{{ form.program.label }} <span class="required" aria-hidden="true">*</span></label>
+            <div class="market-program-control">
+              <div class="market-program-select-wrap">
+                {{ form.program }}
+              </div>
+              {% if not need.approved_support %}
+                {% if not need %}
+                  {% allowed 'market_needs' 'create' %}
+                    <button type="button" class="button button-secondary market-clear-program-btn" data-clear-program-wrap data-clear-program hidden>إزالة البرنامج</button>
+                  {% endallowed %}
+                {% else %}
+                  {% allowed 'market_needs' 'edit' %}
+                    <button type="button" class="button button-secondary market-clear-program-btn" data-clear-program-wrap data-clear-program hidden>إزالة البرنامج</button>
+                  {% endallowed %}
+                {% endif %}
+              {% endif %}
+            </div>
+            {% if form.program.help_text %}<p class="field-help">{{ form.program.help_text }}</p>{% endif %}
+            <div class="field-error" id="error-program" role="alert">{{ form.program.errors }}</div>
+          </div>
           <div class="partnership-field">
             <label for="market-category">تصنيف البرنامج</label><input id="market-category" readonly>
           </div>

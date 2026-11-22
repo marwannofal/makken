@@ -78,6 +78,8 @@ class SiteWideResponsivenessTests(TestCase):
         self.assertIn(".account-chip-clock", css)
         self.assertIn("text-overflow: ellipsis;", css)
         self.assertIn("max-width: none !important;", css)
+        self.assertIn("body.mk-sidebar-collapsed .app-layout", css)
+        self.assertIn("grid-template-columns: minmax(0, 1fr) !important;", css)
 
     def test_compact_tables_css_enforces_readable_mobile_scroll_and_dialog_clamping(self):
         css = _read_static("core/static/core/css/makken-compact-tables.css")
@@ -216,3 +218,5 @@ class SiteWideResponsivenessTests(TestCase):
         self.assertContains(res, "willingness_clauses.css")
         self.assertContains(res, 'class="partnership-table market-edit-lines" data-no-export')
         self.assertContains(res, "data-clear-program")
+        self.assertContains(res, "market-program-control")
+        self.assertNotContains(res, "العودة للسجل")

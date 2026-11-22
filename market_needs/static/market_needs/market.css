@@ -1004,3 +1004,45 @@ progress::-moz-progress-bar {
 #market-followup-records table.market-followup tbody tr:hover > td {
   background-color: #e4f1f8 !important;
 }
+
+/* Inline program selector + clear button on the same row */
+.market-program-control {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.market-program-select-wrap {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.market-clear-program-btn {
+  flex: 0 0 auto;
+  min-height: 48px;
+  white-space: nowrap;
+  color: #b91c1c !important;
+  border-color: #f5c2c7 !important;
+  background: #fff5f5 !important;
+}
+
+.market-clear-program-btn:hover {
+  background: #fee2e2 !important;
+  border-color: #dc2626 !important;
+  color: #991b1b !important;
+}
+
+.market-clear-program-btn[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 640px) {
+  .market-program-control {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .market-clear-program-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
