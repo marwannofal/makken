@@ -1,0 +1,218 @@
+/* Makken unified Ocean-Blue (#005b85) styling for all detail/view popups & .detail-grid cards site-wide (RTL-first, responsive, CSP-safe). */
+
+dialog.detail-dialog,
+.detail-dialog {
+  border: 2px solid #c5deec !important;
+  border-top: 5px solid #005b85 !important;
+  border-radius: 20px !important;
+  box-shadow: 0 24px 64px rgba(0, 56, 84, 0.22) !important;
+  color: #0f2b3a;
+}
+
+.detail-dialog .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: #e6f2f8;
+  color: #005b85 !important;
+  font-size: 12.5px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0;
+  margin-bottom: 8px;
+}
+
+.detail-dialog h2,
+.detail-dialog #detail-title {
+  color: #00334d !important;
+  font-size: 22px !important;
+  font-weight: 800 !important;
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+.detail-dialog .dialog-top .icon-button {
+  border: 1.5px solid #005b85 !important;
+  color: #005b85 !important;
+  background: #f0f7fb !important;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.detail-dialog .dialog-top .icon-button:hover {
+  background: #005b85 !important;
+  color: #ffffff !important;
+}
+
+/* Vibrant, high-contrast Ocean-Blue detail grid tiles */
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px !important;
+  margin: 20px 0 !important;
+  padding: 18px !important;
+  background: linear-gradient(180deg, #f3f9fc 0%, #eaf4fa 100%) !important;
+  border: 1px solid #cce2ee !important;
+  border-radius: 16px !important;
+}
+
+.detail-grid > div {
+  min-width: 0;
+  background: #ffffff;
+  border: 1px solid #d5e6f0;
+  border-inline-start: 3.5px solid #005b85;
+  border-radius: 11px;
+  padding: 11px 14px;
+  box-shadow: 0 2px 6px rgba(0, 74, 110, 0.04);
+}
+
+.detail-grid dt {
+  font-size: 12.5px !important;
+  font-weight: 800 !important;
+  color: #005b85 !important;
+  margin-bottom: 6px !important;
+  line-height: 1.45;
+}
+
+.detail-grid dd {
+  margin: 0 !important;
+  font-size: 14.5px !important;
+  font-weight: 700 !important;
+  color: #0f2b3a !important;
+  line-height: 1.6 !important;
+  overflow-wrap: anywhere;
+}
+
+.detail-grid dd small {
+  display: inline-block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #36596b;
+}
+
+/* Section titles inside detail dialogs */
+.detail-dialog h3,
+.detail-offerings h3 {
+  font-size: 15.5px !important;
+  font-weight: 800 !important;
+  color: #003d5c !important;
+  border-inline-start: 4px solid #005b85;
+  padding-inline-start: 10px;
+  margin: 20px 0 12px !important;
+}
+
+.detail-dialog p,
+.detail-dialog .field-help,
+.detail-dialog .muted {
+  color: #2b4a59 !important;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.65;
+}
+
+/* High-legibility tables inside detail popups */
+.detail-dialog table {
+  border: 1px solid #d3e5ef;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.detail-dialog table thead th {
+  background: #e6f2f8 !important;
+  color: #003d5c !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  border-bottom: 1.5px solid #c5deec !important;
+}
+
+.detail-dialog table tbody th,
+.detail-dialog table tbody td {
+  color: #0f2b3a !important;
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+}
+
+.detail-dialog table tbody tr:nth-child(even) {
+  background: #f7fbfe;
+}
+
+/* Nested cards (e.g., development history, regions, clauses) */
+.detail-dialog .development-card {
+  background: #f6fafd !important;
+  border: 1px solid #cce2ee !important;
+  border-radius: 14px !important;
+  padding: 18px !important;
+}
+
+.detail-dialog .development-card .card-heading h2 {
+  font-size: 16.5px !important;
+  font-weight: 800 !important;
+  color: #003d5c !important;
+}
+
+.detail-dialog .development-card .fixed-tag,
+.detail-dialog .subtle-badge {
+  background: #e6f2f8 !important;
+  color: #004c70 !important;
+  border: 1px solid #c5deec !important;
+  font-weight: 700 !important;
+}
+
+.detail-dialog .development-item {
+  background: #ffffff !important;
+  border: 1px solid #d3e5ef !important;
+  border-radius: 12px !important;
+}
+
+.detail-dialog .development-name strong {
+  font-size: 14.5px !important;
+  font-weight: 800 !important;
+  color: #0f2b3a !important;
+}
+
+.detail-dialog .development-item time,
+.detail-dialog .development-item p {
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: #1f4456 !important;
+}
+
+.detail-dialog-actions .detail-close-btn {
+  background: #005b85 !important;
+  color: #ffffff !important;
+  border-color: #005b85 !important;
+  font-weight: 700 !important;
+}
+
+.detail-dialog-actions .detail-close-btn:hover {
+  background: #004566 !important;
+}
+
+/* Responsive detail grid breakpoints */
+@media (max-width: 900px) {
+  .detail-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+    padding: 14px !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .detail-dialog h2,
+  .detail-dialog #detail-title {
+    font-size: 18.5px !important;
+  }
+  .detail-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+    padding: 12px !important;
+  }
+  .detail-grid > div {
+    padding: 10px 12px;
+  }
+  .detail-grid dt {
+    font-size: 12px !important;
+  }
+  .detail-grid dd {
+    font-size: 14px !important;
+  }
+}

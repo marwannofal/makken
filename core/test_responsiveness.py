@@ -126,3 +126,53 @@ class SiteWideResponsivenessTests(TestCase):
         self.assertContains(res, 'name="viewport"')
         csp = res.get("Content-Security-Policy", "")
         self.assertNotIn("unsafe-inline", csp)
+
+    def test_detail_dialogs_css_uses_ocean_blue_palette_bold_typography_and_balanced_braces(self):
+        css = _read_static("core/static/core/css/makken-detail-dialogs.css")
+        self.assertTrue(_check_balanced_braces(css))
+        self.assertIn("#005b85", css)
+        self.assertIn("font-weight: 800 !important;", css)
+        self.assertIn("font-weight: 700 !important;", css)
+        self.assertIn("font-size: 12.5px !important;", css)
+        self.assertIn("font-size: 14.5px !important;", css)
+        self.assertIn("border-inline-start: 3.5px solid #005b85;", css)
+        self.assertIn("grid-template-columns: repeat(2, minmax(0, 1fr)) !important;", css)
+        self.assertIn("grid-template-columns: 1fr !important;", css)
+
+    def test_no_duplicate_core_css_or_js_links_in_base_template(self):
+        base_html = (Path(settings.BASE_DIR) / "core/templates/core/makken_base.html").read_text(encoding="utf-8")
+        for asset in (
+            "makken-home.css",
+            "makken-detail-dialogs.css",
+            "makken-dropdowns.css",
+            "makken-dropdowns.js",
+            "compact_tables_assets.html",
+            "table_actions_assets.html",
+        ):
+            with self.subTest(asset=asset):
+                self.assertEqual(base_html.count(asset), 1, f"Duplicate or missing {asset} in makken_base.html")
+
+    def test_partnership_detail_view_modal_loads_ocean_blue_detail_css_and_strict_csp(self):
+        from care_states.models import DevelopmentState
+        from entities.models import Entity
+        from partnerships.models import Partnership
+
+        ent = Entity.objects.create(name="جهة عرض تفاصيل اختبارية", entity_type="government", is_active=True)
+        p = Partnership.objects.create(
+            name="شركة تفاصيل العرض الاختبارية",
+            representative="ممثل التفاصيل",
+            phone="+966501234999",
+            email="detail_view@example.com",
+            entity=ent,
+            scope="local",
+            development_state_id=DevelopmentState.WILLINGNESS,
+        )
+        res = self.client.get(reverse("partnerships:willingness_index"), {"detail": str(p.pk)})
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "makken-detail-dialogs.css")
+        self.assertContains(res, "detail-dialog")
+        self.assertContains(res, "detail-grid")
+        self.assertContains(res, "شركة تفاصيل العرض الاختبارية")
+        self.assertEqual(res.content.decode("utf-8").count("makken-detail-dialogs.css"), 1)
+        csp = res.get("Content-Security-Policy", "")
+        self.assertNotIn("unsafe-inline", csp)
