@@ -118,6 +118,9 @@ class NewPagesRBACTests(TestCase):
 
         admin = User.objects.create_superuser('matrix_admin', 'matrix_admin@makken.test', 'StrongPass!2026')
         self.client.force_login(admin, backend=AUTH_BACKEND)
+        users_res = self.client.get(reverse('access_control:index'))
+        self.assertEqual(users_res.status_code, 200)
+        self.assertContains(users_res, 'M9 5H5v16h14V5h-4M9 3h6v4H9ZM8 11h8m-8 4h5"/></svg>السجل</a>')
         role_res = self.client.get(reverse('access_control:roles'))
         self.assertEqual(role_res.status_code, 200)
         user_edit_res = self.client.get(reverse('access_control:user_edit', args=[self.user.pk]))
