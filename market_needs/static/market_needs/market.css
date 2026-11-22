@@ -1046,3 +1046,23 @@ progress::-moz-progress-bar {
     justify-content: center;
   }
 }
+
+.market-configured-criteria {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 24px;
+  align-items: center;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+  border-radius: 12px;
+  background: #f3f9fc;
+  border: 1px solid #cce2ee;
+}
+.market-criteria-group {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #0f2b3a;
+}

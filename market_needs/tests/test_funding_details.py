@@ -195,11 +195,36 @@ class FundingMigrationTests(MarketFixtures, TransactionTestCase):
         self.addCleanup(self.restore_latest)
         executor=MigrationExecutor(connection); executor.migrate([('market_needs','0001_initial')])
         self.setUpTestData()
-        # The fixture is saved while the migration executor has removed
-        # later agreement-clause tables. Do not attach clauses to this fixture.
-        need = self.create_need()
+        # Build historical 0001_initial records via the migration project state
+        # so later columns (e.g. search_states/search_scopes) are not referenced.
         executor = MigrationExecutor(connection)
         old = executor.loader.project_state(list(executor.loader.applied_migrations)).apps
+        OldNeed = old.get_model('market_needs', 'Need')
+        need = OldNeed.objects.create(
+            title='حاجة الهجرة للتمويل',
+            description='وصف',
+            duration=3,
+            duration_unit='month',
+            source='دراسة السوق',
+            beneficiaries=3,
+            program_id=self.program.pk,
+            program_name=self.program.name,
+            program_category=self.program.category,
+            training_type='training',
+            sector_id=self.sector.pk,
+            specialization_id=self.spec.pk,
+            total_cost='100.00',
+            requested_support='90.00',
+            created_by_id=self.user.pk,
+        )
+        old.get_model('market_needs', 'NeedRegion').objects.create(need_id=need.pk, region_id=self.region.pk)
+        old.get_model('market_needs', 'ExpenseLine').objects.create(
+            need_id=need.pk,
+            expense_item_id=self.expense.pk,
+            sponsorship_shape_id=self.shape.pk,
+            amount='100.00',
+            position=0,
+        )
         OldPartnership = old.get_model('partnerships', 'Partnership')
         org = OldPartnership.objects.create(
             name='جهة الهجرة للتمويل',
@@ -216,7 +241,7 @@ class FundingMigrationTests(MarketFixtures, TransactionTestCase):
         entered = org.development_state_at
         decided=timezone.now()-timedelta(days=3)
         record=old.get_model('market_needs','Sponsorship').objects.create(need_id=need.pk,partnership_id=org.pk,status='approved',amount='80.00',decided_at=decided)
-        event=AuditEvent.objects.create(need=need,need_number=need.number,sponsorship_id=record.pk,actor=self.user,action='اعتماد مساهمة',after={'amount':'80.00'})
+        event=old.get_model('market_needs','AuditEvent').objects.create(need_id=need.pk,need_number=f'MN-{need.pk}',sponsorship_id=record.pk,actor_id=self.user.pk,action='اعتماد مساهمة',after={'amount':'80.00'})
         self.restore_latest()
         current=Sponsorship.objects.get(pk=record.pk);org=Partnership.objects.get(pk=org.pk)
         self.assertEqual(current.amount,80);self.assertEqual(current.decided_at,decided)

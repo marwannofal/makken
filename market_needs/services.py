@@ -107,6 +107,8 @@ def save_need(data, actor, pk=None, version=None, nonce=None):
         need = Need(created_by=actor, request_key=nonce or uuid.uuid4())
     for field in ("title", "sector", "specialization", "description", "duration", "duration_unit", "source", "beneficiaries", "program", "requested_support", "observed_on"):
         setattr(need, field, clean[field])
+    need.search_states = list(clean.get("search_states") or [])
+    need.search_scopes = list(clean.get("search_scopes") or [])
     if new or not need.sponsorships.filter(status=SponsorshipStatus.APPROVED).exists():
         need.program_name = clean["program"].name
         need.program_category = clean["program"].get_category_display()

@@ -94,6 +94,7 @@ def initial(need):
     data = {name: getattr(need, name) for name in ("title", "description", "duration", "duration_unit", "source", "beneficiaries", "requested_support", "observed_on")}
     data.update(sector=need.sector_id, specialization=need.specialization_id, program=need.program_id,
                 regions=list(need.regions.values_list("pk", flat=True)), is_active="1" if need.is_active else "0",
+                search_states=list(need.search_states or []), search_scopes=list(need.search_scopes or []),
                 lines=json.dumps([{"expense": line.expense_item_id, "shape": line.sponsorship_shape_id, "amount": str(line.amount)} for line in need.expense_lines.all()]))
     return data
 
@@ -138,7 +139,9 @@ def editor(request, pk=None):
             context["error"], status = failure(exc)
             if isinstance(exc, services.InvalidForm):
                 form = exc.form
-    context.update(need=need, form=form, snapshot=snapshot, catalog=catalog(need))
+    state_colors = StateColor.objects.in_bulk()
+    editor_state_options = [{"choice": choice, "state": state_colors.get(choice.data["value"])} for choice in form["search_states"]]
+    context.update(need=need, form=form, state_options=editor_state_options, snapshot=snapshot, catalog=catalog(need))
     return add_login_headers(render(request, "market_needs/editor.html", context, status=status))
 
 
@@ -288,9 +291,13 @@ def followup(request, pk):
     history_params = request.GET.copy()
     history_params.pop("history_page", None)
     context["history_query"] = history_params.urlencode()
+    from partnerships.models import Scope as _Scope
     state_colors = StateColor.objects.in_bulk()
     state_options = [{"choice": choice, "state": state_colors.get(choice.data["value"])} for choice in filters["states"]]
-    context.update(state_options=state_options, need=need, filter_form=filters, matches=explain(need, page), page_obj=page, records=rows, add_token=token(request, need, "add"),
+    configured_states = [state_colors[s] for s in (need.search_states or []) if s in state_colors]
+    scope_labels_map = dict(_Scope.choices)
+    configured_scopes = [scope_labels_map[s] for s in (need.search_scopes or []) if s in scope_labels_map]
+    context.update(state_options=state_options, configured_states=configured_states, configured_scopes=configured_scopes, need=need, filter_form=filters, matches=explain(need, page), page_obj=page, records=rows, add_token=token(request, need, "add"),
                    followup_form=followup_form or FollowupForm(need=need), selected_record=selected_record, operation=operation,
                    record_page=record_page, show_record_details=operation == "details" and selected_record is not None,
                    development_history=development_timeline(selected_record.partnership) if selected_record else [],

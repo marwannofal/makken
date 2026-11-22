@@ -46,6 +46,18 @@ class NeedForm(forms.Form):
     program = forms.ModelChoiceField(label="البرنامج التدريبي", queryset=TrainingProgram.objects.none())
     lines = forms.CharField(widget=forms.HiddenInput, max_length=60000, initial="[]")
     dependencies_confirmed = forms.BooleanField(required=False, widget=forms.HiddenInput)
+    search_states = forms.MultipleChoiceField(
+        label="سيتم البحث في المنظمات",
+        choices=DevelopmentState.choices,
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+    )
+    search_scopes = forms.MultipleChoiceField(
+        label="سيتم البحث في نطاق الكيان",
+        choices=Scope.choices,
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+    )
 
     def __init__(self, *args, instance=None, actor=None, **kwargs):
         super().__init__(*args, **kwargs)
@@ -125,6 +137,11 @@ class NeedForm(forms.Form):
         data["total_cost"] = total
         if data.get("requested_support") and data["requested_support"] > total:
             self.add_error("requested_support", "الدعم المطلوب لا يمكن أن يتجاوز إجمالي تكلفة الحاجة.")
+        if self.data.get("search_criteria_present") == "1":
+            if not data.get("search_states"):
+                self.add_error("search_states", "اختر حالة واحدة على الأقل للبحث في المنظمات (قدرة / رغبة / رعاية).")
+            if not data.get("search_scopes"):
+                self.add_error("search_scopes", "اختر نطاق كيان واحدًا على الأقل (محلي / عالمي).")
         return data
 
 

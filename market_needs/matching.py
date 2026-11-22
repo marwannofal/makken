@@ -36,10 +36,12 @@ def candidates(need, filters=None, exclude_linked=True, actor=None):
     query = eligible_partnerships(need, actor=actor).filter(development_state_id__in=DevelopmentState.values)
     if exclude_linked:
         query = query.exclude(pk__in=Sponsorship.objects.filter(need=need).values("partnership_id"))
-    if filters.get("states"):
-        query = query.filter(development_state_id__in=filters["states"])
-    if filters.get("scopes"):
-        query = query.filter(scope__in=filters["scopes"])
+    active_states = filters.get("states") or list(getattr(need, "search_states", None) or [])
+    active_scopes = filters.get("scopes") or list(getattr(need, "search_scopes", None) or [])
+    if active_states:
+        query = query.filter(development_state_id__in=active_states)
+    if active_scopes:
+        query = query.filter(scope__in=active_scopes)
     for word in filters.get("q", "").split()[:12]:
         query = query.filter(Q(name__icontains=word) | Q(representative__icontains=word) | Q(entity__name__icontains=word) | Q(phone__icontains=word) | Q(email__icontains=word))
     return query.select_related("entity", "development_state").prefetch_related(

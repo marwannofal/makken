@@ -42,6 +42,8 @@ class Need(models.Model):
     requested_support = models.DecimalField("قيمة الدعم المطلوبة", max_digits=14, decimal_places=2)
     approved_support = models.DecimalField(max_digits=14, decimal_places=2, default=0, editable=False)
     observed_on = models.DateField("تاريخ الرصد", default=timezone.localdate)
+    search_states = models.JSONField("سيتم البحث في المنظمات", default=list, blank=True)
+    search_scopes = models.JSONField("سيتم البحث في نطاق الكيان", default=list, blank=True)
     is_active = models.BooleanField(default=True)
     status = models.CharField(max_length=12, choices=NeedStatus.choices, default=NeedStatus.NEW, editable=False, db_index=True)
     version = models.PositiveBigIntegerField(default=1, editable=False)
