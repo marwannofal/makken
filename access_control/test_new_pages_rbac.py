@@ -111,3 +111,29 @@ class NewPagesRBACTests(TestCase):
         api_url = reverse('partnerships:work_edit', args=[p.pk, wk.pk])
         self.assertEqual(self.client.get(api_url).status_code, 403)
         self.assertEqual(self.client.post(api_url, {'title': 'محاولة تعديل'}).status_code, 403)
+
+    def test_all_registered_modules_appear_in_rbac_assignment_matrix_and_empty_action_cols_hide(self):
+        from pathlib import Path
+        from access_control.registry import MODULES
+
+        admin = User.objects.create_superuser('matrix_admin', 'matrix_admin@makken.test', 'StrongPass!2026')
+        self.client.force_login(admin, backend=AUTH_BACKEND)
+        role_res = self.client.get(reverse('access_control:roles'))
+        self.assertEqual(role_res.status_code, 200)
+        user_edit_res = self.client.get(reverse('access_control:user_edit', args=[self.user.pk]))
+        self.assertEqual(user_edit_res.status_code, 200)
+        for mod in MODULES:
+            self.assertTrue(Module.objects.filter(pk=mod.key).exists(), f'Missing Module {mod.key}')
+            self.assertContains(user_edit_res, mod.title)
+
+        self.client.force_login(self.user, backend=AUTH_BACKEND)
+        ov = PermissionOverride.objects.create(
+            user=self.user, module_id='care_states', operation='view', effect='grant'
+        )
+        cs_res = self.client.get(reverse('care_states:index'))
+        self.assertEqual(cs_res.status_code, 200)
+        self.assertNotContains(cs_res, 'الإجراء')
+        ov.delete()
+
+        js_txt = Path('core/static/core/js/makken-row-actions-menu.js').read_text(encoding='utf-8')
+        self.assertIn('function hideEmptyActionColumns', js_txt)

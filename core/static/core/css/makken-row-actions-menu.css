@@ -275,3 +275,8 @@
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+
+/* Hide empty action columns when user has no accessible actions */
+th[hidden], td[hidden] {
+  display: none !important;
+}

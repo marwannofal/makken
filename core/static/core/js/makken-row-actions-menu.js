@@ -326,6 +326,36 @@
     });
   }
 
+
+  function hideEmptyActionColumns(main) {
+    main.querySelectorAll('table').forEach(table => {
+      if (table.closest('dialog, template, [data-ac-matrix]')) return;
+      const headRow = table.querySelector('thead tr');
+      if (!headRow) return;
+      [...headRow.cells].forEach((th, colIdx) => {
+        const label = (th.textContent || '').trim();
+        if (label !== 'الإجراء' && label !== 'الإجراءات') return;
+        const bodyRows = [...table.querySelectorAll('tbody tr')];
+        const dataRows = bodyRows.filter(tr => {
+          if (tr.cells.length === 1 && tr.cells[0].colSpan > 1) return false;
+          return Boolean(tr.cells[colIdx]);
+        });
+        if (!dataRows.length) return;
+        const hasAnyAction = dataRows.some(tr => {
+          const td = tr.cells[colIdx];
+          if (!td) return false;
+          if (td.querySelector('.mk-actions-menu, a, button, form, input, select')) return true;
+          const txt = (td.textContent || '').replace(/[—–\-\s]/g, '');
+          return txt.length > 0;
+        });
+        th.hidden = !hasAnyAction;
+        dataRows.forEach(tr => {
+          if (tr.cells[colIdx]) tr.cells[colIdx].hidden = !hasAnyAction;
+        });
+      });
+    });
+  }
+
   function enhanceAll(root = document) {
     const main = root.querySelector?.('#main-content') || root;
     if (!main || !main.querySelectorAll) return;
@@ -333,6 +363,7 @@
     main.querySelectorAll('table tbody td.action-cell').forEach(enhanceDirectActionCell);
     moveRowStatusTogglesIntoMenu(main);
     moveRowDetailLinksIntoMenu(main);
+    hideEmptyActionColumns(main);
   }
 
   document.addEventListener('click', event => {
