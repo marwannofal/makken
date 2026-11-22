@@ -418,3 +418,46 @@ class ViewSecurityTests(MarketFixtures,TestCase):
         self.assertRedirects(post_resp, reverse('market_needs:index'), fetch_redirect_response=False)
         list_resp = self.client.get(reverse('market_needs:index'))
         self.assertContains(list_resp, 'class="is-highlighted-row"')
+
+    def test_complete_card_locks_edit_delete_toggle_enables_provider_engine_and_renders_care_pills(self):
+        # 1. Working card shows edit/delete/toggle and does NOT show provider engine
+        working = self.create_need(title='بطاقة جاري العمل')
+        rec_w = self.attach(working, self.organization('جهة جزئية'))
+        self.approve(working, rec_w, '40.00')
+        working.refresh_from_db()
+        self.assertEqual(working.get_status_display(), 'جاري العمل (تأمين رعاة)')
+        res_w = self.client.get(reverse('market_needs:index'), {'q': working.number})
+        self.assertContains(res_w, 'جاري العمل (تأمين رعاة)')
+        self.assertContains(res_w, f'/market-needs/{working.pk}/edit/')
+        self.assertNotContains(res_w, f'/execution/{working.pk}/providers/')
+        self.assertContains(res_w, 'market-care-pill is-individual')
+
+        # 2. Complete alliance card: locks edit/delete/toggle, enables provider engine, renders red pill
+        alliance = self.create_need(title='بطاقة تحالف مكتملة')
+        r1 = self.attach(alliance, self.organization('راعي تحالف 1'))
+        r2 = self.attach(alliance, self.organization('راعي تحالف 2'))
+        self.approve(alliance, r1, '60.00')
+        self.approve(alliance, r2, '40.00')
+        alliance.refresh_from_db()
+        self.assertEqual(alliance.status, NeedStatus.COMPLETE)
+        with self.assertRaises(services.Conflict):
+            services.save_need(self.data(description='محاولة تعديل'), self.user, alliance.pk, alliance.version)
+        with self.assertRaises(services.Conflict):
+            services.card_action(alliance.pk, alliance.version, 'delete', self.user)
+        with self.assertRaises(services.Conflict):
+            services.card_action(alliance.pk, alliance.version, 'toggle', self.user)
+        self.assertRedirects(self.client.get(reverse('market_needs:edit', args=[alliance.pk])), reverse('market_needs:index'), fetch_redirect_response=False)
+        res_a = self.client.get(reverse('market_needs:index'), {'q': alliance.number})
+        self.assertContains(res_a, 'market-care-pill is-alliance')
+        self.assertContains(res_a, f'/execution/{alliance.pk}/providers/')
+        self.assertContains(res_a, 'محرك مزود الخدمة')
+        self.assertContains(res_a, '<span>مشاهدة</span>')
+        self.assertNotContains(res_a, f'/market-needs/{alliance.pk}/edit/')
+        self.assertNotContains(res_a, 'تأكيد تغيير حالة تفعيل البطاقة؟')
+
+        # 3. Complete individual card renders blue pill
+        indiv = self.create_need(title='بطاقة فردي مكتملة')
+        ri = self.attach(indiv, self.organization('راعي فردي كامل'))
+        self.approve(indiv, ri, '100.00')
+        res_i = self.client.get(reverse('market_needs:index'), {'q': indiv.number})
+        self.assertContains(res_i, 'market-care-pill is-individual')

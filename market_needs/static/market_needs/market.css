@@ -1213,3 +1213,35 @@ progress::-moz-progress-bar {
     grid-template-columns: 1fr;
   }
 }
+
+/* Care arrangement pills (نوع الرعاية): alliance=red, individual=blue */
+.market-care-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.market-care-pill.is-alliance {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fca5a5;
+}
+
+.market-care-pill.is-individual {
+  background: #e0f2fe;
+  color: #005b85;
+  border: 1px solid #93c5fd;
+}
+
+.market-care-pill.is-none {
+  background: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+  font-weight: 600;
+}

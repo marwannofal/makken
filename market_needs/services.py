@@ -61,6 +61,8 @@ def lock_need(pk, version):
 @transaction.atomic
 def save_need(data, actor, pk=None, version=None, nonce=None):
     need = lock_need(pk, version) if pk else None
+    if need and need.status == NeedStatus.COMPLETE:
+        raise Conflict("لا يمكن تعديل بطاقة مكتملة الدعم؛ يُسمح بالمشاهدة فقط.")
     if not pk and nonce and Need.objects.filter(request_key=nonce).exists():
         raise Conflict("تم حفظ هذا الطلب مسبقًا. افتح قائمة البطاقات.")
     # Lock selected references in a stable order. Existing reference CRUD also
@@ -261,6 +263,8 @@ def followup(pk, version, sponsorship_id, record_version, operation, data, files
 @transaction.atomic
 def card_action(pk, version, operation, actor):
     need = lock_need(pk, version)
+    if need.status == NeedStatus.COMPLETE:
+        raise Conflict("لا يمكن تعديل أو حذف أو تغيير حالة بطاقة مكتملة الدعم؛ يُسمح بالمشاهدة فقط.")
     ensure_allowed(need, operation, not need.is_active if operation == "toggle" else None)
     before = card_data(need)
     if operation == "delete":

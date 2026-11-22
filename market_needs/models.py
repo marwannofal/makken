@@ -13,7 +13,7 @@ from partnerships.attachment_storage import willingness_storage, delete_private_
 
 class NeedStatus(models.TextChoices):
     NEW = "new", "جديد"
-    WORKING = "working", "جاري العمل"
+    WORKING = "working", "جاري العمل (تأمين رعاة)"
     COMPLETE = "complete", "مكتملة الدعم"
     REJECTED = "rejected", "تم الرفض"
 
@@ -91,6 +91,17 @@ class Need(models.Model):
         if count == 1:
             return "فردي" if self.approved_support == self.total_cost else "مساهمة واحدة جزئية"
         return "لم يُعتمد دعم بعد"
+
+    @property
+    def arrangement_key(self):
+        count = getattr(self, "approved_count", None)
+        if count is None:
+            count = self.sponsorships.filter(status=SponsorshipStatus.APPROVED).count()
+        if count > 1:
+            return "alliance"
+        if count == 1:
+            return "individual"
+        return "none"
 
     def __str__(self):
         return self.title

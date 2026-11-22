@@ -122,6 +122,9 @@ HIGHLIGHT_SESSION_KEY = "market_needs_highlighted_pk"
 @require_http_methods(["GET", "POST"])
 def editor(request, pk=None):
     need = get_object_or_404(query(request.user), pk=pk) if pk else None
+    if need and need.status == NeedStatus.COMPLETE and request.method == "GET":
+        messages.warning(request, "لا يمكن تعديل بطاقة مكتملة الدعم؛ يُسمح بالمشاهدة فقط.")
+        return add_login_headers(redirect("market_needs:index"))
     context = base(request, "إضافة / تعديل بطاقة حاجة السوق وفقًا للتخصص", "market_need_editor")
     form = NeedForm(initial=initial(need), instance=need, actor=request.user)
     snapshot, status = token(request, need), 200
