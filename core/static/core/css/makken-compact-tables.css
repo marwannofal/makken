@@ -318,3 +318,94 @@
 ) {
   white-space: nowrap !important;
 }
+
+/* === Site-Wide Responsive Tables, Forms, Filters & Dialogs (Option 1A) === */
+:root .main-content :is(.table-scroll, .states-table-wrapper, .table-wrapper, .table-responsive) {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+
+@media (max-width: 1024px) {
+  .main-content .table-scroll-hint {
+    display: block !important;
+    font-size: 12.5px;
+    color: #546e7a;
+    margin: 6px 0 8px;
+  }
+
+  :root .main-content :is(.table-scroll, .states-table-wrapper, .table-wrapper, .table-responsive) table:not(.ac-matrix):not(.states-table) {
+    min-width: 680px !important;
+  }
+
+  :root .main-content table:not(.ac-matrix):not(.states-table) thead th:not(.action-cell):not(.mk-actions-cell),
+  :root .main-content table:not(.ac-matrix):not(.states-table) tbody th:not(.action-cell):not(.mk-actions-cell),
+  :root .main-content table:not(.ac-matrix):not(.states-table) tbody td:not(.action-cell):not(.mk-actions-cell) {
+    min-width: 96px !important;
+    padding: 10px 9px !important;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content .partnership-form-grid,
+  .main-content .ach-filters,
+  .main-content .sr-decision-grid,
+  .main-content .inq-filters,
+  .main-content .mail-inline,
+  .main-content .settings-filters {
+    grid-template-columns: 1fr !important;
+    display: grid !important;
+    gap: 12px !important;
+  }
+
+  .main-content .ach-kpis,
+  .main-content .inq-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  .main-content .table-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    text-align: center;
+  }
+
+  .main-content .table-footer .pagination {
+    justify-content: center;
+  }
+
+  .main-content .editor-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .main-content .editor-actions > .button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .main-content .ach-kpis,
+  .main-content .inq-stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  dialog.partnership-dialog,
+  dialog.states-dialog,
+  dialog.level-dialog,
+  dialog.entity-dialog,
+  dialog.region-dialog,
+  dialog.sector-dialog,
+  dialog.specialization-dialog,
+  dialog.expense-dialog,
+  dialog.program-dialog,
+  dialog.sponsorship-shape-dialog {
+    width: calc(100vw - 24px) !important;
+    max-width: calc(100vw - 24px) !important;
+    max-height: 90vh !important;
+    margin: auto !important;
+    border-radius: 16px !important;
+  }
+}

@@ -980,3 +980,91 @@ button.button-secondary:hover,
 .states-table tbody tr:hover > td {
   background-color: #e8f3fa !important;
 }
+
+/* === Responsive Topbar & Greeting Pill Hardening (Option 2A: sleek single-row header on phones) === */
+html, body {
+  overflow-x: clip;
+}
+
+.workspace {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.topbar {
+  gap: 12px;
+  flex-wrap: nowrap;
+}
+
+.page-location {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+
+.current-location {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-chip {
+  flex: 0 0 auto;
+  max-width: none !important;
+  flex-wrap: nowrap !important;
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .topbar {
+    min-height: 60px !important;
+    padding: 10px 16px !important;
+    gap: 10px;
+  }
+  .account-chip {
+    font-size: 13px !important;
+    padding: 6px 12px !important;
+    gap: 7px !important;
+    max-width: none !important;
+  }
+  .account-chip-clock {
+    font-size: 12px !important;
+  }
+  .main-content {
+    padding: 16px 16px 20px !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .topbar {
+    min-height: 58px !important;
+    padding: 8px 12px !important;
+    gap: 8px;
+  }
+  .breadcrumb-brand,
+  .breadcrumb-divider,
+  .account-chip-sep,
+  .account-chip-clock {
+    display: none !important;
+  }
+  .page-location {
+    gap: 8px;
+    font-size: 14px;
+  }
+  .account-chip {
+    font-size: 13px !important;
+    padding: 6px 11px !important;
+    gap: 6px !important;
+    max-width: 46vw !important;
+    overflow: hidden;
+  }
+  .account-chip-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .main-content {
+    padding: 14px 12px 18px !important;
+  }
+}

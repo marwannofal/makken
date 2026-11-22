@@ -44,11 +44,53 @@
     return backdrop;
   }
 
+  function isMobileSheet() {
+    return typeof window.matchMedia === 'function' && window.matchMedia('(max-width: 640px)').matches;
+  }
+
+  function positionOpenMenu(entry) {
+    const {trigger, dropdown} = entry;
+    if (isMobileSheet()) {
+      dropdown.classList.add('is-mobile-sheet');
+      dropdown.classList.remove('is-dropup');
+      dropdown.style.top = '';
+      dropdown.style.left = '';
+      return;
+    }
+    dropdown.classList.remove('is-mobile-sheet');
+    const rect = trigger.getBoundingClientRect();
+    const vw = window.innerWidth || document.documentElement.clientWidth || 1024;
+    const vh = window.innerHeight || document.documentElement.clientHeight || 768;
+    const menuRect = dropdown.getBoundingClientRect();
+    const menuW = Math.max(menuRect.width || 200, 185);
+    const menuH = Math.max(menuRect.height || 160, 48);
+    const gap = 6;
+    const pad = 12;
+
+    const openUp = (rect.bottom + gap + menuH + pad > vh) && (rect.top - gap - menuH >= pad);
+    dropdown.classList.toggle('is-dropup', openUp);
+    let top = openUp ? (rect.top - gap - menuH) : (rect.bottom + gap);
+    top = Math.max(pad, Math.min(top, vh - menuH - pad));
+
+    const isRtl = getComputedStyle(document.documentElement).direction === 'rtl';
+    let left = isRtl ? rect.left : (rect.right - menuW);
+    if (left + menuW + pad > vw) left = vw - menuW - pad;
+    if (left < pad) left = pad;
+
+    dropdown.style.top = `${Math.round(top)}px`;
+    dropdown.style.left = `${Math.round(left)}px`;
+  }
+
   function closeOpenMenu(returnFocus = false) {
     if (!openMenu) return;
     const {wrapper, trigger, dropdown, row, scroll} = openMenu;
     dropdown.hidden = true;
-    dropdown.classList.remove('is-dropup');
+    dropdown.classList.remove('is-dropup', 'is-portaled', 'is-mobile-sheet');
+    dropdown.style.top = '';
+    dropdown.style.left = '';
+    if (wrapper.isConnected && dropdown.parentElement !== wrapper) {
+      wrapper.append(dropdown);
+    }
     wrapper.classList.remove('is-open');
     trigger.setAttribute('aria-expanded', 'false');
     if (row) row.classList.remove('mk-has-open-menu');
@@ -66,21 +108,13 @@
       return;
     }
     closeOpenMenu(false);
-    const {wrapper, trigger, dropdown, row, scroll} = entry;
+    const {wrapper, trigger, dropdown, row} = entry;
 
-    const tbody = row?.closest('tbody');
-    const allRows = tbody ? [...tbody.rows] : [];
-    const rowIndex = row ? allRows.indexOf(row) : -1;
-    const rect = trigger.getBoundingClientRect();
-    const nearViewportBottom = window.innerHeight - rect.bottom < 240;
-    const isBottomRow = allRows.length >= 3 && rowIndex >= allRows.length - 2;
-    dropdown.classList.toggle('is-dropup', nearViewportBottom || isBottomRow);
-
-    if (scroll && scroll.scrollWidth <= scroll.clientWidth + 2) {
-      scroll.classList.add('mk-scroll-unclipped');
-    }
-
+    dropdown.classList.add('is-portaled');
+    document.body.append(dropdown);
     dropdown.hidden = false;
+    positionOpenMenu(entry);
+
     wrapper.classList.add('is-open');
     trigger.setAttribute('aria-expanded', 'true');
     if (row) row.classList.add('mk-has-open-menu');
@@ -135,7 +169,7 @@
       event.stopPropagation();
       const clickedAction = event.target.closest('a, button');
       if (clickedAction) {
-        closeOpenMenu(false);
+        setTimeout(() => closeOpenMenu(false), 0);
       }
     });
 
@@ -367,7 +401,7 @@
   }
 
   document.addEventListener('click', event => {
-    if (openMenu && !openMenu.wrapper.contains(event.target)) {
+    if (openMenu && !openMenu.wrapper.contains(event.target) && !openMenu.dropdown.contains(event.target)) {
       closeOpenMenu(false);
     }
   });
@@ -379,9 +413,17 @@
     }
   });
 
-  window.addEventListener('resize', () => closeOpenMenu(false));
+  window.addEventListener('resize', () => {
+    if (openMenu) positionOpenMenu(openMenu);
+  });
+  window.addEventListener('scroll', event => {
+    if (!openMenu) return;
+    if (openMenu.dropdown.contains(event.target)) return;
+    if (isMobileSheet()) return;
+    positionOpenMenu(openMenu);
+  }, true);
 
-  window.MakkenRowActionsMenu = {enhanceAll, closeOpenMenu};
+  window.MakkenRowActionsMenu = {enhanceAll, closeOpenMenu, positionOpenMenu};
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => enhanceAll(document));

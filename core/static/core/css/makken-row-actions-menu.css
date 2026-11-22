@@ -109,8 +109,8 @@
   padding: 0;
 }
 
-:root .main-content .mk-actions-dropdown a,
-:root .main-content .mk-actions-dropdown button {
+:root .mk-actions-dropdown a,
+:root .mk-actions-dropdown button {
   appearance: none;
   box-sizing: border-box;
   display: flex !important;
@@ -137,20 +137,20 @@
   transition: background 0.14s ease, color 0.14s ease;
 }
 
-:root .main-content .mk-actions-dropdown a:hover,
-:root .main-content .mk-actions-dropdown button:hover {
+:root .mk-actions-dropdown a:hover,
+:root .mk-actions-dropdown button:hover {
   background: #edf5f9 !important;
   color: #0e3e54 !important;
 }
 
-:root .main-content .mk-actions-dropdown a:focus-visible,
-:root .main-content .mk-actions-dropdown button:focus-visible {
+:root .mk-actions-dropdown a:focus-visible,
+:root .mk-actions-dropdown button:focus-visible {
   outline: 2px solid #005b85;
   outline-offset: -2px;
 }
 
-:root .main-content .mk-actions-dropdown a svg,
-:root .main-content .mk-actions-dropdown button svg {
+:root .mk-actions-dropdown a svg,
+:root .mk-actions-dropdown button svg {
   width: 17px !important;
   height: 17px !important;
   min-width: 17px;
@@ -159,21 +159,21 @@
 }
 
 /* Danger / delete items */
-:root .main-content .mk-actions-dropdown .delete-action,
-:root .main-content .mk-actions-dropdown .action-delete,
-:root .main-content .mk-actions-dropdown [class*="delete"] {
+:root .mk-actions-dropdown .delete-action,
+:root .mk-actions-dropdown .action-delete,
+:root .mk-actions-dropdown [class*="delete"] {
   color: #ba3b46 !important;
 }
 
-:root .main-content .mk-actions-dropdown .delete-action:hover,
-:root .main-content .mk-actions-dropdown .action-delete:hover,
-:root .main-content .mk-actions-dropdown [class*="delete"]:hover {
+:root .mk-actions-dropdown .delete-action:hover,
+:root .mk-actions-dropdown .action-delete:hover,
+:root .mk-actions-dropdown [class*="delete"]:hover {
   background: #fef2f2 !important;
   color: #991b1b !important;
 }
 
 /* Status pills if any are inside row-actions (e.g. market_needs) */
-:root .main-content .mk-actions-dropdown .record-status {
+:root .mk-actions-dropdown .record-status {
   justify-content: flex-start;
   border-radius: 10px !important;
 }
@@ -221,8 +221,8 @@
     gap: 6px;
   }
 
-  :root .main-content .mk-actions-dropdown a,
-  :root .main-content .mk-actions-dropdown button {
+  :root .mk-actions-dropdown a,
+  :root .mk-actions-dropdown button {
     min-height: 46px;
     padding: 10px 14px !important;
     font-size: 14.5px !important;
@@ -232,8 +232,8 @@
 @media (prefers-reduced-motion: reduce) {
   .mk-actions-trigger,
   .mk-actions-dropdown,
-  :root .main-content .mk-actions-dropdown a,
-  :root .main-content .mk-actions-dropdown button {
+  :root .mk-actions-dropdown a,
+  :root .mk-actions-dropdown button {
     transition: none;
     animation: none;
   }
@@ -246,7 +246,7 @@
   }
 }
 
-:root .main-content .mk-actions-dropdown .mk-toggle-action svg {
+:root .mk-actions-dropdown .mk-toggle-action svg {
   fill: none;
   stroke: currentColor;
   stroke-width: 1.9;
@@ -279,4 +279,66 @@
 /* Hide empty action columns when user has no accessible actions */
 th[hidden], td[hidden] {
   display: none !important;
+}
+
+/* Portaled dropdown (appended to document.body while open — zero table/card clipping) */
+.mk-actions-dropdown.is-portaled {
+  position: fixed !important;
+  right: auto !important;
+  bottom: auto !important;
+  margin: 0 !important;
+  z-index: 1200 !important;
+  max-height: calc(100vh - 24px);
+  overflow-y: auto;
+}
+
+.mk-actions-dropdown.is-mobile-sheet {
+  position: fixed !important;
+  left: 12px !important;
+  right: 12px !important;
+  bottom: 12px !important;
+  top: auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  max-height: 75vh !important;
+  overflow-y: auto;
+  padding: 12px !important;
+  border-radius: 18px !important;
+  box-shadow: 0 20px 60px rgba(12, 37, 48, 0.28) !important;
+  z-index: 1200 !important;
+  gap: 6px !important;
+}
+
+.mk-actions-dropdown.is-mobile-sheet a,
+.mk-actions-dropdown.is-mobile-sheet button {
+  min-height: 48px !important;
+  padding: 10px 14px !important;
+  font-size: 14.5px !important;
+}
+
+@media (max-width: 640px) {
+  .mk-actions-backdrop.is-open {
+    z-index: 1190 !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  .mk-actions-trigger {
+    width: 44px;
+    height: 44px;
+  }
+  :root .main-content :is(.table-scroll, .states-table-wrapper, .table-wrapper, .table-responsive) table:not(.ac-matrix) th.action-cell,
+  :root .main-content :is(.table-scroll, .states-table-wrapper, .table-wrapper, .table-responsive) table:not(.ac-matrix) td.action-cell,
+  :root .main-content :is(.table-scroll, .states-table-wrapper, .table-wrapper, .table-responsive) table:not(.ac-matrix) td.mk-actions-cell {
+    position: sticky;
+    inset-inline-end: 0;
+    background: #ffffff;
+    box-shadow: 4px 0 10px -4px rgba(15, 38, 48, 0.12);
+    z-index: 4;
+  }
+  :root .main-content :is(.table-scroll, .states-table-wrapper, .table-wrapper, .table-responsive) table:not(.ac-matrix) thead th.action-cell {
+    background: #f4f8fb;
+    z-index: 5;
+  }
 }
