@@ -2,9 +2,9 @@
   <div class="mk-pagination-wrap">
     <nav class="pagination mk-pagination" data-page-key="{{ page_param }}" aria-label="{{ aria_label }}">
       {% if prev_url %}
-        <a class="mk-pg-pill mk-pg-prev" href="{{ prev_url }}" rel="prev"><span class="mk-pg-arrow" aria-hidden="true">→</span><span>السابق</span></a>
+        <a class="mk-pg-pill mk-pg-prev" href="{{ prev_url }}" rel="prev"><span>السابق</span></a>
       {% else %}
-        <span class="mk-pg-pill mk-pg-prev is-disabled" aria-disabled="true"><span class="mk-pg-arrow" aria-hidden="true">→</span><span>السابق</span></span>
+        <span class="mk-pg-pill mk-pg-prev is-disabled" aria-disabled="true"><span>السابق</span></span>
       {% endif %}
       <div class="mk-pg-numbers">
         {% for item in page_items %}
@@ -18,9 +18,9 @@
         {% endfor %}
       </div>
       {% if next_url %}
-        <a class="mk-pg-pill mk-pg-next" href="{{ next_url }}" rel="next"><span>التالي</span><span class="mk-pg-arrow" aria-hidden="true">←</span></a>
+        <a class="mk-pg-pill mk-pg-next" href="{{ next_url }}" rel="next"><span>التالي</span></a>
       {% else %}
-        <span class="mk-pg-pill mk-pg-next is-disabled" aria-disabled="true"><span>التالي</span><span class="mk-pg-arrow" aria-hidden="true">←</span></span>
+        <span class="mk-pg-pill mk-pg-next is-disabled" aria-disabled="true"><span>التالي</span></span>
       {% endif %}
     </nav>
     <div class="mk-pagination-meta">
