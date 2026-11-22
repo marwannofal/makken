@@ -222,25 +222,64 @@
       emptyMsg.hidden = visibleCount > 0;
     }
 
+    function positionPanel() {
+      const rect = trigger.getBoundingClientRect();
+      const vw = window.innerWidth || document.documentElement.clientWidth || 1024;
+      const vh = window.innerHeight || document.documentElement.clientHeight || 768;
+      const pad = 12;
+      const gap = 6;
+      const minW = Math.max(rect.width, 190);
+      panel.style.minWidth = `${Math.round(minW)}px`;
+
+      const pRect = panel.getBoundingClientRect();
+      const pW = Math.max(pRect.width || minW, minW);
+      const pH = Math.max(pRect.height || 180, 80);
+
+      const spaceBelow = vh - rect.bottom - pad;
+      const spaceAbove = rect.top - pad;
+      const openUp = spaceBelow < pH + gap && spaceAbove > spaceBelow;
+      wrap.classList.toggle('is-dropup', openUp);
+
+      let top = openUp ? (rect.top - gap - pH) : (rect.bottom + gap);
+      top = Math.max(pad, Math.min(top, vh - pH - pad));
+
+      const isRtl = getComputedStyle(document.documentElement).direction === 'rtl';
+      let left = isRtl ? (rect.right - pW) : rect.left;
+      if (left + pW + pad > vw) left = vw - pW - pad;
+      if (left < pad) left = pad;
+
+      panel.style.top = `${Math.round(top)}px`;
+      panel.style.left = `${Math.round(left)}px`;
+    }
+
     function open() {
       if (select.disabled) return;
       if (openCtrl && openCtrl !== ctrl) openCtrl.close();
-      panel.hidden = false;
-      trigger.setAttribute('aria-expanded', 'true');
-      wrap.classList.add('is-open');
-
-      const rect = trigger.getBoundingClientRect();
-      const spaceBelow = window.innerHeight - rect.bottom;
-      wrap.classList.toggle('is-dropup', spaceBelow < 280 && rect.top > 280);
 
       searchInput.value = '';
       renderOptions();
+
+      const host = wrap.closest('dialog[open]') || document.body;
+      panel.classList.add('is-portaled');
+      host.appendChild(panel);
+      panel.hidden = false;
+      trigger.setAttribute('aria-expanded', 'true');
+      wrap.classList.add('is-open');
+      positionPanel();
+
       openCtrl = ctrl;
-      requestAnimationFrame(() => searchInput.focus());
+      requestAnimationFrame(() => searchInput.focus({ preventScroll: true }));
     }
 
     function close() {
       panel.hidden = true;
+      panel.classList.remove('is-portaled');
+      panel.style.top = '';
+      panel.style.left = '';
+      panel.style.minWidth = '';
+      if (wrap.isConnected && panel.parentElement !== wrap) {
+        wrap.appendChild(panel);
+      }
       trigger.setAttribute('aria-expanded', 'false');
       wrap.classList.remove('is-open', 'is-dropup');
       if (openCtrl === ctrl) openCtrl = null;
@@ -313,7 +352,7 @@
       wrap.remove();
     }
 
-    const ctrl = { open, close, updateTrigger, renderOptions, destroy };
+    const ctrl = { open, close, position: positionPanel, panel, updateTrigger, renderOptions, destroy };
     enhanced.set(select, ctrl);
     updateTrigger();
   }
@@ -332,10 +371,18 @@
   window.MakkenDropdowns = { unwrap: unwrapSelect, scan };
 
   document.addEventListener('click', (e) => {
-    if (openCtrl && e.target.isConnected && !e.target.closest('.mk-ss-wrap')) {
+    if (openCtrl && e.target.isConnected && !e.target.closest('.mk-ss-wrap') && !e.target.closest('.mk-ss-panel.is-portaled')) {
       openCtrl.close();
     }
   });
+  window.addEventListener('resize', () => {
+    if (openCtrl && openCtrl.position) openCtrl.position();
+  });
+  window.addEventListener('scroll', (e) => {
+    if (!openCtrl || !openCtrl.position) return;
+    if (openCtrl.panel && openCtrl.panel.contains(e.target)) return;
+    openCtrl.position();
+  }, true);
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && openCtrl) {

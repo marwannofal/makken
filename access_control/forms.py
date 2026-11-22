@@ -69,7 +69,7 @@ class UserForm(AccessFields):
             self.fields.pop('new_password1');self.fields.pop('new_password2');self.fields.pop('send_welcome_email',None)
         for module in DEFINITIONS.values():
             for operation in module.operations:
-                self.fields[f'override__{module.key}__{operation}']=forms.ChoiceField(label=Operation(operation).label,choices=[('inherit','من الأدوار'),('grant','منح مباشر'),('deny','منع صريح')],initial='inherit',required=False,error_messages={'invalid_choice':'اختر منحًا مباشرًا أو منعًا صريحًا أو الاعتماد على الأدوار.'},widget=forms.Select(attrs={'class':'ac-control ac-override'}))
+                self.fields[f'override__{module.key}__{operation}']=forms.ChoiceField(label=Operation(operation).label,choices=[('inherit','من الأدوار'),('grant','اعطاء صلاحية'),('deny','الغاء الصلاحية')],initial='inherit',required=False,error_messages={'invalid_choice':'اختر منحًا مباشرًا أو منعًا صريحًا أو الاعتماد على الأدوار.'},widget=forms.Select(attrs={'class':'ac-control ac-override'}))
 
     def clean_full_name(self):
         value=normalize_name(self.cleaned_data['full_name'])

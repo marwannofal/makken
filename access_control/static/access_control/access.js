@@ -43,9 +43,9 @@
       if(scope==='selected'&&!pages.has(module))return [false,'خارج الصفحات المحددة'];
       if(module==='regions'&&op==='create'&&editor.elements.region_scope?.value==='selected')return [false,'إضافة منطقة جديدة تتطلب نطاق جميع المناطق'];
       const field=editor.elements.namedItem('override__'+module+'__'+op),value=field?.value||'inherit';
-      if(value==='deny')return [false,'منع صريح للمستخدم'];
+      if(value==='deny')return [false,'الغاء الصلاحية'];
       if(op!=='view'&&!decide(module,'view')[0])return [false,'صلاحية العرض مطلوبة'];
-      if(value==='grant')return [true,'منح مباشر'];
+      if(value==='grant')return [true,'اعطاء صلاحية'];
       const sources=grants.get(module+':'+op)||[];return [sources.length>0,sources.join(' + ')||'لم تُمنح الصلاحية'];
     };
     $$('[data-ac-module]',editor).forEach(row=>$$('[data-ac-op]',row).forEach(cell=>{

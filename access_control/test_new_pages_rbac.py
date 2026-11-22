@@ -140,3 +140,20 @@ class NewPagesRBACTests(TestCase):
 
         js_txt = Path('core/static/core/js/makken-row-actions-menu.js').read_text(encoding='utf-8')
         self.assertIn('function hideEmptyActionColumns', js_txt)
+
+    def test_user_permissions_override_labels_and_portaled_dropdown_panel(self):
+        from pathlib import Path
+        admin = User.objects.create_superuser('lbl_admin', 'lbl_admin@makken.test', 'StrongPass!2026')
+        self.client.force_login(admin, backend=AUTH_BACKEND)
+        res = self.client.get(reverse('access_control:user_edit', args=[self.user.pk]))
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, 'اعطاء صلاحية')
+        self.assertContains(res, 'الغاء الصلاحية')
+        self.assertNotContains(res, '>منح مباشر<')
+        self.assertNotContains(res, '>منع صريح<')
+
+        js = Path('core/static/core/js/makken-dropdowns.js').read_text(encoding='utf-8')
+        css = Path('core/static/core/css/makken-dropdowns.css').read_text(encoding='utf-8')
+        self.assertIn('is-portaled', js)
+        self.assertIn('positionPanel', js)
+        self.assertIn('.mk-ss-panel.is-portaled', css)

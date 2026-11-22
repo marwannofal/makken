@@ -429,3 +429,13 @@ select.mk-ss-native {
   max-height: 260px !important;
   overscroll-behavior: contain;
 }
+
+/* Portaled dropdown panel (escapes overflow:auto tables like RBAC matrix without clipping) */
+.mk-ss-panel.is-portaled {
+  position: fixed !important;
+  right: auto !important;
+  bottom: auto !important;
+  margin: 0 !important;
+  z-index: 1250 !important;
+  max-width: calc(100vw - 24px) !important;
+}
