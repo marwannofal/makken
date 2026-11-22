@@ -143,9 +143,21 @@
         {% empty %}
           <p class="muted">لم تُضف جهات مرشحة بعد.</p>
         {% endfor %}
+        <div class="dialog-actions detail-dialog-actions">
+          <button class="button button-secondary" type="button" data-open-history-dialog><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 5H5v16h14V5h-4M9 3h6v4H9ZM8 11h8m-8 4h5"/></svg><span>سجل دورة الحياة</span></button>
+          <a class="button button-primary detail-close-btn" href="?{{ filter_query }}&amp;page={{ page_obj.number }}">إغلاق</a>
+        </div>
+      </div>
+    </dialog>
+    <dialog id="market-history-dialog" class="partnership-dialog detail-dialog" aria-labelledby="market-history-title"{% if request.GET.history_page %} data-open-on-load{% endif %}>
+      <div class="dialog-body">
+        <div class="dialog-top">
+          <p class="eyebrow">سجل دورة الحياة</p><button type="button" class="icon-button" data-market-close aria-label="إغلاق سجل دورة الحياة"><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+        </div>
+        <h2 id="market-history-title">{{ detail.title }}</h2>
         {% include "market_needs/_history.html" with need=detail %}
-        <div class="dialog-actions">
-          <a class="button button-primary" href="?{{ filter_query }}&amp;page={{ page_obj.number }}">إغلاق</a>
+        <div class="dialog-actions detail-dialog-actions">
+          <button class="button button-primary detail-close-btn" type="button" data-market-close>إغلاق</button>
         </div>
       </div>
     </dialog>

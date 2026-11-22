@@ -19,6 +19,9 @@
   let busy = false, confirmationCancel = null;
   $$('[data-market-close]').forEach(b => b.addEventListener('click', () => {if (!busy) {const dialog=b.closest('dialog');if(dialog.id==='market-confirm'){const cancel=confirmationCancel;confirmationCancel=null;confirmationAction=null;cancel?.();}dialog.close();}}));
   $$('[data-market-server]').forEach(d => {d.removeAttribute('open');show(d);if(d.dataset.closeUrl)d.addEventListener('cancel', e=>{e.preventDefault();location.assign(d.dataset.closeUrl);});});
+  const historyDialog = $('#market-history-dialog');
+  $$('[data-open-history-dialog]').forEach(b => b.addEventListener('click', () => show(historyDialog)));
+  if (historyDialog && historyDialog.hasAttribute('data-open-on-load')) show(historyDialog);
   const confirmation = $('#market-confirm');
   let confirmationAction = null;
   function ask(text, callback, danger=false, cancel=null) {

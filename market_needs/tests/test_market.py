@@ -461,3 +461,8 @@ class ViewSecurityTests(MarketFixtures,TestCase):
         self.approve(indiv, ri, '100.00')
         res_i = self.client.get(reverse('market_needs:index'), {'q': indiv.number})
         self.assertContains(res_i, 'market-care-pill is-individual')
+        detail_res = self.client.get(reverse('market_needs:index'), {'detail': indiv.pk})
+        self.assertContains(detail_res, 'detail-dialog-actions')
+        self.assertContains(detail_res, 'detail-close-btn')
+        self.assertContains(detail_res, 'data-open-history-dialog')
+        self.assertContains(detail_res, 'id="market-history-dialog"')
