@@ -45,7 +45,7 @@
       const field=editor.elements.namedItem('override__'+module+'__'+op),value=field?.value||'inherit';
       if(value==='deny')return [false,'الغاء الصلاحية'];
       if(op!=='view'&&!decide(module,'view')[0])return [false,'صلاحية العرض مطلوبة'];
-      if(value==='grant')return [true,'اعطاء صلاحية'];
+      if(value==='grant')return [true,'اعطاء الصلاحية'];
       const sources=grants.get(module+':'+op)||[];return [sources.length>0,sources.join(' + ')||'لم تُمنح الصلاحية'];
     };
     $$('[data-ac-module]',editor).forEach(row=>$$('[data-ac-op]',row).forEach(cell=>{

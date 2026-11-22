@@ -147,7 +147,7 @@ class NewPagesRBACTests(TestCase):
         self.client.force_login(admin, backend=AUTH_BACKEND)
         res = self.client.get(reverse('access_control:user_edit', args=[self.user.pk]))
         self.assertEqual(res.status_code, 200)
-        self.assertContains(res, 'اعطاء صلاحية')
+        self.assertContains(res, 'اعطاء الصلاحية')
         self.assertContains(res, 'الغاء الصلاحية')
         self.assertNotContains(res, '>منح مباشر<')
         self.assertNotContains(res, '>منع صريح<')
