@@ -419,3 +419,18 @@
 #provider-phone::placeholder {
   text-align: start !important;
 }
+
+/* Larger, more comfortable coverage editor popup on provider create/edit */
+#provider-coverage-editor.partnership-dialog {
+  width: min(820px, 94vw);
+  max-width: 94vw;
+  min-height: min(620px, 86vh);
+  max-height: 90vh;
+}
+#provider-coverage-editor .dialog-body {
+  padding: 26px 30px;
+  gap: 16px;
+}
+#provider-coverage-editor .search-select-options {
+  max-height: 300px;
+}
