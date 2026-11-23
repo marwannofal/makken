@@ -6,7 +6,6 @@
 {% block market_content %}
   {{ selection_labels|json_script:"execution-labels" }} <noscript><p class="feedback feedback-info">فعّل JavaScript لاختيار المزودين والتنقل بين نتائج البحث مع الاحتفاظ بمسودة الاختيارات.</p></noscript>
   <div data-execution-page data-draft-key="{{ draft_key }}" data-posted="{% if form.is_bound %}1{% else %}0{% endif %}">
-    <p class="execution-intro">ربط برنامج بطاقة حاجة السوق وفقًا للتخصص مع مزود خدمة التدريب / التشغيل.</p>
     <section class="partnership-card">
       <div>
         <header class="card-heading">
@@ -86,7 +85,7 @@
         <h2>الجهات الممولة المعتمدة</h2><span class="subtle-badge">عدد السجلات: {{ funders|length }}</span>
       </header>
       <div class="table-scroll" tabindex="0">
-        <table class="partnership-table">
+        <table class="partnership-table" data-no-export>
           <caption class="visually-hidden">المساهمات المالية المعتمدة</caption>
           <thead>
             <tr>
@@ -171,7 +170,7 @@
         <button class="button button-primary" type="submit">بحث</button><a class="button button-secondary" href="?employer_q={{ employer_q|urlencode }}&amp;q={{ return_q|urlencode }}&amp;status={{ return_status|urlencode }}&amp;return_page={{ return_page|urlencode }}">مسح</a>
       </form>
       <div class="table-scroll" tabindex="0">
-        <table class="partnership-table">
+        <table class="partnership-table" data-no-export>
           <caption class="visually-hidden">مزودو التدريب المطابقون</caption>
           <thead>
             <tr>
@@ -224,7 +223,7 @@
           <button class="button button-primary" type="submit">بحث</button><a class="button button-secondary" href="?provider_q={{ provider_q|urlencode }}&amp;q={{ return_q|urlencode }}&amp;status={{ return_status|urlencode }}&amp;return_page={{ return_page|urlencode }}">مسح</a>
         </form>
         <div class="table-scroll" tabindex="0">
-          <table class="partnership-table">
+          <table class="partnership-table" data-no-export>
             <caption class="visually-hidden">جهات التوظيف المطابقة</caption>
             <thead>
               <tr>
