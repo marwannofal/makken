@@ -454,7 +454,7 @@ class ViewSecurityTests(MarketFixtures,TestCase):
         self.assertContains(res_a, '<span>مشاهدة</span>')
         self.assertNotContains(res_a, f'/market-needs/{alliance.pk}/sponsors/')
         self.assertNotContains(res_a, f'/execution/{alliance.pk}/providers/')
-        self.assertNotContains(res_a, 'محرك مزود الخدمة')
+        self.assertNotContains(res_a, 'محرك مزود خدمات التدريب')
         self.assertNotContains(res_a, f'/market-needs/{alliance.pk}/edit/')
         self.assertNotContains(res_a, 'تأكيد تغيير حالة تفعيل البطاقة؟')
 

@@ -66,7 +66,7 @@ def pagination(request, key, page):
 
 
 def list_context(request, assignment=False):
-    context = base(request, "محرك مزود الخدمة", "approved_programs")
+    context = base(request, "محرك مزود خدمات التدريب", "approved_programs")
     context["page_subheading"] = "مرحلة تنفيذ البرامج المعتمدة وفقا للتخصص"
     items = matching.approved_needs(request.user)
     q, state = request.GET.get("q", "").strip()[:200], request.GET.get("status", "")
@@ -143,7 +143,7 @@ def assignment(request, pk):
     initial = {"status": execution.status if execution else "new", "notes": execution.notes if execution else "",
                "selection": json.dumps({"providers": selected_p, "employers": selected_e})}
     form = ExecutionForm(initial=initial)
-    context = base(request, "اختيار مزود خدمة", "provider_assignments")
+    context = base(request, "اختيار مزود خدمة التدريب", "provider_assignments")
     status_code, pending = 200, None
     snapshot = signed(request, need, execution)
     if request.method == "POST":
