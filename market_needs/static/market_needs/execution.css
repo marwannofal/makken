@@ -208,22 +208,22 @@
 .exec-training-wrap {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   flex-shrink: 0;
-  margin-top: 10px;
+  margin-top: 14px;
 }
 .exec-training-label {
-  font-size: 13px;
-  font-weight: 700;
-  color: #3b5563;
+  font-size: 16px;
+  font-weight: 800;
+  color: #2b4554;
 }
 .exec-training-pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 5px 16px;
+  padding: 8px 26px;
   border-radius: 999px;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 800;
   line-height: 1.4;
   border: 1.5px solid transparent;
@@ -252,4 +252,90 @@
   width: auto;
   min-width: 110px;
   padding: 9px 22px;
+}
+
+/* Simplified selected execution entities card */
+.exec-selected-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 36px;
+  align-items: center;
+}
+.exec-selected-chips:empty::before {
+  content: "لم يتم اختيار أي جهة بعد.";
+  font-size: 13px;
+  color: #6b808c;
+}
+.exec-selected-chips button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1.5px solid #9cc4d8;
+  background: #edf6fb;
+  color: #004666;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.exec-selected-chips button:hover:not(:disabled) {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #991b1b;
+}
+.exec-saved-strip {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed #d5e4ee;
+}
+.exec-saved-label {
+  font-size: 12px;
+  font-weight: 800;
+  color: #4b6775;
+}
+.exec-saved-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.exec-saved-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  background: #f4f8fa;
+  border: 1px solid #d5e4ee;
+  color: #1f3b4a;
+}
+.exec-saved-pill.is-provider {
+  background: #eef6fb;
+  border-color: #bdd9e8;
+  color: #004b6e;
+}
+.exec-saved-pill.is-employer {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #065f46;
+}
+.exec-saved-pill small {
+  color: #5b7482;
+}
+
+/* Tighter spacing in section 03 (حالة التنفيذ والحفظ) */
+.exec-status-card .card-heading {
+  margin-bottom: 8px;
+}
+.exec-status-card .partnership-form-grid,
+.exec-status-card .partnership-field {
+  margin-top: 0;
+  gap: 6px;
 }

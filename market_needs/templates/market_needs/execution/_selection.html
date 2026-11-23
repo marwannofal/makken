@@ -1,32 +1,28 @@
-<section class="partnership-card">
-  <header class="card-heading">
-    <div>
-      <h2>الاختيارات المحفوظة والمسودة</h2><p class="muted">لا تُحفظ الاختيارات في قاعدة البيانات إلا بعد مراجعة الحفظ وتأكيده.</p>
-    </div>
-  </header>
-  <p data-execution-selection-count aria-live="polite"></p>
-  <div class="execution-selected" data-execution-selection>
+<section class="partnership-card exec-selection-card">
+  <div>
+    <header class="card-heading">
+      <div>
+        <h2>الجهات المختارة للتنفيذ</h2>
+        <p class="muted">اختر من الجداول أعلاه ثم اضغط «حفظ» بالأسفل لتأكيد التغييرات.</p>
+      </div>
+      <span class="subtle-badge" data-execution-selection-count></span>
+    </header>
   </div>
-  {% if selected_rows %}
-    <h3>آخر اختيارات محفوظة</h3>
-    <ul class="execution-saved">
-      {% for row in selected_rows %}
-        <li>
-        {% if row.provider_id %}
-          <strong>مزود تدريب: {{ row.evidence.name }}</strong><span>
-          {% for region in row.evidence.regions %}
-            {{ region.name }}
-            {% if not forloop.last %}
-              ،
+  <div class="exec-selected-chips" data-execution-selection></div>
+  {% if saved_links %}
+    <div class="exec-saved-strip">
+      <span class="exec-saved-label">المحفوظة حاليًا:</span>
+      <div class="exec-saved-pills">
+        {% for row in saved_links %}
+          <span class="exec-saved-pill {% if row.provider_id %}is-provider{% else %}is-employer{% endif %}">
+            <strong>{% if row.provider_id %}مزود تدريب{% else %}جهة توظيف{% endif %}:</strong>
+            {{ row.evidence.name }}
+            {% if row.evidence.regions %}
+              <small>({% for region in row.evidence.regions %}{{ region.name }}{% if not forloop.last %}، {% endif %}{% endfor %})</small>
             {% endif %}
-          {% endfor %}
           </span>
-        {% else %}
-          <strong>جهة توظيف: {{ row.evidence.name }}</strong><span>{% if row.evidence.regions %}{% for region in row.evidence.regions %}{{ region.name }}{% if not forloop.last %}، {% endif %}{% endfor %}{% else %}مطابقة على مستوى المناطق الإدارية للجهة مع مناطق بطاقة الحاجة.{% endif %}</span>
-        {% endif %}
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p class="muted">لم تُحفظ اختيارات لهذه البطاقة بعد.</p>
+        {% endfor %}
+      </div>
+    </div>
   {% endif %}
 </section>
