@@ -206,7 +206,7 @@ class ExecutionTests(MarketFixtures, TestCase):
         need=self.funded()
         response=self.client.get(reverse("program_execution:index"),{"q":need.sector.name,"detail":need.pk})
         self.assertEqual(response.status_code,200)
-        for text in ("حالة التنفيذ","تكلفة البرنامج","عدد المتدربين","شكل الرعاية","سجل دورة الحياة"):
+        for text in ("حالة التنفيذ","تكلفة البرنامج","عدد المتدربين","شكل الرعاية","تفاصيل البرنامج التدريبي وبنود الصرف","تكلفة المقعد","المجموع"):
             self.assertContains(response,text)
         self.assertEqual(response.context["page_obj"].paginator.count,1)
 
