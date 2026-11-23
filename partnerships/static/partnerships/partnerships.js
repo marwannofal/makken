@@ -813,5 +813,25 @@
     });
   }
 
+  const willCreateDialog = $('#willingness-create-confirm');
+  const pForm = $('#partnership-form');
+  if (willCreateDialog && pForm) {
+    pForm.addEventListener('submit', (event) => {
+      if (pForm.dataset.willConfirmed === '1') return;
+      event.preventDefault();
+      if (!pForm.reportValidity()) return;
+      show(willCreateDialog);
+    });
+    const confirmWillBtn = $('[data-confirm-will-create]', willCreateDialog);
+    if (confirmWillBtn) {
+      confirmWillBtn.addEventListener('click', () => {
+        willCreateDialog.close();
+        pForm.dataset.willConfirmed = '1';
+        if (typeof pForm.requestSubmit === 'function') pForm.requestSubmit();
+        else pForm.submit();
+      });
+    }
+  }
+
   renderRows();
 })();

@@ -297,7 +297,7 @@ class WillingnessUnifiedWorkflowTests(TestCase):
             res = self.client.get(reverse(route))
             self.assertEqual(res.status_code, 200)
             self.assertContains(res, 'data-offering-toast')
-            self.assertContains(res, 'partnerships.js?v=20261121-6')
+            self.assertContains(res, 'partnerships.js?v=')
 
     def test_quick_clauses_progress_modal_endpoint_and_button(self):
         self.client.force_login(self.admin)

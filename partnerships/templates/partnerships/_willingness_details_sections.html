@@ -85,6 +85,7 @@
         </div>
       {% endif %}
     </div>
+    {% if show_section_save %}{% include "partnerships/_section_save.html" %}{% endif %}
   </div>
 </details>
 <details class="mk-accordion" {% if open_details %}open{% endif %}>
@@ -151,6 +152,7 @@
         </div>
       </div>
     </div>
+    {% if show_section_save %}{% include "partnerships/_section_save.html" %}{% endif %}
   </div>
 </details>
 <details class="mk-accordion" {% if open_details %}open{% endif %}>
@@ -241,6 +243,7 @@
       </div>
       <p class="empty-state" data-team-empty>لم يُضف أعضاء لفريق الجهة بعد.</p>
     </div>
+    {% if show_section_save %}{% include "partnerships/_section_save.html" %}{% endif %}
   </div>
 </details>
 <details class="mk-accordion" {% if open_details %}open{% endif %}>
@@ -277,5 +280,6 @@
         </div>
       </div>
     </div>
+    {% if show_section_save %}{% include "partnerships/_section_save.html" %}{% endif %}
   </div>
 </details>

@@ -10,8 +10,8 @@
   <link rel="stylesheet" href="{% static 'care_states/states.css' %}?v=20261121-blue6">
   <link rel="stylesheet" href="{% static 'partnerships/partnerships.css' %}?v=20261121-blue14">
   <link rel="stylesheet" href="{% static 'partnerships/willingness_upload.css' %}?v=20261121-blue6">
-  <link rel="stylesheet" href="{% static 'partnerships/willingness_clauses.css' %}?v=20261121-blue6">
-  <script src="{% static 'partnerships/partnerships.js' %}?v=20261121-10" defer></script>
+  <link rel="stylesheet" href="{% static 'partnerships/willingness_clauses.css' %}?v=20261123-sec1">
+  <script src="{% static 'partnerships/partnerships.js' %}?v=20261123-sec1" defer></script>
   <script src="{% static 'partnerships/willingness_clauses.js' %}?v=20261121-dmy" defer></script>
   {% include "partnerships/_financial_assets.html" %}
   {% include "partnerships/_editor_fields_assets.html" %}
@@ -105,6 +105,7 @@
           {% include "partnerships/_field.html" with field=form.starts_on %}
           {% include "partnerships/_field.html" with field=form.ends_on %}
         </div>
+        {% if is_will_create or show_edit_clauses %}{% include "partnerships/_section_save.html" %}{% endif %}
       </div>
     </details>
     <details class="mk-accordion"{% if not item or form.offerings.errors %} open{% endif %}>
@@ -138,6 +139,7 @@
           </table>
         </div>
         <p class="empty-state" data-offerings-empty>لم تُضف بنود شراكة بعد. أضف قطاعًا وتخصصاته وشكل الرعاية أولًا.</p>
+        {% if is_will_create or show_edit_clauses %}{% include "partnerships/_section_save.html" %}{% endif %}
       </div>
     </details>
     {% if is_will_create %}
@@ -170,6 +172,7 @@
               </div>
             </div>
           </div>
+          {% include "partnerships/_section_save.html" %}
         </div>
       </details>
       <details class="mk-accordion" open>
@@ -181,6 +184,7 @@
         </summary>
         <div class="mk-acc-body">
           {% include "partnerships/_clauses_section.html" with allow_progress=False section_id="create" %}
+          {% include "partnerships/_section_save.html" %}
         </div>
       </details>
       <details class="mk-accordion" open>
@@ -192,9 +196,10 @@
         </summary>
         <div class="mk-acc-body">
           {% include "partnerships/_work_section.html" %}
+          {% include "partnerships/_section_save.html" %}
         </div>
       </details>
-      {% include "partnerships/_willingness_details_sections.html" with num_term="06" num_signatories="07" num_teams="08" num_content="09" open_details=False %}
+      {% include "partnerships/_willingness_details_sections.html" with num_term="06" num_signatories="07" num_teams="08" num_content="09" open_details=False show_section_save=True %}
     {% elif show_edit_clauses %}
       <details class="mk-accordion"{% if clauses_error %} open{% endif %}>
         <summary>
@@ -205,6 +210,7 @@
         </summary>
         <div class="mk-acc-body">
           {% include "partnerships/_clauses_section.html" with allow_progress=True section_id="edit" %}
+          {% include "partnerships/_section_save.html" %}
         </div>
       </details>
       <details class="mk-accordion" {% if work_form and work_form.errors %}open{% endif %}>
@@ -253,9 +259,10 @@
             <p class="field-help">إسناد مهمة جديدة (اختياري عند التعديل — املأ الحقول أدناه فقط لإضافة مهمة جديدة مع حفظ الشراكة):</p>
             {% include "partnerships/_work_section.html" with work_optional=True %}
           {% endif %}
+          {% include "partnerships/_section_save.html" %}
         </div>
       </details>
-      {% include "partnerships/_willingness_details_sections.html" with num_term="05" num_signatories="06" num_teams="07" num_content="08" open_details=False %}
+      {% include "partnerships/_willingness_details_sections.html" with num_term="05" num_signatories="06" num_teams="07" num_content="08" open_details=False show_section_save=True %}
     {% endif %}
     <div class="editor-actions" style="margin-top:18px;">
       <button class="button button-primary" type="submit" data-save-partnership>
@@ -364,5 +371,22 @@
   </dialog>
   {% endif %}
   {{ catalog|json_script:"partnership-catalog" }}{{ drafts|json_script:"partnership-drafts" }}{{ clause_catalog_data|json_script:"clause-catalog-data" }}
+  {% if is_will_create %}
+  <dialog id="willingness-create-confirm" class="partnership-dialog confirmation-dialog" aria-labelledby="will-create-confirm-title">
+    <div class="dialog-body">
+      <div class="dialog-top">
+        <span class="dialog-symbol"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3 3 7v5c0 5 9 9 9 9s9-4 9-9V7Z"/><path d="m8 12 3 3 5-6"/></svg></span>
+        <button type="button" class="icon-button" data-dismiss-dialog aria-label="إغلاق"><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+      </div>
+      <p class="eyebrow">تأكيد العملية</p>
+      <h2 id="will-create-confirm-title">تأكيد حفظ وإنشاء شراكة الرغبة</h2>
+      <p class="dialog-description">هل تريد تأكيد حفظ جميع البيانات والأقسام المدخلة وإنشاء شراكة الرغبة؟ لن تُحفظ البيانات إلا بعد التأكيد.</p>
+      <div class="dialog-actions">
+        <button class="button button-primary" type="button" data-confirm-will-create>تأكيد الحفظ</button>
+        <button class="button button-secondary" type="button" data-dismiss-dialog autofocus>إلغاء</button>
+      </div>
+    </div>
+  </dialog>
+  {% endif %}
   {% include "partnerships/_dialogs.html" %}
 {% endblock %}
