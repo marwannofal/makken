@@ -284,20 +284,11 @@
             {% endif %}
             {{ form.status.errors }}
           </div>
-          <div class="partnership-field">
-            <label for="execution-notes">ملاحظات التنفيذ</label>
-            {% if writable %}
-              {{ form.notes }}
-            {% else %}
-              <p>{{ execution.notes|default:'—'|linebreaksbr }}</p>
-            {% endif %}
-            {{ form.notes.errors }}
-          </div>
         </div>
         <p class="field-help"><strong>قبل بدء التنفيذ أو إكماله:</strong> اختر مزود تدريب واحدًا على الأقل؛ والبرنامج التشغيلي يحتاج جهة توظيف أيضًا. عند «مكتمل التنفيذ» يُمنع التعديل لاحقًا.</p>
         <div class="dialog-actions">
           {% if writable %}
-            <button type="submit" class="button button-primary">مراجعة وحفظ</button><button type="button" class="button button-secondary" data-execution-reset>إلغاء تغييرات المسودة</button>
+            <button type="submit" class="button button-primary">حفظ</button>
           {% endif %}
           <a class="button button-secondary" data-execution-leave href="{{ return_url }}">إغلاق</a>
         </div>
