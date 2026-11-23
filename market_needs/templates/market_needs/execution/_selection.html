@@ -22,7 +22,7 @@
           {% endfor %}
           </span>
         {% else %}
-          <strong>جهة توظيف: {{ row.evidence.name }}</strong><span>{{ row.evidence.geography }}</span>
+          <strong>جهة توظيف: {{ row.evidence.name }}</strong><span>{% if row.evidence.regions %}{% for region in row.evidence.regions %}{{ region.name }}{% if not forloop.last %}، {% endif %}{% endfor %}{% else %}مطابقة على مستوى المناطق الإدارية للجهة مع مناطق بطاقة الحاجة.{% endif %}</span>
         {% endif %}
       {% endfor %}
     </ul>

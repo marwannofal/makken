@@ -70,7 +70,9 @@ def provider_evidence(need, provider):
 
 
 def employer_evidence(need, organization):
+    matched_regions = list(organization.administrative_regions.filter(pk__in=need.regions.values("pk")).values("id", "name"))
     return {"name": organization.name, "sector": need.sector.name,
             "specialization": need.specialization.name,
+            "regions": matched_regions,
             "offerings": [{"id": o.pk, "shape": o.sponsorship_shape.name} for o in organization.matched_offerings],
             "geography": "مطابقة على مستوى المناطق الإدارية للجهة مع مناطق بطاقة الحاجة."}
