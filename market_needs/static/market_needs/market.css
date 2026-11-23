@@ -1245,3 +1245,108 @@ progress::-moz-progress-bar {
   border: 1px solid #e2e8f0;
   font-weight: 600;
 }
+
+/* Prominent Ocean-Blue expandable button for details.market-card-fold */
+details.market-card-fold {
+  border: 1.5px solid #b9d4e3;
+  border-radius: 14px;
+  padding: 0;
+  background: #ffffff;
+  box-shadow: 0 2px 10px rgba(0, 91, 133, 0.07);
+  overflow: hidden;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+details.market-card-fold:hover {
+  border-color: #005b85;
+  box-shadow: 0 6px 18px rgba(0, 91, 133, 0.13);
+}
+details.market-card-fold > summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 13px 18px;
+  background: linear-gradient(90deg, #e8f4fa 0%, #f6fbfe 100%);
+  color: #004261;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.6;
+  transition: background-color 0.2s ease;
+}
+details.market-card-fold > summary::-webkit-details-marker {
+  display: none;
+}
+details.market-card-fold > summary:hover {
+  background: linear-gradient(90deg, #dceef8 0%, #edf7fc 100%);
+}
+.market-fold-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+.market-fold-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: #005b85;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 91, 133, 0.22);
+}
+.market-fold-icon svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.market-fold-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: #005b85;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(0, 91, 133, 0.2);
+  transition: background-color 0.18s ease;
+}
+details.market-card-fold > summary:hover .market-fold-cta {
+  background: #004464;
+}
+.market-fold-chevron {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.2s ease;
+}
+details.market-card-fold[open] .market-fold-chevron {
+  transform: rotate(180deg);
+}
+.market-fold-open-label {
+  display: none;
+}
+details.market-card-fold[open] .market-fold-open-label {
+  display: inline;
+}
+details.market-card-fold[open] .market-fold-closed-label {
+  display: none;
+}
+.market-fold-body {
+  padding: 18px;
+  background: #ffffff;
+  border-top: 1px solid #d8e6ee;
+}

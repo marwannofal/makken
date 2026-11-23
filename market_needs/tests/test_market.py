@@ -486,3 +486,4 @@ class ViewSecurityTests(MarketFixtures,TestCase):
         self.assertContains(fu_working, 'data-open-history-dialog')
         self.assertContains(fu_working, 'id="market-history-dialog"')
         self.assertEqual(fu_working.content.decode('utf-8').count('class="market-summary"'), 1)
+        self.assertContains(fu_working, 'class="market-fold-cta"')
