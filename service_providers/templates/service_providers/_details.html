@@ -1,13 +1,13 @@
 {% load access_tags %}
 {# MAKKEN ACCESS UI v1 #}
-<dialog id="provider-detail" class="partnership-dialog provider-wide-dialog" aria-labelledby="provider-detail-title" open data-provider-server>
+<dialog id="provider-detail" class="partnership-dialog provider-wide-dialog detail-dialog" aria-labelledby="provider-detail-title" open data-provider-server>
   <div class="dialog-body">
     <div class="dialog-top">
       <span class="dialog-symbol"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 21h18M5 21V5l7-3v19M12 8h7v13"/></svg></span><a class="icon-button" href="{% url 'service_providers:index' %}?{{ filter_query }}&amp;page={{ page_obj.number }}" aria-label="إغلاق"><svg aria-hidden="true"><use href="#icon-close"/></svg></a>
     </div>
     <p class="eyebrow">تفاصيل مزود الخدمة</p><h2 id="provider-detail-title">{{ detail.name }}</h2>
     {% include "access_control/_regional_notice.html" with item=detail %}
-    <dl class="provider-details">
+    <dl class="detail-grid">
       <div>
         <dt>البرنامج التدريبي</dt><dd>{{ detail.program.name|default:"لم يحدد بعد — يحتاج استكمالًا للمطابقة" }}</dd>
       </div>
@@ -115,11 +115,11 @@
         <li>لا توجد تغييرات مسجلة.</li>
       {% endfor %}
     </ol>
-    <div class="dialog-actions">
+    <div class="dialog-actions detail-dialog-actions">
       {% allowed 'service_providers' 'edit' detail %}
-        <a class="button button-primary" href="{% url 'service_providers:edit' detail.pk %}">تعديل المزود</a>
+        <a class="button button-secondary" href="{% url 'service_providers:edit' detail.pk %}">تعديل المزود</a>
       {% endallowed %}
-      <a class="button button-secondary" href="{% url 'service_providers:index' %}?{{ filter_query }}&amp;page={{ page_obj.number }}">إغلاق</a>
+      <a class="button button-primary detail-close-btn" href="{% url 'service_providers:index' %}?{{ filter_query }}&amp;page={{ page_obj.number }}">إغلاق</a>
     </div>
   </div>
 </dialog>
