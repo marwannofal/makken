@@ -148,14 +148,15 @@
       </dialog>
     {% endfor %}
     <section class="partnership-card">
-      <p class="eyebrow mk-numbered-section-title">02 · مطابقة مزودي التنفيذ</p><h2>نوع التدريب للبرنامج: <span class="subtle-badge">{{ need.training_type }}</span></h2><p class="feedback feedback-info"><strong>التدريبي:</strong> مزودو خدمات التدريب فقط. <strong>التشغيلي:</strong> مزودو التدريب إضافةً إلى جهات لديها عرض رعاية توظيف. اختيار الجهات لا يُنشئ تمويلًا ولا يغير حالة تطورها.</p><p class="muted">يكفي تطابق منطقة واحدة لدى مزود التدريب، ونوضح التغطية الجزئية. جهات التوظيف تُطابق القطاع والتخصص ورعاية التوظيف دون فلتر مناطق.</p>
-      {% if incomplete_count %}
-        <p class="feedback feedback-info">يوجد {{ incomplete_count }} مزود نشط بلا برنامج محدد؛ لا يدخلون في المطابقة حتى استكمال البرنامج.
-        {% allowed 'service_providers' 'view' %}
-          <a href="{% url 'service_providers:index' %}" data-execution-leave>مراجعة سجل المزودين</a>
-        {% endallowed %}
-        </p>
-      {% endif %}
+      <div>
+        <header class="card-heading">
+          <div>
+            <h2>البحث الذكي</h2>
+            <p class="muted">البحث عن مزودي الخدمة بناءا على التخصص /القطاع / المنطقة / والمنظمات التي لديها شكل رعايات تشغيلية</p>
+          </div>
+          <span class="subtle-badge">نوع التدريب للبرنامج: <strong>{{ need.training_type }}</strong></span>
+        </header>
+      </div>
     </section>
     <section class="partnership-card">
       <header class="card-heading">
