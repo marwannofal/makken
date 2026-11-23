@@ -15,6 +15,10 @@
           {% include 'market_needs/execution/_status.html' with item=execution %}
         </header>
       </div>
+      {% include "market_needs/_summary.html" %}
+      <details class="market-card-fold">
+        <summary><span class="market-fold-title"><span class="market-fold-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 5H5v16h14V5h-4M9 3h6v4H9ZM8 11h8m-8 4h5"/></svg></span><span>بيانات الحاجة والبرنامج وبنود الصرف والاتفاقية</span></span><span class="market-fold-cta"><span class="market-fold-closed-label">عرض التفاصيل</span><span class="market-fold-open-label">إخفاء التفاصيل</span><svg class="market-fold-chevron" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span></summary>
+        <div class="market-fold-body">
       <dl class="detail-grid">
         <div>
           <dt>حاجة السوق</dt><dd>{{ need.title }}</dd>
@@ -79,6 +83,8 @@
           </tfoot>
         </table>
       </div>
+        </div>
+      </details>
     </section>
     <section class="partnership-card">
       <div>
