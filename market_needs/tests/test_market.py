@@ -449,9 +449,10 @@ class ViewSecurityTests(MarketFixtures,TestCase):
         self.assertRedirects(self.client.get(reverse('market_needs:edit', args=[alliance.pk])), reverse('market_needs:index'), fetch_redirect_response=False)
         res_a = self.client.get(reverse('market_needs:index'), {'q': alliance.number})
         self.assertContains(res_a, 'market-care-pill is-alliance')
-        self.assertContains(res_a, f'/execution/{alliance.pk}/providers/')
-        self.assertContains(res_a, 'محرك مزود الخدمة')
         self.assertContains(res_a, '<span>مشاهدة</span>')
+        self.assertNotContains(res_a, f'/market-needs/{alliance.pk}/sponsors/')
+        self.assertNotContains(res_a, f'/execution/{alliance.pk}/providers/')
+        self.assertNotContains(res_a, 'محرك مزود الخدمة')
         self.assertNotContains(res_a, f'/market-needs/{alliance.pk}/edit/')
         self.assertNotContains(res_a, 'تأكيد تغيير حالة تفعيل البطاقة؟')
 
