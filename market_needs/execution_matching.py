@@ -1,7 +1,7 @@
 """Execution eligibility, deliberately independent of financial sponsor matching."""
-from django.db.models import Count, DecimalField, F, OuterRef, Prefetch, Q, Subquery, Sum, Value
+from django.db.models import Count, DecimalField, Exists, F, OuterRef, Prefetch, Q, Subquery, Sum, Value
 from django.db.models.functions import Coalesce
-from partnerships.models import Partnership, PartnershipOffering
+from partnerships.models import Partnership, PartnershipOffering, PartnershipRegion
 from service_providers.models import ServiceProvider, ProviderCoverage
 from .models import Need, NeedStatus, Sponsorship, SponsorshipStatus
 from access_control.regions import scoped
@@ -29,7 +29,7 @@ def matching_coverage(need):
 def providers(need, actor=None):
     if not need.is_active or not need.program.is_active or not need.sector.is_active or not need.specialization.is_active:
         return ServiceProvider.objects.none()
-    return (scoped(ServiceProvider.objects.all(), actor).filter(is_active=True, program_id=need.program_id,
+    return (scoped(ServiceProvider.objects.all(), actor).filter(is_active=True,
                                           coverage__in=matching_coverage(need))
             .select_related("program")
             .prefetch_related(Prefetch("coverage", queryset=matching_coverage(need), to_attr="matched_coverage"))
@@ -48,8 +48,13 @@ def employment_offerings(need):
 def employers(need, actor=None):
     if need.training_type != "تشغيلي" or not need.is_active or not need.program.is_active or not need.sector.is_active or not need.specialization.is_active:
         return Partnership.objects.none()
-    # Product decision: no partnership geographic filtering; scope is not coverage.
-    return (scoped(Partnership.objects.all(), actor).filter(is_active=True, entity__is_active=True, offerings__in=employment_offerings(need))
+    region_match = PartnershipRegion.objects.filter(
+        partnership_id=OuterRef("pk"),
+        region_id__in=need.regions.values("pk"),
+    )
+    return (scoped(Partnership.objects.all(), actor).filter(
+                Exists(region_match),
+                is_active=True, entity__is_active=True, offerings__in=employment_offerings(need))
             .select_related("entity", "development_state")
             .prefetch_related(Prefetch("offerings", queryset=employment_offerings(need), to_attr="matched_offerings"))
             .distinct().order_by("name", "pk"))
@@ -68,4 +73,4 @@ def employer_evidence(need, organization):
     return {"name": organization.name, "sector": need.sector.name,
             "specialization": need.specialization.name,
             "offerings": [{"id": o.pk, "shape": o.sponsorship_shape.name} for o in organization.matched_offerings],
-            "geography": "التغطية الجغرافية غير محددة؛ لا يطبق فلتر مناطق على جهات التوظيف."}
+            "geography": "مطابقة على مستوى المناطق الإدارية للجهة مع مناطق بطاقة الحاجة."}

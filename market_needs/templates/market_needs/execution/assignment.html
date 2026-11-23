@@ -159,19 +159,13 @@
       </div>
     </section>
     <section class="partnership-card">
-      <header class="card-heading">
-        <div>
-          <h2>مزودو الخدمة / التدريب</h2><p class="muted">نفس البرنامج والتخصص، ضمن منطقة مستهدفة نشطة في الارتباط نفسه.</p>
-        </div>
-      </header>
-      <form method="get" class="execution-filters execution-candidate-search">
-        {% include "market_needs/execution/_return_fields.html" %}
-        <input type="hidden" name="employer_q" value="{{ employer_q }}">
-        <div class="partnership-field">
-          <label for="provider-search">بحث مزودي التدريب</label><input id="provider-search" name="provider_q" type="search" value="{{ provider_q }}" maxlength="200">
-        </div>
-        <button class="button button-primary" type="submit">بحث</button><a class="button button-secondary" href="?employer_q={{ employer_q|urlencode }}&amp;q={{ return_q|urlencode }}&amp;status={{ return_status|urlencode }}&amp;return_page={{ return_page|urlencode }}">مسح</a>
-      </form>
+      <div>
+        <header class="card-heading">
+          <div>
+            <h2>مزودو الخدمة / التدريب</h2><p class="muted">المطابقة تلقائيًا بناءً على التخصص / القطاع / المنطقة.</p>
+          </div>
+        </header>
+      </div>
       <div class="table-scroll" tabindex="0">
         <table class="partnership-table" data-no-export>
           <caption class="visually-hidden">مزودو التدريب المطابقون</caption>
@@ -182,7 +176,7 @@
           </thead>
           <tbody>
             {% for row in provider_rows %}
-              <tr data-market-row data-url="{{ row.detail_url }}">
+              <tr>
                 <td><input type="checkbox" data-execution-select="providers" value="{{ row.item.pk }}" aria-label="اختيار {{ row.item.name }}"{% if not writable or not row.item.region_writable %} disabled{% endif %}></td><th scope="row"><a href="{{ row.detail_url }}">{{ row.item.name }}</a><small class="execution-number">
                 {% if row.evidence.full_coverage %}
                   يغطي جميع المناطق المستهدفة
@@ -211,20 +205,13 @@
     </section>
     {% if need.training_type == 'تشغيلي' %}
       <section class="partnership-card">
-        <header class="card-heading">
-          <div>
-            <h2>مزودو الخدمة / الرعاة للتوظيف</h2><p class="muted">عروض نشطة لنفس القطاع والتخصص، وشكل رعاية مصنف «هل الرعاية توظيف؟ نعم».</p>
-          </div>
-        </header>
-        <p class="feedback feedback-info"><strong>التغطية الجغرافية غير محددة.</strong> المناطق الإدارية تضبط صلاحية الوصول فقط ولا تغيّر شروط المطابقة، ولا يعني النطاق «عالمي» تغطية جميع المناطق.</p>
-        <form method="get" class="execution-filters execution-candidate-search">
-          {% include "market_needs/execution/_return_fields.html" %}
-          <input type="hidden" name="provider_q" value="{{ provider_q }}">
-          <div class="partnership-field">
-            <label for="employer-search">بحث جهات التوظيف</label><input id="employer-search" name="employer_q" type="search" value="{{ employer_q }}" maxlength="200">
-          </div>
-          <button class="button button-primary" type="submit">بحث</button><a class="button button-secondary" href="?provider_q={{ provider_q|urlencode }}&amp;q={{ return_q|urlencode }}&amp;status={{ return_status|urlencode }}&amp;return_page={{ return_page|urlencode }}">مسح</a>
-        </form>
+        <div>
+          <header class="card-heading">
+            <div>
+              <h2>مزودو الخدمة / الرعاة للتوظيف</h2><p class="muted">المطابقة تلقائيًا بناءً على التخصص / القطاع / المنطقة + شكل رعاية توظيف.</p>
+            </div>
+          </header>
+        </div>
         <div class="table-scroll" tabindex="0">
           <table class="partnership-table" data-no-export>
             <caption class="visually-hidden">جهات التوظيف المطابقة</caption>
@@ -235,7 +222,7 @@
             </thead>
             <tbody>
               {% for row in employer_rows %}
-                <tr data-market-row data-url="{{ row.detail_url }}">
+                <tr>
                   <td><input type="checkbox" data-execution-select="employers" value="{{ row.item.pk }}" aria-label="اختيار {{ row.item.name }}"{% if not writable or not row.item.region_writable %} disabled{% endif %}></td><th scope="row"><a href="{{ row.detail_url }}">{{ row.item.name }}</a></th><td>{{ row.item.entity.get_entity_type_display }}
                   {% if row.item.entity.branch %}
                     / {{ row.item.entity.get_branch_display }}

@@ -71,7 +71,7 @@ class ExecutionTests(MarketFixtures, TestCase):
         self.assertEqual(evidence["regions"][0]["id"],self.region.pk)
         other=TrainingProgram.objects.create(name="برنامج غير مطابق",category="qualifying_program")
         ServiceProvider.objects.filter(pk=item.pk).update(program=other)
-        self.assertFalse(matching.providers(need).exists())
+        self.assertTrue(matching.providers(need).filter(pk=item.pk).exists())
 
     def test_full_region_match_has_explained_coverage(self):
         need=self.funded(); item=self.provider()
@@ -103,12 +103,14 @@ class ExecutionTests(MarketFixtures, TestCase):
         self.assertEqual(execution.provider_links.count(), 1)
 
     def test_unknown_program_and_cross_coverage_false_match_are_excluded(self):
-        need=self.funded(); self.provider(program=False)
+        need=self.funded(); no_prog=self.provider(program=False)
         item=self.provider(name="مزود ارتباطات مختلفة",specialization=self.spec2)
         from regions.models import Region
         other_region=Region.objects.create(name="منطقة خارج البطاقة")
         row=ProviderCoverage.objects.create(provider=item,region=other_region);row.specializations.add(self.spec)
-        self.assertFalse(matching.providers(need).exists())
+        matched_ids=list(matching.providers(need).values_list("pk",flat=True))
+        self.assertIn(no_prog.pk,matched_ids)
+        self.assertNotIn(item.pk,matched_ids)
 
     def test_inactive_coverage_provider_and_region_excluded(self):
         need=self.funded(); item=self.provider()
@@ -130,7 +132,17 @@ class ExecutionTests(MarketFixtures, TestCase):
         wrong_shape=SponsorshipShape.objects.create(name="توظيف بالاسم فقط",is_employment=False)
         self.organization(name="غير مؤهلة",shapes=[wrong_shape])
         self.assertEqual(list(matching.employers(need).values_list("pk",flat=True)),[correct.pk])
-        self.assertIn("غير محددة",matching.employer_evidence(need,matching.employers(need).get())["geography"])
+        self.assertIn("المناطق الإدارية",matching.employer_evidence(need,matching.employers(need).get())["geography"])
+        from regions.models import Region
+        other_reg=Region.objects.create(name="منطقة غير مطابقة للتوظيف")
+        emp_shape=SponsorshipShape.objects.create(name="شكل توظيف منطقة أخرى",is_employment=True)
+        wrong_reg_emp=self.organization(name="جهة توظيف منطقة أخرى",shapes=[emp_shape],state="capability",regions=[other_reg])
+        self.assertNotIn(wrong_reg_emp.pk,list(matching.employers(need).values_list("pk",flat=True)))
+        res=self.client.get(reverse("program_execution:assignment",args=[need.pk]))
+        self.assertNotContains(res,"بحث مزودي التدريب")
+        self.assertNotContains(res,"بحث جهات التوظيف")
+        self.assertNotContains(res,"التغطية الجغرافية غير محددة")
+        self.assertNotContains(res,"data-market-row")
 
     def test_cross_offering_employment_does_not_match(self):
         need=self.funded(operational=True)
