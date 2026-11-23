@@ -466,3 +466,19 @@ class ViewSecurityTests(MarketFixtures,TestCase):
         self.assertContains(detail_res, 'detail-close-btn')
         self.assertContains(detail_res, 'data-open-history-dialog')
         self.assertContains(detail_res, 'id="market-history-dialog"')
+
+        # 4. Complete card locks editing in sponsor engine (محرك الرعاة) while working card keeps it enabled
+        fu_complete = self.client.get(reverse('market_needs:followup', args=[alliance.pk]))
+        self.assertContains(fu_complete, 'تم إيقاف التعديل في محرك الرعاة')
+        self.assertContains(fu_complete, f'/execution/{alliance.pk}/providers/')
+        self.assertNotContains(fu_complete, 'تعديل الملاحظات')
+        self.assertContains(fu_complete, 'operation=details')
+        r1.refresh_from_db(); alliance.refresh_from_db()
+        fu_get_edit = self.client.get(reverse('market_needs:followup', args=[alliance.pk]), {'record': r1.pk, 'operation': 'notes'})
+        self.assertEqual(fu_get_edit.status_code, 409)
+        self.assertContains(fu_get_edit, 'تم إيقاف التعديل في محرك الرعاة', status_code=409)
+        with self.assertRaises(services.Conflict):
+            services.followup(alliance.pk, alliance.version, r1.pk, r1.version, 'notes', {'notes': 'محاولة تعديل'}, {}, self.user)
+        fu_working = self.client.get(reverse('market_needs:followup', args=[working.pk]))
+        self.assertContains(fu_working, 'تعديل الملاحظات')
+        self.assertNotContains(fu_working, f'/execution/{working.pk}/providers/')

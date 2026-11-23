@@ -189,6 +189,8 @@ def followup(pk, version, sponsorship_id, record_version, operation, data, files
                 raise Conflict("التوزيع الاستكمالي متاح للمساهمات المعتمدة القديمة غير الموزّعة فقط.")
             if not need.is_active:
                 raise Conflict("فعّل البطاقة قبل متابعة الرعاية.")
+            if need.status == NeedStatus.COMPLETE:
+                raise Conflict("بطاقة الحاجة مكتملة الدعم؛ تم إيقاف التعديل في محرك الرعاة.")
             form = FollowupForm(data, files, operation=operation, need=need, record=record)
             valid = form.is_valid()
             if operation == "approve" and form.cleaned_data.get("amount") is not None and form.cleaned_data["amount"] > need.remaining:

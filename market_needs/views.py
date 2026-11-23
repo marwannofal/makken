@@ -246,13 +246,19 @@ def followup(request, pk):
         if record_id.isascii() and record_id.isdigit():
             selected_record = get_object_or_404(sponsorship_query(need, request.user), pk=int(record_id))
             operation = request.GET["operation"]
-            if operation != "details":
-                from access_control.regions import require_write
-                require_write(request.user, need)
-                require_write(request.user, selected_record.partnership)
-            followup_form = FollowupForm(initial={"notes": selected_record.notes}, operation=operation, need=need, record=selected_record)
-            followup_snapshot = token(request, need, operation, selected_record)
-            context["reopen_followup"] = operation != "details"
+            if operation != "details" and need.status == NeedStatus.COMPLETE:
+                context["error"] = "بطاقة الحاجة مكتملة الدعم؛ تم إيقاف التعديل في محرك الرعاة."
+                status = 409
+                selected_record = None
+                operation = ""
+            else:
+                if operation != "details":
+                    from access_control.regions import require_write
+                    require_write(request.user, need)
+                    require_write(request.user, selected_record.partnership)
+                followup_form = FollowupForm(initial={"notes": selected_record.notes}, operation=operation, need=need, record=selected_record)
+                followup_snapshot = token(request, need, operation, selected_record)
+                context["reopen_followup"] = operation != "details"
     if request.method == "POST":
         try:
             payload = load_token(request, pk, {"add", "notes", "approve", "reject", "allocate"})

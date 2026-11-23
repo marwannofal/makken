@@ -2,6 +2,9 @@
 {# MAKKEN ACCESS UI v1 #}
 {% load market_tags %}
 <div class="row-actions">
+  {% if need.status == 'complete' %}
+    <a class="row-action mk-view-action" href="?{{ filter_query }}&amp;record={{ row.record.pk }}&amp;operation=details"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg><span>مشاهدة</span></a>
+  {% else %}
   {% if row.record.status != 'rejected' and need.is_active %}
     {% allowed 'market_needs' 'edit' row.record %}
       <a class="row-action" href="?{{ filter_query }}&amp;record={{ row.record.pk }}&amp;operation=notes" data-followup-open data-operation="notes" data-snapshot="{{ row.notes_token }}" data-name="{{ row.record.partnership.name }}" data-notes="{{ row.record.notes }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m16 4 4 4M4 20l5-1L20 8a2.8 2.8 0 0 0-4-4L5 15Z"/></svg>تعديل الملاحظات</a>
@@ -22,5 +25,6 @@
     {% allowed 'market_needs' 'edit' row.record %}
       <a class="row-action" href="?{{ filter_query }}&amp;record={{ row.record.pk }}&amp;operation=allocate" data-followup-open data-operation="allocate" data-snapshot="{{ row.allocate_token }}" data-name="{{ row.record.partnership.name }}" data-notes="{{ row.record.notes }}" data-record-amount="{{ row.record.amount|money_raw }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 4h16v16H4M8 4v16M4 10h16M4 15h16"/></svg>توزيع دعم سابق</a>
     {% endallowed %}
+  {% endif %}
   {% endif %}
 </div>
