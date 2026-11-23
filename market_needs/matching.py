@@ -7,7 +7,7 @@ data only, following the owner's 2026-10-18 change to BR-MKT-05 / Appendix C.21.
 """
 from dataclasses import dataclass
 from django.db.models import Exists, OuterRef, Prefetch, Q
-from partnerships.models import Partnership, PartnershipOffering
+from partnerships.models import Partnership, PartnershipOffering, PartnershipRegion
 from care_states.models import DevelopmentState
 from training_programs.models import TrainingProgram
 from .models import Sponsorship
@@ -25,8 +25,14 @@ def matching_offerings(need):
 
 def eligible_partnerships(need, actor=None):
     offers = matching_offerings(need).filter(partnership_id=OuterRef("pk"))
+    region_match = PartnershipRegion.objects.filter(
+        partnership_id=OuterRef("pk"),
+        region_id__in=need.regions.values("pk"),
+    )
     return scoped(Partnership.objects.all(), actor).filter(
-        Exists(offers), Exists(TrainingProgram.objects.filter(pk=need.program_id, is_active=True)),
+        Exists(offers),
+        Exists(region_match),
+        Exists(TrainingProgram.objects.filter(pk=need.program_id, is_active=True)),
         is_active=True, entity__is_active=True,
     )
 

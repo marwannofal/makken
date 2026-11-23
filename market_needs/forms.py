@@ -205,6 +205,8 @@ class FollowupForm(forms.Form):
         data = super().clean()
         if self.operation != "approve" and data.get("attachments"):
             self.add_error("attachments", "تُرفق مستندات الدعم عند الاعتماد فقط.")
+        if self.operation == "approve" and not data.get("attachments"):
+            self.add_error("attachments", "يجب إرفاق مستند داعم واحد على الأقل عند الاعتماد.")
         if self.operation not in {"approve", "allocate"}:
             return data
         if self.operation == "allocate":

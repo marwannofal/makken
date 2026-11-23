@@ -1,6 +1,7 @@
 {% load access_tags %}
 {# MAKKEN ACCESS UI v1 #}
 {% load partnership_states %}
+{% load market_tags %}
 {% if show_record_details %}
   <dialog class="partnership-dialog detail-dialog market-record-detail" aria-labelledby="record-detail-title" open data-market-server data-close-url="?{{ filter_query }}#market-followup-records">
     <div class="dialog-body">
@@ -44,6 +45,15 @@
         </div>
         <div>
           <dt>مستوى</dt><dd>{{ selected_record.level_name|default:'—' }}</dd>
+        </div>
+        <div>
+          <dt>حالة الشراكة</dt><dd>{% if selected_record.partnership.partnership_status %}{{ selected_record.partnership.partnership_status.name }}{% elif selected_record.partnership.is_active %}فعالة{% else %}موقوفة{% endif %}</dd>
+        </div>
+        <div>
+          <dt>تاريخ بداية الشراكة</dt><dd><bdi>{% firstof selected_record.partnership.signed_on|date:'d/m/Y' selected_record.partnership.starts_on|date:'d/m/Y' '—' %}</bdi></dd>
+        </div>
+        <div>
+          <dt>تاريخ نهاية الشراكة</dt><dd><bdi>{% firstof selected_record.partnership.calculated_expiry|date:'d/m/Y' selected_record.partnership.ends_on|date:'d/m/Y' '—' %}</bdi></dd>
         </div>
         <div>
           <dt>تاريخ الاعتماد / الرفض</dt><dd>{{ selected_record.decided_at|date:'d/m/Y H:i:s T'|default:'—' }}</dd>
@@ -97,8 +107,22 @@
       <h3>المرفقات الداعمة</h3>
       {% include 'market_needs/_attachments.html' with record=selected_record %}
       {% include 'market_needs/_timeline.html' %}
-      <div class="dialog-actions">
-        <a class="button button-primary" href="?{{ filter_query }}#market-followup-records">إغلاق</a>
+      <div class="dialog-actions detail-dialog-actions">
+        {% if need.status != 'complete' and need.is_active and selected_row %}
+          {% if selected_record.status == 'new' %}
+            {% allowed 'market_needs' 'edit' selected_record %}
+              {% allowed 'market_needs' 'change_status' selected_record %}
+                <a class="button button-primary" href="?{{ filter_query }}&amp;record={{ selected_record.pk }}&amp;operation=approve" data-followup-open data-operation="approve" data-allowed-lines="{{ selected_row.allowed_lines }}" data-snapshot="{{ selected_row.approve_token }}" data-name="{{ selected_record.partnership.name }}" data-notes="{{ selected_record.notes }}">اعتماد</a>
+                <a class="button button-danger" href="?{{ filter_query }}&amp;record={{ selected_record.pk }}&amp;operation=reject" data-followup-open data-operation="reject" data-snapshot="{{ selected_row.reject_token }}" data-name="{{ selected_record.partnership.name }}" data-notes="{{ selected_record.notes }}">رفض</a>
+              {% endallowed %}
+            {% endallowed %}
+          {% elif selected_record.unallocated_amount %}
+            {% allowed 'market_needs' 'edit' selected_record %}
+              <a class="button button-secondary" href="?{{ filter_query }}&amp;record={{ selected_record.pk }}&amp;operation=allocate" data-followup-open data-operation="allocate" data-snapshot="{{ selected_row.allocate_token }}" data-name="{{ selected_record.partnership.name }}" data-notes="{{ selected_record.notes }}" data-record-amount="{{ selected_record.amount|money_raw }}">توزيع دعم سابق</a>
+            {% endallowed %}
+          {% endif %}
+        {% endif %}
+        <a class="button button-secondary detail-close-btn" href="?{{ filter_query }}#market-followup-records">إغلاق</a>
       </div>
     </div>
   </dialog>

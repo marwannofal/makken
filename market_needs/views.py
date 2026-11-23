@@ -74,7 +74,7 @@ def funding_details(need):
 
 
 def sponsorship_query(need, actor=None):
-    return scoped(need.sponsorships.all(), actor).select_related("partnership__development_state", "partnership__entity", "updated_by", "level", "need").prefetch_related(
+    return scoped(need.sponsorships.all(), actor).select_related("partnership__development_state", "partnership__entity", "partnership__partnership_status", "updated_by", "level", "need").prefetch_related(
         "attachments", "allocations__expense_line__expense_item", "partnership__development_history",
     )
 
@@ -305,6 +305,17 @@ def followup(request, pk):
         shape_map.setdefault(organization_id, set()).add(shape_id)
     for row in rows:
         row["allowed_lines"] = ",".join(str(line.pk) for line in need.funding_lines if line.sponsorship_shape_id in shape_map.get(row["record"].partnership_id, set()))
+    selected_row = None
+    if operation == "details" and selected_record is not None:
+        selected_record.region_writable = card_writable and scoped(Partnership.objects.filter(pk=selected_record.partnership_id), request.user, writable=True).exists()
+        sel_shapes = set(matching_offerings(need).filter(partnership_id=selected_record.partnership_id).values_list("sponsorship_shape_id", flat=True))
+        selected_row = {
+            "record": selected_record,
+            "approve_token": token(request, need, "approve", selected_record),
+            "reject_token": token(request, need, "reject", selected_record),
+            "allocate_token": token(request, need, "allocate", selected_record),
+            "allowed_lines": ",".join(str(line.pk) for line in need.funding_lines if line.sponsorship_shape_id in sel_shapes),
+        }
     params = request.GET.copy()
     params.pop("page", None)
     params.pop("record", None)
@@ -320,7 +331,7 @@ def followup(request, pk):
     scope_labels_map = dict(_Scope.choices)
     configured_scopes = [scope_labels_map[s] for s in (need.search_scopes or []) if s in scope_labels_map]
     context.update(state_options=state_options, configured_states=configured_states, configured_scopes=configured_scopes, need=need, filter_form=filters, matches=explain(need, page), page_obj=page, records=rows, add_token=token(request, need, "add"),
-                   followup_form=followup_form or FollowupForm(need=need), selected_record=selected_record, operation=operation,
+                   followup_form=followup_form or FollowupForm(need=need), selected_record=selected_record, selected_row=selected_row, operation=operation,
                    record_page=record_page, show_record_details=operation == "details" and selected_record is not None,
                    development_history=development_timeline(selected_record.partnership) if selected_record else [],
                    followup_snapshot=followup_snapshot,

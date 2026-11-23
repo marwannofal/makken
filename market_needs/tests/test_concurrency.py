@@ -22,7 +22,7 @@ class ApprovalConcurrencyTests(MarketFixtures,TransactionTestCase):
             try:
                 barrier.wait(timeout=10)
                 lines=list(need.expense_lines.order_by('position'))
-                services.followup(need.pk,version,record.pk,record.version,'approve',{'amount':'75',f'allocation_{lines[0].pk}':'60',f'allocation_{lines[1].pk}':'15'}, {},actor)
+                services.followup(need.pk,version,record.pk,record.version,'approve',{'amount':'75',f'allocation_{lines[0].pk}':'60',f'allocation_{lines[1].pk}':'15'}, {'attachments':[self.png()]},actor)
                 return 'saved'
             except (services.Conflict,OperationalError):
                 return 'conflict'
@@ -41,7 +41,7 @@ class ApprovalConcurrencyTests(MarketFixtures,TransactionTestCase):
             close_old_connections()
             try:
                 barrier.wait(timeout=10)
-                services.followup(need.pk,version,record.pk,record.version,'approve',{'support_percent':'40',f'allocation_{line.pk}':'40'}, {},actor)
+                services.followup(need.pk,version,record.pk,record.version,'approve',{'support_percent':'40',f'allocation_{line.pk}':'40'}, {'attachments':[self.png()]},actor)
                 return 'saved'
             except (services.Conflict,OperationalError):
                 return 'conflict'

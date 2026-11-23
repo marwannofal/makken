@@ -71,8 +71,10 @@ class MarketFixtures:
     def create_need(self,**changes):
         return services.save_need(self.data(**changes),self.user,nonce=str(uuid.uuid4()))
 
-    def organization(self,name='جهة تجريبية',shapes=None,state='willingness',active=True):
+    def organization(self,name='جهة تجريبية',shapes=None,state='willingness',active=True,regions=None):
         org=Partnership.objects.create(name=name,representative='الممثل',phone='+966501234567',email='person@example.com',entity=self.entity,scope='local',financial_capacity=1,is_active=active,development_state_id=state)
+        for reg in (regions if regions is not None else [self.region]):
+            org.administrative_regions.add(reg)
         for shape in shapes if shapes is not None else [self.shape,self.shape2]:
             row=PartnershipOffering.objects.create(partnership=org,sector=self.sector,sponsorship_shape=shape)
             row.specializations.add(self.spec)
@@ -94,7 +96,7 @@ class MarketFixtures:
                 remaining-=value
         except Exception:
             pass  # Invalid values are intentionally passed through to form validation.
-        return services.followup(need.pk,need.version,record.pk,record.version,'approve',data,files or {},self.user)
+        return services.followup(need.pk,need.version,record.pk,record.version,'approve',data,{'attachments':[self.png()]} if files is None else files,self.user)
 
     def png(self,name='support.png'):
         out=BytesIO();Image.new('RGB',(4,4),'teal').save(out,format='PNG')
@@ -481,9 +483,30 @@ class ViewSecurityTests(MarketFixtures,TestCase):
         with self.assertRaises(services.Conflict):
             services.followup(alliance.pk, alliance.version, r1.pk, r1.version, 'notes', {'notes': 'محاولة تعديل'}, {}, self.user)
         fu_working = self.client.get(reverse('market_needs:followup', args=[working.pk]))
-        self.assertContains(fu_working, 'تعديل الملاحظات')
+        self.assertNotContains(fu_working, 'تعديل الملاحظات')
+        self.assertContains(fu_working, 'حالة الشراكة')
+        self.assertContains(fu_working, 'تاريخ بداية الشراكة')
+        self.assertContains(fu_working, 'تاريخ نهاية الشراكة')
+        self.assertContains(fu_working, 'data-care-mode="individual"')
+        self.assertContains(fu_working, 'data-care-mode="alliance"')
         self.assertNotContains(fu_working, f'/execution/{working.pk}/providers/')
         self.assertContains(fu_working, 'data-open-history-dialog')
         self.assertContains(fu_working, 'id="market-history-dialog"')
         self.assertEqual(fu_working.content.decode('utf-8').count('class="market-summary"'), 1)
         self.assertContains(fu_working, 'class="market-fold-cta"')
+
+        # 5. Region matching, required attachment on approve, and details modal actions
+        from market_needs.matching import candidates
+        from regions.models import Region
+        other_region = Region.objects.create(name='منطقة غير مطابقة للاختبار')
+        org_other = self.organization('جهة منطقة مختلفة', regions=[other_region])
+        org_match = self.organization('جهة منطقة مطابقة', regions=[self.region])
+        matched_pks = set(candidates(working, actor=self.user).values_list('pk', flat=True))
+        self.assertIn(org_match.pk, matched_pks)
+        self.assertNotIn(org_other.pk, matched_pks)
+        rec_new = self.attach(working, org_match)
+        det_res = self.client.get(reverse('market_needs:followup', args=[working.pk]), {'record': rec_new.pk, 'operation': 'details'})
+        self.assertContains(det_res, 'data-operation="approve"')
+        self.assertContains(det_res, 'data-operation="reject"')
+        with self.assertRaises(services.InvalidForm):
+            self.approve(working, rec_new, '10.00', files={})

@@ -1350,3 +1350,85 @@ details.market-card-fold[open] .market-fold-closed-label {
   background: #ffffff;
   border-top: 1px solid #d8e6ee;
 }
+
+/* Unified sponsor engine section */
+.market-unified-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding-bottom: 14px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid #e3ecef;
+}
+.market-unified-header h2 {
+  margin: 0 0 4px;
+  font-size: 18px;
+  font-weight: 800;
+  color: #004666;
+}
+.market-unified-badges {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.market-care-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #4b6775;
+}
+.market-candidates-fold {
+  border: 1px solid #d5e5ee;
+  border-radius: 12px;
+  margin: 14px 0;
+  background: #f9fcfe;
+  overflow: hidden;
+}
+.market-candidates-fold > summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 16px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 800;
+  color: #005b85;
+  background: #eef6fb;
+}
+.market-candidates-fold > summary::-webkit-details-marker {
+  display: none;
+}
+.market-candidates-body {
+  padding: 14px 16px;
+  background: #ffffff;
+  border-top: 1px solid #d5e5ee;
+}
+.market-care-mode-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  background: #f2f8fc;
+  border: 1px solid #cce0ec;
+}
+.market-care-mode-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: #004666;
+}
+.market-care-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1c3a49;
+  cursor: pointer;
+}

@@ -21,9 +21,11 @@ class FundingDetailsTests(MarketFixtures, TestCase):
         lines = list(need.expense_lines.order_by("position"))
         return {**{f"allocation_{line.pk}": str(value) for line, value in zip(lines, values) if value is not None}, **extra}
 
-    def submit(self, need, record, data, operation="approve", actor=None):
+    def submit(self, need, record, data, operation="approve", actor=None, files=None):
         need.refresh_from_db(); record.refresh_from_db()
-        return services.followup(need.pk, need.version, record.pk, record.version, operation, data, {}, actor or self.user)
+        if files is None:
+            files = {"attachments": [self.png()]} if operation == "approve" else {}
+        return services.followup(need.pk, need.version, record.pk, record.version, operation, data, files, actor or self.user)
 
     def test_exact_band_boundaries_and_no_rounded_promotion(self):
         for value, expected in [("0", None), ("0.01", "bronze"), ("59.99", "bronze"), ("60", "silver"), ("79.99", "silver"), ("80", "gold"), ("99.99", "gold"), ("100", "strategic")]:
@@ -169,7 +171,7 @@ class FundingDetailsTests(MarketFixtures, TestCase):
     def test_nojs_percentage_and_allocation_approval(self):
         need = self.create_need(); record = self.attach(need, self.organization()); path=f"/market-needs/{need.pk}/sponsors/"
         response=self.client.get(path,{"record":record.pk,"operation":"approve"})
-        result=self.client.post(path,self.allocation_data(need,["15","10"],support_percent="25",snapshot=response.context['followup_snapshot']))
+        result=self.client.post(path,self.allocation_data(need,["15","10"],support_percent="25",snapshot=response.context['followup_snapshot'],attachments=self.png()))
         self.assertEqual(result.status_code,302);record.refresh_from_db();self.assertEqual(record.amount,25)
 
     def test_table_headers_follow_requested_order_and_extra_data_remains(self):
