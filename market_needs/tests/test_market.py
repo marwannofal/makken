@@ -485,3 +485,4 @@ class ViewSecurityTests(MarketFixtures,TestCase):
         self.assertNotContains(fu_working, f'/execution/{working.pk}/providers/')
         self.assertContains(fu_working, 'data-open-history-dialog')
         self.assertContains(fu_working, 'id="market-history-dialog"')
+        self.assertEqual(fu_working.content.decode('utf-8').count('class="market-summary"'), 1)

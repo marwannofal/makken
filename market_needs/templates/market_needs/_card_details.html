@@ -66,5 +66,5 @@
 <div class="market-description">
   <h3>وصف الحاجة</h3><p>{{ need.description|linebreaksbr }}</p>
 </div>
-{% include "market_needs/_summary.html" %}
+{% if not hide_summary %}{% include "market_needs/_summary.html" %}{% endif %}
 {% include "market_needs/_expenses.html" %}
