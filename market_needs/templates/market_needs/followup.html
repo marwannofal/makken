@@ -8,7 +8,7 @@
   <div class="market-unified-header">
     <div>
       <h2>البحث الذكي: متابعة البرنامج مع الرعاة المحتملين</h2>
-      <p class="muted">المطابقة حسب شكل الرعاية، المناطق، القطاع، والتخصص — اضغط على أي سجل لعرض التفاصيل والإجراءات.</p>
+      <p class="muted">تُعرض الجهات المطابقة تلقائيًا حسب شكل الرعاية، المناطق، القطاع، والتخصص — اضغط على أي سجل لعرض التفاصيل والإجراءات.</p>
     </div>
     <div class="market-unified-badges">
       <span class="market-care-label">نوع الرعاية:</span>
@@ -20,24 +20,6 @@
     <div class="market-criteria-group"><strong>المنظمات المشمولة في البحث:</strong> {% for st in configured_states %}{% development_pill st %}{% empty %}<span class="subtle-badge">جميع الحالات</span>{% endfor %}</div>
     <div class="market-criteria-group"><strong>نطاق الكيان:</strong> {% for sc in configured_scopes %}<span class="subtle-badge">{{ sc }}</span>{% empty %}<span class="subtle-badge">محلي وعالمي</span>{% endfor %}</div>
   </div>
-  <form method="get" class="market-match-filters">
-    <div class="partnership-field market-wide"><label for="id_q">{{ filter_form.q.label }}</label>{{ filter_form.q }}{{ filter_form.q.errors }}</div>
-    <div class="market-page-actions">
-      <button class="button button-primary" type="submit"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6"/><path d="m15 15 6 6"/></svg>بحث ومطابقة</button>
-      <a class="button button-secondary" href="{% url 'market_needs:followup' need.pk %}">إعادة ضبط</a>
-    </div>
-  </form>
-  {% if need.status != 'complete' %}
-    <details class="market-candidates-fold"{% if matches or request.GET.q %} open{% endif %}>
-      <summary>
-        <span>الجهات المتوافقة المتاحة للإضافة ({{ page_obj.paginator.count }})</span>
-        <span class="subtle-badge">اختيار وإضافة للمتابعة</span>
-      </summary>
-      <div class="market-candidates-body">
-        <form method="post" data-candidates data-market-confirm="هل تريد إضافة الجهات المحددة للمتابعة؟ ستبدأ سجلات رعايتها بحالة جديد، ولن يُحتسب دعم حتى الاعتماد.">{% csrf_token %}<input type="hidden" name="snapshot" value="{{ add_token }}"><div class="field-error" data-candidate-error role="alert"></div><div class="table-scroll" tabindex="0" aria-label="جدول يمكن تمريره أفقيًا"><table class="partnership-table market-matches" data-no-export><caption class="visually-hidden">الجهات المتوافقة وأسباب المطابقة</caption><thead><tr><th scope="col">اختيار</th><th scope="col">الجهة / الكيان</th><th scope="col">حالة التطور</th><th scope="col">النطاق</th><th scope="col">القدرة المالية</th><th scope="col">سبب المطابقة</th></tr></thead><tbody>{% for match in matches %}<tr><td>{% allowed 'market_needs' 'create' need %}{% region_writable match.organization as organization_writable %}<input{% if not organization_writable %} disabled title="هذه الجهة مشتركة مع مناطق خارج نطاقك"{% endif %} type="checkbox" name="organizations" value="{{ match.organization.pk }}" aria-label="اختيار {{ match.organization.name }}">{% endallowed %}</td><th scope="row">{{ match.organization.name }}<small>{{ match.organization.entity.name }}</small></th><td>{% development_pill match.organization.development_state %}</td><td>{{ match.organization.get_scope_display }}</td><td>{% include "market_needs/_money.html" with value=match.organization.financial_capacity %}</td><td><span class="tag">{% if match.full %}توافق مع جميع بنود الصرف المطلوبة{% else %}توافق مع بعض بنود الصرف{% endif %}</span><p class="muted">البرنامج: {{ need.program_name }} · {{ match.lines|length }} / {{ match.line_count }} بنود متوافقة</p><ul class="market-match-reasons">{% for line in match.lines %}<li>{{ line.expense_item.name }} · {{ line.sponsorship_shape.name }}</li>{% endfor %}</ul></td></tr>{% empty %}<tr><td colspan="6"><div class="empty-state"><strong>لا توجد جهات مطابقة متاحة</strong><p>راجع معايير البحث (حالات التطور، النطاق، القطاع، التخصص، المناطق، وأشكال الرعاية). الجهات المضافة للمتابعة لا تتكرر هنا.</p></div></td></tr>{% endfor %}</tbody></table></div>{% include "market_needs/_pagination.html" %}<div class="editor-actions">{% allowed 'market_needs' 'create' need %}<button class="button button-primary" type="submit"{% if not need.is_active or not matches %} disabled{% endif %}>إضافة الجهات المحددة للمتابعة</button>{% endallowed %}</div></form>
-      </div>
-    </details>
-  {% endif %}
   <p class="market-help"><strong>المستوى يُحسب لكل جهة من مساهمتها المعتمدة ÷ إجمالي تكلفة الحاجة: 100% استراتيجي، 80%–99% ذهبي، 60%–79% فضي، 1%–59% برونزي. أكثر من راعٍ = تحالف، راعٍ واحد بنسبة 100% = فردي.</strong></p>
   {% include "market_needs/_records_table.html" %}
 </section>

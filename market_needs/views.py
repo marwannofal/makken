@@ -41,9 +41,10 @@ SALT = "makken.market-needs.v2-expense-allocations"
 AGE = 20 * 60
 
 
-def token(request, need=None, operation="save", record=None):
+def token(request, need=None, operation="save", record=None, org=None):
     return signing.dumps({"user": request.user.pk, "id": need.pk if need else None, "version": need.version if need else None,
-                          "operation": operation, "record": record.pk if record else None, "record_version": record.version if record else None, "nonce": str(uuid.uuid4())}, salt=SALT, compress=True)
+                          "operation": operation, "record": record.pk if record else None, "record_version": record.version if record else None,
+                          "org": org.pk if org else None, "nonce": str(uuid.uuid4())}, salt=SALT, compress=True)
 
 
 def load_token(request, pk, operations):
@@ -241,8 +242,10 @@ def followup(request, pk):
     valid_filters = filters.is_valid()
     followup_form, selected_record, operation = None, None, ""
     followup_snapshot = ""
+    selected_org = None
     if request.method == "GET" and request.GET.get("operation") in {"notes", "approve", "reject", "allocate", "details"}:
         record_id = request.GET.get("record", "")
+        org_id = request.GET.get("org", "")
         if record_id.isascii() and record_id.isdigit():
             selected_record = get_object_or_404(sponsorship_query(need, request.user), pk=int(record_id))
             operation = request.GET["operation"]
@@ -259,9 +262,26 @@ def followup(request, pk):
                 followup_form = FollowupForm(initial={"notes": selected_record.notes}, operation=operation, need=need, record=selected_record)
                 followup_snapshot = token(request, need, operation, selected_record)
                 context["reopen_followup"] = operation != "details"
+        elif org_id.isascii() and org_id.isdigit() and request.GET.get("operation") in {"approve", "reject", "details"}:
+            selected_org = get_object_or_404(candidates(need, {}, exclude_linked=True, actor=request.user).select_related("partnership_status").prefetch_related("development_history"), pk=int(org_id))
+            operation = request.GET["operation"]
+            if operation != "details" and need.status == NeedStatus.COMPLETE:
+                context["error"] = "بطاقة الحاجة مكتملة الدعم؛ تم إيقاف التعديل في محرك الرعاة."
+                status = 409
+                selected_org = None
+                operation = ""
+            else:
+                if operation != "details":
+                    from access_control.regions import require_write
+                    require_write(request.user, need)
+                    require_write(request.user, selected_org)
+                selected_record = Sponsorship(need=need, partnership=selected_org, status=SponsorshipStatus.NEW, amount=Decimal("0.00"))
+                followup_form = FollowupForm(operation=operation, need=need, record=selected_record)
+                followup_snapshot = token(request, need, f"{operation}_org", org=selected_org)
+                context["reopen_followup"] = operation != "details"
     if request.method == "POST":
         try:
-            payload = load_token(request, pk, {"add", "notes", "approve", "reject", "allocate"})
+            payload = load_token(request, pk, {"add", "notes", "approve", "reject", "allocate", "approve_org", "reject_org"})
             operation = payload["operation"]
             followup_snapshot = request.POST.get("snapshot", "")
             if operation == "add":
@@ -271,6 +291,11 @@ def followup(request, pk):
                 if any(not value.isascii() or not value.isdigit() for value in raw_ids):
                     raise signing.BadSignature
                 services.add_candidates(pk, payload["version"], [int(v) for v in raw_ids], filters.cleaned_data, request.user)
+            elif operation in {"approve_org", "reject_org"}:
+                from partnerships.models import Partnership as _P
+                org_obj = get_object_or_404(scoped(_P.objects.all(), request.user, writable=True), pk=payload.get("org"))
+                selected_record = Sponsorship(need=need, partnership=org_obj, status=SponsorshipStatus.NEW, amount=Decimal("0.00"))
+                services.followup_org(pk, payload["version"], org_obj.pk, "approve" if operation == "approve_org" else "reject", request.POST, request.FILES, request.user)
             else:
                 selected_record = get_object_or_404(scoped(Sponsorship.objects.select_related("partnership"), request.user), need=need, pk=payload.get("record"))
                 services.followup(pk, payload["version"], payload["record"], payload["record_version"], operation, request.POST, request.FILES, request.user)
@@ -290,35 +315,75 @@ def followup(request, pk):
     if not valid_filters:
         status = 400
     # Search is a read-only GET. It never creates candidates or advances states.
-    queryset = candidates(need, filters.cleaned_data, actor=request.user) if valid_filters else candidates(need, actor=request.user).none()
+    queryset = candidates(need, filters.cleaned_data, actor=request.user).select_related("partnership_status") if valid_filters else candidates(need, actor=request.user).none()
     page = Paginator(queryset, resolve_page_size(request, 10)).get_page(request.GET.get("page"))
-    record_page = Paginator(sponsorship_query(need, request.user), resolve_page_size(request, 25, param="followup_per_page")).get_page(request.GET.get("followup_page"))
-    rows = [{"record": row, "notes_token": token(request, need, "notes", row), "approve_token": token(request, need, "approve", row), "reject_token": token(request, need, "reject", row), "allocate_token": token(request, need, "allocate", row)} for row in record_page]
+    linked_records = list(sponsorship_query(need, request.user))
+    auto_matched_orgs = list(queryset) if need.status != NeedStatus.COMPLETE else []
+    unified_items = [("linked", r) for r in linked_records] + [("org", o) for o in auto_matched_orgs]
+    record_page = Paginator(unified_items, resolve_page_size(request, 25, param="followup_per_page")).get_page(request.GET.get("followup_page"))
     from partnerships.models import Partnership
     from access_control.regions import can_write
-    editable_organizations = set(scoped(Partnership.objects.filter(pk__in=[row['record'].partnership_id for row in rows]), request.user, writable=True).values_list('pk',flat=True))
+    page_org_ids = [obj.partnership_id if kind == "linked" else obj.pk for kind, obj in record_page]
+    editable_organizations = set(scoped(Partnership.objects.filter(pk__in=page_org_ids), request.user, writable=True).values_list('pk', flat=True))
     card_writable = can_write(request.user, need)
-    for row in rows:
-        row['record'].region_writable = card_writable and row['record'].partnership_id in editable_organizations
     shape_map = {}
-    for organization_id, shape_id in matching_offerings(need).filter(partnership_id__in=[row["record"].partnership_id for row in rows]).values_list("partnership_id", "sponsorship_shape_id"):
+    for organization_id, shape_id in matching_offerings(need).filter(partnership_id__in=page_org_ids).values_list("partnership_id", "sponsorship_shape_id"):
         shape_map.setdefault(organization_id, set()).add(shape_id)
-    for row in rows:
-        row["allowed_lines"] = ",".join(str(line.pk) for line in need.funding_lines if line.sponsorship_shape_id in shape_map.get(row["record"].partnership_id, set()))
+    rows = []
+    for kind, obj in record_page:
+        if kind == "linked":
+            obj.region_writable = card_writable and obj.partnership_id in editable_organizations
+            rows.append({
+                "record": obj,
+                "is_linked": True,
+                "detail_param": f"record={obj.pk}",
+                "notes_token": token(request, need, "notes", obj),
+                "approve_token": token(request, need, "approve", obj),
+                "reject_token": token(request, need, "reject", obj),
+                "allocate_token": token(request, need, "allocate", obj),
+                "allowed_lines": ",".join(str(line.pk) for line in need.funding_lines if line.sponsorship_shape_id in shape_map.get(obj.partnership_id, set())),
+            })
+        else:
+            virtual = Sponsorship(need=need, partnership=obj, status=SponsorshipStatus.NEW, amount=Decimal("0.00"))
+            virtual.region_writable = card_writable and obj.pk in editable_organizations
+            rows.append({
+                "record": virtual,
+                "is_linked": False,
+                "detail_param": f"org={obj.pk}",
+                "notes_token": "",
+                "approve_token": token(request, need, "approve_org", org=obj),
+                "reject_token": token(request, need, "reject_org", org=obj),
+                "allocate_token": "",
+                "allowed_lines": ",".join(str(line.pk) for line in need.funding_lines if line.sponsorship_shape_id in shape_map.get(obj.pk, set())),
+            })
     selected_row = None
     if operation == "details" and selected_record is not None:
         selected_record.region_writable = card_writable and scoped(Partnership.objects.filter(pk=selected_record.partnership_id), request.user, writable=True).exists()
         sel_shapes = set(matching_offerings(need).filter(partnership_id=selected_record.partnership_id).values_list("sponsorship_shape_id", flat=True))
-        selected_row = {
-            "record": selected_record,
-            "approve_token": token(request, need, "approve", selected_record),
-            "reject_token": token(request, need, "reject", selected_record),
-            "allocate_token": token(request, need, "allocate", selected_record),
-            "allowed_lines": ",".join(str(line.pk) for line in need.funding_lines if line.sponsorship_shape_id in sel_shapes),
-        }
+        if selected_org is not None:
+            selected_row = {
+                "record": selected_record,
+                "is_linked": False,
+                "detail_param": f"org={selected_org.pk}",
+                "approve_token": token(request, need, "approve_org", org=selected_org),
+                "reject_token": token(request, need, "reject_org", org=selected_org),
+                "allocate_token": "",
+                "allowed_lines": ",".join(str(line.pk) for line in need.funding_lines if line.sponsorship_shape_id in sel_shapes),
+            }
+        else:
+            selected_row = {
+                "record": selected_record,
+                "is_linked": True,
+                "detail_param": f"record={selected_record.pk}",
+                "approve_token": token(request, need, "approve", selected_record),
+                "reject_token": token(request, need, "reject", selected_record),
+                "allocate_token": token(request, need, "allocate", selected_record),
+                "allowed_lines": ",".join(str(line.pk) for line in need.funding_lines if line.sponsorship_shape_id in sel_shapes),
+            }
     params = request.GET.copy()
     params.pop("page", None)
     params.pop("record", None)
+    params.pop("org", None)
     params.pop("operation", None)
     context["history_page"] = Paginator(regional_history(need.events, request.user).select_related("actor"), 20).get_page(request.GET.get("history_page"))
     history_params = request.GET.copy()

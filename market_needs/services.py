@@ -281,3 +281,22 @@ def card_action(pk, version, operation, actor):
         audit(need, actor, "تغيير حالة تفعيل البطاقة", before, card_data(need))
     else:
         raise Conflict("عملية غير متاحة.")
+
+
+@transaction.atomic
+def followup_org(pk, version, organization_id, operation, data, files, actor):
+    if operation not in {"approve", "reject"}:
+        raise Conflict("عملية غير متاحة.")
+    need = lock_need(pk, version)
+    if not need.is_active:
+        raise Conflict("فعّل البطاقة قبل متابعة الرعاية.")
+    if need.status == NeedStatus.COMPLETE:
+        raise Conflict("بطاقة الحاجة مكتملة الدعم؛ تم إيقاف التعديل في محرك الرعاة.")
+    list(Partnership.objects.select_for_update().filter(pk=organization_id))
+    record = Sponsorship.objects.select_for_update().filter(need=need, partnership_id=organization_id).first()
+    if record is None:
+        if not candidates(need, {}, exclude_linked=False, actor=actor).filter(pk=organization_id).exists():
+            raise Conflict("لم تعد الجهة مطابقة لمعايير البحث أو أصبحت غير نشطة. حدّث الصفحة.")
+        record = Sponsorship.objects.create(need=need, partnership_id=organization_id, updated_by=actor)
+        audit(need, actor, "إضافة جهة مرشحة", after={**sponsor_data(record), "program": need.program_name, "matching_basis": "مطابقة تلقائية حسب معايير البطاقة", "state": record.partnership.development_state_id}, sponsorship=record)
+    return followup(need.pk, need.version, record.pk, record.version, operation, data, files, actor)

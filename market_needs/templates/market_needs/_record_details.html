@@ -84,7 +84,7 @@
             </tr>
           </thead>
           <tbody>
-            {% for allocation in selected_record.allocations.all %}
+            {% if selected_record.pk %}{% for allocation in selected_record.allocations.all %}
               <tr>
                 <th scope="row">{{ allocation.expense_line.expense_item.name }}</th><td>
                 {% include 'market_needs/_money.html' with value=allocation.amount %}
@@ -100,25 +100,25 @@
                 {% endif %}
                 </td>
               </tr>
-            {% endfor %}
+            {% endfor %}{% else %}<tr><td colspan="2">لا يوجد دعم معتمد موزّع.</td></tr>{% endif %}
           </tbody>
         </table>
       </div>
       <h3>المرفقات الداعمة</h3>
-      {% include 'market_needs/_attachments.html' with record=selected_record %}
+      {% if selected_record.pk %}{% include 'market_needs/_attachments.html' with record=selected_record %}{% else %}<p class="muted">لا توجد مرفقات بعد.</p>{% endif %}
       {% include 'market_needs/_timeline.html' %}
       <div class="dialog-actions detail-dialog-actions">
         {% if need.status != 'complete' and need.is_active and selected_row %}
           {% if selected_record.status == 'new' %}
             {% allowed 'market_needs' 'edit' selected_record %}
               {% allowed 'market_needs' 'change_status' selected_record %}
-                <a class="button button-primary" href="?{{ filter_query }}&amp;record={{ selected_record.pk }}&amp;operation=approve" data-followup-open data-operation="approve" data-allowed-lines="{{ selected_row.allowed_lines }}" data-snapshot="{{ selected_row.approve_token }}" data-name="{{ selected_record.partnership.name }}" data-notes="{{ selected_record.notes }}">اعتماد</a>
-                <a class="button button-danger" href="?{{ filter_query }}&amp;record={{ selected_record.pk }}&amp;operation=reject" data-followup-open data-operation="reject" data-snapshot="{{ selected_row.reject_token }}" data-name="{{ selected_record.partnership.name }}" data-notes="{{ selected_record.notes }}">رفض</a>
+                <a class="button button-primary" href="?{{ filter_query }}&amp;{{ selected_row.detail_param }}&amp;operation=approve" data-followup-open data-operation="approve" data-allowed-lines="{{ selected_row.allowed_lines }}" data-snapshot="{{ selected_row.approve_token }}" data-name="{{ selected_record.partnership.name }}" data-notes="{{ selected_record.notes }}">اعتماد</a>
+                <a class="button button-danger" href="?{{ filter_query }}&amp;{{ selected_row.detail_param }}&amp;operation=reject" data-followup-open data-operation="reject" data-snapshot="{{ selected_row.reject_token }}" data-name="{{ selected_record.partnership.name }}" data-notes="{{ selected_record.notes }}">رفض</a>
               {% endallowed %}
             {% endallowed %}
           {% elif selected_record.unallocated_amount %}
             {% allowed 'market_needs' 'edit' selected_record %}
-              <a class="button button-secondary" href="?{{ filter_query }}&amp;record={{ selected_record.pk }}&amp;operation=allocate" data-followup-open data-operation="allocate" data-snapshot="{{ selected_row.allocate_token }}" data-name="{{ selected_record.partnership.name }}" data-notes="{{ selected_record.notes }}" data-record-amount="{{ selected_record.amount|money_raw }}">توزيع دعم سابق</a>
+              <a class="button button-secondary" href="?{{ filter_query }}&amp;{{ selected_row.detail_param }}&amp;operation=allocate" data-followup-open data-operation="allocate" data-snapshot="{{ selected_row.allocate_token }}" data-name="{{ selected_record.partnership.name }}" data-notes="{{ selected_record.notes }}" data-record-amount="{{ selected_record.amount|money_raw }}">توزيع دعم سابق</a>
             {% endallowed %}
           {% endif %}
         {% endif %}
