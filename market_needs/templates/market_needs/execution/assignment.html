@@ -81,9 +81,11 @@
       </div>
     </section>
     <section class="partnership-card">
-      <header class="card-heading">
-        <h2>الجهات الممولة المعتمدة</h2><span class="subtle-badge">عدد السجلات: {{ funders|length }}</span>
-      </header>
+      <div>
+        <header class="card-heading">
+          <h2>الجهات الممولة المعتمدة</h2>
+        </header>
+      </div>
       <div class="table-scroll" tabindex="0">
         <table class="partnership-table" data-no-export>
           <caption class="visually-hidden">المساهمات المالية المعتمدة</caption>
@@ -94,7 +96,7 @@
           </thead>
           <tbody>
             {% for row in funders %}
-              <tr data-execution-dialog="funder-{{ row.pk }}">
+              <tr data-row-dialog="funder-{{ row.pk }}">
                 <th scope="row"><button type="button" class="execution-text-button" data-execution-dialog="funder-{{ row.pk }}">{{ row.partnership.name }}</button></th><td>{{ row.partnership.entity.get_entity_type_display }}
                 {% if row.partnership.entity.branch %}
                   / {{ row.partnership.entity.get_branch_display }}
