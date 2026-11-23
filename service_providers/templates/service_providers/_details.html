@@ -116,9 +116,6 @@
       {% endfor %}
     </ol>
     <div class="dialog-actions detail-dialog-actions">
-      {% allowed 'service_providers' 'edit' detail %}
-        <a class="button button-secondary" href="{% url 'service_providers:edit' detail.pk %}">تعديل المزود</a>
-      {% endallowed %}
       <a class="button button-primary detail-close-btn" href="{% url 'service_providers:index' %}?{{ filter_query }}&amp;page={{ page_obj.number }}">إغلاق</a>
     </div>
   </div>
