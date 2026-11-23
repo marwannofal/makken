@@ -254,7 +254,7 @@
       </section>
     {% endif %}
     {% include 'market_needs/execution/_selection.html' %}
-    <section class="partnership-card">
+    <section class="partnership-card exec-status-card">
       <header class="card-heading">
         <div>
           <p class="eyebrow mk-numbered-section-title">03 · متابعة التنفيذ</p><h2>حالة التنفيذ والحفظ</h2>
@@ -270,7 +270,7 @@
         <input type="hidden" name="action" value="preview"><input type="hidden" name="snapshot" value="{{ snapshot }}">{{ form.selection }}{{ form.selection.errors }}{{ form.non_field_errors }}
         <div class="execution-save-grid">
           <div class="partnership-field">
-            <label for="execution-status">حالة التنفيذ <span class="required">*</span></label>
+            <label for="execution-status" class="visually-hidden">حالة التنفيذ</label>
             {% if writable %}
               {% allowed 'provider_assignments' 'change_status' %}
                 {{ form.status }}
