@@ -8,13 +8,78 @@
   <div data-execution-page data-draft-key="{{ draft_key }}" data-posted="{% if form.is_bound %}1{% else %}0{% endif %}">
     <p class="execution-intro">ربط برنامج بطاقة حاجة السوق وفقًا للتخصص مع مزود خدمة التدريب / التشغيل.</p>
     <section class="partnership-card">
-      <header class="card-heading">
+      <div>
+        <header class="card-heading">
+          <div>
+            <p class="eyebrow mk-numbered-section-title">01 · معلومات الحاجة والبرنامج</p><h2>{{ need.title }}</h2>
+          </div>
+          {% include 'market_needs/execution/_status.html' with item=execution %}
+        </header>
+      </div>
+      <dl class="detail-grid">
         <div>
-          <p class="eyebrow mk-numbered-section-title">01 · معلومات الحاجة والبرنامج</p><h2>{{ need.title }}</h2>
+          <dt>حاجة السوق</dt><dd>{{ need.title }}</dd>
         </div>
-        {% include 'market_needs/execution/_status.html' with item=execution %}
-      </header>
-      {% include 'market_needs/_card_details.html' %}
+        <div>
+          <dt>القطاع</dt><dd>{{ need.sector.name }}</dd>
+        </div>
+        <div>
+          <dt>التخصص</dt><dd>{{ need.specialization.name }}</dd>
+        </div>
+        <div>
+          <dt>المناطق</dt><dd>{% for region in need.regions.all %}{{ region.name }}{% if not forloop.last %} / {% endif %}{% empty %}—{% endfor %}</dd>
+        </div>
+        <div>
+          <dt>المدة الزمنية</dt><dd>{{ need.duration }} {{ need.get_duration_unit_display }}</dd>
+        </div>
+        <div>
+          <dt>مصدر الحاجة</dt><dd>{{ need.source }}</dd>
+        </div>
+        <div>
+          <dt>عدد المتدربين</dt><dd>{{ need.beneficiaries }}</dd>
+        </div>
+        <div>
+          <dt>تكلفة المقعد</dt><dd>{% include 'market_needs/_money.html' with value=need.seat_cost %}</dd>
+        </div>
+      </dl>
+      <h3>تفاصيل البرنامج التدريبي وبنود الصرف</h3>
+      <dl class="detail-grid">
+        <div>
+          <dt>البرنامج التدريبي</dt><dd>{{ need.program_name }}</dd>
+        </div>
+        <div>
+          <dt>تصنيف البرنامج</dt><dd>{{ need.program_category }}</dd>
+        </div>
+      </dl>
+      <div class="table-scroll" tabindex="0" aria-label="بنود الصرف">
+        <table class="partnership-table market-expense-table" data-no-export>
+          <thead>
+            <tr>
+              <th scope="col">بنود الصرف</th>
+              <th scope="col">شكل الرعاية</th>
+              <th scope="col">المبلغ</th>
+              <th scope="col">النسبة %</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for line in need.funding_lines %}
+              <tr>
+                <th scope="row">{{ line.expense_item.name }}</th>
+                <td>{{ line.sponsorship_shape.name }}</td>
+                <td>{% include 'market_needs/_money.html' with value=line.amount %}</td>
+                <td><bdi>{{ line.share }}%</bdi></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr>
+              <th scope="row" colspan="2">المجموع</th>
+              <td>{% include 'market_needs/_money.html' with value=need.total_cost %}</td>
+              <td><bdi>100%</bdi></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
     </section>
     <section class="partnership-card">
       <header class="card-heading">
