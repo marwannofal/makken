@@ -159,8 +159,8 @@
           <div>
             <h2>البحث الذكي</h2>
             <p class="muted">البحث عن مزودي الخدمة بناءا على التخصص /القطاع / المنطقة / والمنظمات التي لديها شكل رعايات تشغيلية</p>
+            <div class="exec-training-wrap"><span class="exec-training-label">نوع التدريب للبرنامج:</span> <span class="exec-training-pill {% if need.training_type == 'تشغيلي' %}is-operational{% else %}is-training{% endif %}">{{ need.training_type }}</span></div>
           </div>
-          <span class="exec-training-wrap"><span class="exec-training-label">نوع التدريب للبرنامج:</span> <span class="exec-training-pill {% if need.training_type == 'تشغيلي' %}is-operational{% else %}is-training{% endif %}">{{ need.training_type }}</span></span>
         </header>
       </div>
     </section>
