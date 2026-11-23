@@ -186,8 +186,8 @@ def requested_operations(request,module,view,kwargs):
         if name in {'create','edit'}:
             implementation.load_token(request,pk,{'save'})
             return ['view','create' if name=='create' else 'edit',*_status_permission(module,pk,post.get('is_active'),name=='create')]
-        payload=implementation.load_token(request,pk,{'add','notes','approve','reject','allocate'})
-        return ['view',*({'add':['create'],'notes':['edit'],'approve':['edit','change_status'],'reject':['edit','change_status'],'allocate':['edit']}[payload['operation']])]
+        payload=implementation.load_token(request,pk,{'add','notes','approve','reject','allocate','approve_org','reject_org'})
+        return ['view',*({'add':['create'],'notes':['edit'],'approve':['edit','change_status'],'reject':['edit','change_status'],'allocate':['edit'],'approve_org':['edit','change_status'],'reject_org':['edit','change_status']}[payload['operation']])]
     raise PermissionDenied
 
 

@@ -1,4 +1,8 @@
 {% load access_tags %}
-{% allowed 'approved_programs' 'view' %}
-  <a class="nav-link{% if active_page == 'approved_programs' or active_page == 'provider_assignments' %} is-active{% endif %}" href="{% url 'program_execution:index' %}"{% if active_page == 'approved_programs' or active_page == 'provider_assignments' %} aria-current="page"{% endif %}><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m17-12v6m-3-3h6"/><circle cx="9" cy="7" r="4"/></svg><span>محرك مزود خدمات التدريب</span><span class="nav-dot" aria-hidden="true"></span></a>
-{% endallowed %}
+{% access_can 'approved_programs' 'view' as can_approved_programs %}
+{% access_can 'provider_assignments' 'view' as can_provider_assignments %}
+{% if can_approved_programs %}
+  <a class="nav-link{% if active_page == 'approved_programs' or active_page == 'provider_assignments' %} is-active{% endif %}" href="{% url 'program_execution:index' %}"{% if active_page == 'approved_programs' or active_page == 'provider_assignments' %} aria-current="page"{% endif %}><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m17-12v6m-3-3h6"/><circle cx="9" cy="7" r="4"/></svg><span>محرك مزود الخدمة</span><span class="nav-dot" aria-hidden="true"></span></a>
+{% elif can_provider_assignments %}
+  <a class="nav-link{% if active_page == 'approved_programs' or active_page == 'provider_assignments' %} is-active{% endif %}" href="{% url 'program_execution:assignments' %}"{% if active_page == 'approved_programs' or active_page == 'provider_assignments' %} aria-current="page"{% endif %}><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m17-12v6m-3-3h6"/><circle cx="9" cy="7" r="4"/></svg><span>محرك مزود الخدمة</span><span class="nav-dot" aria-hidden="true"></span></a>
+{% endif %}
