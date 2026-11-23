@@ -1,6 +1,9 @@
 {% extends "market_needs/execution/base.html" %}
 {% load access_tags partnership_states %}
 {% block page_actions %}
+  {% if execution %}
+    <button class="button button-secondary" type="button" data-open-history-dialog><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 5H5v16h14V5h-4M9 3h6v4H9ZM8 11h8m-8 4h5"/></svg><span>سجل تغييرات التنفيذ</span></button>
+  {% endif %}
   <a class="button button-secondary" data-execution-leave href="{{ return_url }}">العودة للقائمة</a>
 {% endblock %}
 {% block market_content %}
@@ -301,10 +304,18 @@
       </form>
     </section>
     {% if execution %}
-      <section class="partnership-card">
-        <h2>سجل تغييرات التنفيذ</h2>
-        {% include 'market_needs/execution/_history.html' %}
-      </section>
+      <dialog id="market-history-dialog" class="partnership-dialog detail-dialog" aria-labelledby="market-history-title"{% if request.GET.history_page %} data-open-on-load{% endif %}>
+        <div class="dialog-body">
+          <div class="dialog-top">
+            <p class="eyebrow">سجل تغييرات التنفيذ</p><button type="button" class="icon-button" data-market-close aria-label="إغلاق سجل تغييرات التنفيذ"><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+          </div>
+          <h2 id="market-history-title">{{ need.title }}</h2>
+          {% include 'market_needs/execution/_history.html' %}
+          <div class="dialog-actions detail-dialog-actions">
+            <button class="button button-primary detail-close-btn" type="button" data-market-close>إغلاق</button>
+          </div>
+        </div>
+      </dialog>
     {% endif %}
     {% if pending %}
       <dialog class="partnership-dialog confirmation-dialog" aria-labelledby="execution-confirm-title" open data-market-server>
