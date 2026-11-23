@@ -36,7 +36,7 @@
             <tr data-market-row data-url="?{{ filter_query }}&amp;page={{ page_obj.number }}&amp;detail={{ row.pk }}">
               <th scope="row"><a href="?{{ filter_query }}&amp;page={{ page_obj.number }}&amp;detail={{ row.pk }}">{{ row.title }}</a><small class="execution-number">{{ row.number }}</small></th><td>
               {% include 'market_needs/execution/_status.html' with item=row.execution %}
-              </td><td>{{ row.sector.name }}</td><td>{{ row.specialization.name }}</td><td>{{ row.program_name }}</td><td><span class="market-status state-complete">مكتملة الدعم</span></td><td title="ترتيب الدعم المعتمد: فردي أو تحالف">{{ row.arrangement }}</td><td>{{ row.beneficiaries }}</td><td>
+              </td><td>{{ row.sector.name }}</td><td>{{ row.specialization.name }}</td><td>{{ row.program_name }}</td><td><span class="market-status state-complete">مكتملة الدعم</span></td><td title="ترتيب الدعم المعتمد: فردي أو تحالف"><span class="market-care-pill is-{{ row.arrangement_key }}">{{ row.arrangement }}</span></td><td>{{ row.beneficiaries }}</td><td>
               {% include 'market_needs/_money.html' with value=row.total_cost %}
               </td><td>
               <div class="row-actions">
