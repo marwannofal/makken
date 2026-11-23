@@ -139,9 +139,6 @@
           </table>
         </div>
         <div class="dialog-actions detail-dialog-actions">
-          {% allowed 'provider_assignments' 'view' %}
-            <a class="button button-secondary" href="{% url 'program_execution:assignment' detail.pk %}">مزود الخدمة</a>
-          {% endallowed %}
           <a class="button button-primary detail-close-btn" href="?{{ filter_query }}&amp;page={{ page_obj.number }}">إغلاق</a>
         </div>
       </div>
