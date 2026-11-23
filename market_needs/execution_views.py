@@ -66,7 +66,8 @@ def pagination(request, key, page):
 
 
 def list_context(request, assignment=False):
-    context = base(request, "اختيار بطاقة لإدارة تنفيذ البرنامج" if assignment else "البرامج المعتمدة وفقًا للتخصص", "provider_assignments" if assignment else "approved_programs")
+    context = base(request, "محرك مزود الخدمة", "approved_programs")
+    context["page_subheading"] = "مرحلة تنفيذ البرامج المعتمدة وفقا للتخصص"
     items = matching.approved_needs(request.user)
     q, state = request.GET.get("q", "").strip()[:200], request.GET.get("status", "")
     if state in ExecutionStatus.values:

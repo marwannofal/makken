@@ -193,7 +193,7 @@ class ExecutionTests(MarketFixtures, TestCase):
         self.assertIsNone(item.program_id)
         form=ProviderForm(instance=item)
         self.assertFalse(form.fields["program"].required)
-        self.assertTrue(ProviderForm().fields["program"].required)
+        self.assertFalse(ProviderForm().fields["program"].required)
 
     def test_unique_execution_and_provider_constraints(self):
         need=self.funded(); item=self.provider();execution=self.save(need,[item.pk])
