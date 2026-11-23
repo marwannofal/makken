@@ -53,13 +53,25 @@
       const [allowed,source]=decide(row.dataset.acModule,cell.dataset.acOp);output.textContent=allowed?'مسموح':'غير مسموح';output.classList.toggle('is-granted',allowed);$('[data-ac-source]',cell).textContent=source;
     }));
   }
+  let bulkToastTimer=null;
+  function showBulkToast(label){
+    const toast=$('[data-ac-bulk-toast]'),txt=$('[data-ac-bulk-toast-text]');
+    if(!toast||!txt)return;
+    txt.textContent='تم تنفيذ «'+label.replace(/\s+/g,' ').trim()+'» بنجاح.';
+    toast.hidden=false;
+    toast.classList.remove('is-pop');
+    void toast.offsetWidth;
+    toast.classList.add('is-pop');
+    if(bulkToastTimer)clearTimeout(bulkToastTimer);
+    bulkToastTimer=setTimeout(()=>{toast.hidden=true;},4000);
+  }
   $$('[data-ac-column]').forEach(button=>button.addEventListener('click',()=>{
     const op=button.dataset.acColumn,matrix=$('[data-ac-matrix]'),role=matrix.hasAttribute('data-role-matrix');
     $$('[data-ac-op="'+op+'"]',matrix).forEach(cell=>{const field=$(role?'input[type=checkbox]':'select',cell);if(field){if(role)field.checked=true;else field.value='grant';}});
     if(op!=='view')$$('[data-ac-op="view"]',matrix).forEach(cell=>{const field=$(role?'input[type=checkbox]':'select',cell);if(field){if(role)field.checked=true;else field.value='grant';}});
-    matrix.dispatchEvent(new Event('change',{bubbles:true}));preview();
+    matrix.dispatchEvent(new Event('change',{bubbles:true}));preview();showBulkToast(button.textContent);
   }));
-  $('[data-ac-clear]')?.addEventListener('click',()=>{const matrix=$('[data-ac-matrix]');$$('input[type=checkbox]',matrix).forEach(field=>field.checked=false);$$('select',matrix).forEach(field=>field.value='inherit');matrix.dispatchEvent(new Event('change',{bubbles:true}));preview();});
+  $('[data-ac-clear]')?.addEventListener('click',e=>{const matrix=$('[data-ac-matrix]');$$('input[type=checkbox]',matrix).forEach(field=>field.checked=false);$$('select',matrix).forEach(field=>field.value='inherit');matrix.dispatchEvent(new Event('change',{bubbles:true}));preview();showBulkToast(e.currentTarget.textContent);});
   $$('[name=page_scope]').forEach(field=>{const update=()=>{const section=$('[data-ac-pages]');if(section)section.hidden=field.value!=='selected';preview();};field.addEventListener('change',update);update();});
   const regionScope=editor?.elements.region_scope;
   if(regionScope){const update=()=>{const section=$('[data-ac-regions]');if(section)section.hidden=regionScope.value!=='selected';};regionScope.addEventListener('change',update);update();}
