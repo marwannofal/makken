@@ -69,7 +69,8 @@ def save_provider(payload, user):
         for key in ["name", "representative", "phone_country", "phone", "email", "provider_type", "scope"]:
             setattr(item, key, data[key])
         item.is_active = data["is_active"] == "1"
-        item.program_id = data.get("program")
+        if data.get("program") is not None:
+            item.program_id = data.get("program")
         item.updated_by = user
         item.save()
         keep = []

@@ -71,7 +71,7 @@ class ProviderForm(forms.Form):
             for p in TrainingProgram.objects.filter(Q(is_active=True) | Q(pk=previous_program))
         ]]
         # Preserve legacy records with unknown program; never invent a backfill.
-        self.fields["program"].required = instance is None or bool(previous_program)
+        self.fields["program"].required = False
         setup_fields(self)
 
     def clean_name(self):
