@@ -483,3 +483,5 @@ class ViewSecurityTests(MarketFixtures,TestCase):
         fu_working = self.client.get(reverse('market_needs:followup', args=[working.pk]))
         self.assertContains(fu_working, 'تعديل الملاحظات')
         self.assertNotContains(fu_working, f'/execution/{working.pk}/providers/')
+        self.assertContains(fu_working, 'data-open-history-dialog')
+        self.assertContains(fu_working, 'id="market-history-dialog"')
