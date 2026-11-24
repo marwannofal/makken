@@ -1178,3 +1178,36 @@ textarea.flex-input {
   border-radius: 11px;
   box-sizing: border-box;
 }
+
+/* Pixel-identical height & equal width across all modal form rows */
+.flex-wm-common {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  align-items: end;
+}
+
+.flex-dialog .flex-field {
+  min-width: 0;
+}
+
+.flex-dialog .flex-input,
+.flex-dialog .flex-select,
+.flex-dialog .mk-select-trigger {
+  width: 100%;
+  height: 44px !important;
+  min-height: 44px !important;
+  border-radius: 11px;
+  box-sizing: border-box;
+}
+
+.flex-dialog textarea.flex-input {
+  height: auto !important;
+  min-height: 70px !important;
+}
+
+@media (max-width: 780px) {
+  .flex-wm-common {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
