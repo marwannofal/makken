@@ -1253,3 +1253,32 @@ textarea.flex-input {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* Match /dashboard/ (.dash-hero) background & decorative watermark ring */
+.flex-header {
+  position: relative;
+  isolation: isolate;
+  padding: 28px 30px;
+  border: 1px solid #dbe7ec;
+  border-radius: 24px;
+  background: linear-gradient(120deg, #fff 15%, #edf5f9);
+  overflow: hidden;
+  box-shadow: none;
+}
+
+.flex-header::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 210px;
+  height: 210px;
+  left: -80px;
+  top: -90px;
+  border: 32px solid #005b850c;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.flex-filters-bar {
+  background: rgba(255, 255, 255, 0.78);
+}
