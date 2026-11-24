@@ -995,7 +995,8 @@
   function buildWidgetConfigFromModal() {
     if (STATE.wmTab === 'kpi') {
       if (!STATE.wmSelectedKpi) throw new Error('يرجى اختيار مؤشر أداء من القائمة.');
-      const targetVal = document.getElementById('wm-kpi-target').value;
+      const targetEl = document.getElementById('wm-kpi-target');
+      const targetVal = targetEl ? targetEl.value : '';
       return {
         widget_type: 'kpi',
         config: {
@@ -1117,10 +1118,10 @@
 
     if (existing && existing.widget_type === 'kpi') {
       STATE.wmSelectedKpi = existing.config.kpi_key || null;
-      document.getElementById('wm-kpi-target').value = existing.config.target || '';
+      if (document.getElementById('wm-kpi-target')) document.getElementById('wm-kpi-target').value = existing.config.target || '';
     } else {
       STATE.wmSelectedKpi = (STATE.kpiCatalog[0] || {}).key || null;
-      document.getElementById('wm-kpi-target').value = '';
+      if (document.getElementById('wm-kpi-target')) document.getElementById('wm-kpi-target').value = '';
     }
     renderKpiPicker();
 
