@@ -956,3 +956,65 @@ textarea.flex-input {
     grid-template-columns: 1fr;
   }
 }
+
+/* Unified single-row filter bar + crisp SVG chart typography reset */
+.flex-filters-bar {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr)) auto;
+  gap: 12px;
+  align-items: end;
+  padding: 14px 16px;
+  background: var(--fx-bg-soft);
+  border: 1px solid #e0eaee;
+  border-radius: 12px;
+}
+
+.flex-filter-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  height: 44px;
+}
+
+.flex-filter-actions .flex-btn {
+  height: 44px;
+  border-radius: 12px;
+  padding: 0 16px;
+}
+
+.fx-chart-svg {
+  stroke: none;
+  stroke-width: 0;
+  font-family: 'Cairo', sans-serif;
+}
+
+.fx-chart-svg text {
+  stroke: none !important;
+  stroke-width: 0 !important;
+  font-family: 'Cairo', sans-serif;
+  font-weight: 500;
+}
+
+.fx-chart-svg rect {
+  stroke: none !important;
+}
+
+.fx-chart-svg line {
+  stroke-width: 1;
+}
+
+.fx-chart-svg path[fill="none"] {
+  stroke-width: 2.5;
+}
+
+@media (max-width: 1180px) {
+  .flex-filters-bar {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .flex-filters-bar {
+    grid-template-columns: 1fr;
+  }
+}
