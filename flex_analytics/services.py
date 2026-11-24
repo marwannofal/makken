@@ -228,17 +228,31 @@ def ensure_system_templates():
         )
 
 
+def get_org_default_dashboard():
+    return (
+        FlexDashboard.objects.filter(is_archived=False, owner__is_superuser=True)
+        .order_by('-is_default', '-updated_at', 'id')
+        .first()
+        or FlexDashboard.objects.filter(is_archived=False)
+        .order_by('-is_default', '-updated_at', 'id')
+        .first()
+    )
+
+
 def can_view_dashboard(user, dashboard):
     if not user or not user.is_authenticated:
         return False
     if dashboard.owner_id == user.pk or user.is_superuser:
         return True
     group_ids = list(user.groups.values_list('id', flat=True))
-    return FlexDashboardShare.objects.filter(
+    if FlexDashboardShare.objects.filter(
         dashboard=dashboard
     ).filter(
         Q(shared_with_user=user) | Q(shared_with_group_id__in=group_ids)
-    ).exists()
+    ).exists():
+        return True
+    org_def = get_org_default_dashboard()
+    return bool(org_def and org_def.pk == dashboard.pk)
 
 
 def can_edit_dashboard(user, dashboard):
@@ -433,7 +447,21 @@ def create_dashboard_from_template(user, title=None, description='', template_ke
     return apply_snapshot_to_dashboard(dash, snap, user, revision_label='إنشاء اللوحة')
 
 
-def get_or_create_initial_dashboard(user):
+def get_or_create_initial_dashboard(user, view_only=False):
+    if view_only:
+        group_ids = list(user.groups.values_list('id', flat=True))
+        shared = (
+            FlexDashboard.objects.filter(is_archived=False)
+            .filter(Q(shares__shared_with_user=user) | Q(shares__shared_with_group_id__in=group_ids))
+            .distinct()
+            .order_by('-updated_at', 'id')
+            .first()
+        )
+        if shared:
+            return shared
+        org_def = get_org_default_dashboard()
+        if org_def:
+            return org_def
     existing = list_accessible_dashboards(user).first()
     if existing:
         return existing

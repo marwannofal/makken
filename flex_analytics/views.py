@@ -78,11 +78,15 @@ def api_bootstrap(request):
         cand = FlexDashboard.objects.filter(pk=active_id).first()
         if cand and can_view_dashboard(request.user, cand):
             active_dash = cand
-    if active_dash is None:
-        active_dash = get_or_create_initial_dashboard(request.user)
-        dashboards_qs = list_accessible_dashboards(request.user, include_archived=request.GET.get('archived') == '1')
-
     policy = for_request(request)
+    is_view_only = not (
+        policy.can('flex_analytics', 'create')
+        or policy.can('flex_analytics', 'edit')
+        or policy.can('flex_analytics', 'delete')
+    )
+    if active_dash is None:
+        active_dash = get_or_create_initial_dashboard(request.user, view_only=is_view_only)
+        dashboards_qs = list_accessible_dashboards(request.user, include_archived=request.GET.get('archived') == '1')
     regions_list = [
         {'id': r.pk, 'name': r.name}
         for r in regional_scoped(Region.objects.filter(is_active=True), request.user).order_by('name')
