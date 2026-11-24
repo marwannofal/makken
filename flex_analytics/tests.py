@@ -307,3 +307,20 @@ class FlexAnalyticsTestCase(TestCase):
         )
         self.assertEqual(exp_resp.status_code, 200)
         self.assertIn('text/csv', exp_resp['Content-Type'])
+
+        # 7. Whole-dashboard Excel (.xlsx) & PDF export
+        xlsx_resp = client.post(
+            reverse('flex_analytics:api_export'),
+            data=json.dumps({'dashboard_id': dash_id, 'format': 'xlsx', 'global_filters': {}}),
+            content_type='application/json',
+        )
+        self.assertEqual(xlsx_resp.status_code, 200)
+        self.assertIn('spreadsheetml.sheet', xlsx_resp['Content-Type'])
+
+        pdf_resp = client.post(
+            reverse('flex_analytics:api_export'),
+            data=json.dumps({'dashboard_id': dash_id, 'format': 'pdf', 'global_filters': {}}),
+            content_type='application/json',
+        )
+        self.assertEqual(pdf_resp.status_code, 200)
+        self.assertIn('application/pdf', pdf_resp['Content-Type'])

@@ -72,12 +72,8 @@ def build_export_response(user, fmt, widget_type, config, title='تقرير تح
         rows=[[[sanitize_spreadsheet_cell(v)] for v in row] for row in rows],
         footers=[],
     )
-    created = timezone.localtime()
-    filters_desc = []
-    if global_filters:
-        for k, v in global_filters.items():
-            if v:
-                filters_desc.append((str(k), str(v)))
+    created = timezone.localtime().strftime('%Y-%m-%d %H:%M')
+    filters_desc = ' | '.join(f'{k}: {v}' for k, v in (global_filters or {}).items() if v) or 'بدون فلاتر إضافية'
 
     if fmt == 'xlsx':
         data = xlsx_bytes(export_table, filters_desc, created)
@@ -150,8 +146,8 @@ def build_dashboard_export_response(user, dashboard, fmt, global_filters=None):
         rows=[[[sanitize_spreadsheet_cell(v)] for v in row] for row in rows],
         footers=[],
     )
-    created = timezone.localtime()
-    filters_desc = [(str(k), str(v)) for k, v in (global_filters or {}).items() if v]
+    created = timezone.localtime().strftime('%Y-%m-%d %H:%M')
+    filters_desc = ' | '.join(f'{k}: {v}' for k, v in (global_filters or {}).items() if v) or 'بدون فلاتر إضافية'
 
     if fmt == 'xlsx':
         data = xlsx_bytes(export_table, filters_desc, created)
