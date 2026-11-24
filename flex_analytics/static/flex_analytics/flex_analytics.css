@@ -1211,3 +1211,45 @@ textarea.flex-input {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* Modal [hidden] fix, equal-width builder grids & preview button spacing */
+.flex-dialog [hidden] {
+  display: none !important;
+}
+
+.flex-wm-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.flex-dialog .flex-builder-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  align-items: end;
+}
+
+#wm-panel-table .flex-builder-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+#wm-panel-chart .flex-builder-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.flex-preview-actions {
+  display: flex;
+  justify-content: flex-start;
+  gap: 8px;
+  margin-top: 6px;
+  margin-bottom: 6px;
+}
+
+@media (max-width: 780px) {
+  .flex-dialog .flex-builder-grid,
+  #wm-panel-table .flex-builder-grid,
+  #wm-panel-chart .flex-builder-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
