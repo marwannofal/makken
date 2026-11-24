@@ -4,9 +4,9 @@
 {% block title %}المؤشرات والتحليلات المرنة | مكّن{% endblock %}
 
 {% block extra_head %}
-  <link rel="stylesheet" href="{% static 'flex_analytics/flex_analytics.css' %}?v=20261124-9">
-  <script src="{% static 'flex_analytics/flex_charts.js' %}?v=20261124-9" defer></script>
-  <script src="{% static 'flex_analytics/flex_studio.js' %}?v=20261124-9" defer></script>
+  <link rel="stylesheet" href="{% static 'flex_analytics/flex_analytics.css' %}?v=20261124-10">
+  <script src="{% static 'flex_analytics/flex_charts.js' %}?v=20261124-10" defer></script>
+  <script src="{% static 'flex_analytics/flex_studio.js' %}?v=20261124-10" defer></script>
 {% endblock %}
 
 {% block content %}
@@ -24,23 +24,11 @@
           <span id="flex-dirty-badge" class="flex-badge flex-badge-warn" hidden>تغييرات غير محفوظة</span>
         </div>
         <p id="flex-dash-desc" class="flex-dash-desc">قم ببناء لوحاتك التحليلية المخصصة بحرية كاملة مع الالتزام التام بالصلاحيات والبيانات الحية.</p>
+        <time id="flex-last-updated" class="dash-update flex-last-updated"></time>
       </div>
 
       <div class="flex-toolbar" hidden>
-        <div class="flex-dash-picker">
-          <label class="flex-picker-label" for="flex-dash-select">اختيار اللوحة:</label>
-          <select id="flex-dash-select" class="flex-select" aria-label="اختر لوحة تحليلات"></select>
-        </div>
-
-        <button type="button" id="btn-new-dash" class="flex-btn flex-btn-ghost" title="إنشاء لوحة جديدة">+ لوحة جديدة</button>
-        <button type="button" id="btn-toggle-fav" class="flex-btn flex-btn-icon" title="إضافة للمفضلة" aria-label="المفضلة">☆</button>
-        <button type="button" id="btn-duplicate-dash" class="flex-btn flex-btn-ghost" title="نسخ اللوحة الحالية">نسخ</button>
-        <button type="button" id="btn-revisions" class="flex-btn flex-btn-ghost" title="سجل الإصدارات">الإصدارات</button>
-        <button type="button" id="btn-share-dash" class="flex-btn flex-btn-ghost" title="مشاركة اللوحة">مشاركة</button>
-        <button type="button" id="btn-toggle-filters" class="flex-btn flex-btn-ghost" aria-expanded="true">الفلاتر</button>
-        <button type="button" id="btn-refresh-all" class="flex-btn flex-btn-ghost" title="تحديث جميع العناصر">تحديث</button>
-
-        <button type="button" id="btn-enter-edit" class="flex-btn flex-btn-primary">تخصيص اللوحة</button>
+        <button type="button" id="btn-enter-edit" class="flex-btn flex-btn-primary">تعديل اللوحة</button>
       </div>
     </div>
 
@@ -51,9 +39,6 @@
         <button type="button" id="btn-open-widget-lib" class="flex-btn flex-btn-secondary">+ إضافة عنصر تحليلي</button>
         <button type="button" id="btn-undo" class="flex-btn flex-btn-ghost" disabled>تراجع</button>
         <button type="button" id="btn-redo" class="flex-btn flex-btn-ghost" disabled>إعادة</button>
-        <button type="button" id="btn-set-default" class="flex-btn flex-btn-ghost">تعيين كافتراضية</button>
-        <button type="button" id="btn-save-template" class="flex-btn flex-btn-ghost">حفظ كقالب</button>
-        <button type="button" id="btn-delete-dash" class="flex-btn flex-btn-danger">حذف اللوحة</button>
       </div>
       <div class="flex-edit-group">
         <input type="text" id="flex-edit-title-input" class="flex-input flex-input-sm" placeholder="عنوان اللوحة" aria-label="عنوان اللوحة">

@@ -47,6 +47,25 @@
     el._timer = setTimeout(function () { el.hidden = true; }, 4200);
   }
 
+  function stampRiyadhNow() {
+    const el = document.getElementById('flex-last-updated');
+    if (!el) return;
+    try {
+      const now = new Date();
+      const parts = new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Asia/Riyadh',
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+        hour12: false
+      }).formatToParts(now).reduce(function (acc, p) { acc[p.type] = p.value; return acc; }, {});
+      const stamp = parts.day + '/' + parts.month + '/' + parts.year + ' ' + parts.hour + ':' + parts.minute + ':' + parts.second;
+      el.dateTime = now.toISOString();
+      el.innerHTML = 'وقت تحديث اللوحة: <bdi>' + stamp + '</bdi> · توقيت الرياض';
+    } catch (_) {
+      el.textContent = 'وقت تحديث اللوحة: الآن · توقيت الرياض';
+    }
+  }
+
   function fmtValue(val, fmtType, unit) {
     if (val === null || val === undefined || val === '') return '—';
     if (typeof val === 'boolean') return val ? 'نعم' : 'لا';
@@ -141,14 +160,8 @@
     document.getElementById('flex-dirty-badge').hidden = !(STATE.editMode && STATE.dirty);
     document.getElementById('flex-edit-bar').hidden = !STATE.editMode;
     document.getElementById('btn-enter-edit').hidden = STATE.editMode || !doc.can_edit || !STATE.permissions.can_edit;
-    document.getElementById('btn-new-dash').hidden = !STATE.permissions.can_create;
-    document.getElementById('btn-duplicate-dash').hidden = !STATE.permissions.can_create;
-    document.getElementById('btn-share-dash').hidden = !doc.is_owner;
-    document.getElementById('btn-delete-dash').hidden = !doc.is_owner || !STATE.permissions.can_delete;
-
-    const favBtn = document.getElementById('btn-toggle-fav');
-    favBtn.textContent = doc.is_favorite ? '★' : '☆';
-    favBtn.title = doc.is_favorite ? 'إزالة من المفضلة' : 'إضافة للمفضلة';
+    const btnEdit = document.getElementById('btn-enter-edit');
+    if (btnEdit) btnEdit.hidden = STATE.editMode || !doc.can_edit || !STATE.permissions.can_edit;
 
     document.getElementById('btn-undo').disabled = STATE.historyIdx <= 0;
     document.getElementById('btn-redo').disabled = STATE.historyIdx >= STATE.history.length - 1;
@@ -159,6 +172,7 @@
 
   function populateDashSelect() {
     const sel = document.getElementById('flex-dash-select');
+    if (!sel) return;
     sel.innerHTML = '';
     STATE.dashboards.forEach(function (d) {
       const opt = document.createElement('option');
@@ -225,6 +239,7 @@
 
   // === Canvas & Independent Async Widget Rendering ===
   function renderCanvas() {
+    stampRiyadhNow();
     const doc = currentDoc();
     const canvas = document.getElementById('flex-canvas');
     canvas.innerHTML = '';
@@ -1236,7 +1251,7 @@
       });
     });
 
-    document.getElementById('flex-dash-select').addEventListener('change', function (e) {
+    (document.getElementById('flex-dash-select') || {addEventListener:function(){}}).addEventListener('change', function (e) {
       if (STATE.dirty && !window.confirm('لديك تغييرات غير محفوظة. هل تريد الانتقال للوحة أخرى؟')) {
         populateDashSelect();
         return;
@@ -1247,9 +1262,9 @@
     document.getElementById('btn-enter-edit').addEventListener('click', enterEditMode);
     document.getElementById('btn-cancel-edit').addEventListener('click', cancelEditMode);
     document.getElementById('btn-save-edit').addEventListener('click', saveEditMode);
-    document.getElementById('btn-refresh-all').addEventListener('click', renderCanvas);
+    (document.getElementById('btn-refresh-all') || {addEventListener:function(){}}).addEventListener('click', renderCanvas);
 
-    document.getElementById('btn-toggle-filters').addEventListener('click', function (e) {
+    (document.getElementById('btn-toggle-filters') || {addEventListener:function(){}}).addEventListener('click', function (e) {
       const bar = document.getElementById('flex-filters-bar');
       bar.hidden = !bar.hidden;
       e.currentTarget.setAttribute('aria-expanded', String(!bar.hidden));
@@ -1341,7 +1356,7 @@
     });
 
     // Dashboard actions
-    document.getElementById('btn-new-dash').addEventListener('click', function () {
+    (document.getElementById('btn-new-dash') || {addEventListener:function(){}}).addEventListener('click', function () {
       document.getElementById('dm-input-title').value = '';
       document.getElementById('dm-input-desc').value = '';
       document.getElementById('flex-dashboard-modal').showModal();
@@ -1367,7 +1382,7 @@
       }
     });
 
-    document.getElementById('btn-toggle-fav').addEventListener('click', async function () {
+    (document.getElementById('btn-toggle-fav') || {addEventListener:function(){}}).addEventListener('click', async function () {
       if (!STATE.activeDashboard) return;
       try {
         const res = await apiFetch(URLS.dashboards + STATE.activeDashboard.id + '/action/', {
@@ -1379,7 +1394,7 @@
       } catch (err) { showToast(err.message, true); }
     });
 
-    document.getElementById('btn-duplicate-dash').addEventListener('click', async function () {
+    (document.getElementById('btn-duplicate-dash') || {addEventListener:function(){}}).addEventListener('click', async function () {
       if (!STATE.activeDashboard) return;
       try {
         const res = await apiFetch(URLS.dashboards + STATE.activeDashboard.id + '/action/', {
@@ -1391,7 +1406,7 @@
       } catch (err) { showToast(err.message, true); }
     });
 
-    document.getElementById('btn-set-default').addEventListener('click', async function () {
+    (document.getElementById('btn-set-default') || {addEventListener:function(){}}).addEventListener('click', async function () {
       if (!STATE.activeDashboard) return;
       try {
         await apiFetch(URLS.dashboards + STATE.activeDashboard.id + '/action/', {
@@ -1402,7 +1417,7 @@
       } catch (err) { showToast(err.message, true); }
     });
 
-    document.getElementById('btn-save-template').addEventListener('click', async function () {
+    (document.getElementById('btn-save-template') || {addEventListener:function(){}}).addEventListener('click', async function () {
       if (!STATE.activeDashboard) return;
       const name = window.prompt('اسم القالب الجديد:', STATE.activeDashboard.title);
       if (!name) return;
@@ -1415,7 +1430,7 @@
       } catch (err) { showToast(err.message, true); }
     });
 
-    document.getElementById('btn-delete-dash').addEventListener('click', async function () {
+    (document.getElementById('btn-delete-dash') || {addEventListener:function(){}}).addEventListener('click', async function () {
       if (!STATE.activeDashboard) return;
       if (!window.confirm('هل أنت متأكد من حذف هذه اللوحة نهائيًا؟')) return;
       try {
@@ -1426,7 +1441,7 @@
     });
 
     // Revisions modal
-    document.getElementById('btn-revisions').addEventListener('click', async function () {
+    (document.getElementById('btn-revisions') || {addEventListener:function(){}}).addEventListener('click', async function () {
       if (!STATE.activeDashboard) return;
       const list = document.getElementById('rm-list');
       list.innerHTML = '<div class="fx-skeleton"></div>';
@@ -1505,7 +1520,7 @@
     }
 
     document.getElementById('sm-target-type').addEventListener('change', fillShareTargetSelect);
-    document.getElementById('btn-share-dash').addEventListener('click', async function () {
+    (document.getElementById('btn-share-dash') || {addEventListener:function(){}}).addEventListener('click', async function () {
       if (!STATE.activeDashboard) return;
       document.getElementById('flex-share-modal').showModal();
       await loadSharesModal();
