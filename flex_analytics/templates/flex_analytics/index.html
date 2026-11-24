@@ -4,9 +4,9 @@
 {% block title %}المؤشرات والتحليلات المرنة | مكّن{% endblock %}
 
 {% block extra_head %}
-  <link rel="stylesheet" href="{% static 'flex_analytics/flex_analytics.css' %}?v=20261124-2">
-  <script src="{% static 'flex_analytics/flex_charts.js' %}?v=20261124-2" defer></script>
-  <script src="{% static 'flex_analytics/flex_studio.js' %}?v=20261124-2" defer></script>
+  <link rel="stylesheet" href="{% static 'flex_analytics/flex_analytics.css' %}?v=20261124-3">
+  <script src="{% static 'flex_analytics/flex_charts.js' %}?v=20261124-3" defer></script>
+  <script src="{% static 'flex_analytics/flex_studio.js' %}?v=20261124-3" defer></script>
 {% endblock %}
 
 {% block content %}
@@ -75,14 +75,19 @@
           <option value="ytd">منذ بداية العام</option>
         </select>
       </div>
-      <div class="flex-filter-field">
-        <label for="gf-date-from">من تاريخ</label>
-        <input type="date" id="gf-date-from" class="flex-input">
-      </div>
-      <div class="flex-filter-field">
-        <label for="gf-date-to">إلى تاريخ</label>
-        <input type="date" id="gf-date-to" class="flex-input">
-      </div>
+      <fieldset class="flex-date-range">
+        <legend>الفترة الزمنية · بتوقيت الرياض</legend>
+        <div class="flex-date-grid">
+          <div class="flex-filter-field">
+            <label for="gf-date-from">من تاريخ</label>
+            <input type="date" id="gf-date-from" class="flex-input">
+          </div>
+          <div class="flex-filter-field">
+            <label for="gf-date-to">إلى تاريخ</label>
+            <input type="date" id="gf-date-to" class="flex-input">
+          </div>
+        </div>
+      </fieldset>
       <div class="flex-filter-field">
         <label for="gf-region">المنطقة</label>
         <select id="gf-region" class="flex-select">

@@ -900,3 +900,59 @@ textarea.flex-input {
 .flex-toolbar {
   align-items: center;
 }
+
+/* Match /access-control/activity/ date range design */
+.flex-date-range {
+  grid-column: 1 / -1;
+  border: 1px solid #e0eaee;
+  border-radius: 12px;
+  padding: 14px 16px;
+  min-width: 0;
+  margin: 0;
+  background: #fff;
+}
+
+.flex-date-range legend {
+  font-weight: 700;
+  font-size: 13px;
+  color: #526b77;
+  padding-inline: 8px;
+}
+
+.flex-date-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.flex-studio .mk-date-field > input.mk-date-display {
+  height: 44px;
+  border: 1px solid #d5e2ea;
+  border-radius: 12px;
+  background: #fff;
+  color: var(--fx-text);
+  font-family: inherit;
+  font-size: 13.5px;
+  padding-inline-start: 14px;
+  padding-inline-end: 42px;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.flex-studio .mk-date-field > input.mk-date-display:focus {
+  outline: none;
+  border-color: var(--fx-primary);
+  box-shadow: 0 0 0 3px rgba(0, 91, 133, 0.12);
+}
+
+.flex-filters-bar .flex-input,
+.flex-filters-bar .flex-select {
+  height: 44px;
+  border-radius: 12px;
+}
+
+@media (max-width: 720px) {
+  .flex-date-grid {
+    grid-template-columns: 1fr;
+  }
+}
