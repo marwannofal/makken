@@ -274,15 +274,7 @@
 
       const tools = document.createElement('div');
       tools.className = 'flex-section-tools';
-      const collapseBtn = document.createElement('button');
-      collapseBtn.type = 'button';
-      collapseBtn.className = 'fx-mini-btn';
-      collapseBtn.textContent = sec.is_collapsed ? 'توسيع' : 'طي';
-      collapseBtn.addEventListener('click', function () {
-        sec.is_collapsed = !sec.is_collapsed;
-        renderCanvas();
-      });
-      tools.appendChild(collapseBtn);
+
 
       if (STATE.editMode) {
         const addWBtn = document.createElement('button');
@@ -347,7 +339,7 @@
       head.appendChild(tools);
       secEl.appendChild(head);
 
-      if (!sec.is_collapsed) {
+      if (true) {
         const grid = document.createElement('div');
         grid.className = 'flex-grid';
         const widgets = sec.widgets || [];
