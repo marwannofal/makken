@@ -1643,3 +1643,58 @@
   .mk-cp-row .mk-cp-extras, .mk-cp-team-row { grid-template-columns: 1fr !important; }
   .mk-cp-team-remove { grid-column: auto !important; grid-row: auto !important; }
 }
+
+/* Fix RTL right alignment of percentage presets & crisp delete icon button */
+.mk-cp-row {
+  align-items: stretch !important;
+}
+
+.mk-cp-row .mk-cp-info {
+  width: 100%;
+  flex-direction: row !important;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.mk-cp-row .mk-cp-input-wrap {
+  direction: rtl !important;
+  width: 100%;
+  justify-content: flex-start !important;
+  align-items: center;
+  gap: 10px;
+}
+
+.mk-cp-row .mk-cp-input {
+  width: 68px !important;
+  height: 34px !important;
+  text-align: center;
+  direction: ltr;
+}
+
+.mk-cp-team-row {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) 40px !important;
+  align-items: end !important;
+}
+
+.mk-cp-team-remove {
+  min-width: 38px !important;
+  max-width: 38px !important;
+  width: 38px !important;
+  height: 38px !important;
+  align-self: end !important;
+  justify-self: center;
+  grid-column: 4 / 5 !important;
+  grid-row: 1 / 2 !important;
+}
+
+@media (max-width: 780px) {
+  .mk-cp-team-row {
+    grid-template-columns: 1fr !important;
+  }
+  .mk-cp-team-remove {
+    grid-column: auto !important;
+    grid-row: auto !important;
+    justify-self: start;
+  }
+}
