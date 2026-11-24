@@ -433,51 +433,60 @@
 
 
     if (STATE.editMode) {
+      function makeWIconBtn(svgPath, label, extraClass, onClick) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'fx-w-icon-btn' + (extraClass ? ' ' + extraClass : '');
+        b.title = label;
+        b.setAttribute('aria-label', label);
+        b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true">' + svgPath + '</svg>';
+        b.addEventListener('click', onClick);
+        return b;
+      }
+
       const resizeSteps = [3, 4, 6, 8, 9, 12];
-      const widenBtn = document.createElement('button');
-      widenBtn.type = 'button';
-      widenBtn.className = 'fx-mini-btn';
-      widenBtn.textContent = '↔ ' + span;
-      widenBtn.title = 'تغيير عرض العنصر';
-      widenBtn.addEventListener('click', function () {
-        const curIdx = resizeSteps.indexOf(span);
-        w.col_span = resizeSteps[(curIdx + 1) % resizeSteps.length];
-        pushHistory();
-        renderCanvas();
-      });
-      actions.appendChild(widenBtn);
+      actions.appendChild(makeWIconBtn(
+        '<path d="M18 8l4 4-4 4M6 8l-4 4 4 4M2 12h20"/>',
+        'تغيير عرض العنصر (' + span + '/12)',
+        '',
+        function () {
+          const curIdx = resizeSteps.indexOf(span);
+          w.col_span = resizeSteps[(curIdx + 1) % resizeSteps.length];
+          pushHistory();
+          renderCanvas();
+        }
+      ));
 
-      const editBtn = document.createElement('button');
-      editBtn.type = 'button';
-      editBtn.className = 'fx-mini-btn';
-      editBtn.textContent = 'تعديل';
-      editBtn.addEventListener('click', function () { openWidgetModal(sIdx, wIdx); });
-      actions.appendChild(editBtn);
+      actions.appendChild(makeWIconBtn(
+        '<path d="M12 20h9M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4Z"/>',
+        'تعديل العنصر',
+        '',
+        function () { openWidgetModal(sIdx, wIdx); }
+      ));
 
-      const dupBtn = document.createElement('button');
-      dupBtn.type = 'button';
-      dupBtn.className = 'fx-mini-btn';
-      dupBtn.textContent = 'نسخ';
-      dupBtn.addEventListener('click', function () {
-        const copy = deepClone(w);
-        copy.title = copy.title + ' (نسخة)';
-        STATE.draft.sections[sIdx].widgets.splice(wIdx + 1, 0, copy);
-        pushHistory();
-        renderCanvas();
-      });
-      actions.appendChild(dupBtn);
+      actions.appendChild(makeWIconBtn(
+        '<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+        'نسخ العنصر',
+        '',
+        function () {
+          const copy = deepClone(w);
+          copy.title = copy.title + ' (نسخة)';
+          STATE.draft.sections[sIdx].widgets.splice(wIdx + 1, 0, copy);
+          pushHistory();
+          renderCanvas();
+        }
+      ));
 
-      const delBtn = document.createElement('button');
-      delBtn.type = 'button';
-      delBtn.className = 'fx-mini-btn is-danger';
-      delBtn.textContent = '×';
-      delBtn.title = 'حذف العنصر';
-      delBtn.addEventListener('click', function () {
-        STATE.draft.sections[sIdx].widgets.splice(wIdx, 1);
-        pushHistory();
-        renderCanvas();
-      });
-      actions.appendChild(delBtn);
+      actions.appendChild(makeWIconBtn(
+        '<path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14ZM10 11v6M14 11v6"/>',
+        'حذف العنصر',
+        'is-danger',
+        function () {
+          STATE.draft.sections[sIdx].widgets.splice(wIdx, 1);
+          pushHistory();
+          renderCanvas();
+        }
+      ));
     }
 
     head.appendChild(actions);
