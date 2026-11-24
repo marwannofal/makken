@@ -112,6 +112,11 @@
     document.getElementById('flex-dash-title').textContent = doc.title || 'المؤشرات والتحليلات المرنة';
     document.getElementById('flex-dash-desc').textContent = doc.description || '';
 
+    const btnXlsx = document.getElementById('btn-export-xlsx');
+    const btnPdf = document.getElementById('btn-export-pdf');
+    if (btnXlsx) btnXlsx.hidden = !STATE.permissions.can_export_xlsx;
+    if (btnPdf) btnPdf.hidden = !STATE.permissions.can_export_pdf;
+
     const hasManageAccess = Boolean(
       STATE.permissions.can_create || STATE.permissions.can_edit || STATE.permissions.can_delete
     );
@@ -415,31 +420,7 @@
     const actions = document.createElement('div');
     actions.className = 'flex-widget-actions';
 
-    if (!STATE.editMode && (w.widget_type === 'table' || w.widget_type === 'chart')) {
-      if (STATE.permissions.can_export_xlsx) {
-        const csvBtn = document.createElement('button');
-        csvBtn.type = 'button';
-        csvBtn.className = 'fx-mini-btn';
-        csvBtn.textContent = 'CSV';
-        csvBtn.addEventListener('click', function () { exportWidget(w, 'csv'); });
-        actions.appendChild(csvBtn);
 
-        const xlsBtn = document.createElement('button');
-        xlsBtn.type = 'button';
-        xlsBtn.className = 'fx-mini-btn';
-        xlsBtn.textContent = 'Excel';
-        xlsBtn.addEventListener('click', function () { exportWidget(w, 'xlsx'); });
-        actions.appendChild(xlsBtn);
-      }
-      if (STATE.permissions.can_export_pdf) {
-        const pdfBtn = document.createElement('button');
-        pdfBtn.type = 'button';
-        pdfBtn.className = 'fx-mini-btn';
-        pdfBtn.textContent = 'PDF';
-        pdfBtn.addEventListener('click', function () { exportWidget(w, 'pdf'); });
-        actions.appendChild(pdfBtn);
-      }
-    }
 
     if (STATE.editMode) {
       const resizeSteps = [3, 4, 6, 8, 9, 12];
@@ -608,6 +589,7 @@
     wrap.className = 'fx-table-wrap';
     const table = document.createElement('table');
     table.className = 'fx-table';
+    table.dataset.mkExportReady = '1';
 
     const thead = document.createElement('thead');
     const hr = document.createElement('tr');
@@ -1264,6 +1246,47 @@
       applyFiltersToBar({});
       renderCanvas();
     });
+
+    async function exportDashboard(fmt) {
+      const doc = currentDoc();
+      if (!doc) return;
+      try {
+        const resp = await fetch(URLS.exportUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrf(),
+            'X-Requested-With': 'XMLHttpRequest',
+          },
+          body: JSON.stringify({
+            dashboard_id: doc.id,
+            format: fmt,
+            global_filters: STATE.activeFilters,
+          }),
+        });
+        if (!resp.ok) {
+          const err = await resp.json().catch(function () { return {}; });
+          throw new Error(err.error || 'تعذر تنفيذ التصدير.');
+        }
+        const blob = await resp.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = (doc.title || 'makken_analytics') + '.' + fmt;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        showToast('تم تصدير اللوحة بنجاح.');
+      } catch (err) {
+        showToast(err.message, true);
+      }
+    }
+
+    const topXlsx = document.getElementById('btn-export-xlsx');
+    if (topXlsx) topXlsx.addEventListener('click', function () { exportDashboard('xlsx'); });
+    const topPdf = document.getElementById('btn-export-pdf');
+    if (topPdf) topPdf.addEventListener('click', function () { exportDashboard('pdf'); });
 
     document.getElementById('btn-undo').addEventListener('click', function () {
       if (STATE.historyIdx <= 0) return;

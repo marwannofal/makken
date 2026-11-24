@@ -95,3 +95,74 @@ def build_export_response(user, fmt, widget_type, config, title='تقرير تح
         return resp
 
     raise ValueError('صيغة التصدير غير مدعومة.')
+
+def build_dashboard_export_response(user, dashboard, fmt, global_filters=None):
+    """Export an entire dashboard's visible KPIs, charts, and tables as XLSX or PDF."""
+    from .kpis import evaluate_custom_kpi, evaluate_predefined_kpi
+
+    if fmt not in {'xlsx', 'pdf'}:
+        raise ValueError('صيغة التصدير المدعومة هي Excel (.xlsx) و PDF فقط.')
+
+    headers = ['القسم', 'العنصر التحليلي', 'البند / التصنيف', 'القيمة']
+    rows = []
+    for sec in dashboard.sections.prefetch_related('widgets').order_by('position', 'id'):
+        sec_title = sec.title or 'قسم تحليلي'
+        merged_filters = dict(global_filters or {})
+        if isinstance(sec.section_filters, dict):
+            merged_filters.update(sec.section_filters)
+        for w in sec.widgets.filter(is_visible=True).order_by('position', 'id'):
+            cfg = w.config or {}
+            try:
+                if w.widget_type == 'kpi':
+                    res = evaluate_predefined_kpi(user, cfg.get('kpi_key'), global_filters=merged_filters)
+                    val_str = f"{res['value']} {res.get('unit', '')}".strip()
+                    rows.append([sec_title, w.title, res.get('title_ar', w.title), val_str])
+                elif w.widget_type == 'custom_kpi':
+                    res = evaluate_custom_kpi(user, cfg, global_filters=merged_filters)
+                    val_str = f"{res['value']} {res.get('unit', '')}".strip()
+                    rows.append([sec_title, w.title, res.get('title_ar', w.title), val_str])
+                elif w.widget_type == 'chart':
+                    res = execute_chart_query(user, cfg, global_filters=merged_filters, use_cache=False)
+                    for idx, lbl in enumerate(res.get('labels') or []):
+                        parts = [
+                            f"{ds['label']}: {ds['data'][idx] if idx < len(ds['data']) else 0}"
+                            for ds in (res.get('datasets') or [])
+                        ]
+                        rows.append([sec_title, w.title, str(lbl), ' | '.join(parts)])
+                elif w.widget_type in {'table', 'summary'}:
+                    res = execute_table_query(user, cfg, global_filters=merged_filters, for_export=True, use_cache=False)
+                    cols = res.get('columns') or []
+                    for r in (res.get('rows') or [])[:200]:
+                        first_val = str(r.get(cols[0]['id'], '')) if cols else ''
+                        rest = ' | '.join(f"{c['label']}: {r.get(c['id'], '')}" for c in cols[1:])
+                        rows.append([sec_title, w.title, first_val, rest])
+            except Exception:
+                continue
+
+    if not rows:
+        rows.append([dashboard.title, '—', 'لا توجد بيانات مطابقة للفلاتر الحالية', '—'])
+
+    safe_title = (dashboard.title or 'المؤشرات والتحليلات المرنة').strip()[:80]
+    stamp = timezone.localtime().strftime('%Y%m%d_%H%M')
+    export_table = _ExportTable(
+        title=safe_title,
+        headers=[sanitize_spreadsheet_cell(h) for h in headers],
+        rows=[[[sanitize_spreadsheet_cell(v)] for v in row] for row in rows],
+        footers=[],
+    )
+    created = timezone.localtime()
+    filters_desc = [(str(k), str(v)) for k, v in (global_filters or {}).items() if v]
+
+    if fmt == 'xlsx':
+        data = xlsx_bytes(export_table, filters_desc, created)
+        resp = HttpResponse(
+            data,
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        )
+        resp['Content-Disposition'] = f'attachment; filename="makken_flex_analytics_{stamp}.xlsx"'
+        return resp
+
+    data = pdf_bytes(export_table, filters_desc, created)
+    resp = HttpResponse(data, content_type='application/pdf')
+    resp['Content-Disposition'] = f'attachment; filename="makken_flex_analytics_{stamp}.pdf"'
+    return resp

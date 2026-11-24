@@ -1018,3 +1018,12 @@ textarea.flex-input {
     grid-template-columns: 1fr;
   }
 }
+
+.flex-studio .mk-export-tools {
+  display: none !important;
+}
+
+.flex-top-export {
+  height: 44px;
+  white-space: nowrap;
+}

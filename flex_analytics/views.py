@@ -15,7 +15,7 @@ from access_control.regions import scoped as regional_scoped
 from regions.models import Region
 from sectors.models import Sector
 
-from .exports import build_export_response
+from .exports import build_dashboard_export_response, build_export_response
 from .graph import compatibility_for_selection, serialize_graph
 from .kpis import evaluate_custom_kpi, evaluate_predefined_kpi, list_kpi_catalog
 from .models import (
@@ -425,13 +425,23 @@ def api_drilldown(request):
 @require_POST
 def api_export(request):
     body = _json_body(request)
-    fmt = str(body.get('format') or 'csv').lower()
+    fmt = str(body.get('format') or 'xlsx').lower()
     policy = for_request(request)
     if fmt in {'xlsx', 'csv'} and not policy.can('flex_analytics', 'export_xlsx'):
-        return JsonResponse({'error': 'لا تملك صلاحية تصدير ملفات Excel/CSV.'}, status=403)
+        return JsonResponse({'error': 'لا تملك صلاحية تصدير ملفات Excel.'}, status=403)
     if fmt == 'pdf' and not policy.can('flex_analytics', 'export_pdf'):
         return JsonResponse({'error': 'لا تملك صلاحية تصدير ملفات PDF.'}, status=403)
     try:
+        if body.get('dashboard_id'):
+            dash = get_object_or_404(FlexDashboard, pk=body.get('dashboard_id'))
+            if not can_view_dashboard(request.user, dash):
+                return JsonResponse({'error': 'لا تملك صلاحية الوصول إلى هذه اللوحة.'}, status=403)
+            return build_dashboard_export_response(
+                request.user,
+                dash,
+                fmt=fmt,
+                global_filters=body.get('global_filters') or {},
+            )
         return build_export_response(
             request.user,
             fmt=fmt,
