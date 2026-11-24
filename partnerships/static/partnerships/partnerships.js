@@ -120,11 +120,28 @@
       org.value = member.organization || '';
       org.maxLength = 160;
 
-      const rm = make('button', 'mk-cp-team-remove', 'حذف');
+      function wrapField(labelText, control) {
+        const g = make('div', 'mk-cp-tfield');
+        g.append(make('span', 'mk-cp-tlabel', labelText), control);
+        return g;
+      }
+
+      const rm = make('button', 'mk-cp-team-remove');
       rm.type = 'button';
+      rm.title = 'حذف العضو';
+      rm.setAttribute('aria-label', 'حذف العضو');
+      rm.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14ZM10 11v6M14 11v6"/></svg>';
       rm.addEventListener('click', () => row.remove());
 
-      row.append(side, role, name, phone, email, org, rm);
+      row.append(
+        wrapField('الطرف', side),
+        wrapField('الصفة', role),
+        wrapField('الاسم *', name),
+        rm,
+        wrapField('رقم الجوال', phone),
+        wrapField('البريد الإلكتروني', email),
+        wrapField('الإدارة أو الجهة', org)
+      );
       return row;
     }
 
@@ -202,11 +219,36 @@
           input.setAttribute('aria-label', `نسبة إنجاز ${item.name}`);
           inputWrap.append(input, make('span', 'mk-cp-pct', '%'));
 
+          const presets = make('div', 'mk-cp-presets');
+          const presetBtns = [0, 25, 50, 75, 100].map(val => {
+            const b = make('button', 'mk-cp-preset-chip', `${val}%`);
+            b.type = 'button';
+            b.dataset.presetVal = String(val);
+            b.addEventListener('click', () => {
+              input.value = String(val);
+              input.dispatchEvent(new Event('input', { bubbles: true }));
+            });
+            presets.append(b);
+            return b;
+          });
+
+          function syncClauseVisual(rawVal) {
+            const v = Math.max(0, Math.min(100, Number(rawVal) || 0));
+            row.classList.toggle('is-done', v === 100);
+            row.classList.toggle('is-zero', v === 0);
+            presetBtns.forEach(b => b.classList.toggle('is-on', Number(b.dataset.presetVal) === v));
+          }
+          syncClauseVisual(item.progress ?? 0);
+
           const bar = make('progress', 'mk-cp-progress');
           bar.max = 100;
           bar.value = Math.max(0, Math.min(100, Number(item.progress) || 0));
+          inputWrap.prepend(presets);
+
           input.addEventListener('input', () => {
-            bar.value = Math.max(0, Math.min(100, Number(input.value) || 0));
+            const v = Math.max(0, Math.min(100, Number(input.value) || 0));
+            bar.value = v;
+            syncClauseVisual(v);
             const allInputs = [...cpList.querySelectorAll('input[data-cp-assignment-id]')];
             if (allInputs.length) {
               const avg = allInputs.reduce((s, el) => s + Math.max(0, Math.min(100, Number(el.value) || 0)), 0) / allInputs.length;

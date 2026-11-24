@@ -9,7 +9,10 @@ from django.test import Client, TestCase, override_settings
 from PIL import Image
 from pypdf import PdfWriter
 from . import tests_development_transition as transitions
-from .models import Partnership, WillingnessAttachment, PreliminaryAgreementType
+import json
+from django.contrib.auth import get_user_model
+from agreement_clauses.models import AgreementClause, ClauseAssignment
+from .models import Partnership, PartnershipType, WillingnessAttachment, PreliminaryAgreementType
 from .willingness import MAX_FILE_SIZE, validate_attachment
 from django import forms
 
@@ -39,9 +42,19 @@ class WillingnessAttachmentTests(TestCase):
         self.client.force_login(self.user)
         self.item,_=self.save();self.original=self.item.development_state_at
         self.url='/partnerships/?q='+self.item.name+'&capacity_min=10&capacity_max=200000'
+        self.clause, _ = AgreementClause.objects.get_or_create(name='بند اختباري للمرفقات', defaults={'is_active': True})
+        self.manager_user, _ = get_user_model().objects.get_or_create(username='willingness_mgr_test', defaults={'email': 'wmgr@example.com', 'is_active': True})
 
     def post(self,files=None,agreement='mou',ajax=True,token=None):
-        values={'action':'confirm','token':token or self.transition_preview(),'agreement_type':agreement}
+        values={
+            'action':'confirm',
+            'token':token or self.transition_preview(),
+            'agreement_type':agreement,
+            'clauses_json':json.dumps([{'clause_id':self.clause.pk,'responsibility':'institution'}]),
+            'work-title':'متابعة تفعيل الشراكة',
+            'work-assignees':[str(self.user.pk)],
+            'work-manager':str(self.manager_user.pk),
+        }
         if files is not None:values['attachments']=files
         return self.client.post(self.url,values,**({'HTTP_X_REQUESTED_WITH':'XMLHttpRequest'} if ajax else {}))
 
@@ -64,10 +77,9 @@ class WillingnessAttachmentTests(TestCase):
         self.assertEqual(self.post([pdf()],agreement='forged-choice').status_code,400);self.assert_unchanged()
 
     def test_multi_upload_all_formats_and_detail_cards(self):
-        for agreement in PreliminaryAgreementType.values:
-            # Each choice is a real, valid enum value, independently checked by the form.
-            from .willingness import WillingnessTransitionForm
-            self.assertTrue(WillingnessTransitionForm({'agreement_type':agreement},{'attachments':[pdf()]}).is_valid())
+        from .willingness import WillingnessTransitionForm
+        for ptype in PartnershipType.objects.filter(is_active=True):
+            self.assertTrue(WillingnessTransitionForm({'agreement_type':str(ptype.pk)},{'attachments':[pdf()]}).is_valid())
         response=self.post([pdf(),image(),image('JPEG','صورة.jpg'),image('JPEG','صورة ثانية.jpeg')],agreement='cooperation')
         self.assertEqual(response.status_code,200,response.content)
         self.assertIn('redirect',response.json())
@@ -149,6 +161,7 @@ class WillingnessAttachmentTests(TestCase):
     def test_delete_cleans_private_files_after_commit(self):
         self.assertEqual(self.post([pdf()]).status_code,200)
         attachment=self.item.willingness_attachments.get();path=Path(attachment.file.path)
+        ClauseAssignment.objects.filter(partnership=self.item).delete()
         with self.captureOnCommitCallbacks(execute=True):self.item.delete()
         self.assertFalse(path.exists())
 
