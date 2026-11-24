@@ -1123,3 +1123,27 @@ textarea.flex-input {
   background: #fbd5d5;
   border-color: var(--fx-danger);
 }
+
+/* Fix DD/MM/YYYY placeholder overlapping calendar icon on /flexible-analytics/ only */
+.flex-studio .mk-date-field > input.mk-date-display {
+  padding-left: 36px !important;
+  padding-right: 10px !important;
+  font-size: 12px;
+  letter-spacing: 0;
+}
+
+.flex-studio .mk-date-field > input.mk-date-display::placeholder {
+  font-size: 11px;
+  letter-spacing: 0;
+}
+
+.flex-studio .mk-date-picker-btn {
+  width: 28px;
+  height: 28px;
+  inset-inline-end: 5px;
+}
+
+.flex-studio .mk-date-picker-btn svg {
+  width: 16px;
+  height: 16px;
+}
