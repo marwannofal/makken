@@ -4,9 +4,9 @@
 {% block title %}المؤشرات والتحليلات المرنة | مكّن{% endblock %}
 
 {% block extra_head %}
-  <link rel="stylesheet" href="{% static 'flex_analytics/flex_analytics.css' %}?v=20261124-10">
-  <script src="{% static 'flex_analytics/flex_charts.js' %}?v=20261124-10" defer></script>
-  <script src="{% static 'flex_analytics/flex_studio.js' %}?v=20261124-10" defer></script>
+  <link rel="stylesheet" href="{% static 'flex_analytics/flex_analytics.css' %}?v=20261124-11">
+  <script src="{% static 'flex_analytics/flex_charts.js' %}?v=20261124-11" defer></script>
+  <script src="{% static 'flex_analytics/flex_studio.js' %}?v=20261124-11" defer></script>
 {% endblock %}
 
 {% block content %}
@@ -17,7 +17,7 @@
   <section class="flex-header card" aria-label="رأس استوديو التحليلات">
     <div class="flex-header-top">
       <div class="flex-title-block">
-        <p class="flex-eyebrow">مكّن · استوديو ذكاء الأعمال الذاتي</p>
+        <p id="flex-dash-eyebrow" class="flex-eyebrow">مكّن · استوديو ذكاء الأعمال الذاتي</p>
         <div class="flex-title-row">
           <h1 id="flex-dash-title" class="flex-dash-title">المؤشرات والتحليلات المرنة</h1>
           <span id="flex-mode-badge" class="flex-badge flex-badge-view" hidden>وضع العرض</span>
@@ -41,7 +41,9 @@
         <button type="button" id="btn-redo" class="flex-btn flex-btn-ghost" disabled>إعادة</button>
       </div>
       <div class="flex-edit-group">
+        <input type="text" id="flex-edit-eyebrow-input" class="flex-input flex-input-sm" placeholder="العنوان العلوي" aria-label="العنوان العلوي">
         <input type="text" id="flex-edit-title-input" class="flex-input flex-input-sm" placeholder="عنوان اللوحة" aria-label="عنوان اللوحة">
+        <input type="text" id="flex-edit-desc-input" class="flex-input flex-input-sm" placeholder="الوصف الفرعي" aria-label="الوصف الفرعي">
         <button type="button" id="btn-cancel-edit" class="flex-btn flex-btn-ghost">إلغاء</button>
         <button type="button" id="btn-save-edit" class="flex-btn flex-btn-primary">حفظ التغييرات</button>
       </div>

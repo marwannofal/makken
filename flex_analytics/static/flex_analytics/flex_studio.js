@@ -128,6 +128,10 @@
   function syncHeaderUI() {
     const doc = currentDoc();
     if (!doc) return;
+    const eyebrowEl = document.getElementById('flex-dash-eyebrow');
+    if (eyebrowEl) {
+      eyebrowEl.textContent = (doc.theme_options && doc.theme_options.eyebrow) || 'مكّن · استوديو ذكاء الأعمال الذاتي';
+    }
     document.getElementById('flex-dash-title').textContent = doc.title || 'المؤشرات والتحليلات المرنة';
     document.getElementById('flex-dash-desc').textContent = doc.description || '';
 
@@ -166,7 +170,11 @@
     document.getElementById('btn-undo').disabled = STATE.historyIdx <= 0;
     document.getElementById('btn-redo').disabled = STATE.historyIdx >= STATE.history.length - 1;
     if (STATE.editMode) {
+      const ebInp = document.getElementById('flex-edit-eyebrow-input');
+      const dInp = document.getElementById('flex-edit-desc-input');
+      if (ebInp) ebInp.value = (doc.theme_options && doc.theme_options.eyebrow) || 'مكّن · استوديو ذكاء الأعمال الذاتي';
       document.getElementById('flex-edit-title-input').value = doc.title || '';
+      if (dInp) dInp.value = doc.description || '';
     }
   }
 
@@ -1184,7 +1192,12 @@
 
   async function saveEditMode() {
     if (!STATE.draft) return;
+    const ebInp = document.getElementById('flex-edit-eyebrow-input');
+    const dInp = document.getElementById('flex-edit-desc-input');
+    STATE.draft.theme_options = Object.assign({}, STATE.draft.theme_options || {});
+    if (ebInp) STATE.draft.theme_options.eyebrow = ebInp.value.trim();
     STATE.draft.title = document.getElementById('flex-edit-title-input').value.trim() || STATE.draft.title;
+    if (dInp) STATE.draft.description = dInp.value.trim();
     STATE.draft.global_filters = STATE.activeFilters;
     try {
       const res = await apiFetch(URLS.dashboards + STATE.draft.id + '/', {
@@ -1192,6 +1205,7 @@
         body: {
           title: STATE.draft.title,
           description: STATE.draft.description,
+          theme_options: STATE.draft.theme_options,
           version: STATE.draft.version,
           global_filters: STATE.draft.global_filters,
           sections: STATE.draft.sections,
