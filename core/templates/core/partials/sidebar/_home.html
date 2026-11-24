@@ -6,3 +6,6 @@
 {% allowed 'dashboard' 'view' %}
   {% include "core/partials/sidebar/_link.html" with nav_page="dashboard" nav_url="core:dashboard" nav_label="مركز المؤشرات والتحليلات" nav_path="M3 3v18h18M7 15l4-4 3 3 5-6" active_page=active_page request=request only %}
 {% endallowed %}
+{% allowed 'flex_analytics' 'view' %}
+  {% include "core/partials/sidebar/_link.html" with nav_page="flex_analytics" nav_url="flex_analytics:index" nav_label="المؤشرات والتحليلات المرنة" nav_path="M4 5a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5Zm9 0a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1V5ZM4 15a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-4Zm9-2a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-6Z" active_page=active_page request=request only %}
+{% endallowed %}

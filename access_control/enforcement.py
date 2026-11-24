@@ -69,6 +69,21 @@ def requested_operations(request,module,view,kwargs):
         if name in {'work_targets', 'work_stats'} and request.method in {'GET', 'HEAD'}:
             return ['view']
         raise PermissionDenied
+    if module == 'flex_analytics':
+        if request.method in {'GET', 'HEAD'}:
+            return ['view']
+        if name in {'api_query', 'api_drilldown', 'api_export'}:
+            return ['view']
+        if name == 'api_dashboards' and request.method == 'POST':
+            return ['view', 'create']
+        if name == 'api_dashboard_detail':
+            if request.method == 'DELETE':
+                return ['view', 'delete']
+            if request.method == 'POST':
+                return ['view', 'edit']
+        if name in {'api_dashboard_action', 'api_revisions', 'api_shares'}:
+            return ['view', 'edit']
+        raise PermissionDenied
     if module in {'home', 'partnerships_all', 'agreement_inquiries', 'partnership_achievement'}:
         if request.method in {'GET', 'HEAD'}:
             return ['view']

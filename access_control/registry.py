@@ -19,6 +19,7 @@ class ModuleDefinition:
 MODULES = (
     ModuleDefinition('home', 'الرئيسية', 'makken_home', ('view',)),
     ModuleDefinition('dashboard', 'مركز المؤشرات والتحليلات', 'core:dashboard', ('view',)),
+    ModuleDefinition('flex_analytics', 'المؤشرات والتحليلات المرنة', 'flex_analytics:index', ('view', 'create', 'edit', 'delete')),
     ModuleDefinition('care_states', 'حالات التطور', 'care_states:index', ('view', 'edit')),
     ModuleDefinition('levels', 'المستويات', 'levels:index', CRUD),
     ModuleDefinition('regions', 'المناطق', 'regions:index', CRUD),

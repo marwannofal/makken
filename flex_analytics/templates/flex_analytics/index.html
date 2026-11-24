@@ -1,0 +1,482 @@
+{% extends "core/makken_base.html" %}
+{% load static %}
+
+{% block title %}المؤشرات والتحليلات المرنة | مكّن{% endblock %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="{% static 'flex_analytics/flex_analytics.css' %}?v=20261124-1">
+  <script src="{% static 'flex_analytics/flex_charts.js' %}?v=20261124-1" defer></script>
+  <script src="{% static 'flex_analytics/flex_studio.js' %}?v=20261124-1" defer></script>
+{% endblock %}
+
+{% block content %}
+<div id="flex-studio-root" class="flex-studio" data-bootstrap-url="{% url 'flex_analytics:api_bootstrap' %}" data-compat-url="{% url 'flex_analytics:api_compatibility' %}" data-dashboards-url="{% url 'flex_analytics:api_dashboards' %}" data-query-url="{% url 'flex_analytics:api_query' %}" data-drilldown-url="{% url 'flex_analytics:api_drilldown' %}" data-export-url="{% url 'flex_analytics:api_export' %}">
+  {% csrf_token %}
+
+  <!-- Studio Header -->
+  <section class="flex-header card" aria-label="رأس استوديو التحليلات">
+    <div class="flex-header-top">
+      <div class="flex-title-block">
+        <p class="flex-eyebrow">مكّن · استوديو ذكاء الأعمال الذاتي</p>
+        <div class="flex-title-row">
+          <h1 id="flex-dash-title" class="flex-dash-title">المؤشرات والتحليلات المرنة</h1>
+          <span id="flex-mode-badge" class="flex-badge flex-badge-view">وضع العرض</span>
+          <span id="flex-dirty-badge" class="flex-badge flex-badge-warn" hidden>تغييرات غير محفوظة</span>
+        </div>
+        <p id="flex-dash-desc" class="flex-dash-desc">قم ببناء لوحاتك التحليلية المخصصة بحرية كاملة مع الالتزام التام بالصلاحيات والبيانات الحية.</p>
+      </div>
+
+      <div class="flex-toolbar">
+        <div class="flex-dash-picker">
+          <label class="sr-only" for="flex-dash-select">اختيار اللوحة</label>
+          <select id="flex-dash-select" class="flex-select" aria-label="اختر لوحة تحليلات"></select>
+        </div>
+
+        <button type="button" id="btn-new-dash" class="flex-btn flex-btn-ghost" title="إنشاء لوحة جديدة">+ لوحة جديدة</button>
+        <button type="button" id="btn-toggle-fav" class="flex-btn flex-btn-icon" title="إضافة للمفضلة" aria-label="المفضلة">☆</button>
+        <button type="button" id="btn-duplicate-dash" class="flex-btn flex-btn-ghost" title="نسخ اللوحة الحالية">نسخ</button>
+        <button type="button" id="btn-revisions" class="flex-btn flex-btn-ghost" title="سجل الإصدارات">الإصدارات</button>
+        <button type="button" id="btn-share-dash" class="flex-btn flex-btn-ghost" title="مشاركة اللوحة">مشاركة</button>
+        <button type="button" id="btn-toggle-filters" class="flex-btn flex-btn-ghost" aria-expanded="true">الفلاتر</button>
+        <button type="button" id="btn-refresh-all" class="flex-btn flex-btn-ghost" title="تحديث جميع العناصر">تحديث</button>
+
+        <button type="button" id="btn-enter-edit" class="flex-btn flex-btn-primary">تخصيص اللوحة</button>
+      </div>
+    </div>
+
+    <!-- Edit Mode Action Bar -->
+    <div id="flex-edit-bar" class="flex-edit-bar" hidden>
+      <div class="flex-edit-group">
+        <button type="button" id="btn-add-section" class="flex-btn flex-btn-secondary">+ إضافة قسم</button>
+        <button type="button" id="btn-open-widget-lib" class="flex-btn flex-btn-secondary">+ إضافة عنصر تحليلي</button>
+        <button type="button" id="btn-undo" class="flex-btn flex-btn-ghost" disabled>تراجع</button>
+        <button type="button" id="btn-redo" class="flex-btn flex-btn-ghost" disabled>إعادة</button>
+        <button type="button" id="btn-set-default" class="flex-btn flex-btn-ghost">تعيين كافتراضية</button>
+        <button type="button" id="btn-save-template" class="flex-btn flex-btn-ghost">حفظ كقالب</button>
+        <button type="button" id="btn-delete-dash" class="flex-btn flex-btn-danger">حذف اللوحة</button>
+      </div>
+      <div class="flex-edit-group">
+        <input type="text" id="flex-edit-title-input" class="flex-input flex-input-sm" placeholder="عنوان اللوحة" aria-label="عنوان اللوحة">
+        <button type="button" id="btn-cancel-edit" class="flex-btn flex-btn-ghost">إلغاء</button>
+        <button type="button" id="btn-save-edit" class="flex-btn flex-btn-primary">حفظ التغييرات</button>
+      </div>
+    </div>
+
+    <!-- Global Filters Bar -->
+    <div id="flex-filters-bar" class="flex-filters-bar">
+      <div class="flex-filter-field">
+        <label for="gf-date-preset">الفترة الزمنية</label>
+        <select id="gf-date-preset" class="flex-select">
+          <option value="">كل الفترات</option>
+          <option value="7d">آخر 7 أيام</option>
+          <option value="30d">آخر 30 يومًا</option>
+          <option value="90d">آخر 90 يومًا</option>
+          <option value="365d">آخر 12 شهرًا</option>
+          <option value="ytd">منذ بداية العام</option>
+        </select>
+      </div>
+      <div class="flex-filter-field">
+        <label for="gf-date-from">من تاريخ</label>
+        <input type="date" id="gf-date-from" class="flex-input">
+      </div>
+      <div class="flex-filter-field">
+        <label for="gf-date-to">إلى تاريخ</label>
+        <input type="date" id="gf-date-to" class="flex-input">
+      </div>
+      <div class="flex-filter-field">
+        <label for="gf-region">المنطقة</label>
+        <select id="gf-region" class="flex-select">
+          <option value="">جميع المناطق المتاحة</option>
+        </select>
+      </div>
+      <div class="flex-filter-field">
+        <label for="gf-sector">القطاع</label>
+        <select id="gf-sector" class="flex-select">
+          <option value="">جميع القطاعات</option>
+        </select>
+      </div>
+      <div class="flex-filter-field">
+        <label for="gf-search">بحث سريع</label>
+        <input type="search" id="gf-search" class="flex-input" placeholder="ابحث بالاسم أو العنوان...">
+      </div>
+      <div class="flex-filter-actions">
+        <button type="button" id="btn-apply-filters" class="flex-btn flex-btn-primary flex-btn-sm">تطبيق</button>
+        <button type="button" id="btn-reset-filters" class="flex-btn flex-btn-ghost flex-btn-sm">مسح</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Toast feedback -->
+  <div id="flex-toast" class="flex-toast" role="status" aria-live="polite" hidden></div>
+
+  <!-- Main Dashboard Canvas -->
+  <div id="flex-canvas" class="flex-canvas" aria-live="polite">
+    <div class="flex-loading-shell">جاري تحميل استوديو المؤشرات والتحليلات المرنة...</div>
+  </div>
+</div>
+
+<!-- Modal 1: Add / Edit Widget Studio -->
+<dialog id="flex-widget-modal" class="flex-dialog flex-dialog-xl" aria-labelledby="wm-title">
+  <div class="flex-dialog-head">
+    <h2 id="wm-title">إضافة عنصر تحليلي</h2>
+    <button type="button" class="flex-close-btn" data-close-dialog="flex-widget-modal" aria-label="إغلاق">×</button>
+  </div>
+  <div class="flex-dialog-tabs" role="tablist">
+    <button type="button" class="flex-tab is-active" data-wm-tab="kpi" role="tab">مؤشرات الأداء (100+)</button>
+    <button type="button" class="flex-tab" data-wm-tab="custom_kpi" role="tab">مؤشر مخصص</button>
+    <button type="button" class="flex-tab" data-wm-tab="table" role="tab">منشئ الجداول المخصصة</button>
+    <button type="button" class="flex-tab" data-wm-tab="chart" role="tab">منشئ الرسوم البيانية</button>
+  </div>
+  <div class="flex-dialog-body">
+    <div class="flex-wm-common">
+      <div class="flex-field">
+        <label for="wm-section-select">القسم المستهدف</label>
+        <select id="wm-section-select" class="flex-select"></select>
+      </div>
+      <div class="flex-field">
+        <label for="wm-widget-title">عنوان العنصر</label>
+        <input type="text" id="wm-widget-title" class="flex-input" placeholder="عنوان واضح للعنصر">
+      </div>
+      <div class="flex-field">
+        <label for="wm-widget-subtitle">وصف فرعي (اختياري)</label>
+        <input type="text" id="wm-widget-subtitle" class="flex-input" placeholder="تفصيل مختصر">
+      </div>
+      <div class="flex-field">
+        <label for="wm-col-span">العرض (من 12 عمودًا)</label>
+        <select id="wm-col-span" class="flex-select">
+          <option value="3">ربع العرض (3)</option>
+          <option value="4">ثلث العرض (4)</option>
+          <option value="6" selected>نصف العرض (6)</option>
+          <option value="8">ثلثان (8)</option>
+          <option value="9">ثلاثة أرباع (9)</option>
+          <option value="12">عرض كامل (12)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Tab: Predefined KPIs -->
+    <div id="wm-panel-kpi" class="flex-wm-panel">
+      <div class="flex-kpi-search-bar">
+        <input type="search" id="wm-kpi-search" class="flex-input" placeholder="ابحث في أكثر من 100 مؤشر أداء حقيقي (مثال: تمويل، شراكات، تنفيذ، مستفيدون)...">
+        <select id="wm-kpi-cat" class="flex-select">
+          <option value="">جميع التصنيفات</option>
+        </select>
+        <input type="number" id="wm-kpi-target" class="flex-input flex-input-sm" placeholder="القيمة المستهدفة (اختياري)">
+      </div>
+      <div id="wm-kpi-grid" class="flex-kpi-picker-grid"></div>
+    </div>
+
+    <!-- Tab: Custom KPI -->
+    <div id="wm-panel-custom_kpi" class="flex-wm-panel" hidden>
+      <div class="flex-builder-grid">
+        <div class="flex-field">
+          <label for="ck-formula">نوع المعادلة</label>
+          <select id="ck-formula" class="flex-select">
+            <option value="single">مقياس مفرد</option>
+            <option value="percentage">نسبة مئوية (البسط ÷ المقام × 100)</option>
+            <option value="ratio">نسبة / معدل (البسط ÷ المقام)</option>
+            <option value="difference">فرق (المقياس الأول − الثاني)</option>
+          </select>
+        </div>
+        <div class="flex-field">
+          <label for="ck-entity-1">المصدر الأساسي</label>
+          <select id="ck-entity-1" class="flex-select"></select>
+        </div>
+        <div class="flex-field">
+          <label for="ck-field-1">الحقل الأساسي</label>
+          <select id="ck-field-1" class="flex-select"></select>
+        </div>
+        <div class="flex-field">
+          <label for="ck-agg-1">عملية التجميع</label>
+          <select id="ck-agg-1" class="flex-select">
+            <option value="count">العدد</option>
+            <option value="count_distinct">العدد الفريد</option>
+            <option value="sum">المجموع</option>
+            <option value="avg">المتوسط</option>
+            <option value="min">الحد الأدنى</option>
+            <option value="max">الحد الأعلى</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="ck-secondary-box" class="flex-builder-grid" hidden>
+        <div class="flex-field">
+          <label for="ck-entity-2">مصدر المقام / المقارنة</label>
+          <select id="ck-entity-2" class="flex-select"></select>
+        </div>
+        <div class="flex-field">
+          <label for="ck-field-2">حقل المقام</label>
+          <select id="ck-field-2" class="flex-select"></select>
+        </div>
+        <div class="flex-field">
+          <label for="ck-agg-2">تجميع المقام</label>
+          <select id="ck-agg-2" class="flex-select">
+            <option value="count">العدد</option>
+            <option value="count_distinct">العدد الفريد</option>
+            <option value="sum">المجموع</option>
+            <option value="avg">المتوسط</option>
+          </select>
+        </div>
+        <div class="flex-field">
+          <label for="ck-target">القيمة المستهدفة (اختياري)</label>
+          <input type="number" id="ck-target" class="flex-input" placeholder="مثال: 100">
+        </div>
+      </div>
+      <div class="flex-preview-actions">
+        <button type="button" id="btn-preview-ck" class="flex-btn flex-btn-secondary">معاينة حية للمؤشر</button>
+      </div>
+      <div id="ck-preview-box" class="flex-preview-box"></div>
+    </div>
+
+    <!-- Tab: Custom Table Wizard -->
+    <div id="wm-panel-table" class="flex-wm-panel" hidden>
+      <div class="flex-builder-grid">
+        <div class="flex-field">
+          <label for="tb-base-entity">مصدر البيانات الأساسي</label>
+          <select id="tb-base-entity" class="flex-select"></select>
+        </div>
+        <div class="flex-field">
+          <label for="tb-mode">نوع الجدول</label>
+          <select id="tb-mode" class="flex-select">
+            <option value="grouped">جدول تجميعي / ملخص</option>
+            <option value="raw">جدول تفصيلي للسجلات</option>
+            <option value="top_n">جدول أعلى / أدنى N</option>
+          </select>
+        </div>
+        <div class="flex-field">
+          <label for="tb-top-n">حد الصفوف / Top N</label>
+          <input type="number" id="tb-top-n" class="flex-input" value="15" min="1" max="200">
+        </div>
+      </div>
+
+      <!-- Relationship Graph Compatibility Inspector -->
+      <div class="flex-compat-box">
+        <div class="flex-compat-head">
+          <strong>الكيانات المرتبطة المتاحة للدمج (مخطط العلاقات الذكي)</strong>
+          <span class="flex-hint">يمكنك إضافة أعمدة من الكيانات المرتبطة فقط؛ الكيانات غير المرتبطة معطلة تلقائيًا.</span>
+        </div>
+        <div id="tb-compat-pills" class="flex-compat-pills"></div>
+      </div>
+
+      <!-- Columns Builder -->
+      <div class="flex-cols-builder">
+        <div class="flex-cols-head">
+          <strong>أعمدة الجدول</strong>
+          <button type="button" id="btn-tb-add-col" class="flex-btn flex-btn-secondary flex-btn-sm">+ إضافة عمود</button>
+        </div>
+        <div id="tb-cols-list" class="flex-cols-list"></div>
+      </div>
+
+      <div class="flex-preview-actions">
+        <button type="button" id="btn-preview-table" class="flex-btn flex-btn-secondary">معاينة حية للجدول</button>
+      </div>
+      <div id="tb-preview-box" class="flex-preview-box"></div>
+    </div>
+
+    <!-- Tab: Chart Wizard -->
+    <div id="wm-panel-chart" class="flex-wm-panel" hidden>
+      <div class="flex-builder-grid">
+        <div class="flex-field">
+          <label for="ch-type">نوع الرسم البياني</label>
+          <select id="ch-type" class="flex-select">
+            <option value="bar">أعمدة رأسية (Bar / Column)</option>
+            <option value="horizontal_bar">أعمدة أفقية (Horizontal Bar)</option>
+            <option value="grouped_bar">أعمدة مجمعة (Grouped Bar)</option>
+            <option value="stacked_bar">أعمدة مكدسة (Stacked Bar)</option>
+            <option value="stacked_100_bar">أعمدة مكدسة 100%</option>
+            <option value="line">خطي (Line)</option>
+            <option value="smooth_line">خطي منحني (Smooth Line)</option>
+            <option value="area">مساحي (Area)</option>
+            <option value="stacked_area">مساحي مكدس (Stacked Area)</option>
+            <option value="combo">مركب: أعمدة + خط (Combo)</option>
+            <option value="pie">دائري (Pie)</option>
+            <option value="donut">حلقي (Donut)</option>
+            <option value="funnel">قمعي (Funnel)</option>
+            <option value="waterfall">شلالي (Waterfall)</option>
+            <option value="lollipop">عصا ودائرة (Lollipop)</option>
+            <option value="radar">راداري (Radar)</option>
+            <option value="treemap">خريطة شجرية (Treemap)</option>
+            <option value="heatmap">خريطة حرارية (Heatmap)</option>
+            <option value="scatter">نقطي (Scatter)</option>
+            <option value="bubble">فقاعي (Bubble)</option>
+            <option value="gauge">مقياس نصف دائري (Gauge)</option>
+            <option value="progress_ring">حلقة إنجاز (Progress Ring)</option>
+            <option value="sparkline">خط مصغر (Sparkline)</option>
+          </select>
+        </div>
+        <div class="flex-field">
+          <label for="ch-base-entity">مصدر البيانات</label>
+          <select id="ch-base-entity" class="flex-select"></select>
+        </div>
+        <div class="flex-field">
+          <label for="ch-dim-entity">كيان البُعد (المحور X)</label>
+          <select id="ch-dim-entity" class="flex-select"></select>
+        </div>
+        <div class="flex-field">
+          <label for="ch-dim-field">حقل البُعد (المحور X)</label>
+          <select id="ch-dim-field" class="flex-select"></select>
+        </div>
+        <div class="flex-field">
+          <label for="ch-date-gran">التجميع الزمني (للتواريخ)</label>
+          <select id="ch-date-gran" class="flex-select">
+            <option value="">بدون تجميع زمني</option>
+            <option value="day">يومي</option>
+            <option value="week">أسبوعي</option>
+            <option value="month">شهري</option>
+            <option value="quarter">ربع سنوي</option>
+            <option value="year">سنوي</option>
+          </select>
+        </div>
+        <div class="flex-field">
+          <label for="ch-top-n">أعلى N عنصرًا</label>
+          <input type="number" id="ch-top-n" class="flex-input" value="10" min="1" max="50">
+        </div>
+      </div>
+
+      <div class="flex-cols-builder">
+        <div class="flex-cols-head">
+          <strong>المقاييس (المحور Y)</strong>
+          <button type="button" id="btn-ch-add-measure" class="flex-btn flex-btn-secondary flex-btn-sm">+ إضافة مقياس</button>
+        </div>
+        <div id="ch-measures-list" class="flex-cols-list"></div>
+      </div>
+
+      <div class="flex-preview-actions">
+        <button type="button" id="btn-preview-chart" class="flex-btn flex-btn-secondary">معاينة حية للرسم البياني</button>
+      </div>
+      <div id="ch-preview-box" class="flex-preview-box flex-preview-chart"></div>
+    </div>
+  </div>
+  <div class="flex-dialog-foot">
+    <button type="button" class="flex-btn flex-btn-ghost" data-close-dialog="flex-widget-modal">إلغاء</button>
+    <button type="button" id="btn-wm-commit" class="flex-btn flex-btn-primary">اعتماد العنصر في اللوحة</button>
+  </div>
+</dialog>
+
+<!-- Modal 2: Create Dashboard / Templates -->
+<dialog id="flex-dashboard-modal" class="flex-dialog" aria-labelledby="dm-title">
+  <div class="flex-dialog-head">
+    <h2 id="dm-title">إنشاء لوحة تحليلات جديدة</h2>
+    <button type="button" class="flex-close-btn" data-close-dialog="flex-dashboard-modal" aria-label="إغلاق">×</button>
+  </div>
+  <div class="flex-dialog-body">
+    <div class="flex-field">
+      <label for="dm-input-title">عنوان اللوحة</label>
+      <input type="text" id="dm-input-title" class="flex-input" placeholder="مثال: لوحة متابعة الشراكات والتمويل">
+    </div>
+    <div class="flex-field">
+      <label for="dm-input-desc">الوصف (اختياري)</label>
+      <textarea id="dm-input-desc" class="flex-input" rows="2" placeholder="وصف مختصر لهدف اللوحة"></textarea>
+    </div>
+    <div class="flex-field">
+      <label for="dm-template-select">القالب المبدئي</label>
+      <select id="dm-template-select" class="flex-select">
+        <option value="blank">لوحة فارغة (ابدأ من الصفر)</option>
+      </select>
+    </div>
+  </div>
+  <div class="flex-dialog-foot">
+    <button type="button" class="flex-btn flex-btn-ghost" data-close-dialog="flex-dashboard-modal">إلغاء</button>
+    <button type="button" id="btn-dm-create" class="flex-btn flex-btn-primary">إنشاء اللوحة</button>
+  </div>
+</dialog>
+
+<!-- Modal 3: Revisions History -->
+<dialog id="flex-revisions-modal" class="flex-dialog" aria-labelledby="rm-title">
+  <div class="flex-dialog-head">
+    <h2 id="rm-title">سجل إصدارات اللوحة</h2>
+    <button type="button" class="flex-close-btn" data-close-dialog="flex-revisions-modal" aria-label="إغلاق">×</button>
+  </div>
+  <div id="rm-list" class="flex-dialog-body"></div>
+  <div class="flex-dialog-foot">
+    <button type="button" class="flex-btn flex-btn-ghost" data-close-dialog="flex-revisions-modal">إغلاق</button>
+  </div>
+</dialog>
+
+<!-- Modal 4: Share Dashboard -->
+<dialog id="flex-share-modal" class="flex-dialog" aria-labelledby="sm-title">
+  <div class="flex-dialog-head">
+    <h2 id="sm-title">مشاركة اللوحة</h2>
+    <button type="button" class="flex-close-btn" data-close-dialog="flex-share-modal" aria-label="إغلاق">×</button>
+  </div>
+  <div class="flex-dialog-body">
+    <p class="flex-hint">يرى كل مستخدم البيانات المسموح له بها فقط وفق صلاحياته ونطاقه المناطقي.</p>
+    <div class="flex-builder-grid">
+      <div class="flex-field">
+        <label for="sm-target-type">نوع المستفيد</label>
+        <select id="sm-target-type" class="flex-select">
+          <option value="user">مستخدم محدد</option>
+          <option value="group">دور / مجموعة صلاحيات</option>
+        </select>
+      </div>
+      <div class="flex-field">
+        <label for="sm-target-id">الاسم</label>
+        <select id="sm-target-id" class="flex-select"></select>
+      </div>
+      <div class="flex-field">
+        <label for="sm-perm">الصلاحية</label>
+        <select id="sm-perm" class="flex-select">
+          <option value="view">عرض فقط</option>
+          <option value="clone">عرض ونسخ</option>
+          <option value="edit">عرض وتعديل</option>
+        </select>
+      </div>
+    </div>
+    <div class="flex-preview-actions">
+      <button type="button" id="btn-sm-add" class="flex-btn flex-btn-primary flex-btn-sm">إضافة مشاركة</button>
+    </div>
+    <div id="sm-shares-list" class="flex-shares-list"></div>
+  </div>
+  <div class="flex-dialog-foot">
+    <button type="button" class="flex-btn flex-btn-ghost" data-close-dialog="flex-share-modal">إغلاق</button>
+  </div>
+</dialog>
+
+<!-- Modal 5: Drill-Down Details -->
+<dialog id="flex-drilldown-modal" class="flex-dialog flex-dialog-xl" aria-labelledby="dd-title">
+  <div class="flex-dialog-head">
+    <h2 id="dd-title">تفاصيل السجلات</h2>
+    <button type="button" class="flex-close-btn" data-close-dialog="flex-drilldown-modal" aria-label="إغلاق">×</button>
+  </div>
+  <div id="dd-body" class="flex-dialog-body"></div>
+  <div class="flex-dialog-foot">
+    <button type="button" class="flex-btn flex-btn-ghost" data-close-dialog="flex-drilldown-modal">إغلاق</button>
+  </div>
+</dialog>
+
+<!-- Modal 6: Section Settings -->
+<dialog id="flex-section-modal" class="flex-dialog" aria-labelledby="sec-m-title">
+  <div class="flex-dialog-head">
+    <h2 id="sec-m-title">إعدادات القسم</h2>
+    <button type="button" class="flex-close-btn" data-close-dialog="flex-section-modal" aria-label="إغلاق">×</button>
+  </div>
+  <div class="flex-dialog-body">
+    <div class="flex-field">
+      <label for="sec-input-title">عنوان القسم</label>
+      <input type="text" id="sec-input-title" class="flex-input" placeholder="مثال: مؤشرات التمويل والشراكات">
+    </div>
+    <div class="flex-field">
+      <label for="sec-input-desc">وصف القسم (اختياري)</label>
+      <input type="text" id="sec-input-desc" class="flex-input">
+    </div>
+    <div class="flex-field">
+      <label for="sec-input-layout">تخطيط القسم</label>
+      <select id="sec-input-layout" class="flex-select">
+        <option value="grid_12">شبكة مرنة (12 عمودًا)</option>
+        <option value="cols_1">عمود كامل (12)</option>
+        <option value="cols_2">عمودان متساويان (6 + 6)</option>
+        <option value="cols_3">ثلاثة أعمدة (4 + 4 + 4)</option>
+        <option value="cols_4">أربعة أعمدة (3 + 3 + 3 + 3)</option>
+        <option value="split_1_2">ثلث + ثلثان (4 + 8)</option>
+        <option value="split_2_1">ثلثان + ثلث (8 + 4)</option>
+        <option value="split_1_3">ربع + ثلاثة أرباع (3 + 9)</option>
+        <option value="split_3_1">ثلاثة أرباع + ربع (9 + 3)</option>
+      </select>
+    </div>
+  </div>
+  <div class="flex-dialog-foot">
+    <button type="button" class="flex-btn flex-btn-ghost" data-close-dialog="flex-section-modal">إلغاء</button>
+    <button type="button" id="btn-sec-save" class="flex-btn flex-btn-primary">حفظ القسم</button>
+  </div>
+</dialog>
+{% endblock %}

@@ -113,5 +113,6 @@ urlpatterns = [path('execution/', include('market_needs.execution_urls'))] + url
 
 from partnerships.partnership_types import partnership_types_index as _partnership_types_view
 urlpatterns = [path('', include('makken_mail.urls')),
+               path('flexible-analytics/', include('flex_analytics.urls')),
                path('settings/agreement-clauses/', include('agreement_clauses.urls')),
                path('settings/partnership-types/', _partnership_types_view, name='partnership_types')] + urlpatterns
