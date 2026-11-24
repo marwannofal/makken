@@ -4,13 +4,13 @@
 {% block title %}المؤشرات والتحليلات المرنة | مكّن{% endblock %}
 
 {% block extra_head %}
-  <link rel="stylesheet" href="{% static 'flex_analytics/flex_analytics.css' %}?v=20261124-15">
-  <script src="{% static 'flex_analytics/flex_charts.js' %}?v=20261124-15" defer></script>
-  <script src="{% static 'flex_analytics/flex_studio.js' %}?v=20261124-15" defer></script>
+  <link rel="stylesheet" href="{% static 'flex_analytics/flex_analytics.css' %}?v=20261124-16">
+  <script src="{% static 'flex_analytics/flex_charts.js' %}?v=20261124-16" defer></script>
+  <script src="{% static 'flex_analytics/flex_studio.js' %}?v=20261124-16" defer></script>
 {% endblock %}
 
 {% block content %}
-<div id="flex-studio-root" class="flex-studio" data-bootstrap-url="{% url 'flex_analytics:api_bootstrap' %}" data-compat-url="{% url 'flex_analytics:api_compatibility' %}" data-dashboards-url="{% url 'flex_analytics:api_dashboards' %}" data-query-url="{% url 'flex_analytics:api_query' %}" data-drilldown-url="{% url 'flex_analytics:api_drilldown' %}" data-export-url="{% url 'flex_analytics:api_export' %}">
+<div id="flex-studio-root" class="flex-studio" data-bootstrap-url="{% url 'flex_analytics:api_bootstrap' %}" data-compat-url="{% url 'flex_analytics:api_compatibility' %}" data-dashboards-url="{% url 'flex_analytics:api_dashboards' %}" data-query-url="{% url 'flex_analytics:api_query' %}" data-batch-query-url="{% url 'flex_analytics:api_batch_query' %}" data-drilldown-url="{% url 'flex_analytics:api_drilldown' %}" data-export-url="{% url 'flex_analytics:api_export' %}">
   {% csrf_token %}
 
   <!-- Studio Header -->

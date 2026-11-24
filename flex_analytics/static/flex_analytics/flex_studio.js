@@ -10,6 +10,7 @@
     compat: root.dataset.compatUrl,
     dashboards: root.dataset.dashboardsUrl,
     query: root.dataset.queryUrl,
+    batchQuery: root.dataset.batchQueryUrl,
     drilldown: root.dataset.drilldownUrl,
     exportUrl: root.dataset.exportUrl,
   };
@@ -246,8 +247,55 @@
   }
 
   // === Canvas & Independent Async Widget Rendering ===
+  let PENDING_BATCH = [];
+
+  async function flushWidgetBatch(batch) {
+    if (!batch.length || !URLS.batchQuery) {
+      batch.forEach(function (it) { loadWidgetData(it.w, it.filters, it.body); });
+      return;
+    }
+    try {
+      const res = await apiFetch(URLS.batchQuery, {
+        method: 'POST',
+        body: {
+          items: batch.map(function (it) {
+            return {
+              key: it.key,
+              widget_type: it.w.widget_type,
+              config: it.w.config || {},
+              global_filters: it.filters || {},
+            };
+          }),
+        },
+      });
+      const map = res.results || {};
+      batch.forEach(function (it) {
+        const entry = map[it.key];
+        if (entry && entry.ok) {
+          renderWidgetBody(it.w, entry.data, it.filters, it.body);
+        } else {
+          it.body.innerHTML = '';
+          const errDiv = document.createElement('div');
+          errDiv.className = 'fx-error';
+          errDiv.textContent = (entry && entry.error) || 'تعذر تحميل بيانات هذا العنصر.';
+          const retry = document.createElement('button');
+          retry.type = 'button';
+          retry.className = 'fx-mini-btn';
+          retry.textContent = 'إعادة المحاولة';
+          retry.addEventListener('click', function () { loadWidgetData(it.w, it.filters, it.body); });
+          errDiv.appendChild(document.createTextNode(' '));
+          errDiv.appendChild(retry);
+          it.body.appendChild(errDiv);
+        }
+      });
+    } catch (_) {
+      batch.forEach(function (it) { loadWidgetData(it.w, it.filters, it.body); });
+    }
+  }
+
   function renderCanvas() {
     stampRiyadhNow();
+    PENDING_BATCH = [];
     const doc = currentDoc();
     const canvas = document.getElementById('flex-canvas');
     canvas.innerHTML = '';
@@ -395,6 +443,11 @@
       }
       canvas.appendChild(secEl);
     });
+    if (PENDING_BATCH.length) {
+      const toRun = PENDING_BATCH.slice();
+      PENDING_BATCH = [];
+      flushWidgetBatch(toRun);
+    }
   }
 
   function moveWidget(fromS, fromW, toS, toW) {
@@ -521,7 +574,7 @@
     card.appendChild(body);
 
     const mergedFilters = Object.assign({}, STATE.activeFilters, sec.section_filters || {});
-    loadWidgetData(w, mergedFilters, body);
+    PENDING_BATCH.push({ key: 'w_' + sIdx + '_' + wIdx, w: w, filters: mergedFilters, body: body });
     return card;
   }
 

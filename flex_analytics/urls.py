@@ -13,6 +13,7 @@ urlpatterns = [
     path('api/dashboards/<int:pk>/revisions/', views.api_revisions, name='api_revisions'),
     path('api/dashboards/<int:pk>/shares/', views.api_shares, name='api_shares'),
     path('api/query/', views.api_query, name='api_query'),
+    path('api/batch-query/', views.api_batch_query, name='api_batch_query'),
     path('api/drilldown/', views.api_drilldown, name='api_drilldown'),
     path('api/export/', views.api_export, name='api_export'),
 ]

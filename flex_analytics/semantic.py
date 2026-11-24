@@ -459,6 +459,28 @@ def get_model(entity_key):
     return apps.get_model(edef.model_label)
 
 
+def get_request_policy(user):
+    pol = getattr(user, '_flex_access_policy', None)
+    if pol is None:
+        pol = AccessPolicy(user)
+        try:
+            setattr(user, '_flex_access_policy', pol)
+        except Exception:
+            pass
+    return pol
+
+
+def get_request_regional_policy(user):
+    rpol = getattr(user, '_flex_regional_policy', None)
+    if rpol is None:
+        rpol = RegionalPolicy(user)
+        try:
+            setattr(user, '_flex_regional_policy', rpol)
+        except Exception:
+            pass
+    return rpol
+
+
 def user_can_view_entity(user, entity_key):
     if not user or not user.is_authenticated or not user.is_active:
         return False
@@ -467,7 +489,7 @@ def user_can_view_entity(user, entity_key):
         return False
     if user.is_superuser:
         return True
-    policy = AccessPolicy(user)
+    policy = get_request_policy(user)
     if policy.can(edef.module_key, 'view'):
         return True
     # Reference catalogs linked to accessible domain modules remain readable as dimensions
@@ -599,7 +621,7 @@ def scoped_queryset(entity_key, user):
     qs = model.objects.all()
     if not edef.is_regional:
         return qs
-    policy = RegionalPolicy(user)
+    policy = get_request_regional_policy(user)
     if not policy.active:
         return qs.none()
     if policy.unrestricted:

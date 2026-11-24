@@ -72,7 +72,7 @@ def requested_operations(request,module,view,kwargs):
     if module == 'flex_analytics':
         if request.method in {'GET', 'HEAD'}:
             return ['view']
-        if name in {'api_query', 'api_drilldown', 'api_export'}:
+        if name in {'api_query', 'api_batch_query', 'api_drilldown', 'api_export'}:
             return ['view']
         if name == 'api_dashboards' and request.method == 'POST':
             return ['view', 'create']

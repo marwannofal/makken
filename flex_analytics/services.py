@@ -215,6 +215,8 @@ STARTER_TEMPLATES = [
 
 
 def ensure_system_templates():
+    if FlexDashboardTemplate.objects.filter(is_system=True).count() >= len(STARTER_TEMPLATES):
+        return
     for tpl in STARTER_TEMPLATES:
         FlexDashboardTemplate.objects.get_or_create(
             key=tpl['key'],

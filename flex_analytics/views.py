@@ -129,12 +129,12 @@ def api_bootstrap(request):
             'can_export_xlsx': policy.can('flex_analytics', 'export_xlsx'),
             'can_export_pdf': policy.can('flex_analytics', 'export_pdf'),
         },
-        'metadata': serialize_metadata(request.user),
-        'graph': serialize_graph(request.user),
-        'kpi_catalog': list_kpi_catalog(request.user),
-        'dashboards': dashboards_list,
+        'metadata': {'entities': [], 'aggregations': []} if is_view_only else serialize_metadata(request.user),
+        'graph': {'nodes': [], 'edges': []} if is_view_only else serialize_graph(request.user),
+        'kpi_catalog': [] if is_view_only else list_kpi_catalog(request.user),
+        'dashboards': [] if is_view_only else dashboards_list,
         'active_dashboard': serialize_dashboard(active_dash, request.user),
-        'templates': templates,
+        'templates': [] if is_view_only else templates,
         'filter_options': {
             'regions': regions_list,
             'sectors': sectors_list,
@@ -454,3 +454,44 @@ def api_export(request):
         return JsonResponse({'error': str(exc)}, status=403)
     except (QueryValidationError, ValueError) as exc:
         return JsonResponse({'error': str(exc)}, status=400)
+
+@module_view('flex_analytics')
+@require_POST
+def api_batch_query(request):
+    """Execute multiple dashboard widgets in a single HTTP request."""
+    body = _json_body(request)
+    items = body.get('items') or []
+    if not isinstance(items, list) or len(items) > 40:
+        return JsonResponse({'error': 'قائمة العناصر غير صالحة أو تتجاوز الحد المسموح.'}, status=400)
+
+    results = {}
+    for item in items:
+        key = str(item.get('key') or '')
+        if not key:
+            continue
+        wtype = str(item.get('widget_type') or 'table').lower()
+        cfg = item.get('config') or {}
+        gfilters = item.get('global_filters') or {}
+        try:
+            if wtype == 'kpi':
+                data = evaluate_predefined_kpi(
+                    request.user,
+                    cfg.get('kpi_key'),
+                    global_filters=gfilters,
+                    target=cfg.get('target'),
+                    thresholds=cfg.get('thresholds'),
+                )
+            elif wtype == 'custom_kpi':
+                data = evaluate_custom_kpi(request.user, cfg, global_filters=gfilters)
+            elif wtype == 'chart':
+                data = execute_chart_query(request.user, cfg, global_filters=gfilters)
+            elif wtype in {'table', 'summary'}:
+                data = execute_table_query(request.user, cfg, global_filters=gfilters)
+            else:
+                raise QueryValidationError(f'نوع العنصر غير مدعوم: {wtype}')
+            results[key] = {'ok': True, 'data': data}
+        except (PermissionError, QueryValidationError) as exc:
+            results[key] = {'ok': False, 'error': str(exc)}
+        except Exception:
+            results[key] = {'ok': False, 'error': 'تعذر تحميل بيانات هذا العنصر.'}
+    return JsonResponse({'results': results})
