@@ -112,7 +112,24 @@
     document.getElementById('flex-dash-title').textContent = doc.title || 'المؤشرات والتحليلات المرنة';
     document.getElementById('flex-dash-desc').textContent = doc.description || '';
 
+    const hasManageAccess = Boolean(
+      STATE.permissions.can_create || STATE.permissions.can_edit || STATE.permissions.can_delete
+    );
+    const toolbar = root.querySelector('.flex-toolbar');
+    const filtersBar = document.getElementById('flex-filters-bar');
     const modeBadge = document.getElementById('flex-mode-badge');
+
+    if (!hasManageAccess) {
+      if (toolbar) toolbar.hidden = true;
+      modeBadge.hidden = true;
+      document.getElementById('flex-dirty-badge').hidden = true;
+      document.getElementById('flex-edit-bar').hidden = true;
+      if (filtersBar) filtersBar.hidden = false;
+      return;
+    }
+
+    if (toolbar) toolbar.hidden = false;
+    modeBadge.hidden = false;
     modeBadge.textContent = STATE.editMode ? 'وضع التخصيص' : 'وضع العرض';
     modeBadge.className = 'flex-badge ' + (STATE.editMode ? 'flex-badge-edit' : 'flex-badge-view');
 
@@ -120,6 +137,7 @@
     document.getElementById('flex-edit-bar').hidden = !STATE.editMode;
     document.getElementById('btn-enter-edit').hidden = STATE.editMode || !doc.can_edit || !STATE.permissions.can_edit;
     document.getElementById('btn-new-dash').hidden = !STATE.permissions.can_create;
+    document.getElementById('btn-duplicate-dash').hidden = !STATE.permissions.can_create;
     document.getElementById('btn-share-dash').hidden = !doc.is_owner;
     document.getElementById('btn-delete-dash').hidden = !doc.is_owner || !STATE.permissions.can_delete;
 

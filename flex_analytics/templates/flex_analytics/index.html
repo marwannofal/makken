@@ -4,9 +4,9 @@
 {% block title %}المؤشرات والتحليلات المرنة | مكّن{% endblock %}
 
 {% block extra_head %}
-  <link rel="stylesheet" href="{% static 'flex_analytics/flex_analytics.css' %}?v=20261124-1">
-  <script src="{% static 'flex_analytics/flex_charts.js' %}?v=20261124-1" defer></script>
-  <script src="{% static 'flex_analytics/flex_studio.js' %}?v=20261124-1" defer></script>
+  <link rel="stylesheet" href="{% static 'flex_analytics/flex_analytics.css' %}?v=20261124-2">
+  <script src="{% static 'flex_analytics/flex_charts.js' %}?v=20261124-2" defer></script>
+  <script src="{% static 'flex_analytics/flex_studio.js' %}?v=20261124-2" defer></script>
 {% endblock %}
 
 {% block content %}
@@ -20,15 +20,15 @@
         <p class="flex-eyebrow">مكّن · استوديو ذكاء الأعمال الذاتي</p>
         <div class="flex-title-row">
           <h1 id="flex-dash-title" class="flex-dash-title">المؤشرات والتحليلات المرنة</h1>
-          <span id="flex-mode-badge" class="flex-badge flex-badge-view">وضع العرض</span>
+          <span id="flex-mode-badge" class="flex-badge flex-badge-view" hidden>وضع العرض</span>
           <span id="flex-dirty-badge" class="flex-badge flex-badge-warn" hidden>تغييرات غير محفوظة</span>
         </div>
         <p id="flex-dash-desc" class="flex-dash-desc">قم ببناء لوحاتك التحليلية المخصصة بحرية كاملة مع الالتزام التام بالصلاحيات والبيانات الحية.</p>
       </div>
 
-      <div class="flex-toolbar">
+      <div class="flex-toolbar" hidden>
         <div class="flex-dash-picker">
-          <label class="sr-only" for="flex-dash-select">اختيار اللوحة</label>
+          <label class="flex-picker-label" for="flex-dash-select">اختيار اللوحة:</label>
           <select id="flex-dash-select" class="flex-select" aria-label="اختر لوحة تحليلات"></select>
         </div>
 

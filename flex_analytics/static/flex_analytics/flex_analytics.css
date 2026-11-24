@@ -878,3 +878,25 @@ textarea.flex-input {
     grid-template-columns: 1fr 1fr;
   }
 }
+
+.flex-studio [hidden] {
+  display: none !important;
+}
+
+.flex-dash-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.flex-picker-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--fx-primary-dark);
+  white-space: nowrap;
+  margin: 0;
+}
+
+.flex-toolbar {
+  align-items: center;
+}
