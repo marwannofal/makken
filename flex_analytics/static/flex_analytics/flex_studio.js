@@ -282,63 +282,73 @@
 
 
       if (STATE.editMode) {
-        const addWBtn = document.createElement('button');
-        addWBtn.type = 'button';
-        addWBtn.className = 'fx-mini-btn';
-        addWBtn.textContent = '+ عنصر';
-        addWBtn.addEventListener('click', function () { openWidgetModal(sIdx, null); });
-        tools.appendChild(addWBtn);
+        function makeSecIconBtn(svgPath, label, extraClass, onClick) {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'fx-sec-icon-btn' + (extraClass ? ' ' + extraClass : '');
+          b.title = label;
+          b.setAttribute('aria-label', label);
+          b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true">' + svgPath + '</svg>';
+          b.addEventListener('click', onClick);
+          return b;
+        }
 
-        const editSBtn = document.createElement('button');
-        editSBtn.type = 'button';
-        editSBtn.className = 'fx-mini-btn';
-        editSBtn.textContent = 'تعديل القسم';
-        editSBtn.addEventListener('click', function () { openSectionModal(sIdx); });
-        tools.appendChild(editSBtn);
+        tools.appendChild(makeSecIconBtn(
+          '<path d="M12 5v14M5 12h14"/>',
+          'إضافة عنصر تحليلي',
+          'is-primary',
+          function () { openWidgetModal(sIdx, null); }
+        ));
+
+        tools.appendChild(makeSecIconBtn(
+          '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.08a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.08a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+          'إعدادات القسم',
+          '',
+          function () { openSectionModal(sIdx); }
+        ));
 
         if (sIdx > 0) {
-          const upBtn = document.createElement('button');
-          upBtn.type = 'button';
-          upBtn.className = 'fx-mini-btn';
-          upBtn.textContent = '↑';
-          upBtn.title = 'نقل القسم للأعلى';
-          upBtn.addEventListener('click', function () {
-            const arr = STATE.draft.sections;
-            const tmp = arr[sIdx - 1];
-            arr[sIdx - 1] = arr[sIdx];
-            arr[sIdx] = tmp;
-            pushHistory();
-            renderCanvas();
-          });
-          tools.appendChild(upBtn);
-        }
-        if (sIdx < sections.length - 1) {
-          const dnBtn = document.createElement('button');
-          dnBtn.type = 'button';
-          dnBtn.className = 'fx-mini-btn';
-          dnBtn.textContent = '↓';
-          dnBtn.title = 'نقل القسم للأسفل';
-          dnBtn.addEventListener('click', function () {
-            const arr = STATE.draft.sections;
-            const tmp = arr[sIdx + 1];
-            arr[sIdx + 1] = arr[sIdx];
-            arr[sIdx] = tmp;
-            pushHistory();
-            renderCanvas();
-          });
-          tools.appendChild(dnBtn);
+          tools.appendChild(makeSecIconBtn(
+            '<path d="M12 19V5M5 12l7-7 7 7"/>',
+            'نقل القسم للأعلى',
+            '',
+            function () {
+              const arr = STATE.draft.sections;
+              const tmp = arr[sIdx - 1];
+              arr[sIdx - 1] = arr[sIdx];
+              arr[sIdx] = tmp;
+              pushHistory();
+              renderCanvas();
+            }
+          ));
         }
 
-        const delSBtn = document.createElement('button');
-        delSBtn.type = 'button';
-        delSBtn.className = 'fx-mini-btn is-danger';
-        delSBtn.textContent = 'حذف';
-        delSBtn.addEventListener('click', function () {
-          STATE.draft.sections.splice(sIdx, 1);
-          pushHistory();
-          renderCanvas();
-        });
-        tools.appendChild(delSBtn);
+        if (sIdx < sections.length - 1) {
+          tools.appendChild(makeSecIconBtn(
+            '<path d="M12 5v14M19 12l-7 7-7-7"/>',
+            'نقل القسم للأسفل',
+            '',
+            function () {
+              const arr = STATE.draft.sections;
+              const tmp = arr[sIdx + 1];
+              arr[sIdx + 1] = arr[sIdx];
+              arr[sIdx] = tmp;
+              pushHistory();
+              renderCanvas();
+            }
+          ));
+        }
+
+        tools.appendChild(makeSecIconBtn(
+          '<path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14ZM10 11v6M14 11v6"/>',
+          'حذف القسم',
+          'is-danger',
+          function () {
+            STATE.draft.sections.splice(sIdx, 1);
+            pushHistory();
+            renderCanvas();
+          }
+        ));
       }
 
       head.appendChild(tools);
