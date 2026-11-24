@@ -1601,7 +1601,7 @@
   display: grid;
   grid-template-columns: 1.4fr 1fr;
   gap: 12px;
-  align-items: end;
+  align-items: start;
   padding-top: 10px;
 }
 
@@ -1697,4 +1697,21 @@
     grid-row: auto !important;
     justify-self: start;
   }
+}
+
+.mk-cp-add-team {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mk-cp-add-team svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
 }
