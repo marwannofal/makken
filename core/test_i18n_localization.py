@@ -398,6 +398,10 @@ class Round2LocalizationAndMirroringTests(TestCase):
             "إحصائيات المهام": "Task Statistics",
             "بطاقات السوق": "Market Need Cards",
             "إضافة بطاقة حاجة السوق": "Add Market Need Card",
+            "إدارة حالة التطور للشراكة": "Partnership Progress States Management",
+            "إدارة تصنيف الاتفاقية": "Agreement Classifications Management",
+            "إدارة المستوى الشراكة": "Partnership Levels Management",
+            "إدارة بنود الشراكة": "Partnership Clauses Management",
         }
         for ar, en in expected.items():
             with self.subTest(ar=ar):

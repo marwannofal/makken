@@ -613,6 +613,15 @@ AR_TO_EN: dict[str, str] = {
     "يجب ألا تتجاوز البيانات 254 حرفًا.": "Input must not exceed 254 characters.",
     "كلمة المرور أطول من الحد المسموح.": "Password exceeds the maximum allowed length.",
     "سجل": "records",
+    # Data Management sidebar variants
+    "إدارة حالة التطور للشراكة": "Partnership Progress States Management",
+    "حالة التطور للشراكة": "Partnership Progress State",
+    "إدارة تصنيف الاتفاقية": "Agreement Classifications Management",
+    "إدارة المستوى الشراكة": "Partnership Levels Management",
+    "إدارة مستوى الشراكة": "Partnership Levels Management",
+    "المستوى الشراكة": "Partnership Level",
+    "إدارة بنود الشراكة": "Partnership Clauses Management",
+    "بنود الشراكة": "Partnership Clauses",
 }
 
 # Dynamic regex patterns for parameterized UI phrases.
