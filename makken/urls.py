@@ -116,3 +116,13 @@ urlpatterns = [path('', include('makken_mail.urls')),
                path('flexible-analytics/', include('flex_analytics.urls')),
                path('settings/agreement-clauses/', include('agreement_clauses.urls')),
                path('settings/partnership-types/', _partnership_types_view, name='partnership_types')] + urlpatterns
+
+# BEGIN MAKKEN I18N ROUTES
+from django.contrib.auth.decorators import login_not_required as _makken_i18n_public
+from django.views.i18n import set_language as _django_set_language
+from core.i18n_views import i18n_js_catalog as _makken_i18n_js_catalog
+urlpatterns = [
+    path("i18n/setlang/", _makken_i18n_public(_django_set_language), name="set_language"),
+    path("i18n/catalog.js", _makken_i18n_js_catalog, name="makken_i18n_catalog"),
+] + list(urlpatterns)
+# END MAKKEN I18N ROUTES

@@ -1,0 +1,14 @@
+{% load i18n %}
+{% get_current_language as CURRENT_LANG %}
+<form method="post" action="{% url 'set_language' %}" class="mk-lang-form" data-lang-switcher>
+  {% csrf_token %}
+  <input type="hidden" name="next" value="{{ request.get_full_path }}">
+  <input type="hidden" name="language" value="{% if CURRENT_LANG == 'en' %}ar{% else %}en{% endif %}">
+  <button type="submit" class="mk-lang-btn" aria-label="{% if CURRENT_LANG == 'en' %}التبديل إلى العربية{% else %}Switch to English{% endif %}" title="{% if CURRENT_LANG == 'en' %}التبديل إلى العربية{% else %}Switch to English{% endif %}">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="9"/>
+      <path d="M3.6 9h16.8M3.6 15h16.8M12 3a14.5 14.5 0 0 1 0 18M12 3a14.5 14.5 0 0 0 0 18"/>
+    </svg>
+    <span>{% if CURRENT_LANG == 'en' %}العربية{% else %}English{% endif %}</span>
+  </button>
+</form>

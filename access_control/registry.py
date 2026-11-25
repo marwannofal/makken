@@ -55,7 +55,7 @@ MODULES = tuple(
 
 DEFINITIONS = {row.key: row for row in MODULES}
 SETTINGS_MODULES = frozenset({'levels','regions','entities','specializations','sectors','expense_items','agreement_clauses','training_programs','sponsorship_shapes'})
-PUBLIC_ROUTES = frozenset({'accounts:login','accounts:login_slash','accounts:logout','accounts:logout_slash','partnerships:public_sponsor_register','partnerships:public_sponsor_thanks'})
+PUBLIC_ROUTES = frozenset({'accounts:login','accounts:login_slash','accounts:logout','accounts:logout_slash','partnerships:public_sponsor_register','partnerships:public_sponsor_thanks','set_language','makken_i18n_catalog'})
 SELF_ROUTES = frozenset({'accounts:profile','access_control:landing','access_control:no_access','makken_mail:work_index','makken_mail:work_detail'})
 
 

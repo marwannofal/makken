@@ -1,0 +1,149 @@
+/* Makken Arabic / English Language Switcher + Full LTR Mirroring (CSP-safe) */
+
+.topbar-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.mk-lang-form {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+.mk-lang-btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 6px 13px;
+  border: 1.5px solid rgba(0, 91, 133, 0.24);
+  border-radius: 999px;
+  background: #ffffff;
+  color: #005b85;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 59, 92, 0.06);
+  transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease, transform 0.14s ease;
+}
+
+.mk-lang-btn:hover {
+  background: #005b85;
+  border-color: #005b85;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.mk-lang-btn:focus-visible {
+  outline: 2px solid #005b85;
+  outline-offset: 2px;
+}
+
+.mk-lang-btn svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Login page language bar */
+.mk-login-lang-bar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 640px) {
+  .topbar-actions {
+    gap: 6px;
+  }
+  .mk-lang-btn {
+    min-height: 34px;
+    padding: 5px 10px;
+    font-size: 12px;
+    gap: 5px;
+  }
+  .mk-lang-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+/* ==========================================================================
+   LTR Layout Mirroring (activates ONLY when <html dir="ltr" lang="en">)
+   ========================================================================== */
+
+html[dir="ltr"] body {
+  direction: ltr;
+  text-align: left;
+}
+
+/* Flip sidebar collapse chevron so it points left (collapse) and right (expand) */
+html[dir="ltr"] .mk-sidebar-toggle svg {
+  transform: rotate(180deg);
+}
+
+html[dir="ltr"] body.mk-sidebar-collapsed .mk-sidebar-toggle svg {
+  transform: rotate(0deg);
+}
+
+/* Tables & cards default left alignment in LTR */
+html[dir="ltr"] .main-content table th,
+html[dir="ltr"] .main-content table td {
+  text-align: left;
+}
+
+html[dir="ltr"] .main-content table th.action-cell,
+html[dir="ltr"] .main-content table td.action-cell,
+html[dir="ltr"] .main-content table td.mk-actions-cell {
+  text-align: center;
+}
+
+/* Row actions dropdown & mobile bottom sheet in LTR */
+html[dir="ltr"] .mk-actions-dropdown {
+  direction: ltr;
+  text-align: left;
+}
+
+html[dir="ltr"] .mk-actions-dropdown a,
+html[dir="ltr"] .mk-actions-dropdown button {
+  text-align: left;
+}
+
+/* Custom dropdowns in LTR */
+html[dir="ltr"] .mk-dd-trigger,
+html[dir="ltr"] .mk-dd-panel,
+html[dir="ltr"] .mk-dd-option {
+  direction: ltr;
+  text-align: left;
+}
+
+/* Form controls, dialogs & labels in LTR */
+html[dir="ltr"] input,
+html[dir="ltr"] select,
+html[dir="ltr"] textarea,
+html[dir="ltr"] label,
+html[dir="ltr"] dialog {
+  text-align: left;
+}
+
+/* Sidebar navigation links in LTR */
+html[dir="ltr"] .sidebar,
+html[dir="ltr"] .sidebar-navigation,
+html[dir="ltr"] .nav-link,
+html[dir="ltr"] .nav-management-toggle {
+  text-align: left;
+}

@@ -44,6 +44,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -63,6 +64,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.i18n',
             ],
         },
     },
@@ -203,7 +205,8 @@ if not any(_app == "market_needs" or _app.startswith("market_needs.") for _app i
 # BEGIN MAKKEN ARABIC VALIDATION
 LANGUAGE_CODE = "ar"
 USE_I18N = True
-LANGUAGES = [("ar", "العربية")]
+LANGUAGES = [("ar", "العربية"), ("en", "English")]
+LOCALE_PATHS = [BASE_DIR / "locale"]
 DATE_FORMAT = "d/m/Y"
 SHORT_DATE_FORMAT = "d/m/Y"
 DATETIME_FORMAT = "d/m/Y H:i"
@@ -245,3 +248,18 @@ if 'access_control.activity_middleware.ActivityMiddleware' not in MIDDLEWARE:
 INSTALLED_APPS = [*INSTALLED_APPS, 'makken_mail', 'agreement_clauses', 'flex_analytics']
 MAKKEN_MAIL_BASE_URL = os.environ.get('MAKKEN_MAIL_BASE_URL', 'https://makken.menatech.edu.jo')
 MAKKEN_MAIL_ENCRYPTION_KEY = os.environ.get('MAKKEN_MAIL_ENCRYPTION_KEY', '')
+
+if "core.middleware.MakkenLocalizationMiddleware" not in MIDDLEWARE:
+    MIDDLEWARE = [*MIDDLEWARE, "core.middleware.MakkenLocalizationMiddleware"]
+
+# BEGIN MAKKEN I18N CONFIG
+LANGUAGE_CODE = "ar"
+USE_I18N = True
+LANGUAGES = [("ar", "العربية"), ("en", "English")]
+LOCALE_PATHS = [BASE_DIR / "locale"]
+if "django.middleware.locale.LocaleMiddleware" not in MIDDLEWARE:
+    _sess_idx = MIDDLEWARE.index("django.contrib.sessions.middleware.SessionMiddleware")
+    MIDDLEWARE.insert(_sess_idx + 1, "django.middleware.locale.LocaleMiddleware")
+if "core.middleware.MakkenLocalizationMiddleware" not in MIDDLEWARE:
+    MIDDLEWARE = [*MIDDLEWARE, "core.middleware.MakkenLocalizationMiddleware"]
+# END MAKKEN I18N CONFIG
