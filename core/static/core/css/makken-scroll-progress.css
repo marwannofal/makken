@@ -1,0 +1,125 @@
+/* Makken Circular Scroll-Progress & Back-to-Top Indicator (Ocean-Blue, CSP-safe) */
+
+.mk-scroll-progress {
+  position: fixed;
+  bottom: 20px;
+  right: calc(var(--sidebar-width, 280px) + 20px);
+  z-index: 9990;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border: 2px solid rgba(255, 255, 255, 0.22);
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 28%, #0c78a8 0%, #005b85 68%, #004769 100%);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 8px 22px rgba(0, 59, 92, 0.32), 0 2px 6px rgba(0, 59, 92, 0.2);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(10px) scale(0.9);
+  transition:
+    right 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.2s ease,
+    visibility 0.2s ease,
+    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.18s ease,
+    box-shadow 0.18s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mk-scroll-progress.is-visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+.mk-scroll-progress:hover {
+  background: radial-gradient(circle at 32% 28%, #0a6892 0%, #004c70 68%, #003b5c 100%);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 12px 26px rgba(0, 59, 92, 0.38), 0 4px 10px rgba(0, 59, 92, 0.24);
+}
+
+.mk-scroll-progress:active {
+  transform: translateY(0) scale(0.97);
+}
+
+.mk-scroll-progress:focus-visible {
+  outline: 3px solid #7dd3fc;
+  outline-offset: 3px;
+}
+
+.mk-scroll-progress-ring {
+  position: absolute;
+  inset: 3px;
+  width: calc(100% - 6px);
+  height: calc(100% - 6px);
+  transform: rotate(-90deg);
+  pointer-events: none;
+}
+
+.mk-scroll-progress-track {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.28);
+  stroke-width: 3.4;
+}
+
+.mk-scroll-progress-fill {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 3.4;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.08s linear;
+}
+
+.mk-scroll-progress-label {
+  position: relative;
+  z-index: 1;
+  font-family: "Cairo", system-ui, -apple-system, sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  font-variant-numeric: tabular-nums;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* When desktop sidebar is collapsed, glide cleanly to the right corner of the screen */
+body.mk-sidebar-collapsed .mk-scroll-progress {
+  right: 20px;
+}
+
+/* On mobile/tablet where sidebar is an off-canvas drawer, sit in the bottom-right corner */
+@media (max-width: 900px) {
+  .mk-scroll-progress,
+  body.mk-sidebar-collapsed .mk-scroll-progress {
+    right: 14px;
+    bottom: 16px;
+    width: 50px;
+    height: 50px;
+  }
+
+  .mk-scroll-progress-label {
+    font-size: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-scroll-progress,
+  .mk-scroll-progress-fill {
+    transition: none;
+  }
+}
+
+@media print {
+  .mk-scroll-progress {
+    display: none !important;
+  }
+}
