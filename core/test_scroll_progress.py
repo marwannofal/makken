@@ -32,7 +32,7 @@ class ScrollProgressStaticAssetTests(SimpleTestCase):
         self.assertIn("stroke-linecap: round", self.css)
 
     def test_css_positions_beside_sidebar_and_moves_to_right_corner_when_collapsed_or_mobile(self):
-        self.assertIn("right: calc(var(--sidebar-width, 280px) + 16px);", self.css)
+        self.assertIn("right: calc(var(--sidebar-width, 280px) - 27px);", self.css)
         self.assertIn("body.mk-sidebar-collapsed .mk-scroll-progress {", self.css)
         self.assertIn("right: 16px;", self.css)
         self.assertIn("width: 54px;", self.css)

@@ -3,12 +3,12 @@
 .mk-scroll-progress {
   position: fixed;
   bottom: 20px;
-  right: calc(var(--sidebar-width, 280px) + 16px);
+  right: calc(var(--sidebar-width, 280px) - 27px);
   z-index: 9990;
   width: 54px;
   height: 54px;
   padding: 0;
-  border: 2px solid rgba(255, 255, 255, 0.22);
+  border: 2px solid #ffffff;
   border-radius: 50%;
   background: radial-gradient(circle at 32% 28%, #0c78a8 0%, #005b85 68%, #004769 100%);
   color: #ffffff;
