@@ -429,7 +429,8 @@ class Round2LocalizationAndMirroringTests(TestCase):
         res = self.client.get(reverse("partnerships:public_sponsor_register"))
         self.assertEqual(res.status_code, 200)
         self.assertContains(res, '<html lang="ar" dir="rtl">')
-        self.assertContains(res, "طلب تسجيل راعٍ خارجي")
+        self.assertContains(res, "<title>طلب شراكة جديدة لراعي جديد | مكّن</title>")
+        self.assertContains(res, "<h1>طلب شراكة جديدة لراعي جديد</h1>")
         self.assertNotContains(res, "Organization Name")
         self.assertNotContains(res, '<html lang="en" dir="ltr">')
 
