@@ -304,9 +304,6 @@
   .program-action {
     padding-inline: 10px;
   }
-  .program-action > span {
-    display: none;
-  }
   .program-status {
     min-width: 80px;
     font-size: 10px;
@@ -677,9 +674,6 @@
 }
 
 @media (max-width: 1100px) {
-  .program-action > span {
-    display: none;
-  }
   .program-status {
     min-width: 0;
   }
@@ -892,9 +886,6 @@
   .training_programs-table {
     --program-actions-width: 8rem;
   }
-  .program-action > span {
-    display: none;
-  }
   .program-action {
     min-width: 44px;
     padding: 9px;
@@ -994,9 +985,6 @@
   .training_programs-table tbody > tr[data-program-row] {
     padding: 19px 16px;
     gap: 16px;
-  }
-  .program-action > span {
-    display: none;
   }
   .program-action {
     width: 44px;

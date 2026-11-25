@@ -315,9 +315,6 @@
   .entity-action {
     padding-inline: 10px;
   }
-  .entity-action > span {
-    display: none;
-  }
   .entity-status {
     min-width: 80px;
     font-size: 10px;
@@ -469,9 +466,6 @@
   font-size: 12px;
 }
 
-.entities-table .entity-action > span {
-  display: none;
-}
 
 .entities-table .entity-status {
   font-size: 10px;

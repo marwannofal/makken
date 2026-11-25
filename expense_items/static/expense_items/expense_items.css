@@ -315,9 +315,6 @@
   .expense-item-action {
     padding-inline: 10px;
   }
-  .expense-item-action > span {
-    display: none;
-  }
   .expense-item-status {
     min-width: 80px;
     font-size: 10px;

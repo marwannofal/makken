@@ -315,9 +315,6 @@
   .level-action {
     padding-inline: 10px;
   }
-  .level-action > span {
-    display: none;
-  }
   .level-status {
     min-width: 80px;
     font-size: 10px;

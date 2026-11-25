@@ -315,9 +315,6 @@
   .sponsorship-shape-action {
     padding-inline: 10px;
   }
-  .sponsorship-shape-action > span {
-    display: none;
-  }
   .sponsorship-shape-status {
     min-width: 80px;
     font-size: 10px;
@@ -541,9 +538,6 @@
 }
 
 @media (max-width: 1400px) {
-  .sponsorship-shape-action > span {
-    display: none;
-  }
   .sponsorship-shape-row-actions {
     gap: 6px;
   }
@@ -632,9 +626,6 @@
   }
   .sponsorship_shapes-introduction h1 {
     font-size: 24px;
-  }
-  .sponsorship-shape-action > span {
-    display: none;
   }
   .sponsorship-shape-action {
     width: 44px;

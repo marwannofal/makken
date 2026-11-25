@@ -315,9 +315,6 @@
   .specialization-action {
     padding-inline: 10px;
   }
-  .specialization-action > span {
-    display: none;
-  }
   .specialization-status {
     min-width: 80px;
     font-size: 10px;

@@ -315,9 +315,6 @@
   .sector-action {
     padding-inline: 10px;
   }
-  .sector-action > span {
-    display: none;
-  }
   .sector-status {
     min-width: 80px;
     font-size: 10px;
@@ -686,9 +683,6 @@
 }
 
 @media (max-width: 1100px) {
-  .sector-action > span {
-    display: none;
-  }
   .sectors-table thead th:first-child {
     width: 24%;
   }

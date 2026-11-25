@@ -132,3 +132,23 @@ class RowActionsMenuTests(TestCase):
         self.assertEqual(sp_res.status_code, 200)
         self.assertContains(sp_res, f'detail={sp.pk}')
         self.assertContains(sp_res, 'makken-row-actions-menu.js')
+
+    def test_mobile_action_labels_are_never_hidden_in_any_stylesheet(self):
+        import re
+        base = Path(settings.BASE_DIR)
+        menu_css = (base / 'core' / 'static' / 'core' / 'css' / 'makken-row-actions-menu.css').read_text(encoding='utf-8')
+        self.assertIn(':root .mk-actions-dropdown :is(a, button) > span:not([aria-hidden="true"])', menu_css)
+        self.assertIn('display: inline !important;', menu_css)
+
+        hide_span_re = re.compile(r'\.[a-z0-9_-]+-action\s*>\s*span\s*\{[^}]*display\s*:\s*none', re.I)
+        offenders = []
+        for css_file in sorted(base.rglob('*.css')):
+            if 'staticfiles' in css_file.parts or '.git' in css_file.parts:
+                continue
+            if hide_span_re.search(css_file.read_text(encoding='utf-8', errors='ignore')):
+                offenders.append(str(css_file.relative_to(base)))
+        self.assertEqual(offenders, [], f'Found stylesheets hiding action button text on mobile: {offenders}')
+
+        res = self.client.get(reverse('agreement_clauses:references'))
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, 'makken-row-actions-menu.css')

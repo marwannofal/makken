@@ -342,3 +342,13 @@ th[hidden], td[hidden] {
     z-index: 5;
   }
 }
+
+/* Never hide action text labels inside the unified ⋮ dropdown or mobile bottom sheet */
+:root .mk-actions-dropdown :is(a, button) > span:not([aria-hidden="true"]),
+:root .mk-actions-dropdown.is-mobile-sheet :is(a, button) > span:not([aria-hidden="true"]) {
+  display: inline !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+}

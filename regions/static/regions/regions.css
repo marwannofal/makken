@@ -315,9 +315,6 @@
   .region-action {
     padding-inline: 10px;
   }
-  .region-action > span {
-    display: none;
-  }
   .region-status {
     min-width: 80px;
     font-size: 10px;
