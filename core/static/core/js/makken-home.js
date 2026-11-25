@@ -45,9 +45,11 @@
 (function () {
   const clockEl = document.querySelector('[data-makken-clock]');
   if (!clockEl) return;
-  const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+  const daysAr = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+  const daysEn = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   function renderClock() {
     const now = new Date();
+    const isEn = (document.documentElement.lang || '').toLowerCase().startsWith('en');
     try {
       const parts = new Intl.DateTimeFormat('en-GB', {
         timeZone: 'Asia/Riyadh',
@@ -61,9 +63,10 @@
       }).formatToParts(now);
       const map = Object.fromEntries(parts.map((p) => [p.type, p.value]));
       const wkIdx = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(map.weekday);
-      const arDay = wkIdx >= 0 ? days[wkIdx] : '';
-      const period = (map.dayPeriod || '').toLowerCase() === 'pm' ? 'م' : 'ص';
-      clockEl.textContent = `${arDay} ${map.day}/${map.month}/${map.year} — ${map.hour}:${map.minute} ${period}`;
+      const dayLabel = wkIdx >= 0 ? (isEn ? daysEn[wkIdx] : daysAr[wkIdx]) : '';
+      const isPm = (map.dayPeriod || '').toLowerCase() === 'pm';
+      const period = isEn ? (isPm ? 'PM' : 'AM') : (isPm ? 'م' : 'ص');
+      clockEl.textContent = `${dayLabel} ${map.day}/${map.month}/${map.year} — ${map.hour}:${map.minute} ${period}`;
     } catch {
       const d = String(now.getDate()).padStart(2, '0');
       const m = String(now.getMonth() + 1).padStart(2, '0');

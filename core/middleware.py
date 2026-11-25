@@ -107,11 +107,17 @@ def localize_html_to_english(html: str) -> str:
 class MakkenLocalizationMiddleware:
     """Translates HTML UI responses to English when the active session/cookie language is 'en'."""
 
+    _EXCLUDED_PATH_PREFIXES = ("/partnerships/register",)
+
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
         response = self.get_response(request)
+        path = getattr(request, "path", "") or ""
+        if any(path == p or path.startswith(p + "/") for p in self._EXCLUDED_PATH_PREFIXES):
+            return response
+
         lang = getattr(request, "LANGUAGE_CODE", "ar") or "ar"
         if not lang.lower().startswith("en"):
             return response

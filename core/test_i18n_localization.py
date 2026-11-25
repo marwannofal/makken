@@ -376,3 +376,78 @@ class LtrDesignMirroringTests(SimpleTestCase):
             with self.subTest(rule=rule):
                 self.assertIn(rule, self.css)
         self.assertEqual(self.css.count("{"), self.css.count("}"))
+
+
+class Round2LocalizationAndMirroringTests(TestCase):
+    """Regression tests for sidebar, login flip/copy, Arabic-only public sponsor form, greeting clock, and pagination."""
+
+    def setUp(self):
+        self.user = get_user_model().objects.create_superuser(
+            username="i18n_round2_admin",
+            email="i18n_round2@makken.test",
+            password="StrongPassword123!",
+            first_name="Marwan",
+        )
+
+    def test_all_sidebar_labels_translate_and_closed_chevron_flips_in_ltr(self):
+        expected = {
+            "إنجاز الشراكات": "Partnerships Achievement",
+            "طلبات الرعاة الخارجيين": "External Sponsor Requests",
+            "مزودي خدمات التدريب": "Training Service Providers",
+            "سجل الأعمال": "Work Log",
+            "إحصائيات المهام": "Task Statistics",
+            "بطاقات السوق": "Market Need Cards",
+            "إضافة بطاقة حاجة السوق": "Add Market Need Card",
+        }
+        for ar, en in expected.items():
+            with self.subTest(ar=ar):
+                self.assertEqual(translate_ui_text(ar), en)
+
+        css = (Path(settings.BASE_DIR) / "core" / "static" / "core" / "css" / "makken-i18n.css").read_text(encoding="utf-8")
+        self.assertIn('html[dir="ltr"] .nav-management-toggle .management-chevron {', css)
+        self.assertIn("transform: rotate(-90deg);", css)
+
+    def test_login_page_fully_translated_and_mirrored_in_english(self):
+        self.client.cookies[settings.LANGUAGE_COOKIE_NAME] = "en"
+        res = self.client.get(reverse("accounts:login"))
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, '<html lang="en" dir="ltr">')
+        self.assertContains(res, "Email or Username")
+        self.assertContains(res, "Remember me")
+        self.assertContains(res, "Together We Empower")
+        self.assertContains(res, "the Future.")
+        self.assertContains(res, "Sign in using your authorized platform account")
+        self.assertContains(res, "External sponsor? Submit a new partnership request")
+
+        css = (Path(settings.BASE_DIR) / "core" / "static" / "core" / "css" / "makken-i18n.css").read_text(encoding="utf-8")
+        self.assertIn('html[dir="ltr"] .login-layout {', css)
+        self.assertIn('html[dir="ltr"] .submit-button svg {', css)
+        self.assertIn("transform: scaleX(-1);", css)
+
+    def test_public_sponsor_register_form_stays_arabic_rtl_even_in_english_session(self):
+        self.client.cookies[settings.LANGUAGE_COOKIE_NAME] = "en"
+        res = self.client.get(reverse("partnerships:public_sponsor_register"))
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, '<html lang="ar" dir="rtl">')
+        self.assertContains(res, "طلب تسجيل راعٍ خارجي")
+        self.assertNotContains(res, "Organization Name")
+        self.assertNotContains(res, '<html lang="en" dir="ltr">')
+
+    def test_greeting_clock_js_supports_english_weekdays_and_ampm(self):
+        js = (Path(settings.BASE_DIR) / "core" / "static" / "core" / "js" / "makken-home.js").read_text(encoding="utf-8")
+        self.assertIn("'Wednesday'", js)
+        self.assertIn("'Sunday'", js)
+        self.assertIn("'PM' : 'AM'", js)
+
+    def test_pagination_renders_clean_english_summary_and_per_page_label(self):
+        self.client.force_login(self.user)
+        self.client.cookies[settings.LANGUAGE_COOKIE_NAME] = "en"
+        from regions.models import Region
+        Region.objects.create(name="منطقة اختبار الترقيم", is_active=True)
+        res = self.client.get(reverse("regions:index"))
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "Showing ")
+        self.assertContains(res, " of ")
+        self.assertContains(res, " records")
+        self.assertContains(res, "Rows per page")
+        self.assertNotContains(res, "من <bdi>1</bdi> سجل")

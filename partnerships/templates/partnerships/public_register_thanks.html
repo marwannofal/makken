@@ -1,6 +1,6 @@
-{% load static i18n %}{% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
+{% load static %}
 <!DOCTYPE html>
-<html lang="{{ LANGUAGE_CODE|default:'ar' }}" dir="{% if LANGUAGE_BIDI %}rtl{% else %}ltr{% endif %}">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,7 +12,7 @@
     <section class="pub-card pub-thanks-card">
       <div class="pub-check" aria-hidden="true">✓</div>
       <h1>تم استلام طلب التسجيل بنجاح</h1>
-      <p>شكرًا لتواصلكم{% if sponsor_name %} ({{ sponsor_name }}){% endif %}. تم تسجيل طلبكم بحالة <strong>جديد</strong> وسيقوم الفريق المختص بمراجعته قبل اعتماده وإدراجه في سجل الشراكات. كما تم إرسال رسالة تأكيد إلى البريد الإلكتروني المسجّل، وسيصلكم إشعار عبر البريد فور البت في الطلب.</p>
+      <p>شكرًا لتواصلكم{% if sponsor_name %} ({{ sponsor_name }}){% endif %}. تم تسجيل طلبكم بحالة <strong>جديد</strong> وسيقوم الفريق المختص بمراجعته قبل اعتماده وإدراجه في سجل الشراكات.</p>
       {% if reference_code %}
       <div class="pub-ref">
         <span>الرقم المرجعي للطلب</span>

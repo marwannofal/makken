@@ -357,3 +357,42 @@ html[dir="ltr"] .mk-cp-row.is-zero {
 html[dir="ltr"] .mk-cp-row .mk-cp-input-wrap {
   direction: ltr !important;
 }
+
+/* 10. Sidebar Collapsible Group Chevron Flip in LTR (closed points right >, open points down v) */
+html[dir="ltr"] .nav-management-toggle .management-chevron {
+  transform: rotate(-90deg);
+}
+
+html[dir="ltr"] .nav-management[open] > .nav-management-toggle .management-chevron {
+  transform: rotate(0);
+}
+
+/* 11. Login Page Complete LTR Flip, Input Alignment & Arrow Mirroring */
+html[dir="ltr"] .login-layout {
+  direction: rtl;
+}
+
+html[dir="ltr"] .login-layout .form-panel,
+html[dir="ltr"] .login-layout .visual-panel {
+  direction: ltr;
+  text-align: left;
+}
+
+html[dir="ltr"] .input-wrap input,
+html[dir="ltr"] .input-wrap input::placeholder {
+  text-align: left;
+}
+
+html[dir="ltr"] .submit-button svg {
+  transform: scaleX(-1);
+}
+
+html[dir="ltr"] .mk-login-lang-bar {
+  justify-content: flex-end;
+}
+
+@media (max-width: 860px) {
+  html[dir="ltr"] .login-layout {
+    direction: ltr;
+  }
+}

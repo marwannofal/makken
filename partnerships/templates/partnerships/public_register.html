@@ -1,6 +1,6 @@
-{% load static i18n %}{% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
+{% load static %}
 <!DOCTYPE html>
-<html lang="{{ LANGUAGE_CODE|default:'ar' }}" dir="{% if LANGUAGE_BIDI %}rtl{% else %}ltr{% endif %}">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -21,7 +21,7 @@
       </div>
       <div class="pub-brand">
         <span class="pub-badge">منصة مكّن · الشراكات الاستراتيجية</span>
-        <h1>طلب شراكة جديدة لراعي جديد</h1>
+        <h1>طلب تسجيل راعٍ خارجي</h1>
         <p>قدّم بيانات جهتك للانضمام إلى رعاة برامج المؤسسة العامة للتدريب التقني والمهني. ستتم مراجعة الطلب من الفريق المختص قبل اعتماده وإدراجه في سجل شراكات القدرة.</p>
       </div>
     </header>
@@ -147,7 +147,7 @@
         </div>
 
         <div class="pub-actions">
-          <button type="submit" class="pub-btn-primary">إرسال طلب شراكة</button>
+          <button type="submit" class="pub-btn-primary">إرسال طلب التسجيل</button>
         </div>
       </form>
     </section>
