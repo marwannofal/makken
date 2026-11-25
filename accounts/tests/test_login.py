@@ -177,6 +177,7 @@ class LoginTests(TestCase):
         self.assertNotContains(response, "<script>alert(1)</script>")
         self.assertContains(response, "&lt;script&gt;")
 
+    @override_settings(AXES_ENABLED=True)
     def test_failed_attempt_lockout_shared_by_identifier(self):
         for index in range(4):
             self.assertEqual(self.post(f"unknown-{index}", password="wrong").status_code, 200)

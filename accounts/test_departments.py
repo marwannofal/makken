@@ -52,14 +52,14 @@ class DepartmentLookupTests(TestCase):
         token = add_page.context['token']
 
         # Create new department
-        res = self.client.post(self.url, {'operation': 'add', 'snapshot': token, 'name': 'إدارة الجودة والتطوير'})
+        res = self.client.post(self.url, {'operation': 'add', 'snapshot': token, 'name': 'إدارة الجودة والتطوير', 'kind': 'department'})
         self.assertEqual(res.status_code, 302)
         dept = Department.objects.get(name='إدارة الجودة والتطوير')
         self.assertTrue(dept.is_active)
 
         # Duplicate name rejected
         add_page2 = self.client.get(f'{self.url}?edit=new')
-        dup = self.client.post(self.url, {'operation': 'add', 'snapshot': add_page2.context['token'], 'name': 'إدارة الجودة والتطوير'})
+        dup = self.client.post(self.url, {'operation': 'add', 'snapshot': add_page2.context['token'], 'name': 'إدارة الجودة والتطوير', 'kind': 'department'})
         self.assertEqual(dup.status_code, 400)
 
         # Edit via pop-up
@@ -69,6 +69,7 @@ class DepartmentLookupTests(TestCase):
             'operation': 'edit',
             'snapshot': edit_page.context['token'],
             'name': 'إدارة الجودة المؤسسية',
+            'kind': 'department',
         })
         self.assertEqual(res.status_code, 302)
         dept.refresh_from_db()

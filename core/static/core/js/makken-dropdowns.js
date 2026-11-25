@@ -31,7 +31,7 @@
     if (select.classList.contains('native-enhanced')) return true;
     if (select.dataset.providerPicker) return true;
     if (select.hasAttribute('data-market-select')) return true;
-    if (select.closest('.search-select, .market-select, .multi-select, .multi-field')) return true;
+    if (select.classList.contains('profile-country-native') || select.closest('.search-select, .market-select, .multi-select, .multi-field, .profile-country-control')) return true;
     const next = select.nextElementSibling;
     if (next && (next.classList.contains('search-select') || next.classList.contains('multi-select') || next.hasAttribute('data-multi-select'))) return true;
     if (select.parentElement && select.parentElement.querySelector(':scope > .search-select, :scope > .multi-select, :scope > [data-multi-select]')) return true;
