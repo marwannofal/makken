@@ -1282,3 +1282,81 @@ textarea.flex-input {
 .flex-filters-bar {
   background: rgba(255, 255, 255, 0.78);
 }
+
+/* Bulletproof responsive filter bar & action buttons across desktop/laptop/tablet/mobile */
+.flex-filters-bar {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.flex-filter-field,
+.flex-filter-field > *,
+.flex-filters-bar .flex-input,
+.flex-filters-bar .flex-select,
+.flex-filters-bar .mk-select-wrap,
+.flex-filters-bar .mk-select-trigger,
+.flex-filters-bar .mk-date-field {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  box-sizing: border-box;
+}
+
+.flex-filter-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  height: auto;
+  min-height: 44px;
+  min-width: 0;
+}
+
+@media (max-width: 1380px) {
+  .flex-filters-bar {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+  .flex-filter-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 860px) {
+  .flex-header {
+    padding: 18px 16px !important;
+    border-radius: 18px !important;
+  }
+  .flex-filters-bar {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    padding: 12px !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .flex-header {
+    padding: 14px 12px !important;
+    border-radius: 14px !important;
+  }
+  .flex-filters-bar {
+    grid-template-columns: 1fr !important;
+    padding: 10px !important;
+    gap: 10px !important;
+  }
+  .flex-filter-actions {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    gap: 8px;
+  }
+  .flex-filter-actions .flex-btn,
+  .flex-filter-actions .flex-top-export {
+    width: 100% !important;
+    justify-content: center;
+    padding: 0 8px !important;
+    font-size: 12px !important;
+    white-space: nowrap;
+  }
+}
