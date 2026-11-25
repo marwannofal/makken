@@ -1,12 +1,12 @@
-/* Makken Circular Scroll-Progress & Back-to-Top Indicator (Ocean-Blue, CSP-safe) */
+/* Makken Circular Scroll-Progress & Back-to-Top Indicator (Ocean-Blue, 44x44 aligned, CSP-safe) */
 
 .mk-scroll-progress {
   position: fixed;
   bottom: 20px;
-  right: calc(var(--sidebar-width, 280px) + 20px);
+  right: calc(var(--sidebar-width, 280px) + 12px);
   z-index: 9990;
-  width: 56px;
-  height: 56px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   border: 2px solid rgba(255, 255, 255, 0.22);
   border-radius: 50%;
@@ -56,9 +56,9 @@
 
 .mk-scroll-progress-ring {
   position: absolute;
-  inset: 3px;
-  width: calc(100% - 6px);
-  height: calc(100% - 6px);
+  inset: 2px;
+  width: calc(100% - 4px);
+  height: calc(100% - 4px);
   transform: rotate(-90deg);
   pointer-events: none;
 }
@@ -66,13 +66,13 @@
 .mk-scroll-progress-track {
   fill: none;
   stroke: rgba(255, 255, 255, 0.28);
-  stroke-width: 3.4;
+  stroke-width: 3;
 }
 
 .mk-scroll-progress-fill {
   fill: none;
   stroke: #ffffff;
-  stroke-width: 3.4;
+  stroke-width: 3;
   stroke-linecap: round;
   transition: stroke-dashoffset 0.08s linear;
 }
@@ -81,7 +81,7 @@
   position: relative;
   z-index: 1;
   font-family: "Cairo", system-ui, -apple-system, sans-serif;
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.02em;
@@ -91,23 +91,23 @@
   unicode-bidi: isolate;
 }
 
-/* When desktop sidebar is collapsed, glide cleanly to the right corner of the screen */
+/* Aligns vertically with collapsed .mk-sidebar-toggle (inset-inline-start: 12px) */
 body.mk-sidebar-collapsed .mk-scroll-progress {
-  right: 20px;
+  right: 12px;
 }
 
-/* On mobile/tablet where sidebar is an off-canvas drawer, sit in the bottom-right corner */
+/* On mobile/tablet where sidebar is a drawer, align with .mk-a11y-fab (bottom: 14px) */
 @media (max-width: 900px) {
   .mk-scroll-progress,
   body.mk-sidebar-collapsed .mk-scroll-progress {
     right: 14px;
-    bottom: 16px;
-    width: 50px;
-    height: 50px;
+    bottom: 14px;
+    width: 44px;
+    height: 44px;
   }
 
   .mk-scroll-progress-label {
-    font-size: 12px;
+    font-size: 11px;
   }
 }
 
