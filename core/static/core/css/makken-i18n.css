@@ -1,4 +1,4 @@
-/* Makken Arabic / English Language Switcher + Full LTR Mirroring (CSP-safe) */
+/* Makken Arabic / English Language Switcher + Complete Site-Wide LTR Mirroring (CSP-safe) */
 
 .topbar-actions {
   display: inline-flex;
@@ -83,7 +83,7 @@
 }
 
 /* ==========================================================================
-   LTR Layout Mirroring (activates ONLY when <html dir="ltr" lang="en">)
+   Complete Site-Wide LTR Mirroring (activates ONLY when <html dir="ltr">)
    ========================================================================== */
 
 html[dir="ltr"] body {
@@ -91,7 +91,22 @@ html[dir="ltr"] body {
   text-align: left;
 }
 
-/* Flip sidebar collapse chevron so it points left (collapse) and right (expand) */
+/* 1. Shell, Skip Link, Sidebar Toggle & Mobile Drawer */
+html[dir="ltr"] .skip-link {
+  right: auto;
+  left: 20px;
+}
+
+html[dir="ltr"] .drawer-close {
+  left: auto;
+  right: 12px;
+}
+
+html[dir="ltr"] .visual-caption {
+  left: auto;
+  right: 28px;
+}
+
 html[dir="ltr"] .mk-sidebar-toggle svg {
   transform: rotate(180deg);
 }
@@ -100,9 +115,130 @@ html[dir="ltr"] body.mk-sidebar-collapsed .mk-sidebar-toggle svg {
   transform: rotate(0deg);
 }
 
-/* Tables & cards default left alignment in LTR */
+html[dir="ltr"] .sidebar,
+html[dir="ltr"] .sidebar-navigation,
+html[dir="ltr"] .nav-link,
+html[dir="ltr"] .nav-management-toggle {
+  text-align: left;
+}
+
+/* 2. Home Landing Hero (flip text left + decorative circles right) */
+html[dir="ltr"] .mk-hero-inner {
+  text-align: left;
+}
+
+html[dir="ltr"] .mk-hero-circle.c-navy {
+  left: auto;
+  right: 58px;
+}
+
+html[dir="ltr"] .mk-hero-circle.c-teal {
+  left: auto;
+  right: 56px;
+}
+
+html[dir="ltr"] .mk-hero-circle.c-gold {
+  left: auto;
+  right: 292px;
+}
+
+html[dir="ltr"] .mk-hero-circle.c-sky {
+  left: auto;
+  right: 204px;
+}
+
+@media (max-width: 900px) {
+  html[dir="ltr"] .mk-hero-circle.c-navy {
+    left: auto;
+    right: 24px;
+  }
+  html[dir="ltr"] .mk-hero-circle.c-teal {
+    left: auto;
+    right: 24px;
+  }
+  html[dir="ltr"] .mk-hero-circle.c-gold {
+    left: auto;
+    right: 190px;
+  }
+  html[dir="ltr"] .mk-hero-circle.c-sky {
+    left: auto;
+    right: 130px;
+  }
+}
+
+/* 3. Accessibility Floating Circle Button & Drawer (move from left to right in EN) */
+html[dir="ltr"] .mk-a11y-fab {
+  left: auto;
+  right: 20px;
+}
+
+html[dir="ltr"] .mk-a11y-fab-badge {
+  right: auto;
+  left: -3px;
+}
+
+html[dir="ltr"] .mk-a11y-drawer {
+  left: auto;
+  right: 0;
+  direction: ltr;
+  border-right: 0;
+  border-left: 1px solid #d7e3e8;
+}
+
+html[dir="ltr"] .mk-a11y-section-toggle,
+html[dir="ltr"] .mk-a11y-profile-btn,
+html[dir="ltr"] .mk-a11y-help-box {
+  text-align: left;
+}
+
+@media (max-width: 640px) {
+  html[dir="ltr"] .mk-a11y-fab {
+    left: auto;
+    right: 14px;
+  }
+}
+
+/* 4. Login Page LTR Mirroring */
+html[dir="ltr"] .form-panel,
+html[dir="ltr"] .visual-panel {
+  direction: ltr;
+  text-align: left;
+}
+
+html[dir="ltr"] .input-wrap input {
+  padding-right: 14px;
+  padding-left: 43px;
+}
+
+html[dir="ltr"] .input-wrap .input-icon {
+  right: auto;
+  left: 14px;
+}
+
+/* 5. Profile Page (password eye toggle, country code, selects) */
+html[dir="ltr"] .profile-password-control input {
+  padding-left: 14px !important;
+  padding-right: 48px !important;
+}
+
+html[dir="ltr"] .profile-password-toggle {
+  left: auto;
+  right: 3px;
+}
+
+html[dir="ltr"] .profile-country-control {
+  direction: ltr;
+}
+
+/* 6. Tables, Headers, Cells & Row Actions Popover */
+html[dir="ltr"] .main-content table,
 html[dir="ltr"] .main-content table th,
-html[dir="ltr"] .main-content table td {
+html[dir="ltr"] .main-content table td,
+html[dir="ltr"] .states-table,
+html[dir="ltr"] .entities-table th,
+html[dir="ltr"] .entities-table td,
+html[dir="ltr"] .fx-table th,
+html[dir="ltr"] .inquiry-progress-value {
   text-align: left;
 }
 
@@ -112,7 +248,6 @@ html[dir="ltr"] .main-content table td.mk-actions-cell {
   text-align: center;
 }
 
-/* Row actions dropdown & mobile bottom sheet in LTR */
 html[dir="ltr"] .mk-actions-dropdown {
   direction: ltr;
   text-align: left;
@@ -123,27 +258,102 @@ html[dir="ltr"] .mk-actions-dropdown button {
   text-align: left;
 }
 
-/* Custom dropdowns in LTR */
+/* 7. Custom Dropdowns, Search Selects & Native <select> Chevrons */
 html[dir="ltr"] .mk-dd-trigger,
 html[dir="ltr"] .mk-dd-panel,
-html[dir="ltr"] .mk-dd-option {
+html[dir="ltr"] .mk-dd-option,
+html[dir="ltr"] .mk-ss-trigger,
+html[dir="ltr"] .mk-ss-opt,
+html[dir="ltr"] .fx-kpi-opt {
   direction: ltr;
   text-align: left;
 }
 
-/* Form controls, dialogs & labels in LTR */
+html[dir="ltr"] .ac-workspace .search-select-trigger:after {
+  left: auto;
+  right: 14px;
+}
+
+html[dir="ltr"] select:not([multiple]),
+html[dir="ltr"] .search-select-trigger,
+html[dir="ltr"] .market-select-trigger {
+  padding-left: 13px !important;
+  padding-right: 40px !important;
+  background-position: right 13px center !important;
+  text-align: left;
+}
+
+html[dir="ltr"] .mk-cp-team-row select {
+  padding-left: 10px !important;
+  padding-right: 34px !important;
+}
+
+/* 8. Form Controls, Multi-Search, Money Inputs, Dialogs & Exports */
 html[dir="ltr"] input,
 html[dir="ltr"] select,
 html[dir="ltr"] textarea,
 html[dir="ltr"] label,
-html[dir="ltr"] dialog {
+html[dir="ltr"] dialog,
+html[dir="ltr"] .provider-grid input,
+html[dir="ltr"] .provider-grid input::placeholder {
   text-align: left;
 }
 
-/* Sidebar navigation links in LTR */
-html[dir="ltr"] .sidebar,
-html[dir="ltr"] .sidebar-navigation,
-html[dir="ltr"] .nav-link,
-html[dir="ltr"] .nav-management-toggle {
+html[dir="ltr"] .multi-search svg {
+  right: auto;
+  left: 23px;
+}
+
+html[dir="ltr"] .multi-search input {
+  padding-right: 13px;
+  padding-left: 39px;
+}
+
+html[dir="ltr"] .market-money-input img,
+html[dir="ltr"] .provider-grid .market-money-input img {
+  right: auto;
+  left: 13px;
+}
+
+html[dir="ltr"] .market-money-input input {
+  padding-right: 13px !important;
+  padding-left: 40px !important;
+}
+
+html[dir="ltr"] .dependency-dialog,
+html[dir="ltr"] .mk-export-tools,
+html[dir="ltr"] .mk-export-dialog,
+html[dir="ltr"] .mk-values-dialog,
+html[dir="ltr"] .mk-values-search,
+html[dir="ltr"] .ac-audit-values pre,
+html[dir="ltr"] .financial-money-control,
+html[dir="ltr"] .country-control .search-select {
+  direction: ltr;
   text-align: left;
+}
+
+html[dir="ltr"] .mk-values-search::placeholder {
+  text-align: left;
+}
+
+/* 9. Partnership Follow-up Modal Clause Status Accent Border */
+html[dir="ltr"] .mk-cp-row {
+  border-right: 1px solid #d5e2ea !important;
+  border-left: 4px solid #005b85 !important;
+}
+
+html[dir="ltr"] .mk-cp-row.is-done {
+  border-left-color: #0f766e !important;
+}
+
+html[dir="ltr"] .mk-cp-row.is-progress {
+  border-left-color: #005b85 !important;
+}
+
+html[dir="ltr"] .mk-cp-row.is-zero {
+  border-left-color: #94a3b8 !important;
+}
+
+html[dir="ltr"] .mk-cp-row .mk-cp-input-wrap {
+  direction: ltr !important;
 }

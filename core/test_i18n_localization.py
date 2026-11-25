@@ -309,3 +309,70 @@ class LanguageSwitcherEndToEndTests(TestCase):
                 self.assertContains(res, '<html lang="en" dir="ltr">')
                 self.assertContains(res, "data-lang-switcher")
                 self.assertContains(res, "Sign Out")
+
+
+class LtrDesignMirroringTests(SimpleTestCase):
+    """Verifies every site-wide LTR layout flip (Home hero, Accessibility FAB/drawer, Login, Profile, Selects, Modals)."""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.css = (Path(settings.BASE_DIR) / "core" / "static" / "core" / "css" / "makken-i18n.css").read_text(encoding="utf-8")
+
+    def test_accessibility_fab_and_drawer_flip_to_right_in_english_ltr(self):
+        self.assertIn('html[dir="ltr"] .mk-a11y-fab {', self.css)
+        self.assertIn("right: 20px;", self.css)
+        self.assertIn('html[dir="ltr"] .mk-a11y-fab-badge {', self.css)
+        self.assertIn("left: -3px;", self.css)
+        self.assertIn('html[dir="ltr"] .mk-a11y-drawer {', self.css)
+        self.assertIn("right: 0;", self.css)
+        self.assertIn("border-left: 1px solid #d7e3e8;", self.css)
+        self.assertIn("right: 14px;", self.css)
+
+    def test_home_landing_hero_text_and_decorative_circles_flip_in_ltr(self):
+        self.assertIn('html[dir="ltr"] .mk-hero-inner {', self.css)
+        self.assertIn('html[dir="ltr"] .mk-hero-circle.c-navy {', self.css)
+        self.assertIn('html[dir="ltr"] .mk-hero-circle.c-teal {', self.css)
+        self.assertIn('html[dir="ltr"] .mk-hero-circle.c-gold {', self.css)
+        self.assertIn('html[dir="ltr"] .mk-hero-circle.c-sky {', self.css)
+        self.assertIn("right: 58px;", self.css)
+        self.assertIn("right: 292px;", self.css)
+        self.assertEqual(translate_ui_text("من الشراكة إلى الأثر"), "From Partnership to Impact")
+        self.assertEqual(translate_ui_text("التنفيذ والمتابعة"), "Execution & Follow-up")
+
+    def test_accessibility_drawer_labels_are_fully_translated(self):
+        for ar, en in {
+            "إعدادات إمكانية الوصول": "Accessibility Settings",
+            "إمكانية الوصول (Alt+A)": "Accessibility (Alt+A)",
+            "إعادة تعيين الإعدادات": "Reset Settings",
+            "ملفات تعريف إمكانية الوصول": "Accessibility Profiles",
+            "ضعف البصر": "Vision Impaired",
+            "تباين داكن": "Dark Contrast",
+            "دليل القراءة": "Reading Guide",
+            "قناع القراءة": "Reading Mask",
+            "مؤشر أسود كبير": "Large Black Cursor",
+        }.items():
+            with self.subTest(ar=ar):
+                self.assertEqual(translate_ui_text(ar), en)
+
+    def test_login_profile_selects_dialogs_and_followup_mirror_cleanly_in_ltr(self):
+        required_rules = [
+            'html[dir="ltr"] .skip-link',
+            'html[dir="ltr"] .drawer-close',
+            'html[dir="ltr"] .mk-sidebar-toggle svg',
+            'html[dir="ltr"] .form-panel',
+            'html[dir="ltr"] .profile-password-toggle',
+            'html[dir="ltr"] .profile-country-control',
+            'html[dir="ltr"] .mk-actions-dropdown',
+            'html[dir="ltr"] .mk-ss-trigger',
+            'html[dir="ltr"] select:not([multiple])',
+            'html[dir="ltr"] .multi-search svg',
+            'html[dir="ltr"] .market-money-input img',
+            'html[dir="ltr"] .mk-export-tools',
+            'html[dir="ltr"] .mk-values-dialog',
+            'html[dir="ltr"] .mk-cp-row',
+        ]
+        for rule in required_rules:
+            with self.subTest(rule=rule):
+                self.assertIn(rule, self.css)
+        self.assertEqual(self.css.count("{"), self.css.count("}"))
