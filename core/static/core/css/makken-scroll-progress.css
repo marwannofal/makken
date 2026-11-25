@@ -190,3 +190,18 @@ body.mk-sidebar-collapsed .mk-scroll-progress .mk-scroll-progress-label {
     display: none !important;
   }
 }
+
+/* Make breathing room for the melting scroll-progress circle beside Logout */
+.desktop-sidebar .logout-button {
+  transition: width 0.22s cubic-bezier(0.22, 1, 0.36, 1), background 0.16s, border-color 0.16s;
+}
+
+body.mk-scroll-progress-visible:not(.mk-sidebar-collapsed) .desktop-sidebar .logout-button {
+  width: calc(100% - 22px);
+}
+
+@media (max-width: 900px) {
+  body.mk-scroll-progress-visible:not(.mk-sidebar-collapsed) .desktop-sidebar .logout-button {
+    width: 100%;
+  }
+}

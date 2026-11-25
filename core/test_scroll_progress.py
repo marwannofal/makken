@@ -53,6 +53,8 @@ class ScrollProgressStaticAssetTests(SimpleTestCase):
         self.assertIn("opacity: 0;", self.css)
         self.assertIn(".mk-scroll-progress.is-visible {", self.css)
         self.assertIn("opacity: 1;", self.css)
+        self.assertIn("body.mk-scroll-progress-visible:not(.mk-sidebar-collapsed) .desktop-sidebar .logout-button", self.css)
+        self.assertIn("mk-scroll-progress-visible", self.js)
         self.assertIn("@media (prefers-reduced-motion: reduce)", self.css)
         self.assertIn("@media print", self.css)
 

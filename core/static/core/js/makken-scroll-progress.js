@@ -84,6 +84,7 @@
       rafId = 0;
       var state = computePercent();
       btn.classList.toggle("is-visible", state.visible);
+      document.body.classList.toggle("mk-scroll-progress-visible", state.visible);
       btn.setAttribute("aria-hidden", state.visible ? "false" : "true");
       btn.tabIndex = state.visible ? 0 : -1;
 
