@@ -442,3 +442,24 @@
     grid-template-columns: 120px minmax(0, 1fr);
   }
 }
+
+/* Match enhanced country dropdown (.mk-ss-trigger) height exactly to phone input (54px) */
+.mk-prof-phone-row {
+  align-items: stretch;
+}
+
+.mk-prof-phone-row .mk-ss-wrap {
+  width: 100%;
+  height: 54px;
+}
+
+.mk-prof-phone-row .mk-ss-trigger,
+.mk-prof-phone-row select,
+.mk-prof-phone-row input {
+  height: 54px;
+  min-height: 54px;
+  border-radius: 13px;
+  border: 1.5px solid #cbdbe3;
+  font-size: 15px;
+  font-weight: 700;
+}
