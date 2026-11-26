@@ -256,7 +256,7 @@ class FollowupForm(forms.Form):
             amount = data.get("amount")
             percent = data.get("support_percent")
             if percent is not None and self.need is not None:
-                calculated = (self.need.total_cost * percent / 100).quantize(Decimal(".01"), rounding=ROUND_HALF_UP)
+                calculated = (self.need.remaining * percent / 100).quantize(Decimal(".01"), rounding=ROUND_HALF_UP)
                 if calculated <= 0:
                     self.add_error("support_percent", "النسبة صغيرة جدًا؛ يجب أن تعادل المساهمة هللة واحدة على الأقل.")
                 elif amount is not None and amount != calculated:

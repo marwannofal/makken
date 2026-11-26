@@ -15,24 +15,18 @@
       {% endif %}
     </div>
     <div class="market-dialog-fields">
+      <p class="market-help market-funding-top-summary" data-funding-summary{% if operation != 'approve' and operation != 'allocate' %} hidden{% endif %}>قيمة الدعم الكلي المطلوب:
+        {% include 'market_needs/_money.html' with value=need.requested_support %}
+        · المبلغ المتبقي:
+        {% include 'market_needs/_money.html' with value=need.remaining %}
+        · المستوى: <strong data-level-preview>—</strong></p>
       {% include 'market_needs/_field.html' with field=followup_form.notes %}
       <div data-approval-fields{% if operation != 'approve' and operation != 'allocate' %} hidden{% endif %}>
-        <div class="market-care-mode-bar" data-care-mode-bar{% if operation != 'approve' %} hidden{% endif %}>
-          <span class="market-care-mode-title">نوع الرعاية المتوقع:</span>
-          <label class="market-care-radio"><input type="radio" name="care_mode_ui" value="individual" data-care-mode="individual"><span>فردي (100% — راعٍ واحد)</span></label>
-          <label class="market-care-radio"><input type="radio" name="care_mode_ui" value="alliance" data-care-mode="alliance"><span>تحالف (تقسيم النسبة على عدة جهات)</span></label>
-        </div>
         <div class="partnership-form-grid">
           <div data-percent-wrap>{% include 'market_needs/_field.html' with field=followup_form.support_percent %}</div>
           {% include 'market_needs/_field.html' with field=followup_form.amount %}
         </div>
-        <p class="field-help">قيمة نسبة الدعم في الرعاية = نسبة الدعم × إجمالي تكلفة الحاجة، مع التقريب لأقرب هللة. يُراجع الخادم الحساب والمبلغ المتبقي عند الحفظ.</p> <p class="market-help">قيمة الدعم الكلي المطلوب:
-        {% include 'market_needs/_money.html' with value=need.requested_support %}
-        · إجمالي تكلفة الحاجة (أساس النسبة):
-        {% include 'market_needs/_money.html' with value=need.total_cost %}
-        · المبلغ المتبقي:
-        {% include 'market_needs/_money.html' with value=need.remaining %}
-        · المستوى المتوقع: <strong data-level-preview>—</strong></p>
+        <p class="field-help">قيمة نسبة الدعم في الرعاية = نسبة الدعم × المبلغ المتبقي، مع التقريب لأقرب هللة. يُراجع الخادم الحساب والمبلغ المتبقي عند الحفظ.</p>
         <div class="partnership-field market-upload-field" data-evidence-fields{% if operation == 'allocate' %} hidden{% endif %}>
           <label for="id_attachments">المرفقات الداعمة <span class="required-mark" aria-hidden="true">*</span></label>
           <div class="market-upload-picker">

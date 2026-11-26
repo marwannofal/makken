@@ -95,8 +95,8 @@ class FundingDetailsTests(MarketFixtures, TestCase):
         need = self.create_need(); first = self.attach(need, self.organization()); second = self.attach(need, self.organization("جهة ثانية"))
         self.submit(need, first, self.allocation_data(need, ["50"], support_percent="50"))
         with self.assertRaises(services.InvalidForm):
-            self.submit(need, second, self.allocation_data(need, ["20"], support_percent="20"))
-        self.submit(need, second, self.allocation_data(need, ["10", "10"], support_percent="20"))
+            self.submit(need, second, self.allocation_data(need, ["20"], support_percent="40"))
+        self.submit(need, second, self.allocation_data(need, ["10", "10"], support_percent="40"))
         need.refresh_from_db(); self.assertEqual(need.approved_support, 70)
         self.assertEqual([x.approved_amount for x in expense_funding(need)], [Decimal("60"), Decimal("10")])
 
@@ -218,6 +218,29 @@ class FundingDetailsTests(MarketFixtures, TestCase):
         self.assertEqual(res2.status_code, 200)
         self.assertContains(res2, org_care.name)
         self.assertNotContains(res2, org_cap.name)
+
+
+    def test_remaining_based_percentage_and_simplified_approval_popup(self):
+        need = self.create_need()
+        first = self.attach(need, self.organization("جهة أولى"))
+        second = self.attach(need, self.organization("جهة ثانية"))
+        self.submit(need, first, {"support_percent": "80"})
+        need.refresh_from_db()
+        self.assertEqual(need.remaining, Decimal("20.00"))
+        res = self.client.get(f'/market-needs/{need.pk}/sponsors/', {'record': second.pk, 'operation': 'approve'})
+        self.assertEqual(res.status_code, 200)
+        html = res.content.decode()
+        self.assertNotIn('market-care-mode-bar', html)
+        self.assertNotIn('إجمالي تكلفة الحاجة (أساس النسبة)', html)
+        self.assertNotIn('المستوى المتوقع', html)
+        self.assertIn('المستوى:', html)
+        self.assertLess(html.index('data-funding-summary'), html.index('id="id_notes"'))
+        self.submit(need, second, {"support_percent": "100"})
+        second.refresh_from_db(); need.refresh_from_db()
+        self.assertEqual(second.amount, Decimal("20.00"))
+        self.assertEqual(second.level.funding_key, "bronze")
+        self.assertEqual(need.approved_support, Decimal("100.00"))
+        self.assertEqual(need.arrangement_key, "alliance")
 
 
 class FundingMigrationTests(MarketFixtures, TransactionTestCase):
