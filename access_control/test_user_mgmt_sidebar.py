@@ -28,8 +28,6 @@ class UserManagementSidebarAndHiddenLogsTests(TestCase):
         for label in [
             "<span>المستخدمون</span>",
             "<span>الأدوار</span>",
-            "<span>الصلاحيات</span>",
-            "<span>صلاحيات الصفحات</span>",
             "<span>إشعارات البريد</span>",
             "<span>نشاط المستخدمين</span>",
             "<span>إدارات الهيكل التنظيمي</span>",
@@ -43,6 +41,8 @@ class UserManagementSidebarAndHiddenLogsTests(TestCase):
         # Old duplicate footer links removed
         self.assertNotContains(res, "<span>المستخدمون والصلاحيات</span>")
         self.assertNotContains(res, "<span>سجل نشاط المستخدمين</span>")
+        self.assertNotContains(res, "<span>الصلاحيات</span>")
+        self.assertNotContains(res, "<span>صلاحيات الصفحات</span>")
 
     def test_access_control_logs_page_is_completely_hidden_404(self):
         self.client.force_login(self.admin)
