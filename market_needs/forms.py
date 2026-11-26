@@ -282,10 +282,10 @@ class FollowupForm(forms.Form):
                 (self.data.get(line.allocation_field_name) or "").strip() != ""
                 for line in self.allocation_lines
             )
-            if self.operation == "approve" and not has_manual_alloc and amount is not None and amount > 0 and not self.errors:
+            if self.operation in {"approve", "allocate"} and not has_manual_alloc and amount is not None and amount > 0 and not self.errors:
                 allocations = _auto_allocate_lines(self.allocation_lines, amount, self.allowed_shapes)
             if not allocations or sum((value for _, value in allocations), Decimal("0")) != amount:
-                if self.operation == "approve" and not has_manual_alloc:
+                if self.operation in {"approve", "allocate"} and not has_manual_alloc:
                     self.add_error(None, "المبلغ المطلوب اعتماده يتجاوز المتبقي المتاح في بنود الصرف.")
                 else:
                     self.add_error(None, "وزّع مبلغ المساهمة كاملًا على بنود الصرف؛ يجب أن يساوي مجموع التوزيع مبلغ الدعم تمامًا.")

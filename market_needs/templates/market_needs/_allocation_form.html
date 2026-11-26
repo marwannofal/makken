@@ -1,6 +1,6 @@
 {% load access_tags %}
 {# MAKKEN ACCESS UI v1 #}
-<section class="market-allocation-section" data-allocation-fields{% if operation != 'allocate' %} hidden{% endif %}>
+<section class="market-allocation-section" data-allocation-fields hidden>
   <h3>توزيع الدعم الفعلي على بنود الصرف</h3> <p class="muted">أدخل حصة كل بند من هذه المساهمة. اترك البنود غير المشمولة فارغة. البنود التي لا يغطيها شكل رعاية الجهة تكون غير متاحة عند الاعتماد. يجب أن يساوي مجموع التوزيع مبلغ المساهمة، وألا يتجاوز المتبقي لأي بند.</p>
   <div class="field-error" role="alert" id="error-__all__">
     {{ followup_form.non_field_errors }}
