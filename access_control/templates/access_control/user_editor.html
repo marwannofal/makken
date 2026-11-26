@@ -76,8 +76,7 @@
     <div class="ac-save">
       <button class="button button-primary" type="submit">حفظ الحساب والصلاحيات</button><a class="button button-secondary" href="{% url 'access_control:index' %}">إلغاء</a>
       {% if target_user %}
-        <a class="button button-secondary" href="{% url 'access_control:logs' %}?user={{ target_user.pk }}">سجل تغييرات المستخدم</a>
-      {% endif %}
+{% endif %}
     </div>
   </form>
   {% if target_user %}

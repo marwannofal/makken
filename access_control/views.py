@@ -1,3 +1,4 @@
+from django.http import Http404
 import json
 import uuid
 from django.contrib import messages
@@ -218,16 +219,7 @@ def role_action(request,pk,operation):
 @superuser_view
 @require_GET
 def logs(request):
-    context=base(request,'logs');q=request.GET.get('q','').strip()[:200];action=request.GET.get('action','');target=request.GET.get('user','');actor=request.GET.get('actor','')
-    events=SecurityAudit.objects.select_related('actor','target_user','target_role')
-    if q:events=events.filter(Q(actor_name__icontains=q)|Q(target_name__icontains=q)|Q(action__icontains=q))
-    if action:events=events.filter(action=action)
-    if numeric_id(target) is not None:events=events.filter(target_user_id=numeric_id(target))
-    if numeric_id(actor) is not None:events=events.filter(actor_id=numeric_id(actor))
-    page=Paginator(events, resolve_page_size(request, 20)).get_page(request.GET.get('page'))
-    context.update(page_obj=page,q=q,selected_action=action,actions=SecurityAudit.objects.order_by('action').values_list('action',flat=True).distinct(),target_filter=target,actor_filter=actor)
-    return finish(request,'logs.html',context)
-
+    raise Http404("الصفحة غير متاحة.")
 
 @require_GET
 def landing(request):

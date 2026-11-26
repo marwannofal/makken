@@ -1,0 +1,50 @@
+{% load access_tags %}
+{% access_can 'user_activity' 'view' as show_user_activity %}
+{% access_can 'departments' 'view' as show_departments %}
+{% if request.user.is_superuser or show_user_activity or show_departments %}
+  {% with is_um_active=False %}
+  <details class="nav-management{% if active_page == 'access_control' or active_page == 'user_activity' or active_page == 'departments' or access_tab == 'users' or access_tab == 'roles' or access_tab == 'permissions' or access_tab == 'pages' or access_tab == 'mail' or access_tab == 'activity' or access_tab == 'departments' %} has-active-page{% endif %}" data-management-group data-user-management-group{% if active_page == 'access_control' or active_page == 'user_activity' or active_page == 'departments' or access_tab == 'users' or access_tab == 'roles' or access_tab == 'permissions' or access_tab == 'pages' or access_tab == 'mail' or access_tab == 'activity' or access_tab == 'departments' %} open{% endif %}>
+    <summary class="nav-management-toggle">
+      <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3 3 7v5c0 5 9 9 9 9s9-4 9-9V7Z"/><path d="m8 12 3 3 5-6"/></svg>
+      <span>إدارة المستخدمين</span>
+      <svg class="management-chevron" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+    </summary>
+    <div class="nav-management-links">
+      {% if request.user.is_superuser %}
+        <a class="nav-link{% if access_tab == 'users' %} is-active{% endif %}" href="{% url 'access_control:index' %}"{% if access_tab == 'users' %} aria-current="page"{% endif %}>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>المستخدمون</span><span class="nav-dot" aria-hidden="true"></span>
+        </a>
+        <a class="nav-link{% if access_tab == 'roles' %} is-active{% endif %}" href="{% url 'access_control:roles' %}"{% if access_tab == 'roles' %} aria-current="page"{% endif %}>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3 4 7v6c0 5 8 8 8 8s8-3 8-8V7Z"/><path d="M9 12h6"/></svg>
+          <span>الأدوار</span><span class="nav-dot" aria-hidden="true"></span>
+        </a>
+        <a class="nav-link{% if access_tab == 'permissions' %} is-active{% endif %}" href="{% url 'access_control:index' %}?tab=permissions"{% if access_tab == 'permissions' %} aria-current="page"{% endif %}>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          <span>الصلاحيات</span><span class="nav-dot" aria-hidden="true"></span>
+        </a>
+        <a class="nav-link{% if access_tab == 'pages' %} is-active{% endif %}" href="{% url 'access_control:index' %}?tab=pages"{% if access_tab == 'pages' %} aria-current="page"{% endif %}>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 5h16v14H4ZM4 10h16M9 10v9"/></svg>
+          <span>صلاحيات الصفحات</span><span class="nav-dot" aria-hidden="true"></span>
+        </a>
+        <a class="nav-link{% if access_tab == 'mail' %} is-active{% endif %}" href="{% url 'makken_mail:index' %}"{% if access_tab == 'mail' %} aria-current="page"{% endif %}>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+          <span>إشعارات البريد</span><span class="nav-dot" aria-hidden="true"></span>
+        </a>
+      {% endif %}
+      {% if show_user_activity %}
+        <a class="nav-link{% if access_tab == 'activity' or active_page == 'user_activity' %} is-active{% endif %}" href="{% url 'access_control:activity' %}"{% if access_tab == 'activity' or active_page == 'user_activity' %} aria-current="page"{% endif %}>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 5H5v16h14V5h-4M9 3h6v4H9ZM8 11h8m-8 4h5"/></svg>
+          <span>نشاط المستخدمين</span><span class="nav-dot" aria-hidden="true"></span>
+        </a>
+      {% endif %}
+      {% if show_departments %}
+        <a class="nav-link{% if access_tab == 'departments' or active_page == 'departments' %} is-active{% endif %}" href="{% url 'accounts:departments' %}"{% if access_tab == 'departments' or active_page == 'departments' %} aria-current="page"{% endif %}>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 10h2m2 0h2M9 14h2m2 0h2"/></svg>
+          <span>إدارات الهيكل التنظيمي</span><span class="nav-dot" aria-hidden="true"></span>
+        </a>
+      {% endif %}
+    </div>
+  </details>
+  {% endwith %}
+{% endif %}
