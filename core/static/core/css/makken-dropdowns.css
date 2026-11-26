@@ -164,7 +164,8 @@
 
 
 /* Global Searchable Dropdowns (.mk-ss-*) — single & multi-select */
-select.mk-ss-native {
+select.mk-ss-native,
+select.native-enhanced {
   position: absolute !important;
   width: 1px !important;
   height: 1px !important;
@@ -174,6 +175,8 @@ select.mk-ss-native {
   clip: rect(0, 0, 0, 0) !important;
   white-space: nowrap !important;
   border: 0 !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
   pointer-events: none !important;
 }
 

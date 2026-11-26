@@ -409,6 +409,68 @@
     bodyObserver.observe(document.body, { childList: true, subtree: true });
   }
 
+
+  function findCustomTriggerForSelect(select) {
+    if (!select || select.tagName !== 'SELECT') return null;
+    const ctrl = enhanced.get(select);
+    if (ctrl && ctrl.trigger) return ctrl.trigger;
+    const wrap = select.closest('.mk-ss-wrap, .search-select, .market-select, .multi-select');
+    if (wrap) {
+      const trig = wrap.querySelector('.mk-ss-trigger, .search-select-trigger, .market-select-trigger');
+      if (trig) return trig;
+    }
+    const parent = select.parentElement;
+    if (parent) {
+      const trig = parent.querySelector(':scope > .mk-ss-wrap > .mk-ss-trigger, :scope > .search-select > .search-select-trigger, :scope > .market-select > .market-select-trigger');
+      if (trig) return trig;
+    }
+    return null;
+  }
+
+  function isEnhancedSelect(el) {
+    if (!el || el.tagName !== 'SELECT') return false;
+    return (
+      el.classList.contains('mk-ss-native') ||
+      el.classList.contains('native-enhanced') ||
+      enhanced.has(el) ||
+      Boolean(findCustomTriggerForSelect(el))
+    );
+  }
+
+  function resolveLabelSelect(label) {
+    if (!label) return null;
+    if (label.control && label.control.tagName === 'SELECT') return label.control;
+    if (label.htmlFor) {
+      const target = document.getElementById(label.htmlFor);
+      if (target && target.tagName === 'SELECT') return target;
+    }
+    return label.querySelector('select');
+  }
+
+  function bindGlobalLabelInterceptor() {
+    if (document.documentElement.dataset.mkSelectLabelGuard) return;
+    document.documentElement.dataset.mkSelectLabelGuard = '1';
+
+    document.addEventListener('click', (e) => {
+      const target = e.target;
+      if (!target || !target.closest) return;
+      if (target.closest('.mk-ss-trigger, .mk-ss-panel, .search-select-trigger, .search-select-panel, .market-select-trigger, .market-select-panel')) return;
+      const label = target.closest('label');
+      if (!label) return;
+      const sel = resolveLabelSelect(label);
+      if (!isEnhancedSelect(sel)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const trigger = findCustomTriggerForSelect(sel);
+      if (trigger && !trigger.disabled) {
+        trigger.focus();
+        trigger.click();
+      }
+    }, true);
+  }
+
+  bindGlobalLabelInterceptor();
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
