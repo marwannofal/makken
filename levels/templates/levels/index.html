@@ -15,7 +15,7 @@
 {% block content %}
   <section class="page-introduction levels-introduction" aria-labelledby="page-heading">
     <div>
-      <p class="eyebrow">الإعدادات</p><h1 id="page-heading">المستوى</h1><p class="page-description">إدارة المستويات وحالة تفعيلها في مكان واحد.</p>
+      <p class="eyebrow">الإعدادات</p><h1 id="page-heading">مستويات الشراكة</h1><p class="page-description">إدارة المستويات وحالة تفعيلها في مكان واحد.</p>
     </div>
     {% allowed 'levels' 'create' %}
       <a href="?{% if settings_filter_query %}{{ settings_filter_query }}&amp;{% endif %}edit=new" class="button button-primary add-level" data-add-level data-snapshot="{{ add_snapshot }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>إضافة مستوى</a>

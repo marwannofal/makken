@@ -13,7 +13,7 @@
       {% if request.user.is_superuser %}
         <a class="nav-link{% if access_tab == 'users' or access_tab == 'permissions' or access_tab == 'pages' %} is-active{% endif %}" href="{% url 'access_control:index' %}"{% if access_tab == 'users' %} aria-current="page"{% endif %}>
           <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          <span>المستخدمون</span><span class="nav-dot" aria-hidden="true"></span>
+          <span>المستخدمين</span><span class="nav-dot" aria-hidden="true"></span>
         </a>
         <a class="nav-link{% if access_tab == 'roles' %} is-active{% endif %}" href="{% url 'access_control:roles' %}"{% if access_tab == 'roles' %} aria-current="page"{% endif %}>
           <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3 4 7v6c0 5 8 8 8 8s8-3 8-8V7Z"/><path d="M9 12h6"/></svg>
