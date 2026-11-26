@@ -1575,3 +1575,227 @@ details.market-card-fold[open] .market-fold-closed-label {
     justify-content: center;
   }
 }
+
+/* Bigger, modern KPI summary cards on /market-needs/<pk>/sponsors/ */
+.market-summary {
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.market-summary > div {
+  padding: 22px 20px;
+  border-radius: 16px;
+  border: 1px solid #cce2ee;
+  background: #f5fafe;
+  box-shadow: 0 2px 8px rgba(0, 59, 92, 0.04);
+}
+
+.market-summary > div > span {
+  font-size: 15.5px;
+  font-weight: 800;
+  color: #004769;
+  margin-bottom: 12px;
+}
+
+.market-summary strong {
+  font-size: clamp(22px, 2vw, 30px);
+  font-weight: 800;
+  color: #003954;
+  line-height: 1.3;
+}
+
+.market-summary .market-money img {
+  width: 22px;
+  height: 22px;
+}
+
+.market-summary progress {
+  margin-top: 12px;
+  height: 10px;
+  border-radius: 999px;
+}
+
+/* Bigger, simple, modern sponsorship approval pop-up (#market-followup-dialog) */
+#market-followup-dialog.market-funding-dialog {
+  width: min(860px, calc(100vw - 28px));
+  max-width: 860px;
+  border-radius: 24px;
+  box-shadow: 0 26px 64px rgba(0, 41, 66, 0.24);
+}
+
+#market-followup-dialog .dialog-body {
+  padding: 32px 34px;
+  gap: 18px;
+}
+
+#market-followup-dialog .dialog-top .icon-button {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+}
+
+#market-followup-dialog .eyebrow {
+  font-size: 14px;
+  font-weight: 700;
+  color: #005b85;
+  margin-bottom: 2px;
+}
+
+#market-followup-dialog #followup-dialog-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: #003b5c;
+  margin: 0;
+}
+
+#market-followup-dialog .confirm-name {
+  font-size: 18px;
+  font-weight: 800;
+  color: #003954;
+  background: #eff7fb;
+  border: 1px solid #cce2ee;
+  border-radius: 14px;
+  padding: 14px 18px;
+  margin: 0;
+}
+
+.market-funding-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 4px;
+}
+
+.market-funding-kpis[hidden] {
+  display: none !important;
+}
+
+.market-funding-kpi {
+  background: #f8fbfd;
+  border: 1px solid #d4e4ed;
+  border-radius: 16px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.market-funding-kpi.is-accent {
+  background: #ebf5fa;
+  border-color: #9ec8dd;
+}
+
+.market-funding-kpi-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #355868;
+}
+
+.market-funding-kpi-val {
+  font-size: 22px;
+  font-weight: 800;
+  color: #003954;
+  line-height: 1.3;
+}
+
+.market-funding-kpi-val .market-money img {
+  width: 19px;
+  height: 19px;
+}
+
+#market-followup-dialog .market-dialog-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+#market-followup-dialog .partnership-field > label {
+  font-size: 16px;
+  font-weight: 800;
+  color: #003954;
+  margin-bottom: 8px;
+}
+
+#market-followup-dialog input[type="text"],
+#market-followup-dialog textarea {
+  font-size: 16.5px;
+  border-radius: 14px;
+  border: 1.5px solid #c4d7e1;
+  padding: 13px 16px;
+  color: #0f2b3a;
+}
+
+#market-followup-dialog input[type="text"] {
+  min-height: 54px;
+}
+
+#market-followup-dialog textarea {
+  min-height: 108px;
+}
+
+#market-followup-dialog input[type="text"]:focus,
+#market-followup-dialog textarea:focus {
+  border-color: #005b85;
+  box-shadow: 0 0 0 3px rgba(0, 91, 133, 0.14);
+}
+
+#market-followup-dialog .partnership-form-grid {
+  gap: 18px;
+}
+
+#market-followup-dialog .market-upload-picker {
+  min-height: 88px;
+  border-radius: 16px;
+  border: 2px dashed #82b5cc;
+  background: #f5fafe;
+  font-size: 16px;
+  font-weight: 700;
+  color: #004769;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+#market-followup-dialog .market-upload-picker:hover {
+  background: #eaf5fb;
+  border-color: #005b85;
+}
+
+#market-followup-dialog .field-help {
+  font-size: 13.5px;
+  color: #4f6a77;
+  line-height: 1.65;
+}
+
+#market-followup-dialog .dialog-actions {
+  gap: 14px;
+  margin-top: 6px;
+}
+
+#market-followup-dialog .dialog-actions .button {
+  min-height: 54px;
+  font-size: 17px;
+  font-weight: 800;
+  border-radius: 14px;
+}
+
+@media (max-width: 720px) {
+  #market-followup-dialog .dialog-body {
+    padding: 22px 18px;
+  }
+  #market-followup-dialog #followup-dialog-title {
+    font-size: 22px;
+  }
+  .market-funding-kpis {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  #market-followup-dialog .partnership-form-grid {
+    grid-template-columns: 1fr;
+  }
+  #market-followup-dialog .dialog-actions {
+    flex-direction: column;
+  }
+  #market-followup-dialog .dialog-actions .button {
+    width: 100%;
+  }
+}

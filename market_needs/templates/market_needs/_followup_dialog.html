@@ -15,11 +15,20 @@
       {% endif %}
     </div>
     <div class="market-dialog-fields">
-      <p class="market-help market-funding-top-summary" data-funding-summary{% if operation != 'approve' and operation != 'allocate' %} hidden{% endif %}>قيمة الدعم الكلي المطلوب:
-        {% include 'market_needs/_money.html' with value=need.requested_support %}
-        · المبلغ المتبقي:
-        {% include 'market_needs/_money.html' with value=need.remaining %}
-        · المستوى: <strong data-level-preview>—</strong></p>
+      <div class="market-funding-kpis" data-funding-summary{% if operation != 'approve' and operation != 'allocate' %} hidden{% endif %}>
+        <div class="market-funding-kpi">
+          <span class="market-funding-kpi-label">قيمة الدعم الكلي المطلوب</span>
+          <strong class="market-funding-kpi-val">{% include 'market_needs/_money.html' with value=need.requested_support %}</strong>
+        </div>
+        <div class="market-funding-kpi is-accent">
+          <span class="market-funding-kpi-label">المبلغ المتبقي</span>
+          <strong class="market-funding-kpi-val">{% include 'market_needs/_money.html' with value=need.remaining %}</strong>
+        </div>
+        <div class="market-funding-kpi">
+          <span class="market-funding-kpi-label">المستوى:</span>
+          <strong class="market-funding-kpi-val market-funding-level" data-level-preview>—</strong>
+        </div>
+      </div>
       {% include 'market_needs/_field.html' with field=followup_form.notes %}
       <div data-approval-fields{% if operation != 'approve' and operation != 'allocate' %} hidden{% endif %}>
         <div class="partnership-form-grid">
