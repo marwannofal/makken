@@ -62,7 +62,7 @@
         {% user_avatar_url as topbar_avatar_url %}
           <div class="account-menu" data-account-menu>
             <button type="button" class="account-chip account-chip-trigger" aria-expanded="false" aria-haspopup="menu" data-account-menu-trigger>
-              <span class="account-chip-avatar" aria-hidden="true">{% if topbar_avatar_url %}<img src="{{ topbar_avatar_url }}" alt="">{% else %}{{ avatar_initial }}{% endif %}</span>
+              <span class="account-chip-avatar" aria-hidden="true">{{ avatar_initial }}</span>
               <span class="account-chip-name">مرحبًا، <bdi>{{ display_name }}</bdi></span>
               <span class="account-chip-sep" aria-hidden="true">·</span>
               <span class="account-chip-clock" data-makken-clock></span>

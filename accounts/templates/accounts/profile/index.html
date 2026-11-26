@@ -1,25 +1,17 @@
 {% extends 'core/makken_base.html' %}
-{% load static user_avatar %}
+{% load static %}
 {% block title %}الملف الشخصي | مكّن{% endblock %}
 {% block extra_head %}
-  <link rel="stylesheet" href="{% static 'accounts/profile/profile.css' %}?v=20261126-prof2">
-  <script src="{% static 'accounts/profile/profile.js' %}?v=20261126-prof2" defer></script>
+  <link rel="stylesheet" href="{% static 'accounts/profile/profile.css' %}?v=20261126-prof3">
+  <script src="{% static 'accounts/profile/profile.js' %}?v=20261126-prof3" defer></script>
 {% endblock %}
 {% block content %}
-  {% user_avatar_url as current_avatar_url %}
   <div class="mk-prof-shell">
     <section class="page-introduction mk-prof-intro">
       <div>
         <p class="eyebrow">حسابي · الإعدادات الشخصية</p>
         <h1>الملف الشخصي</h1>
-        <p class="page-description">حدّث صورتك الشخصية وبيانات التواصل الأساسية بسهولة.</p>
-      </div>
-      <div class="mk-prof-head-actions">
-        <a class="mk-prof-btn mk-prof-btn-outline" href="{% url 'accounts:profile_password' %}">
-          <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
-          تغيير كلمة المرور
-        </a>
-        <a class="mk-prof-btn mk-prof-btn-ghost" href="{% url 'makken_home' %}">الرئيسية</a>
+        <p class="page-description">حدّث بيانات التواصل الأساسية لحسابك بسهولة.</p>
       </div>
     </section>
 
@@ -28,9 +20,8 @@
         <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01M10.3 3.9 1.8 18.5A2 2 0 0 0 3.5 21.5h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
         <div>
           <strong>تنبيه أمني إلزامي: يجب تغيير كلمة المرور</strong>
-          <p>يرجى الانتقال إلى صفحة تغيير كلمة المرور لتعيين كلمة مرور جديدة لحسابك.</p>
+          <p>يرجى الانتقال إلى صفحة تغيير كلمة المرور من قائمة حسابك لتعيين كلمة مرور جديدة.</p>
         </div>
-        <a class="mk-prof-btn mk-prof-btn-primary" href="{% url 'accounts:profile_password' %}">تغيير كلمة المرور الآن</a>
       </div>
     {% endif %}
 
@@ -47,36 +38,17 @@
       </div>
     {% endif %}
 
-    <form method="post" action="{% url 'accounts:profile' %}" enctype="multipart/form-data" class="mk-prof-card" novalidate>
+    <form method="post" action="{% url 'accounts:profile' %}" class="mk-prof-card" novalidate>
       {% csrf_token %}
       {{ detail_form.snapshot }}
 
       <div class="mk-prof-avatar-section">
-        <div class="mk-prof-avatar-circle" data-avatar-preview-wrap>
-          {% if current_avatar_url %}
-            <img src="{{ current_avatar_url }}" alt="{{ display_name }}" class="mk-prof-avatar-img" data-avatar-preview-img>
-          {% else %}
-            <span class="mk-prof-avatar-initial" data-avatar-preview-initial>{{ avatar_initial }}</span>
-          {% endif %}
+        <div class="mk-prof-avatar-circle" aria-hidden="true">
+          <span class="mk-prof-avatar-initial">{{ avatar_initial }}</span>
         </div>
         <div class="mk-prof-avatar-meta">
           <h2><bdi>{{ profile_user.get_full_name|default:profile_user.get_username }}</bdi></h2>
           <p class="mk-prof-sub"><bdi>{{ profile_user.email|default:profile_user.get_username }}</bdi></p>
-          <div class="mk-prof-avatar-controls">
-            <label class="mk-prof-upload-btn" for="{{ detail_form.avatar.id_for_label }}">
-              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 16V4m0 0-4 4m4-4 4 4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
-              <span>رفع صورة جديدة</span>
-            </label>
-            <input type="file" name="avatar" id="{{ detail_form.avatar.id_for_label }}" accept="image/png,image/jpeg,image/webp" class="visually-hidden" data-avatar-input>
-            {% if current_avatar_url %}
-              <label class="mk-prof-remove-check">
-                {{ detail_form.remove_avatar }}
-                <span>حذف الصورة الحالية</span>
-              </label>
-            {% endif %}
-          </div>
-          <p class="mk-prof-hint">PNG أو JPG أو WEBP · بحد أقصى 5 ميجابايت</p>
-          {% for err in detail_form.avatar.errors %}<p class="mk-prof-field-err">{{ err }}</p>{% endfor %}
         </div>
       </div>
 
