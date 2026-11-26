@@ -197,3 +197,16 @@ class PartnershipAchievementUS08Tests(TestCase):
         self.assertEqual(res2.context['rows_page_obj'].number, 2)
         self.assertContains(res2, '<span class="mk-pg-num is-current" aria-current="page"><bdi>2</bdi></span>')
         self.assertContains(res2, 'status=active&amp;page=1')
+
+    def test_achievement_filter_card_matches_inquiries_design(self):
+        self.client.force_login(self.admin, backend=AUTH_BACKEND)
+        res = self.client.get(reverse('partnerships:achievement_report'))
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, 'agreement_clauses/inquiries.css')
+        self.assertContains(res, 'class="partnership-card inquiry-card ach-card mk-unified-filter-card"')
+        self.assertContains(res, 'class="inquiry-form ach-filters-form"')
+        self.assertContains(res, 'class="inquiry-grid"')
+        self.assertContains(res, 'class="inquiry-field"')
+        self.assertContains(res, 'class="inquiry-actions"')
+        self.assertContains(res, 'معايير البحث')
+        self.assertContains(res, 'إعادة تعيين الفلاتر')

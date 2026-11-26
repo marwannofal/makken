@@ -174,3 +174,8 @@
   background-position: left 14px center;
   background-size: 16px 16px;
 }
+
+/* Align achievement report filter card kicker spacing with inquiries page */
+.ach-card .mk-section-kicker {
+  margin-block-end: 14px;
+}

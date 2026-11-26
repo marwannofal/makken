@@ -5,7 +5,8 @@
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'care_states/states.css' %}?v=20261121-blue6">
 <link rel="stylesheet" href="{% static 'partnerships/partnerships.css' %}?v=20261121-blue6">
-<link rel="stylesheet" href="{% static 'partnerships/achievement_report.css' %}?v=20261121-blue6">
+<link rel="stylesheet" href="{% static 'agreement_clauses/inquiries.css' %}?v=20261121-blue6">
+<link rel="stylesheet" href="{% static 'partnerships/achievement_report.css' %}?v=20261126-inq1">
 {% endblock %}
 {% block content %}
 <section class="page-introduction partnership-intro">
@@ -22,95 +23,92 @@
 </div>
 {% endif %}
 
-<section class="partnership-card ach-card" aria-labelledby="ach-filters-heading">
-  <header class="card-heading">
-    <div>
-      <p class="eyebrow">معايير التقرير</p>
-      <h2 id="ach-filters-heading">تصفية وتجميع إنجاز الشراكات</h2>
-    </div>
-  </header>
+<section class="partnership-card inquiry-card ach-card mk-unified-filter-card" aria-labelledby="ach-filters-heading">
+  <p class="mk-section-kicker" id="ach-filters-heading">معايير البحث</p>
 
-  <form method="get" action="{% url 'partnerships:achievement_report' %}" class="ach-filters" role="search">
-    <div class="partnership-field">
-      <label for="ach-year">السنة</label>
-      <select name="year" id="ach-year">
-        <option value="">جميع السنوات</option>
-        {% for yr in report.years %}
-        <option value="{{ yr }}"{% if report.selected_year == yr %} selected{% endif %}>{{ yr }}</option>
-        {% endfor %}
-      </select>
-    </div>
-
-    <div class="partnership-field">
-      <label for="ach-region">المنطقة</label>
-      <select name="region" id="ach-region">
-        <option value="">جميع المناطق المتاحة</option>
-        {% for reg in report.regions %}
-        <option value="{{ reg.pk }}"{% if report.selected_region == reg.pk %} selected{% endif %}>{{ reg.name }}</option>
-        {% endfor %}
-      </select>
-    </div>
-
-    <div class="partnership-field">
-      <label for="ach-sector">القطاع</label>
-      <select name="sector" id="ach-sector">
-        <option value="">جميع القطاعات</option>
-        {% for sec in report.sectors %}
-        <option value="{{ sec.pk }}"{% if report.selected_sector == sec.pk %} selected{% endif %}>{{ sec.name }}</option>
-        {% endfor %}
-      </select>
-    </div>
-
-    <div class="partnership-field">
-      <label for="ach-activity">النشاط / التخصص</label>
-      <select name="activity" id="ach-activity">
-        <option value="">جميع الأنشطة</option>
-        {% for act in report.activities %}
-        <option value="{{ act.pk }}"{% if report.selected_activity == act.pk %} selected{% endif %}>{{ act.name }}{% if act.sector %} ({{ act.sector.name }}){% endif %}</option>
-        {% endfor %}
-      </select>
-    </div>
-
-    <div class="partnership-field">
-      <label for="ach-status">الحالة</label>
-      <select name="status" id="ach-status">
-        <option value="">جميع الحالات</option>
-        <optgroup label="حالة السجل">
-          <option value="active"{% if report.selected_status == 'active' %} selected{% endif %}>نشطة</option>
-          <option value="inactive"{% if report.selected_status == 'inactive' %} selected{% endif %}>غير نشطة</option>
-        </optgroup>
-        <optgroup label="مرحلة التطوير">
-          {% for token, label in report.development_states %}
-          <option value="{{ token }}"{% if report.selected_status == token %} selected{% endif %}>{{ label }}</option>
+  <form method="get" action="{% url 'partnerships:achievement_report' %}" class="inquiry-form ach-filters-form" role="search">
+    <div class="inquiry-grid">
+      <div class="inquiry-field">
+        <label for="ach-year">السنة</label>
+        <select name="year" id="ach-year">
+          <option value="">جميع السنوات</option>
+          {% for yr in report.years %}
+          <option value="{{ yr }}"{% if report.selected_year == yr %} selected{% endif %}>{{ yr }}</option>
           {% endfor %}
-        </optgroup>
-        {% if report.agreement_statuses %}
-        <optgroup label="حالة الاتفاقية">
-          {% for token, label in report.agreement_statuses %}
-          <option value="{{ token }}"{% if report.selected_status == token %} selected{% endif %}>{{ label }}</option>
+        </select>
+      </div>
+
+      <div class="inquiry-field">
+        <label for="ach-region">المنطقة</label>
+        <select name="region" id="ach-region">
+          <option value="">جميع المناطق المتاحة</option>
+          {% for reg in report.regions %}
+          <option value="{{ reg.pk }}"{% if report.selected_region == reg.pk %} selected{% endif %}>{{ reg.name }}</option>
           {% endfor %}
-        </optgroup>
-        {% endif %}
-      </select>
+        </select>
+      </div>
+
+      <div class="inquiry-field">
+        <label for="ach-sector">القطاع</label>
+        <select name="sector" id="ach-sector">
+          <option value="">جميع القطاعات</option>
+          {% for sec in report.sectors %}
+          <option value="{{ sec.pk }}"{% if report.selected_sector == sec.pk %} selected{% endif %}>{{ sec.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="inquiry-field">
+        <label for="ach-activity">النشاط / التخصص</label>
+        <select name="activity" id="ach-activity">
+          <option value="">جميع الأنشطة</option>
+          {% for act in report.activities %}
+          <option value="{{ act.pk }}"{% if report.selected_activity == act.pk %} selected{% endif %}>{{ act.name }}{% if act.sector %} ({{ act.sector.name }}){% endif %}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="inquiry-field">
+        <label for="ach-status">الحالة</label>
+        <select name="status" id="ach-status">
+          <option value="">جميع الحالات</option>
+          <optgroup label="حالة السجل">
+            <option value="active"{% if report.selected_status == 'active' %} selected{% endif %}>نشطة</option>
+            <option value="inactive"{% if report.selected_status == 'inactive' %} selected{% endif %}>غير نشطة</option>
+          </optgroup>
+          <optgroup label="مرحلة التطوير">
+            {% for token, label in report.development_states %}
+            <option value="{{ token }}"{% if report.selected_status == token %} selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </optgroup>
+          {% if report.agreement_statuses %}
+          <optgroup label="حالة الاتفاقية">
+            {% for token, label in report.agreement_statuses %}
+            <option value="{{ token }}"{% if report.selected_status == token %} selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </optgroup>
+          {% endif %}
+        </select>
+      </div>
+
+      <div class="inquiry-field">
+        <label for="ach-group">تجميع الملخص</label>
+        <select name="group_by" id="ach-group">
+          {% for key, label in report.group_choices %}
+          <option value="{{ key }}"{% if report.group_by == key %} selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="inquiry-field ach-search">
+        <label for="ach-q">البحث باسم الشراكة</label>
+        <input type="search" name="q" id="ach-q" value="{{ report.q }}" maxlength="120" placeholder="اسم الجهة أو الممثل">
+      </div>
     </div>
 
-    <div class="partnership-field">
-      <label for="ach-group">تجميع الملخص</label>
-      <select name="group_by" id="ach-group">
-        {% for key, label in report.group_choices %}
-        <option value="{{ key }}"{% if report.group_by == key %} selected{% endif %}>{{ label }}</option>
-        {% endfor %}
-      </select>
-    </div>
-
-    <div class="partnership-field ach-search">
-      <label for="ach-q">البحث باسم الشراكة</label>
-      <input type="search" name="q" id="ach-q" value="{{ report.q }}" maxlength="120" placeholder="اسم الجهة أو الممثل">
-    </div>
-
-    <div class="ach-actions">
-      <button class="button button-primary" type="submit">عرض التقرير</button>
-      <a class="button button-secondary" href="{% url 'partnerships:achievement_report' %}">مسح</a>
+    <div class="inquiry-actions">
+      <button class="button button-primary" type="submit">بحث</button>
+      <a class="button button-secondary" href="{% url 'partnerships:achievement_report' %}">إعادة تعيين الفلاتر</a>
     </div>
   </form>
 </section>
