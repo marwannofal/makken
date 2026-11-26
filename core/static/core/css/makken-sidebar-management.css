@@ -195,10 +195,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 22px;
+  width: 22px;
   height: 22px;
   padding: 0 6px;
-  margin-inline-start: auto;
+  margin-inline-end: auto;
   border-radius: 999px;
   background: #ffffff;
   color: #005b85;
@@ -218,7 +218,7 @@
 }
 
 .nav-management-toggle .nav-group-badge + .management-chevron {
-  margin-inline-start: 0;
+  margin-inline-end: 0;
 }
 
 /* Hide parent group badge when expanded so the inner link badge is not duplicated */
