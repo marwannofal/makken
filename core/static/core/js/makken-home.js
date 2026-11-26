@@ -133,3 +133,33 @@
     }
   });
 })();
+
+/* Promote server-opened <dialog class="color-dialog" open> to true modal so ::backdrop blurs & darkens */
+(function () {
+  function promoteOpenColorDialogs() {
+    document.querySelectorAll('dialog.color-dialog[open]').forEach(function (dlg) {
+      if (typeof dlg.showModal !== 'function') return;
+      try {
+        if (dlg.matches(':modal')) return;
+      } catch (e) {}
+      dlg.removeAttribute('open');
+      try {
+        dlg.showModal();
+      } catch (e) {
+        dlg.setAttribute('open', '');
+      }
+      dlg.addEventListener('cancel', function (ev) {
+        var closeLink = dlg.querySelector('a.dialog-close, .dialog-actions a.button-secondary');
+        if (closeLink && closeLink.href) {
+          ev.preventDefault();
+          window.location.assign(closeLink.href);
+        }
+      });
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', promoteOpenColorDialogs);
+  } else {
+    promoteOpenColorDialogs();
+  }
+})();

@@ -17,6 +17,9 @@ class SettingsDialogsCssUnitTests(SimpleTestCase):
         self.assertIn("font-size: 25px !important;", css)
         self.assertIn("min-height: 52px !important;", css)
         self.assertIn("@media (max-width: 640px)", css)
+        self.assertIn("dialog.color-dialog::backdrop,", css)
+        js = (Path(settings.BASE_DIR) / "core" / "static" / "core" / "js" / "makken-home.js").read_text(encoding="utf-8")
+        self.assertIn("promoteOpenColorDialogs", js)
 
 
 class SettingsDialogsSiteWideRenderTests(TestCase):
@@ -50,4 +53,4 @@ class SettingsDialogsSiteWideRenderTests(TestCase):
             with self.subTest(route=route):
                 res = self.client.get(reverse(route))
                 self.assertEqual(res.status_code, 200)
-                self.assertContains(res, "makken-settings-dialogs.css?v=20261126-dlg1")
+                self.assertContains(res, "makken-settings-dialogs.css?v=20261126-dlg2")

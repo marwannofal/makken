@@ -352,3 +352,9 @@ dialog.mk-values-dialog .mk-values-done {
     padding: 8px 12px !important;
   }
 }
+
+dialog.color-dialog::backdrop,
+dialog.mk-values-dialog::backdrop {
+  background: rgba(18, 47, 61, 0.42) !important;
+  backdrop-filter: blur(4px) !important;
+}
