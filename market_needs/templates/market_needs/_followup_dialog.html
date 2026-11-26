@@ -29,24 +29,24 @@
           <strong class="market-funding-kpi-val market-funding-level" data-level-preview>—</strong>
         </div>
       </div>
-      {% include 'market_needs/_field.html' with field=followup_form.notes %}
       <div data-approval-fields{% if operation != 'approve' and operation != 'allocate' %} hidden{% endif %}>
         <div class="partnership-form-grid">
           <div data-percent-wrap>{% include 'market_needs/_field.html' with field=followup_form.support_percent %}</div>
           {% include 'market_needs/_field.html' with field=followup_form.amount %}
         </div>
         <p class="field-help">قيمة نسبة الدعم في الرعاية = نسبة الدعم × المبلغ المتبقي، مع التقريب لأقرب هللة. يُراجع الخادم الحساب والمبلغ المتبقي عند الحفظ.</p>
-        <div class="partnership-field market-upload-field" data-evidence-fields{% if operation == 'allocate' %} hidden{% endif %}>
-          <label for="id_attachments">المرفقات الداعمة <span class="required-mark" aria-hidden="true">*</span></label>
-          <div class="market-upload-picker">
-            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 16V3m-4 4 4-4 4 4M4 15v6h16v-6"/></svg><span>اختيار ملفات أو إضافة المزيد</span>{{ followup_form.attachments }}
-          </div>
-          <p class="field-help">PDF، PNG، JPG، JPEG · حتى {{ upload_max_files }} مرفق. الحد لكل ملف: {{ upload_limit|filesizeformat }}.</p>
-          <div data-upload-files class="market-upload-list">
-          </div>
-          <div class="field-error" id="error-attachments">
-            {{ followup_form.attachments.errors }}
-          </div>
+      </div>
+      {% include 'market_needs/_field.html' with field=followup_form.notes %}
+      <div class="partnership-field market-upload-field" data-evidence-fields{% if operation != 'approve' %} hidden{% endif %}>
+        <label for="id_attachments">المرفقات الداعمة <span class="required-mark" aria-hidden="true">*</span></label>
+        <div class="market-upload-picker">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 16V3m-4 4 4-4 4 4M4 15v6h16v-6"/></svg><span>اختيار ملفات أو إضافة المزيد</span>{{ followup_form.attachments }}
+        </div>
+        <p class="field-help">PDF، PNG، JPG، JPEG · حتى {{ upload_max_files }} مرفق. الحد لكل ملف: {{ upload_limit|filesizeformat }}.</p>
+        <div data-upload-files class="market-upload-list">
+        </div>
+        <div class="field-error" id="error-attachments">
+          {{ followup_form.attachments.errors }}
         </div>
       </div>
       {% include 'market_needs/_allocation_form.html' %}

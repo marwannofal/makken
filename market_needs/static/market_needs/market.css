@@ -1799,3 +1799,17 @@ details.market-card-fold[open] .market-fold-closed-label {
     width: 100%;
   }
 }
+
+/* Breathing space above KPI row & colored level pill matching table */
+.market-funding-kpis {
+  margin-top: 14px;
+}
+
+.market-funding-level.market-level {
+  align-self: flex-start;
+  font-size: 16px;
+  font-weight: 800;
+  padding: 6px 16px;
+  min-height: 36px;
+  border-radius: 999px;
+}
