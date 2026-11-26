@@ -26,7 +26,7 @@
           <div data-percent-wrap>{% include 'market_needs/_field.html' with field=followup_form.support_percent %}</div>
           {% include 'market_needs/_field.html' with field=followup_form.amount %}
         </div>
-        <p class="field-help">قيمة نسبة الدعم في الرعاية = نسبة الدعم × إجمالي تكلفة الحاجة، مع التقريب لأقرب هللة. يُراجع الخادم الحساب والتوزيع والمبلغ المتبقي عند الحفظ.</p> <p class="market-help">قيمة الدعم الكلي المطلوب:
+        <p class="field-help">قيمة نسبة الدعم في الرعاية = نسبة الدعم × إجمالي تكلفة الحاجة، مع التقريب لأقرب هللة. يُراجع الخادم الحساب والمبلغ المتبقي عند الحفظ.</p> <p class="market-help">قيمة الدعم الكلي المطلوب:
         {% include 'market_needs/_money.html' with value=need.requested_support %}
         · إجمالي تكلفة الحاجة (أساس النسبة):
         {% include 'market_needs/_money.html' with value=need.total_cost %}

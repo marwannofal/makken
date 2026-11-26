@@ -71,9 +71,19 @@ class FundingDetailsTests(MarketFixtures, TestCase):
 
     def test_distribution_required_and_wrong_total_rejected(self):
         need = self.create_need(); record = self.attach(need, self.organization())
-        for data in [{"support_percent":"25"}, self.allocation_data(need, ["10"], support_percent="25"), self.allocation_data(need, ["26"], support_percent="25")]:
+        for data in [self.allocation_data(need, ["10"], support_percent="25"), self.allocation_data(need, ["26"], support_percent="25")]:
             with self.assertRaises(services.InvalidForm): self.submit(need, record, data)
         self.assertFalse(SponsorshipAllocation.objects.exists())
+
+    def test_percentage_only_approval_auto_allocates_without_manual_distribution(self):
+        need = self.create_need(); record = self.attach(need, self.organization())
+        self.submit(need, record, {"support_percent": "25"})
+        record.refresh_from_db(); need.refresh_from_db()
+        self.assertEqual(record.amount, Decimal("25.00"))
+        self.assertEqual(need.approved_support, Decimal("25.00"))
+        allocs = list(record.allocations.order_by("expense_line_id").values_list("amount", flat=True))
+        self.assertEqual(sum(allocs, Decimal("0.00")), Decimal("25.00"))
+        self.assertTrue(all(v > 0 for v in allocs))
 
     def test_foreign_line_and_negative_distribution_rejected(self):
         need = self.create_need(); other = self.create_need(); record = self.attach(need, self.organization())

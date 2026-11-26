@@ -164,6 +164,46 @@ class OptionalAttachments(forms.FileField):
         return result
 
 
+
+def _auto_allocate_lines(lines, amount, allowed_shapes=None):
+    """Distribute approved sponsorship amount proportionally across remaining expense lines."""
+    if not lines or amount is None or amount <= 0:
+        return []
+    eligible = [ln for ln in lines if ln.remaining_amount > 0 and (allowed_shapes is None or ln.sponsorship_shape_id in allowed_shapes)]
+    pool = eligible if sum((ln.remaining_amount for ln in eligible), Decimal("0.00")) >= amount else [ln for ln in lines if ln.remaining_amount > 0]
+    total_rem = sum((ln.remaining_amount for ln in pool), Decimal("0.00"))
+    if not pool or total_rem < amount:
+        return []
+    allocs = []
+    allocated = Decimal("0.00")
+    for ln in pool:
+        share = (amount * ln.remaining_amount / total_rem).quantize(Decimal(".01"), rounding=ROUND_HALF_UP)
+        share = min(share, ln.remaining_amount)
+        allocs.append([ln, share])
+        allocated += share
+    diff = amount - allocated
+    if diff > 0:
+        for pair in sorted(allocs, key=lambda p: p[0].remaining_amount - p[1], reverse=True):
+            room = pair[0].remaining_amount - pair[1]
+            if room <= 0:
+                continue
+            add = min(diff, room)
+            pair[1] += add
+            diff -= add
+            if diff == 0:
+                break
+    elif diff < 0:
+        for pair in sorted(allocs, key=lambda p: p[1], reverse=True):
+            if pair[1] <= 0:
+                continue
+            sub = min(-diff, pair[1])
+            pair[1] -= sub
+            diff += sub
+            if diff == 0:
+                break
+    return [(ln, val) for ln, val in allocs if val > 0]
+
+
 class FollowupForm(forms.Form):
     notes = forms.CharField(label="نتيجة التواصل / الملاحظات", required=False, max_length=4000, widget=forms.Textarea(attrs={"rows": 3}), validators=[validate_description])
     amount = SARAmountField(label="قيمة الدعم المعتمد", required=False)
@@ -238,8 +278,17 @@ class FollowupForm(forms.Form):
                     if value > line.remaining_amount:
                         self.add_error(line.allocation_field_name, "المبلغ يتجاوز المتبقي لهذا البند.")
                     allocations.append((line, value))
+            has_manual_alloc = any(
+                (self.data.get(line.allocation_field_name) or "").strip() != ""
+                for line in self.allocation_lines
+            )
+            if self.operation == "approve" and not has_manual_alloc and amount is not None and amount > 0 and not self.errors:
+                allocations = _auto_allocate_lines(self.allocation_lines, amount, self.allowed_shapes)
             if not allocations or sum((value for _, value in allocations), Decimal("0")) != amount:
-                self.add_error(None, "وزّع مبلغ المساهمة كاملًا على بنود الصرف؛ يجب أن يساوي مجموع التوزيع مبلغ الدعم تمامًا.")
+                if self.operation == "approve" and not has_manual_alloc:
+                    self.add_error(None, "المبلغ المطلوب اعتماده يتجاوز المتبقي المتاح في بنود الصرف.")
+                else:
+                    self.add_error(None, "وزّع مبلغ المساهمة كاملًا على بنود الصرف؛ يجب أن يساوي مجموع التوزيع مبلغ الدعم تمامًا.")
             data["allocations"] = allocations
         return data
 
