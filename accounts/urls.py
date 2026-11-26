@@ -13,8 +13,8 @@ urlpatterns = [
     path("settings/departments/", departments_index, name="departments"),
 ]
 
-from .profile_views import profile
+from .profile_views import profile, profile_avatar, profile_password
 
 # BEGIN MAKKEN PROFILE URL
-urlpatterns = [path("profile/", profile, name="profile")] + list(urlpatterns)
+urlpatterns = [path("profile/", profile, name="profile"), path("profile/password/", profile_password, name="profile_password"), path("profile/avatar/", profile_avatar, name="profile_avatar")] + list(urlpatterns)
 # END MAKKEN PROFILE URL

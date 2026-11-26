@@ -1,4 +1,4 @@
-{% load static %}
+{% load static user_avatar %}
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
@@ -59,7 +59,38 @@
           </button>
           <span class="breadcrumb-brand">مكّن</span><span class="breadcrumb-divider" aria-hidden="true">/</span><span class="current-location">{{ page_heading|default:"الرئيسية" }}</span>
         </div>
-        <div class="account-chip"><span class="status-dot" aria-hidden="true"></span><span class="account-chip-name">مرحبًا، <bdi>{{ display_name }}</bdi></span><span class="account-chip-sep" aria-hidden="true">·</span><span class="account-chip-clock" data-makken-clock></span></div>
+        {% user_avatar_url as topbar_avatar_url %}
+          <div class="account-menu" data-account-menu>
+            <button type="button" class="account-chip account-chip-trigger" aria-expanded="false" aria-haspopup="menu" data-account-menu-trigger>
+              <span class="account-chip-avatar" aria-hidden="true">{% if topbar_avatar_url %}<img src="{{ topbar_avatar_url }}" alt="">{% else %}{{ avatar_initial }}{% endif %}</span>
+              <span class="account-chip-name">مرحبًا، <bdi>{{ display_name }}</bdi></span>
+              <span class="account-chip-sep" aria-hidden="true">·</span>
+              <span class="account-chip-clock" data-makken-clock></span>
+              <svg class="account-chip-chevron" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div class="account-dropdown" role="menu" hidden data-account-menu-panel>
+              <div class="account-dropdown-head">
+                <strong><bdi>{{ request.user.get_full_name|default:display_name }}</bdi></strong>
+                <span><bdi>{{ request.user.email|default:request.user.get_username }}</bdi></span>
+              </div>
+              <a class="account-dropdown-item" role="menuitem" href="{% url 'accounts:profile' %}">
+                <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M5 20v-1a7 7 0 0 1 14 0v1"/></svg>
+                <span>الملف الشخصي</span>
+              </a>
+              <a class="account-dropdown-item" role="menuitem" href="{% url 'accounts:profile_password' %}">
+                <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+                <span>تغيير كلمة المرور</span>
+              </a>
+              <div class="account-dropdown-sep" role="separator"></div>
+              <form method="post" action="{% url 'accounts:logout' %}" class="account-dropdown-logout-form">
+                {% csrf_token %}
+                <button type="submit" class="account-dropdown-item is-danger" role="menuitem">
+                  <svg aria-hidden="true" viewBox="0 0 24 24"><use href="#icon-logout"></use></svg>
+                  <span>تسجيل الخروج</span>
+                </button>
+              </form>
+            </div>
+          </div>
       </header>
       <main id="main-content" class="main-content" tabindex="-1">{% block content %}{% endblock %}</main>
       <footer class="site-footer">جميع الحقوق محفوظة لـ © المؤسسة العامة للتدريب التقني والمهني، 2026</footer>

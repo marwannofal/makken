@@ -100,3 +100,36 @@
     try { localStorage.setItem(KEY, next ? '1' : '0'); } catch {}
   });
 })();
+
+/* Topbar Greeting Dropdown Menu */
+(function () {
+  var menu = document.querySelector("[data-account-menu]");
+  if (!menu) return;
+  var trigger = menu.querySelector("[data-account-menu-trigger]");
+  var panel = menu.querySelector("[data-account-menu-panel]");
+  if (!trigger || !panel) return;
+
+  function setOpen(open) {
+    menu.classList.toggle("is-open", open);
+    trigger.setAttribute("aria-expanded", open ? "true" : "false");
+    panel.hidden = !open;
+  }
+
+  trigger.addEventListener("click", function (e) {
+    e.stopPropagation();
+    setOpen(panel.hidden);
+  });
+
+  document.addEventListener("click", function (e) {
+    if (!panel.hidden && !menu.contains(e.target)) {
+      setOpen(false);
+    }
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !panel.hidden) {
+      setOpen(false);
+      trigger.focus();
+    }
+  });
+})();

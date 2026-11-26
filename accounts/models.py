@@ -61,6 +61,7 @@ class UserProfile(models.Model):
         verbose_name='الإدارة أو الوحدة',
     )
     must_change_password = models.BooleanField('تغيير كلمة المرور عند أول دخول', default=False)
+    avatar = models.FileField('الصورة الشخصية', upload_to='avatars/', blank=True, default='')
     # The built-in user email is not unique; reserve self-service addresses here.
     email_key = models.CharField(max_length=64, unique=True, null=True, blank=True, editable=False)
     version = models.PositiveBigIntegerField(default=1, editable=False)

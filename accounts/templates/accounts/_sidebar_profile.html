@@ -1,5 +1,6 @@
-<a class="user-profile profile-sidebar-link" href="{% url 'accounts:profile' %}" aria-label="الملف الشخصي — تعديل بيانات الحساب"{% if active_page == 'profile' %} aria-current="page"{% endif %}>
-  <span class="user-avatar" aria-hidden="true">{{ avatar_initial }}</span>
+{% load user_avatar %}{% user_avatar_url as sidebar_avatar_url %}
+<a class="user-profile profile-sidebar-link" href="{% url 'accounts:profile' %}" aria-label="الملف الشخصي — تعديل بيانات الحساب"{% if active_page == 'profile' or active_page == 'profile_password' %} aria-current="page"{% endif %}>
+  <span class="user-avatar" aria-hidden="true">{% if sidebar_avatar_url %}<img src="{{ sidebar_avatar_url }}" alt="" class="user-avatar-img">{% else %}{{ avatar_initial }}{% endif %}</span>
   <div class="user-details">
     <bdi class="user-name">{{ display_name }}</bdi>
     <bdi class="user-email">{% if user.email %}{{ user.email }}{% else %}{{ user.get_username }}{% endif %}</bdi>
