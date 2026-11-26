@@ -63,7 +63,7 @@ class WillingnessUnifiedWorkflowTests(TestCase):
 
     def test_capability_to_willingness_requires_documents_clauses_and_work_atomically(self):
         p = self._create_capability()
-        url = reverse('partnerships:willingness_index')
+        url = reverse('partnerships:capability_index')
         page = self.client.get(url)
         self.assertEqual(page.status_code, 200)
 
@@ -235,7 +235,7 @@ class WillingnessUnifiedWorkflowTests(TestCase):
         from partnerships.models import PartnershipTeamMember, RenewalRule, TeamMemberRole, TeamSide
 
         p = self._create_capability('شراكة اختبار الحقول النصية والفرق')
-        url = reverse('partnerships:willingness_index')
+        url = reverse('partnerships:capability_index')
         page = self.client.get(url)
         row = next(r for r in page.context['rows'] if r['item'].pk == p.pk)
         preview = self.client.post(url, {'action': 'preview', 'token': row['advance']})
@@ -358,12 +358,17 @@ class WillingnessUnifiedWorkflowTests(TestCase):
     def test_transition_note_removed_and_convert_action_in_row_actions(self):
         self.client.force_login(self.admin)
         self._create_capability('شراكة قدرة للتحويل من الإجراءات')
-        for route in ('partnerships:capability_index', 'partnerships:willingness_index'):
-            res = self.client.get(reverse(route))
-            self.assertEqual(res.status_code, 200)
-            self.assertNotContains(res, 'development-transition-note')
-            self.assertNotContains(res, 'اضغط على شارة «قدرة»')
-            self.assertContains(res, 'تحويل إلى رغبة')
+        cap_res = self.client.get(reverse('partnerships:capability_index'))
+        self.assertEqual(cap_res.status_code, 200)
+        self.assertNotContains(cap_res, 'development-transition-note')
+        self.assertNotContains(cap_res, 'اضغط على شارة «قدرة»')
+        self.assertContains(cap_res, 'تحويل إلى رغبة')
+
+        will_res = self.client.get(reverse('partnerships:willingness_index'))
+        self.assertEqual(will_res.status_code, 200)
+        self.assertNotContains(will_res, 'development-transition-note')
+        self.assertNotContains(will_res, 'اضغط على شارة «قدرة»')
+        self.assertNotContains(will_res, 'شراكة قدرة للتحويل من الإجراءات')
 
     def test_us17_followup_notes_evidence_teams_and_last_updated_column(self):
         from agreement_clauses.models import ClauseEvidence

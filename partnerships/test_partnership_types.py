@@ -118,7 +118,7 @@ class PartnershipTypeAndSigningTests(TestCase):
         self.assertEqual(create_page.status_code, 200)
         self.assertContains(create_page, 'data-no-export')
 
-        url = reverse('partnerships:willingness_index')
+        url = reverse('partnerships:capability_index')
         page = self.client.get(url)
         row = next(r for r in page.context['rows'] if r['item'].pk == p.pk)
         preview = self.client.post(url, {'action': 'preview', 'token': row['advance']})
@@ -165,7 +165,7 @@ class PartnershipTypeAndSigningTests(TestCase):
         )
         p.administrative_regions.add(self.region)
 
-        url = reverse('partnerships:willingness_index')
+        url = reverse('partnerships:capability_index')
         page = self.client.get(url)
         row = next(r for r in page.context['rows'] if r['item'].pk == p.pk)
         preview = self.client.post(url, {'action': 'preview', 'token': row['advance']})

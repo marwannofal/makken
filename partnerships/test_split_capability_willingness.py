@@ -64,7 +64,7 @@ class SplitCapabilityWillingnessPagesTests(TestCase):
         self.assertEqual(will_res.status_code, 200)
         self.assertContains(will_res, 'إدارة سجل شراكات الرغبة')
         self.assertContains(will_res, 'جهة رغبة مستقلة')
-        self.assertContains(will_res, 'جهة قدرة مستقلة')
+        self.assertNotContains(will_res, 'جهة قدرة مستقلة')
 
     def test_can_create_partnership_directly_in_willingness_state(self):
         self.client.force_login(self.admin, backend=AUTH_BACKEND)
@@ -168,29 +168,40 @@ class SplitCapabilityWillingnessPagesTests(TestCase):
         self.assertNotContains(will_only, self.p_cap.name)
         self.assertNotContains(will_only, p_care.name)
 
-    def test_capability_and_willingness_show_rule_scoped_development_state_filter(self):
+    def test_capability_and_willingness_hide_development_state_filter_and_scope_rows(self):
         self.client.force_login(self.admin, backend=AUTH_BACKEND)
 
-        cap_res = self.client.get(reverse('partnerships:capability_index'))
+        # Capability page: hides development state filter and lists only قدرة
+        cap_url = reverse('partnerships:capability_index')
+        cap_res = self.client.get(cap_url)
         self.assertEqual(cap_res.status_code, 200)
-        cap_choices = [c[0] for c in cap_res.context['development_filter_form'].fields['development_state'].choices]
-        self.assertEqual(cap_choices, ['', 'قدرة'])
+        self.assertTrue(cap_res.context['hide_development_filter'])
+        self.assertNotContains(cap_res, 'id="register-development-state"')
+        self.assertNotContains(cap_res, 'name="development_state"')
+        self.assertContains(cap_res, self.p_cap.name)
+        self.assertNotContains(cap_res, self.p_will.name)
 
+        # Willingness page: hides development state filter and lists only رغبة
         will_url = reverse('partnerships:willingness_index')
         will_res = self.client.get(will_url)
         self.assertEqual(will_res.status_code, 200)
-        will_choices = [c[0] for c in will_res.context['development_filter_form'].fields['development_state'].choices]
-        self.assertEqual(will_choices, ['', 'قدرة', 'رغبة'])
+        self.assertTrue(will_res.context['hide_development_filter'])
+        self.assertNotContains(will_res, 'id="register-development-state"')
+        self.assertNotContains(will_res, 'name="development_state"')
+        self.assertContains(will_res, self.p_will.name)
+        self.assertNotContains(will_res, self.p_cap.name)
 
-        only_will = self.client.get(will_url, {'development_state': 'رغبة'})
-        self.assertEqual(only_will.status_code, 200)
-        self.assertContains(only_will, self.p_will.name)
-        self.assertNotContains(only_will, self.p_cap.name)
+        # Passing development_state query param manually cannot leak other states
+        will_forced = self.client.get(will_url, {'development_state': 'قدرة'})
+        self.assertEqual(will_forced.status_code, 200)
+        self.assertContains(will_forced, self.p_will.name)
+        self.assertNotContains(will_forced, self.p_cap.name)
 
-        only_cap = self.client.get(will_url, {'development_state': 'قدرة'})
-        self.assertEqual(only_cap.status_code, 200)
-        self.assertContains(only_cap, self.p_cap.name)
-        self.assertNotContains(only_cap, self.p_will.name)
+        # All partnerships page still shows the development state filter
+        all_res = self.client.get(reverse('partnerships:all_index'))
+        self.assertEqual(all_res.status_code, 200)
+        self.assertFalse(all_res.context['hide_development_filter'])
+        self.assertContains(all_res, 'id="register-development-state"')
 
     def test_edit_capability_and_willingness_save_works_and_button_is_save(self):
         import json, re
