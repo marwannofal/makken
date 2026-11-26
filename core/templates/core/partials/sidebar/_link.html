@@ -8,5 +8,5 @@
     {% if nav_use %}<use href="{{ nav_use }}"></use>{% else %}<path d="{{ nav_path }}"/>{% if nav_circle %}<circle cx="12" cy="10" r="2.5"/>{% endif %}{% endif %}
   </svg>
   <span>{{ nav_label }}</span>
-  <span class="nav-dot" aria-hidden="true"></span>
+  {% if nav_badge %}<span class="nav-count-badge"{% if nav_badge_kind %} data-badge-kind="{{ nav_badge_kind }}"{% endif %}>{{ nav_badge }}</span>{% else %}<span class="nav-dot" aria-hidden="true"></span>{% endif %}
 </a>

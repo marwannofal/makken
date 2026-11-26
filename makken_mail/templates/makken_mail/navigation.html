@@ -1,14 +1,16 @@
-{% load access_tags %}
+{% load access_tags sidebar_badges %}
+{% sidebar_new_counts as nav_badges %}
 {% access_can 'work_assignments' 'view' as show_work_stats %}
 <details class="nav-management{% if active_page == 'work' or active_page == 'work_stats' %} has-active-page{% endif %}" data-management-group{% if active_page == 'work' or active_page == 'work_stats' %} open{% endif %}>
   <summary class="nav-management-toggle">
     <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 5h6m-9 0H4v16h16V5h-2M8 3h8v4H8Zm0 11 3 3 5-6"/></svg>
     <span>متابعة الأعمال</span>
+    {% if nav_badges.work_assignments_new %}<span class="nav-count-badge nav-group-badge" data-badge-group="work">{{ nav_badges.work_assignments_display }}</span>{% endif %}
     <svg class="management-chevron" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
   </summary>
   <div class="nav-management-links">
     <a class="nav-link{% if active_page == 'work' %} is-active{% endif %}" href="{% url 'makken_mail:work_index' %}"{% if active_page == 'work' %} aria-current="page"{% endif %}>
-      <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 5h6m-9 0H4v16h16V5h-2M8 3h8v4H8Zm0 11 3 3 5-6"/></svg><span>سجل الأعمال</span><span class="nav-dot" aria-hidden="true"></span>
+      <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 5h6m-9 0H4v16h16V5h-2M8 3h8v4H8Zm0 11 3 3 5-6"/></svg><span>سجل الأعمال</span>{% if nav_badges.work_assignments_new %}<span class="nav-count-badge" data-badge-kind="work_assignments">{{ nav_badges.work_assignments_display }}</span>{% else %}<span class="nav-dot" aria-hidden="true"></span>{% endif %}
     </a>
     {% if show_work_stats %}
     <a class="nav-link{% if active_page == 'work_stats' %} is-active{% endif %}" href="{% url 'makken_mail:work_stats' %}"{% if active_page == 'work_stats' %} aria-current="page"{% endif %}>

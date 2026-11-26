@@ -189,3 +189,46 @@
     transition: none;
   }
 }
+
+/* Live "New" circular counter badges on sidebar links & collapsed parent groups */
+.nav-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  margin-inline-start: auto;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #005b85;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 2px 6px rgba(0, 42, 64, 0.22);
+  flex-shrink: 0;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+.nav-management-toggle .nav-group-badge {
+  margin-inline-start: auto;
+  margin-inline-end: 2px;
+}
+
+.nav-management-toggle .nav-group-badge + .management-chevron {
+  margin-inline-start: 0;
+}
+
+/* Hide parent group badge when expanded so the inner link badge is not duplicated */
+.nav-management[open] > .nav-management-toggle .nav-group-badge {
+  display: none;
+}
+
+/* Invert badge on active white sidebar pill so the number stays crisp */
+.sidebar .nav-link.is-active .nav-count-badge {
+  background: #005b85;
+  color: #ffffff;
+  box-shadow: none;
+}
