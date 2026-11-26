@@ -1,0 +1,354 @@
+/* Makken Settings ("إدارة البيانات") & See-More ("عرض المزيد") Upgraded Spacious Dialogs (Ocean-Blue, Responsive, CSP-safe) */
+
+/* 1. Add / Edit / Review / Confirm / Delete Modals (dialog.color-dialog) */
+dialog.color-dialog {
+  width: min(640px, calc(100vw - 28px)) !important;
+  max-width: none !important;
+  max-height: calc(100svh - 28px) !important;
+  border: 1px solid #d5e5ee !important;
+  border-radius: 24px !important;
+  box-shadow: 0 28px 80px rgba(0, 45, 70, 0.24) !important;
+}
+
+dialog.color-dialog .dialog-content {
+  padding: 34px 36px 32px !important;
+}
+
+dialog.color-dialog .dialog-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px !important;
+}
+
+dialog.color-dialog .dialog-icon {
+  width: 52px !important;
+  height: 52px !important;
+  border-radius: 16px !important;
+  background: #e6f3f9 !important;
+  color: #005b85 !important;
+}
+
+dialog.color-dialog .dialog-icon svg {
+  width: 26px !important;
+  height: 26px !important;
+}
+
+dialog.color-dialog .dialog-close,
+dialog.mk-values-dialog .mk-values-close {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 50% !important;
+  border: 1.5px solid #c3dce9 !important;
+  background: #ffffff !important;
+  color: #005b85 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease !important;
+}
+
+dialog.color-dialog .dialog-close:hover,
+dialog.mk-values-dialog .mk-values-close:hover {
+  background: #005b85 !important;
+  border-color: #005b85 !important;
+  color: #ffffff !important;
+}
+
+dialog.color-dialog .dialog-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 13px;
+  border-radius: 999px;
+  background: #e7f3f9;
+  color: #005b85 !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  line-height: 1.5 !important;
+  margin: 0 0 10px !important;
+}
+
+dialog.color-dialog h2 {
+  font-size: 26px !important;
+  font-weight: 800 !important;
+  color: #003b5c !important;
+  line-height: 1.45 !important;
+  margin: 0 0 10px !important;
+}
+
+dialog.color-dialog .dialog-description {
+  font-size: 15px !important;
+  color: #4e6774 !important;
+  line-height: 1.8 !important;
+  margin: 0 0 24px !important;
+}
+
+dialog.color-dialog label,
+dialog.color-dialog legend {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  color: #153646 !important;
+  margin-bottom: 8px !important;
+}
+
+dialog.color-dialog input[type="text"],
+dialog.color-dialog input[type="search"],
+dialog.color-dialog input[type="number"],
+dialog.color-dialog input[type="email"],
+dialog.color-dialog select,
+dialog.color-dialog .mk-ss-trigger,
+dialog.color-dialog .multi-trigger,
+dialog.color-dialog .search-select-trigger {
+  min-height: 52px !important;
+  padding: 12px 16px !important;
+  border: 1.5px solid #c6dae4 !important;
+  border-radius: 13px !important;
+  background: #fafcfd !important;
+  color: #122d3a !important;
+  font-size: 15.5px !important;
+  font-weight: 600 !important;
+  line-height: 1.5 !important;
+}
+
+dialog.color-dialog textarea {
+  min-height: 118px !important;
+  padding: 14px 16px !important;
+  border: 1.5px solid #c6dae4 !important;
+  border-radius: 13px !important;
+  background: #fafcfd !important;
+  color: #122d3a !important;
+  font-size: 15.5px !important;
+  font-weight: 600 !important;
+  line-height: 1.75 !important;
+}
+
+dialog.color-dialog input:focus,
+dialog.color-dialog textarea:focus,
+dialog.color-dialog select:focus,
+dialog.color-dialog .mk-ss-trigger:focus-visible {
+  background: #ffffff !important;
+  border-color: #005b85 !important;
+  box-shadow: 0 0 0 3px rgba(0, 91, 133, 0.14) !important;
+}
+
+dialog.color-dialog .field-help {
+  font-size: 13px !important;
+  color: #5b727e !important;
+  line-height: 1.7 !important;
+  margin: 8px 0 20px !important;
+}
+
+dialog.color-dialog .field-error {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+}
+
+dialog.color-dialog .active-options {
+  gap: 12px !important;
+}
+
+dialog.color-dialog .active-option {
+  min-height: 52px !important;
+  padding: 10px 16px !important;
+  border-width: 1.5px !important;
+  border-radius: 13px !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+}
+
+dialog.color-dialog .active-option span {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+}
+
+dialog.color-dialog .active-option:has(input:checked) {
+  background: #eaf5fa !important;
+  border-color: #005b85 !important;
+  color: #003b5c !important;
+}
+
+/* Review / Confirm / Delete Summary Cards inside color-dialog */
+dialog.color-dialog dl,
+dialog.color-dialog .confirm-summary,
+dialog.color-dialog .preview-summary {
+  background: #f4f9fc !important;
+  border: 1px solid #d5e6ef !important;
+  border-radius: 16px !important;
+  padding: 18px 20px !important;
+  gap: 14px !important;
+}
+
+dialog.color-dialog dl dt {
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  color: #536d7a !important;
+}
+
+dialog.color-dialog dl dd {
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  color: #003b5c !important;
+}
+
+dialog.color-dialog .dialog-actions {
+  gap: 12px !important;
+  margin-top: 26px !important;
+}
+
+dialog.color-dialog .dialog-actions .button,
+dialog.color-dialog .dialog-actions button,
+dialog.color-dialog .dialog-actions a.button {
+  min-height: 50px !important;
+  padding: 0 22px !important;
+  border-radius: 13px !important;
+  font-size: 15.5px !important;
+  font-weight: 700 !important;
+}
+
+/* 2. "See More / عرض المزيد" Values Modal (dialog.mk-values-dialog) */
+dialog.mk-values-dialog {
+  width: min(760px, calc(100vw - 28px)) !important;
+  max-width: none !important;
+  max-height: calc(100svh - 28px) !important;
+  border: 1px solid #d5e5ee !important;
+  border-radius: 24px !important;
+  box-shadow: 0 28px 80px rgba(0, 45, 70, 0.24) !important;
+}
+
+dialog.mk-values-dialog .mk-values-body {
+  padding: 32px 34px !important;
+}
+
+dialog.mk-values-dialog .mk-values-eyebrow {
+  display: inline-flex;
+  padding: 4px 13px;
+  border-radius: 999px;
+  background: #e7f3f9;
+  color: #005b85 !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  margin-bottom: 10px !important;
+}
+
+dialog.mk-values-dialog h2,
+dialog.mk-values-dialog .mk-values-title {
+  font-size: 25px !important;
+  font-weight: 800 !important;
+  color: #003b5c !important;
+  margin: 0 0 8px !important;
+}
+
+dialog.mk-values-dialog .mk-values-description,
+dialog.mk-values-dialog .mk-values-subtitle {
+  font-size: 15px !important;
+  color: #4e6774 !important;
+  margin: 0 0 18px !important;
+}
+
+dialog.mk-values-dialog .mk-values-search-label,
+dialog.mk-values-dialog label {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  color: #153646 !important;
+}
+
+dialog.mk-values-dialog .mk-values-search {
+  min-height: 50px !important;
+  padding: 12px 16px !important;
+  border: 1.5px solid #c6dae4 !important;
+  border-radius: 13px !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+}
+
+dialog.mk-values-dialog .mk-values-count {
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  color: #005b85 !important;
+  margin: 12px 0 !important;
+}
+
+dialog.mk-values-dialog .mk-values-list {
+  max-height: 46vh !important;
+  gap: 10px !important;
+  padding: 14px !important;
+  border-radius: 16px !important;
+  background: #f6fafc !important;
+  border: 1px solid #dce9f0 !important;
+}
+
+dialog.mk-values-dialog .mk-values-item {
+  padding: 9px 15px !important;
+  border-radius: 11px !important;
+  background: #ffffff !important;
+  border: 1px solid #cce0eb !important;
+  color: #0f445c !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  line-height: 1.5 !important;
+}
+
+dialog.mk-values-dialog .mk-values-actions .button,
+dialog.mk-values-dialog .mk-values-done {
+  min-height: 50px !important;
+  border-radius: 13px !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+}
+
+/* 3. Responsive Mobile & Tablet Scaling */
+@media (max-width: 640px) {
+  dialog.color-dialog,
+  dialog.mk-values-dialog {
+    width: calc(100vw - 20px) !important;
+    max-height: calc(100svh - 20px) !important;
+    border-radius: 20px !important;
+  }
+
+  dialog.color-dialog .dialog-content,
+  dialog.mk-values-dialog .mk-values-body {
+    padding: 22px 18px !important;
+  }
+
+  dialog.color-dialog h2,
+  dialog.mk-values-dialog h2,
+  dialog.mk-values-dialog .mk-values-title {
+    font-size: 21px !important;
+  }
+
+  dialog.color-dialog .dialog-description,
+  dialog.mk-values-dialog .mk-values-description {
+    font-size: 14px !important;
+  }
+
+  dialog.color-dialog label,
+  dialog.color-dialog legend {
+    font-size: 15px !important;
+  }
+
+  dialog.color-dialog input[type="text"],
+  dialog.color-dialog input[type="search"],
+  dialog.color-dialog input[type="number"],
+  dialog.color-dialog select,
+  dialog.color-dialog .mk-ss-trigger,
+  dialog.mk-values-dialog .mk-values-search {
+    min-height: 48px !important;
+    font-size: 15px !important;
+  }
+
+  dialog.color-dialog .dialog-actions {
+    flex-direction: column !important;
+  }
+
+  dialog.color-dialog .dialog-actions .button,
+  dialog.color-dialog .dialog-actions button,
+  dialog.color-dialog .dialog-actions a.button {
+    width: 100% !important;
+  }
+
+  dialog.mk-values-dialog .mk-values-item {
+    font-size: 13.5px !important;
+    padding: 8px 12px !important;
+  }
+}
