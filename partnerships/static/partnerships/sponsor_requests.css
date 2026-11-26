@@ -1034,3 +1034,80 @@
 .pub-field[hidden] {
   display: none !important;
 }
+
+/* Ocean-Blue Sponsor Request Detail Modal Extensions */
+.sr-dialog-tags,
+.sr-dialog-attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.sr-att-link {
+  text-decoration: none;
+  color: #005b85;
+  font-weight: 700;
+}
+
+.sr-att-link:hover {
+  background: #d8ecf5;
+}
+
+.sr-muted {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.sr-dialog-note {
+  margin-top: 6px;
+  margin-bottom: 16px;
+}
+
+.sr-dialog-approved-bar {
+  margin-top: 14px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.sr-dialog-decisions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid #d7e6ef;
+}
+
+.sr-dialog-decision-card {
+  background: #f5f9fc;
+  border: 1px solid #d7e6ef;
+  border-inline-start: 4px solid #005b85;
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sr-dialog-decision-card.is-reject {
+  background: #fff7f7;
+  border-color: #f3d2d2;
+  border-inline-start-color: #b42318;
+}
+
+.sr-dialog-decision-card h3 {
+  margin: 0;
+  font-size: 15px;
+  color: #003b5c;
+}
+
+.sr-dialog-decision-card.is-reject h3 {
+  color: #912018;
+}
+
+@media (max-width: 760px) {
+  .sr-dialog-decisions {
+    grid-template-columns: 1fr;
+  }
+}

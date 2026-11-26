@@ -5,6 +5,8 @@
 <link rel="stylesheet" href="{% static 'care_states/states.css' %}?v=20261121-blue6">
 <link rel="stylesheet" href="{% static 'partnerships/partnerships.css' %}?v=20261121-blue6">
 <link rel="stylesheet" href="{% static 'partnerships/sponsor_requests.css' %}?v=20261121-blue6">
+<script src="{% static 'partnerships/partnerships.js' %}?v=20261124-opt2-v3" defer></script>
+{% include "partnerships/_financial_assets.html" %}
 {% endblock %}
 {% block content %}
 <section class="page-introduction partnership-intro">
@@ -114,4 +116,5 @@
     </table>
   </div>
 </section>
+{% include "partnerships/_sponsor_request_detail_dialog.html" %}
 {% endblock %}

@@ -431,10 +431,7 @@ def public_sponsor_thanks(request):
     }))
 
 
-@module_view('sponsor_requests')
-@require_GET
-def sponsor_request_queue(request):
-    """RBAC and regionally-scoped admin review queue for external sponsor requests."""
+def _queue_context(request, req=None, reject_form=None, error_message=''):
     base_qs = _scoped_requests(request.user)
     selected_status = (request.GET.get('status') or '').strip()
     q = (request.GET.get('q') or '').strip()[:120]
@@ -462,18 +459,54 @@ def sponsor_request_queue(request):
     policy = AccessPolicy(request.user)
     can_decide = request.user.is_superuser or policy.can('sponsor_requests', 'edit')
     name = request.user.get_short_name() or request.user.get_username()
-    return add_login_headers(render(request, 'partnerships/sponsor_requests.html', {
+    close_url = reverse('partnerships:sponsor_requests')
+    if q or selected_status:
+        from urllib.parse import urlencode
+        params = {k: v for k, v in (('q', q), ('status', selected_status)) if v}
+        if params:
+            close_url = f'{close_url}?{urlencode(params)}'
+
+    ctx = {
         'display_name': name,
         'avatar_initial': name[:1],
         'active_page': 'sponsor_requests',
-        'page_heading': 'طلبات الرعاة الخارجيين - شراكات القدرة',
+        'page_heading': f'مراجعة طلب راعٍ · {req.reference_code}' if req else 'طلبات الرعاة الخارجيين - شراكات القدرة',
         'rows': list(qs[:200]),
         'counts': counts,
         'selected_status': selected_status,
         'q': q,
         'statuses': SponsorRequestStatus.choices,
         'can_decide': can_decide,
-    }))
+        'close_url': close_url,
+    }
+    if req is not None:
+        ctx.update({
+            'req': req,
+            'offering_rows': _resolve_offerings_display(req.offerings),
+            'reject_form': reject_form if reject_form is not None else RejectSponsorRequestForm(),
+            'error_message': error_message,
+        })
+    return ctx
+
+
+@module_view('sponsor_requests')
+@require_GET
+def sponsor_request_queue(request):
+    """RBAC and regionally-scoped admin review queue for external sponsor requests."""
+    req = None
+    detail_id = (request.GET.get('detail') or '').strip()
+    if detail_id.isdigit():
+        candidate = (
+            SponsorRegistrationRequest.objects.select_related(
+                'entity', 'partnership_type', 'sector', 'sponsorship_shape', 'reviewed_by', 'created_partnership'
+            )
+            .prefetch_related('administrative_regions', 'attachments')
+            .filter(pk=int(detail_id))
+            .first()
+        )
+        if candidate is not None and _can_review_request(request.user, candidate):
+            req = candidate
+    return add_login_headers(render(request, 'partnerships/sponsor_requests.html', _queue_context(request, req=req)))
 
 
 @module_view('sponsor_requests')
@@ -612,18 +645,12 @@ def sponsor_request_review(request, request_id):
         else:
             return denied(request, 'إجراء غير صالح.')
 
-    name = request.user.get_short_name() or request.user.get_username()
-    return add_login_headers(render(request, 'partnerships/sponsor_request_detail.html', {
-        'display_name': name,
-        'avatar_initial': name[:1],
-        'active_page': 'sponsor_requests',
-        'page_heading': f'مراجعة طلب راعٍ · {req.reference_code}',
-        'req': req,
-        'offering_rows': _resolve_offerings_display(req.offerings),
-        'can_decide': can_decide,
-        'reject_form': reject_form,
-        'error_message': error_message,
-    }, status=status_code))
+    return add_login_headers(render(
+        request,
+        'partnerships/sponsor_requests.html',
+        _queue_context(request, req=req, reject_form=reject_form, error_message=error_message),
+        status=status_code,
+    ))
 
 
 @module_view('sponsor_requests')

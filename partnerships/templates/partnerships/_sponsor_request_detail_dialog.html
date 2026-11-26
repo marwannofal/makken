@@ -1,0 +1,171 @@
+{% load static %}
+{% if req %}
+<dialog id="sponsor-request-detail" class="partnership-dialog detail-dialog sr-detail-dialog" aria-labelledby="sr-detail-title" open data-server-dialog data-close-url="{{ close_url }}">
+  <div class="dialog-body">
+    <div class="dialog-top">
+      <p class="eyebrow">تفاصيل طلب الراعي الخارجي · <bdi>{{ req.reference_code }}</bdi></p>
+      <a class="icon-button" href="{{ close_url }}" aria-label="إغلاق التفاصيل" autofocus><svg aria-hidden="true"><use href="#icon-close"/></svg></a>
+    </div>
+    <h2 id="sr-detail-title"><bdi>{{ req.name }}</bdi></h2>
+
+    {% for message in messages %}<p class="feedback feedback-success" role="status">{{ message }}</p>{% endfor %}
+    {% if error_message %}<p class="feedback feedback-error" role="alert">{{ error_message }}</p>{% endif %}
+
+    <dl class="detail-grid">
+      <div>
+        <dt>اسم الممثل عن الجهة</dt>
+        <dd><bdi>{{ req.representative }}</bdi></dd>
+      </div>
+      <div>
+        <dt>هاتف التواصل</dt>
+        <dd><bdi dir="ltr">{{ req.formatted_phone }}</bdi></dd>
+      </div>
+      <div>
+        <dt>البريد الإلكتروني</dt>
+        <dd><bdi>{{ req.email }}</bdi></dd>
+      </div>
+      <div>
+        <dt>القدرة المالية</dt>
+        <dd>{% if req.financial_capacity is not None %}{% include "partnerships/_financial_value.html" with amount=req.financial_capacity %}{% else %}غير محدد{% endif %}</dd>
+      </div>
+      <div>
+        <dt>الكيان / نوعه</dt>
+        <dd>{{ req.entity.name }} · {{ req.entity.get_entity_type_display }}</dd>
+      </div>
+      <div>
+        <dt>النطاق</dt>
+        <dd>{{ req.get_scope_display }}</dd>
+      </div>
+      <div>
+        <dt>حالة الطلب</dt>
+        <dd><span class="sr-pill is-{{ req.status }}">{{ req.get_status_display }}</span></dd>
+      </div>
+      <div>
+        <dt>نوع الشراكة</dt>
+        <dd>{{ req.partnership_type.name|default:"غير محدد" }}</dd>
+      </div>
+      <div>
+        <dt>تاريخ التقديم</dt>
+        <dd><bdi dir="ltr">{{ req.created_at|date:"d/m/Y H:i" }}</bdi></dd>
+      </div>
+      {% if req.reviewed_at %}
+      <div>
+        <dt>تمت المراجعة</dt>
+        <dd>{{ req.reviewed_by.get_full_name|default:req.reviewed_by }} · <bdi dir="ltr">{{ req.reviewed_at|date:"d/m/Y H:i" }}</bdi></dd>
+      </div>
+      {% endif %}
+    </dl>
+
+    <div class="detail-offerings">
+      <h3>القطاعات والتخصصات وأشكال الرعاية</h3>
+      <div class="table-scroll">
+        <table class="partnership-table">
+          <thead>
+            <tr>
+              <th scope="col">القطاع</th>
+              <th scope="col">التخصصات المرتبطة</th>
+              <th scope="col">شكل الرعاية</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if offering_rows %}
+              {% for off in offering_rows %}
+                <tr>
+                  <td>{{ off.sector_name }}</td>
+                  <td>
+                    <div class="tags">
+                      {% for spec in off.specializations %}
+                        <bdi class="tag">{{ spec }}</bdi>
+                      {% empty %}
+                        <span>—</span>
+                      {% endfor %}
+                    </div>
+                  </td>
+                  <td>{{ off.shape_name }}</td>
+                </tr>
+              {% endfor %}
+            {% elif req.sector or req.sponsorship_shape %}
+              <tr>
+                <td>{{ req.sector.name|default:"—" }}</td>
+                <td>—</td>
+                <td>{{ req.sponsorship_shape.name|default:"—" }}</td>
+              </tr>
+            {% else %}
+              <tr>
+                <td colspan="3">لم تُحدَّد قطاعات أو أشكال رعاية.</td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <h3>المناطق الإدارية للجهة</h3>
+    <div class="tags sr-dialog-tags">
+      {% for reg in req.administrative_regions.all %}
+        <span class="tag">{{ reg.name }}</span>
+      {% empty %}
+        <span class="sr-muted">لم تُحدَّد مناطق إدارية.</span>
+      {% endfor %}
+    </div>
+
+    <h3>المرفقات الداعمة</h3>
+    <div class="sr-dialog-attachments">
+      {% for att in req.attachments.all %}
+        <a class="tag sr-att-link" href="{% url 'partnerships:sponsor_request_attachment_download' req.pk att.pk %}"><bdi>{{ att.original_name }}</bdi></a>
+      {% empty %}
+        <span class="sr-muted">لا توجد مرفقات داعمة.</span>
+      {% endfor %}
+    </div>
+
+    {% if req.notes %}
+    <h3>ملاحظات الجهة</h3>
+    <div class="sr-notes-box sr-dialog-note">
+      <p>{{ req.notes }}</p>
+    </div>
+    {% endif %}
+
+    {% if req.status == 'rejected' and req.rejection_reason %}
+    <h3>سبب الرفض (قرار نهائي)</h3>
+    <div class="sr-reject-box sr-dialog-note">
+      <p>{{ req.rejection_reason }}</p>
+    </div>
+    {% endif %}
+
+    {% if req.created_partnership %}
+    <div class="sr-dialog-approved-bar">
+      <a class="button button-primary" href="{% url 'partnerships:index' %}?detail={{ req.created_partnership.pk }}">عرض الشراكة المعتمدة</a>
+    </div>
+    {% endif %}
+
+    {% if req.status == 'new' and can_decide %}
+    <section class="sr-dialog-decisions" aria-label="اتخاذ قرار حول الطلب">
+      <div class="sr-dialog-decision-card is-approve">
+        <h3>اعتماد الطلب وإنشاء الشراكة</h3>
+        <p class="sr-desc">سيتم إنشاء سجل شراكة جديد بالحالة الافتراضية (<strong>قدرة</strong>) وربط المناطق وبيانات الرعاية، وتغيير حالة الطلب إلى <strong>معتمد</strong>.</p>
+        <form method="post" action="{% url 'partnerships:sponsor_request_review' req.pk %}">
+          {% csrf_token %}
+          <input type="hidden" name="operation" value="approve">
+          <button type="submit" class="button button-primary">اعتماد وإنشاء الشراكة</button>
+        </form>
+      </div>
+
+      <div class="sr-dialog-decision-card is-reject">
+        <h3>رفض الطلب</h3>
+        <p class="sr-desc">سيبقى الطلب بحالة <strong>مرفوض</strong> ولن يُنشأ أي سجل في قائمة الشراكات الرئيسية.</p>
+        <form method="post" action="{% url 'partnerships:sponsor_request_review' req.pk %}" class="sr-reject-form">
+          {% csrf_token %}
+          <input type="hidden" name="operation" value="reject">
+          <div class="partnership-field">
+            {{ reject_form.rejection_reason.label_tag }}
+            {{ reject_form.rejection_reason }}
+            {% for err in reject_form.rejection_reason.errors %}<span class="pub-err">{{ err }}</span>{% endfor %}
+          </div>
+          <button type="submit" class="button sr-btn-danger">رفض الطلب نهائيًا</button>
+        </form>
+      </div>
+    </section>
+    {% endif %}
+  </div>
+</dialog>
+{% endif %}
