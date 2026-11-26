@@ -198,6 +198,28 @@ class FundingDetailsTests(MarketFixtures, TestCase):
             self.assertNotContains(response,f'<th scope="col">{label}</th>',html=True)
 
 
+    def test_sponsors_criteria_section_is_reselectable_and_filters(self):
+        need = self.create_need()
+        need.search_states = ['capability', 'willingness']
+        need.search_scopes = ['local']
+        need.save(update_fields=['search_states', 'search_scopes'])
+        org_cap = self.organization("جهة قدرة محلية", state='capability')
+        org_cap.scope = 'local'; org_cap.save(update_fields=['scope'])
+        org_care = self.organization("جهة رعاية عالمية", state='care')
+        org_care.scope = 'global'; org_care.save(update_fields=['scope'])
+        res = self.client.get(f'/market-needs/{need.pk}/sponsors/')
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, 'class="market-sponsors-criteria-form"')
+        self.assertContains(res, 'name="states"')
+        self.assertContains(res, 'name="scopes"')
+        self.assertContains(res, org_cap.name)
+        self.assertNotContains(res, org_care.name)
+        res2 = self.client.get(f'/market-needs/{need.pk}/sponsors/', {'states': ['care'], 'scopes': ['global']})
+        self.assertEqual(res2.status_code, 200)
+        self.assertContains(res2, org_care.name)
+        self.assertNotContains(res2, org_cap.name)
+
+
 class FundingMigrationTests(MarketFixtures, TransactionTestCase):
     def setUp(self):
         pass  # Historical models are prepared after rolling back this migration.

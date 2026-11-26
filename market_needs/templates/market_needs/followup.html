@@ -16,10 +16,32 @@
       <span class="subtle-badge">{% include "core/partials/record_count.html" with record_count=record_page.paginator.count only %}</span>
     </div>
   </div>
-  <div class="market-configured-criteria">
-    <div class="market-criteria-group"><strong>المنظمات المشمولة في البحث:</strong> {% for st in configured_states %}{% development_pill st %}{% empty %}<span class="subtle-badge">جميع الحالات</span>{% endfor %}</div>
-    <div class="market-criteria-group"><strong>نطاق الكيان:</strong> {% for sc in configured_scopes %}<span class="subtle-badge">{{ sc }}</span>{% empty %}<span class="subtle-badge">محلي وعالمي</span>{% endfor %}</div>
-  </div>
+  <form method="get" action="{% url 'market_needs:followup' need.pk %}" class="market-sponsors-criteria-form" role="search" aria-label="تصفية المنظمات ونطاق الكيان">
+    <div class="market-criteria-grid market-sponsors-criteria-grid">
+      <fieldset class="partnership-field market-criteria-card market-sponsors-criteria-card">
+        <legend>المنظمات المشمولة في البحث</legend>
+        <div class="status-choices">
+          {% for option in state_options %}
+            <label>{{ option.choice.tag }}{% if option.state %}{% development_pill option.state %}{% else %}<span>{{ option.choice.choice_label }}</span>{% endif %}</label>
+          {% endfor %}
+        </div>
+        <div class="field-error" id="error-states" role="alert">{{ filter_form.states.errors }}</div>
+      </fieldset>
+      <fieldset class="partnership-field market-criteria-card market-sponsors-criteria-card">
+        <legend>نطاق الكيان</legend>
+        <div class="status-choices">
+          {% for checkbox in filter_form.scopes %}
+            <label>{{ checkbox.tag }}<span>{{ checkbox.choice_label }}</span></label>
+          {% endfor %}
+        </div>
+        <div class="field-error" id="error-scopes" role="alert">{{ filter_form.scopes.errors }}</div>
+      </fieldset>
+    </div>
+    <div class="market-sponsors-criteria-actions">
+      <button class="button button-primary" type="submit">تحديث نتائج البحث</button>
+      <a class="button button-secondary" href="{% url 'market_needs:followup' need.pk %}">إعادة للافتراضي</a>
+    </div>
+  </form>
   <p class="market-help"><strong>المستوى يُحسب لكل جهة من مساهمتها المعتمدة ÷ إجمالي تكلفة الحاجة: 100% استراتيجي، 80%–99% ذهبي، 60%–79% فضي، 1%–59% برونزي. أكثر من راعٍ = تحالف، راعٍ واحد بنسبة 100% = فردي.</strong></p>
   {% include "market_needs/_records_table.html" %}
 </section>

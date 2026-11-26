@@ -398,8 +398,8 @@ class ViewSecurityTests(MarketFixtures,TestCase):
             response=self.client.get(url,{'states':states});self.assertEqual(response.status_code,200)
             found={match.organization.pk for match in response.context['matches']}
             self.assertEqual(found,{organizations[state].pk for state in states or DevelopmentState.values})
-            self.assertContains(response,'market-configured-criteria')
-            self.assertNotContains(response,'name="states"')
+            self.assertContains(response,'market-sponsors-criteria-form')
+            self.assertContains(response,'name="states"',count=3)
             self.assertNotContains(response,'حالة الشراكات المؤهلة · ثابتة')
         editor=self.client.get(reverse('market_needs:create'))
         self.assertEqual(editor.status_code,200)

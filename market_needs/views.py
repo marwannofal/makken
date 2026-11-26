@@ -238,8 +238,18 @@ def followup(request, pk):
     need = get_object_or_404(query(request.user).prefetch_related("expense_lines__expense_item", "expense_lines__sponsorship_shape"), pk=pk)
     context, status = base(request, "البحث الذكي: محرك الرعاة المحتملون"), 200
     funding_details(need)
-    filters = MatchFilterForm(request.GET)
-    valid_filters = filters.is_valid()
+    from partnerships.models import Scope as _ScopeFilter
+    default_states = list(need.search_states or DevelopmentState.values)
+    default_scopes = list(need.search_scopes or [val for val, _ in _ScopeFilter.choices])
+    has_query_filters = any(k in request.GET for k in ("states", "scopes", "q"))
+    if has_query_filters:
+        filters = MatchFilterForm(request.GET)
+        valid_filters = filters.is_valid()
+        active_filter_data = filters.cleaned_data if valid_filters else {}
+    else:
+        filters = MatchFilterForm(initial={"states": default_states, "scopes": default_scopes})
+        valid_filters = True
+        active_filter_data = {"states": default_states, "scopes": default_scopes, "q": ""}
     followup_form, selected_record, operation = None, None, ""
     followup_snapshot = ""
     selected_org = None
@@ -315,7 +325,7 @@ def followup(request, pk):
     if not valid_filters:
         status = 400
     # Search is a read-only GET. It never creates candidates or advances states.
-    queryset = candidates(need, filters.cleaned_data, actor=request.user).select_related("partnership_status") if valid_filters else candidates(need, actor=request.user).none()
+    queryset = candidates(need, active_filter_data, actor=request.user).select_related("partnership_status") if valid_filters else candidates(need, actor=request.user).none()
     page = Paginator(queryset, resolve_page_size(request, 10)).get_page(request.GET.get("page"))
     linked_records = list(sponsorship_query(need, request.user))
     auto_matched_orgs = list(queryset) if need.status != NeedStatus.COMPLETE else []
