@@ -30,7 +30,7 @@ class UserManagementSidebarAndHiddenLogsTests(TestCase):
             "<span>الأدوار</span>",
             "<span>إشعارات البريد</span>",
             "<span>نشاط المستخدمين</span>",
-            "<span>إدارات الهيكل التنظيمي</span>",
+            "<span>إدارة الهيكل التنظيمي</span>",
         ]:
             with self.subTest(label=label):
                 self.assertContains(res, label)

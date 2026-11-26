@@ -2,7 +2,7 @@
 {% load makken_pagination %}
 {% load access_tags static %}
 {% block title %}
-  إدارات الهيكل التنظيمي | مكّن
+  إدارة الهيكل التنظيمي | مكّن
 {% endblock %}
 {% block access_head %}
   <link rel="stylesheet" href="{% static 'levels/levels.css' %}?v=20261121-blue6">
@@ -13,7 +13,7 @@
   <section class="states-card levels-card" aria-labelledby="table-heading">
     <header class="states-card-header">
       <div>
-        <h2 id="table-heading">إدارات الهيكل التنظيمي</h2>
+        <h2 id="table-heading">إدارة الهيكل التنظيمي</h2>
         <p>أضف الإدارات والوحدات في الهيكل التنظيمي، وعدّل بياناتها أو حالة تفعيلها.</p>
       </div>
       <div class="row-actions">
@@ -26,7 +26,7 @@
       </div>
     </header>
     <table class="states-table levels-table">
-      <caption class="visually-hidden">قائمة إدارات الهيكل التنظيمي وحالة تفعيل كل إدارة</caption>
+      <caption class="visually-hidden">قائمة إدارة الهيكل التنظيمي وحالة تفعيل كل إدارة</caption>
       <thead>
         <tr>
           <th scope="col">الإدارة أو الوحدة</th>
@@ -102,7 +102,7 @@
           <span class="dialog-icon"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 21h18M5 21V6l7-3 7 3v15M9 9h1m4 0h1m-6 4h1m4 0h1M10 21v-5h4v5"/></svg></span>
           <a class="icon-button dialog-close" href="{% url 'accounts:departments' %}{% if settings_filter_query %}?{{ settings_filter_query }}{% endif %}" aria-label="إغلاق"><svg aria-hidden="true"><use href="#icon-close"></use></svg></a>
         </div>
-        <p class="dialog-eyebrow">إدارات الهيكل التنظيمي</p>
+        <p class="dialog-eyebrow">إدارة الهيكل التنظيمي</p>
         <h2 id="editor-title">{% if operation == 'edit' %}تعديل الإدارة{% else %}إضافة إدارة{% endif %}</h2>
         <p class="dialog-description">أدخل اسم الإدارة أو الوحدة ثم احفظ التغييرات.</p>
         {% if form.non_field_errors %}

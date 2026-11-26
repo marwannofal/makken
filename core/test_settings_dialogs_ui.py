@@ -1,4 +1,4 @@
-"""Tests verifying all 13 إدارة البيانات pages + إدارات الهيكل التنظيمي load the spacious, responsive settings dialogs CSS."""
+"""Tests verifying all 13 إدارة البيانات pages + إدارة الهيكل التنظيمي load the spacious, responsive settings dialogs CSS."""
 from pathlib import Path
 
 from django.conf import settings

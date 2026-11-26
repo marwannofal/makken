@@ -159,7 +159,7 @@ def departments_index(request):
         for row in page_obj
     ]
     context = {
-        'page_heading': 'إدارات الهيكل التنظيمي',
+        'page_heading': 'إدارة الهيكل التنظيمي',
         'active_page': 'access_control',
         'access_tab': 'departments',
         'display_name': name,

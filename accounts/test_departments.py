@@ -38,7 +38,7 @@ class DepartmentLookupTests(TestCase):
         self.client.force_login(self.reader, backend='accounts.backends.EmailOrUsernameBackend')
         res = self.client.get(self.url)
         self.assertEqual(res.status_code, 200)
-        self.assertContains(res, 'إدارات الهيكل التنظيمي')
+        self.assertContains(res, 'إدارة الهيكل التنظيمي')
         self.assertNotContains(res, 'إضافة إدارة')
         self.assertEqual(self.client.get(f'{self.url}?edit=new').status_code, 403)
 
@@ -131,7 +131,7 @@ class DepartmentLookupTests(TestCase):
         self.client.force_login(self.admin)
         ac_page = self.client.get(reverse('access_control:index'))
         self.assertEqual(ac_page.status_code, 200)
-        self.assertContains(ac_page, 'إدارات الهيكل التنظيمي')
+        self.assertContains(ac_page, 'إدارة الهيكل التنظيمي')
         self.assertContains(ac_page, self.url)
         dept_page = self.client.get(self.url)
         self.assertEqual(dept_page.status_code, 200)
