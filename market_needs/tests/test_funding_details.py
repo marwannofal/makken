@@ -192,8 +192,10 @@ class FundingDetailsTests(MarketFixtures, TestCase):
         self.assertEqual(positions,sorted(positions));self.assertContains(response,need.number)
         response=self.client.get(f'/market-needs/{need.pk}/sponsors/')
         self.assertNotContains(response, 'إسناد متابعة البطاقة')
-        for label in ['الكيان / نوعه','نطاق الكيان','مستوى','تاريخ التعديل','المستخدم / التعديل']:
+        for label in ['الكيان / نوعه','نطاق الكيان','مستوى']:
             self.assertContains(response,f'<th scope="col">{label}</th>',html=True)
+        for label in ['تاريخ التعديل','المستخدم / التعديل']:
+            self.assertNotContains(response,f'<th scope="col">{label}</th>',html=True)
 
 
 class FundingMigrationTests(MarketFixtures, TransactionTestCase):

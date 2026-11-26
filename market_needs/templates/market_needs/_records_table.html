@@ -19,8 +19,6 @@
           <th scope="col">حالة الشراكة</th>
           <th scope="col">تاريخ بداية الشراكة</th>
           <th scope="col">تاريخ نهاية الشراكة</th>
-          <th scope="col">تاريخ التعديل</th>
-          <th scope="col">المستخدم / التعديل</th>
           <th scope="col" class="action-cell">الإجراء</th>
         </tr>
       </thead>
@@ -61,27 +59,13 @@
             </td>
             <td><bdi>{% firstof row.record.partnership.signed_on|date:'d/m/Y' row.record.partnership.starts_on|date:'d/m/Y' '—' %}</bdi></td>
             <td><bdi>{% firstof row.record.partnership.calculated_expiry|date:'d/m/Y' row.record.partnership.ends_on|date:'d/m/Y' '—' %}</bdi></td>
-            <td>
-            {% if row.record.updated_at %}
-              <time datetime="{{ row.record.updated_at|date:'c' }}">{{ row.record.updated_at|date:'d/m/Y H:i:s T' }}</time>
-            {% else %}
-              —
-            {% endif %}
-            </td>
-            <td>
-            {% if row.record.updated_by %}
-              <bdi>{{ row.record.updated_by.get_full_name|default:row.record.updated_by.username }}</bdi>
-            {% else %}
-              النظام / مستخدم سابق غير معروف
-            {% endif %}
-            </td>
             <td class="action-cell">
             {% include 'market_needs/_record_actions.html' %}
             </td>
           </tr>
         {% empty %}
           <tr>
-            <td colspan="14"><p class="empty-state">لا توجد جهات مطابقة لمعايير هذه البطاقة حاليًا (القطاع، التخصص، المناطق، أشكال الرعاية، وحالات التطور المختارة).</p></td>
+            <td colspan="12"><p class="empty-state">لا توجد جهات مطابقة لمعايير هذه البطاقة حاليًا (القطاع، التخصص، المناطق، أشكال الرعاية، وحالات التطور المختارة).</p></td>
           </tr>
         {% endfor %}
       </tbody>
