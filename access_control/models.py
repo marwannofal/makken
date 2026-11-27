@@ -18,6 +18,7 @@ class Operation(models.TextChoices):
     VIEW = 'view', 'عرض'
     CREATE = 'create', 'إضافة'
     EDIT = 'edit', 'تعديل'
+    CLAUSES_PROGRESS = 'clauses_progress', 'تحديث نسب إنجاز البنود'
     DELETE = 'delete', 'حذف'
     STATUS = 'change_status', 'تغيير الحالة'
     EXPORT = 'export', 'تنزيل المرفقات'

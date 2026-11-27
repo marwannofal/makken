@@ -282,7 +282,7 @@ def work_index(request):
         from django.db.models import Subquery
         from access_control.regions import scoped
         from partnerships.models import Partnership
-        visible = Q(target_model='')
+        visible = Q(target_model='') | Q(target_model='partnerships.partnership', employee=request.user) | Q(target_model='partnerships.partnership', assignees=request.user)
         for model, spec in WORK_TARGETS.items():
             if policy.can(spec.module):
                 if model == 'agreement_clauses.agreement':
@@ -324,7 +324,7 @@ def work_index(request):
         elif row.target_model == 'agreement_clauses.agreement' and row.target_key:
             linked = a_map.get(row.target_key)
         row.linked_partnership = linked
-        row.linked_partnership_url = reverse('partnerships:edit', args=[linked.pk]) if linked else ''
+        row.linked_partnership_url = (reverse('partnerships:edit', args=[linked.pk]) + '?from=my_work') if linked else ''
         row.is_overdue = is_work_overdue(row, today)
     status_choices = [*WorkStatus.choices, ('overdue', 'متأخرة')]
     return page(request, 'work_list', section='work', rows=page_obj,

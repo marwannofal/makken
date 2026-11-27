@@ -31,6 +31,10 @@ class AccessBoundaryMiddleware(MiddlewareMixin):
         module=getattr(view_func,'_access_module',None)
         if module is None:
             return None if policy.superuser else denied(request,'لم تُمنح صلاحية لهذه الصفحة.')
+        if module == 'partnerships' and route in {'partnerships:edit', 'partnerships:clauses_progress', 'partnerships:clause_evidence_download'} and view_kwargs.get('pk'):
+            from partnerships.access import is_assigned_partnership_employee
+            if is_assigned_partnership_employee(request.user, view_kwargs['pk']):
+                return None
         if not policy.can(module):return denied(request)
         return None
 

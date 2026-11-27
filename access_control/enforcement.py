@@ -126,7 +126,7 @@ def requested_operations(request,module,view,kwargs):
         raise PermissionDenied
     if module == 'partnerships' and name == 'clauses_progress':
         if request.method in {'GET', 'HEAD', 'POST'}:
-            return ['view', 'edit']
+            return ['view', 'clauses_progress']
         raise PermissionDenied
     if module == 'partnerships' and name == 'work_edit':
         if request.method in {'GET', 'HEAD'}:
@@ -220,6 +220,12 @@ def module_view(module):
                 from .regions import guard_request
                 guard_request(request, module, kwargs)
                 return view(request,*args,**kwargs)
+            if module == 'partnerships' and request.resolver_match and request.resolver_match.url_name in {'edit', 'clauses_progress', 'clause_evidence_download'} and kwargs.get('pk'):
+                from partnerships.access import is_assigned_partnership_employee
+                if is_assigned_partnership_employee(request.user, kwargs['pk']):
+                    uname = request.resolver_match.url_name
+                    if request.method in {'GET', 'HEAD'} or (uname == 'clauses_progress' and request.method == 'POST'):
+                        return view(request, *args, **kwargs)
             try:
                 if not policy.can(module):raise PermissionDenied
                 if request.method not in {'GET','HEAD'} and not any(policy.can(module,op) for op in DEFINITIONS[module].operations if op!='view'):

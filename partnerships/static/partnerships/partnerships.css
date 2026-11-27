@@ -1892,3 +1892,42 @@
   margin: 0 !important;
   box-sizing: border-box !important;
 }
+
+/* Read-only partnership form & auto-opened clauses panel for assigned employees */
+.mk-readonly-fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.mk-readonly-fieldset input,
+.mk-readonly-fieldset select,
+.mk-readonly-fieldset textarea {
+  background-color: #f3f7f9 !important;
+  color: #425a66 !important;
+  cursor: not-allowed;
+}
+
+.mk-readonly-fieldset .mk-section-save,
+.mk-readonly-fieldset .mk-section-save-bar,
+.mk-readonly-fieldset [data-add-offering],
+.mk-readonly-fieldset [data-remove-offering],
+.mk-readonly-fieldset [data-add-team-row],
+.mk-readonly-fieldset [data-remove-team-row] {
+  display: none !important;
+}
+
+.mk-emp-clauses-panel {
+  margin-bottom: 18px;
+}
+
+.mk-emp-cp-actions {
+  margin-top: 16px;
+}
+
+.mk-emp-clauses-panel .mk-cp-preset.is-active {
+  background: #005b85;
+  color: #ffffff;
+  border-color: #005b85;
+}

@@ -30,7 +30,7 @@ MODULES = (
     ModuleDefinition('agreement_clauses', 'بنود الاتفاقية', 'agreement_clauses:index', CRUD),
     ModuleDefinition('training_programs', 'برامج التدريب', 'training_programs:index', CRUD),
     ModuleDefinition('sponsorship_shapes', 'أشكال الرعاية', 'sponsorship_shapes:index', CRUD),
-    ModuleDefinition('partnerships', 'الشراكات', 'partnerships:index', (*CRUD, 'export')),
+    ModuleDefinition('partnerships', 'الشراكات', 'partnerships:index', (*CRUD, 'clauses_progress', 'export')),
     ModuleDefinition('market_needs', 'بطاقات حاجة السوق ومتابعة الرعاية', 'market_needs:index', (*CRUD, 'export')),
     ModuleDefinition('service_providers', 'مزودو الخدمات', 'service_providers:index', CRUD),
     ModuleDefinition('approved_programs', 'البرامج المعتمدة وفقًا للتخصص', 'program_execution:index', ('view',)),

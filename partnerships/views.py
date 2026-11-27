@@ -224,11 +224,21 @@ def _redirect_to_list_with_highlight(request, item, return_to=None):
     return redirect("partnerships:capability_index")
 
 
+def _get_partnership_for_user(request, pk):
+    item = _query(request.user).filter(pk=pk).first()
+    if item is not None:
+        return item
+    from .access import is_assigned_partnership_employee
+    if is_assigned_partnership_employee(request.user, pk):
+        return get_object_or_404(Partnership.objects.all(), pk=pk)
+    raise Http404
+
+
 @module_view('partnerships')
 @login_required(login_url="accounts:login")
 @require_http_methods(["GET", "POST"])
 def editor(request, pk=None, initial_state=DevelopmentState.CAPABILITY):
-    item = get_object_or_404(_query(request.user), pk=pk) if pk else None
+    item = _get_partnership_for_user(request, pk) if pk else None
     is_will_create = item is None and initial_state == DevelopmentState.WILLINGNESS
     show_edit_clauses = bool(
         item and (item.development_state_id == DevelopmentState.WILLINGNESS or item.agreement_clause_assignments.filter(agreement__isnull=True).exists())
@@ -241,8 +251,13 @@ def editor(request, pk=None, initial_state=DevelopmentState.CAPABILITY):
     active_nav = "partnerships_willingness" if is_will_create else "partnership_editor"
     from access_control.policy import for_request as _policy_for_request
     _req_policy = _policy_for_request(request)
-    can_create_work = bool(request.user.is_superuser or _req_policy.can("work_assignments", "create"))
-    can_edit_work = bool(request.user.is_superuser or _req_policy.can("work_assignments", "edit"))
+    from .access import is_assigned_partnership_employee
+    is_assigned_emp = bool(item and is_assigned_partnership_employee(request.user, item.pk))
+    can_edit_partnership = bool(request.user.is_superuser or _req_policy.can("partnerships", "edit"))
+    can_update_clauses = bool(request.user.is_superuser or _req_policy.can("partnerships", "clauses_progress") or is_assigned_emp)
+    clauses_only_mode = bool(item and show_edit_clauses and ((is_assigned_emp and request.GET.get("from") == "my_work") or (not can_edit_partnership and can_update_clauses)))
+    can_create_work = False if clauses_only_mode else bool(request.user.is_superuser or _req_policy.can("work_assignments", "create"))
+    can_edit_work = False if clauses_only_mode else bool(request.user.is_superuser or _req_policy.can("work_assignments", "edit"))
     context = _base(request, heading, active_nav)
     status, pending = 200, None
     return_to = "willingness" if (request.GET.get("from") == "willingness" or is_will_create or (item and item.development_state_id == DevelopmentState.WILLINGNESS)) else "capability"
@@ -257,6 +272,9 @@ def editor(request, pk=None, initial_state=DevelopmentState.CAPABILITY):
     teams_error = ""
     saved_paths = []
     try:
+        if request.method == "POST" and (clauses_only_mode or (item and not can_edit_partnership)):
+            from access_control.enforcement import denied
+            return denied(request)
         if request.method == "POST":
             action = request.POST.get("action")
             if is_will_create and action == "create_willingness":
@@ -423,7 +441,7 @@ def editor(request, pk=None, initial_state=DevelopmentState.CAPABILITY):
             _wk.is_overdue = is_work_overdue(_wk, today_riyadh)
         if work_form is None and can_create_work:
             work_form = PartnershipWorkForm(actor=request.user, prefix="work", optional=True)
-    back_url = reverse("partnerships:willingness_index") if return_to == "willingness" else reverse("partnerships:capability_index")
+    back_url = reverse("makken_mail:work_index") if request.GET.get("from") == "my_work" else (reverse("partnerships:willingness_index") if return_to == "willingness" else reverse("partnerships:capability_index"))
     context.update(
         existing_works=existing_works,
         can_create_work=can_create_work,
@@ -438,6 +456,10 @@ def editor(request, pk=None, initial_state=DevelopmentState.CAPABILITY):
         back_url=back_url,
         is_will_create=is_will_create,
         show_edit_clauses=show_edit_clauses,
+        clauses_only_mode=clauses_only_mode,
+        can_edit_partnership=can_edit_partnership,
+        can_update_clauses=can_update_clauses,
+        clauses_progress_url=reverse("partnerships:clauses_progress", args=[item.pk]) if item else "",
         willingness_form=willingness_form,
         work_form=work_form,
         clauses_json=clauses_json,
@@ -713,7 +735,7 @@ def clauses_progress(request, pk):
     from .willingness import safe_filename, validate_attachment
     from .attachment_storage import willingness_storage
 
-    item = get_object_or_404(_query(request.user), pk=pk)
+    item = _get_partnership_for_user(request, pk)
     if item.development_state_id != DevelopmentState.WILLINGNESS:
         return add_login_headers(
             JsonResponse({"error": "بطاقة المتابعة ونسب إنجاز البنود متاحة لشراكات الرغبة فقط."}, status=400)
@@ -844,7 +866,11 @@ def clauses_progress(request, pk):
             locked_item = Partnership.objects.select_for_update().filter(pk=item.pk).first()
             if not locked_item:
                 return add_login_headers(JsonResponse({"error": "الشراكة غير موجودة."}, status=404))
-            require_write(request.user, locked_item, policy=region_policy)
+            from .access import is_assigned_partnership_employee
+            from access_control.policy import for_request as _cp_policy
+            _has_full_edit = bool(request.user.is_superuser or _cp_policy(request).can("partnerships", "edit"))
+            if not is_assigned_partnership_employee(request.user, locked_item.pk) or _has_full_edit:
+                require_write(request.user, locked_item, policy=region_policy)
             assignments = {
                 r.pk: r
                 for r in ClauseAssignment.objects.select_for_update().filter(
@@ -923,7 +949,7 @@ def download_clause_evidence(request, pk, evidence_id):
     from agreement_clauses.models import ClauseEvidence
     from .attachment_storage import willingness_storage
 
-    partnership = get_object_or_404(_query(request.user), pk=pk)
+    partnership = _get_partnership_for_user(request, pk)
     evidence = get_object_or_404(
         ClauseEvidence.objects.select_related("assignment"),
         pk=evidence_id,

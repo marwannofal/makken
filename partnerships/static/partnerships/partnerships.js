@@ -888,3 +888,168 @@
 
   renderRows();
 })();
+
+  // Standalone inline clauses progress editor (opened from متابعة الأعمال)
+  (() => {
+    const panel = document.querySelector('[data-emp-clauses-panel]');
+    if (!panel) return;
+    const url = panel.dataset.progressUrl;
+    const listRoot = panel.querySelector('[data-emp-clauses-list]');
+    const avgEl = panel.querySelector('[data-emp-clauses-avg]');
+    const errEl = panel.querySelector('[data-emp-cp-error]');
+    const okEl = panel.querySelector('[data-emp-cp-success]');
+    const saveBtn = panel.querySelector('[data-emp-cp-save]');
+    let rows = [];
+
+    function renderRows() {
+      if (!listRoot) return;
+      listRoot.replaceChildren();
+      if (!rows.length) {
+        const p = document.createElement('p');
+        p.className = 'field-help';
+        p.textContent = 'لا توجد بنود اتفاقية مسندة لهذه الشراكة حاليًا.';
+        listRoot.append(p);
+        return;
+      }
+      rows.forEach((row, idx) => {
+        const card = document.createElement('div');
+        card.className = 'mk-cp-item' + (Number(row.progress) >= 50 ? ' is-high' : '');
+
+        const head = document.createElement('div');
+        head.className = 'mk-cp-item-head';
+        const title = document.createElement('div');
+        title.className = 'mk-cp-item-title';
+        const num = document.createElement('span');
+        num.className = 'mk-cp-num';
+        num.textContent = String(idx + 1);
+        const name = document.createElement('strong');
+        name.textContent = row.name;
+        title.append(num, name);
+        const resp = document.createElement('span');
+        resp.className = 'subtle-badge';
+        resp.textContent = 'المسؤولية: ' + (row.responsibility_label || '');
+        head.append(title, resp);
+
+        const controls = document.createElement('div');
+        controls.className = 'mk-cp-controls';
+        [0, 25, 50, 75, 100].forEach(preset => {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'button button-secondary mk-cp-preset' + (Number(row.progress) === preset ? ' is-active' : '');
+          b.textContent = preset + '%';
+          b.addEventListener('click', () => {
+            row.progress = preset;
+            renderRows();
+          });
+          controls.append(b);
+        });
+        const numInput = document.createElement('input');
+        numInput.type = 'number';
+        numInput.min = '0';
+        numInput.max = '100';
+        numInput.step = '1';
+        numInput.dir = 'ltr';
+        numInput.className = 'mk-cp-input';
+        numInput.value = String(row.progress ?? 0);
+        numInput.setAttribute('aria-label', 'نسبة الإنجاز للبند ' + row.name);
+        numInput.addEventListener('input', () => {
+          const val = Math.max(0, Math.min(100, parseInt(numInput.value || '0', 10) || 0));
+          row.progress = val;
+          card.classList.toggle('is-high', val >= 50);
+        });
+        controls.append(numInput);
+
+        const body = document.createElement('div');
+        body.className = 'mk-cp-extra';
+        const notesLabel = document.createElement('label');
+        notesLabel.textContent = 'ملاحظات البند';
+        const notes = document.createElement('textarea');
+        notes.rows = 2;
+        notes.maxLength = 2000;
+        notes.placeholder = 'أضف ملاحظات المتابعة الخاصة بهذا البند…';
+        notes.value = row.notes || '';
+        notes.addEventListener('input', () => { row.notes = notes.value; });
+        notesLabel.append(notes);
+
+        const evWrap = document.createElement('div');
+        evWrap.className = 'mk-cp-evidences';
+        const evLabel = document.createElement('label');
+        evLabel.textContent = 'الشواهد والمرفقات (PDF / PNG / JPG)';
+        const evInput = document.createElement('input');
+        evInput.type = 'file';
+        evInput.multiple = true;
+        evInput.accept = '.pdf,.png,.jpg,.jpeg';
+        evInput.dataset.empEvidenceFor = String(row.id);
+        evLabel.append(evInput);
+        evWrap.append(evLabel);
+
+        if (row.evidences && row.evidences.length) {
+          const evList = document.createElement('ul');
+          evList.className = 'mk-cp-ev-list';
+          row.evidences.forEach(ev => {
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = ev.download_url;
+            a.textContent = ev.name + (ev.uploaded_at ? ' (' + ev.uploaded_at + ')' : '');
+            li.append(a);
+            evList.append(li);
+          });
+          evWrap.append(evList);
+        }
+
+        body.append(notesLabel, evWrap);
+        card.append(head, controls, body);
+        listRoot.append(card);
+      });
+    }
+
+    async function load() {
+      try {
+        const res = await fetch(url, {headers: {'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest'}});
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'تعذّر تحميل بنود الاتفاقية.');
+        rows = data.clauses || [];
+        if (avgEl) avgEl.textContent = data.overall_display || '—';
+        renderRows();
+      } catch (err) {
+        if (errEl) errEl.textContent = err.message || 'تعذّر تحميل بنود الاتفاقية.';
+      }
+    }
+
+    saveBtn?.addEventListener('click', async () => {
+      if (errEl) errEl.textContent = '';
+      if (okEl) okEl.hidden = true;
+      const csrf = document.querySelector('input[name="csrfmiddlewaretoken"]')?.value || '';
+      const fd = new FormData();
+      fd.append('items_json', JSON.stringify(rows.map(r => ({id: r.id, progress: Number(r.progress || 0), notes: r.notes || ''}))));
+      panel.querySelectorAll('input[data-emp-evidence-for]').forEach(inp => {
+        const aid = inp.dataset.empEvidenceFor;
+        [...(inp.files || [])].forEach(file => fd.append('evidence_' + aid, file));
+      });
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'جار الحفظ…';
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: {'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': csrf},
+          body: fd,
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'تعذّر حفظ نسب الإنجاز.');
+        rows = data.clauses || rows;
+        if (avgEl) avgEl.textContent = data.overall_display || '—';
+        renderRows();
+        if (okEl) {
+          okEl.textContent = data.message || 'تم حفظ نسب إنجاز البنود بنجاح.';
+          okEl.hidden = false;
+        }
+      } catch (err) {
+        if (errEl) errEl.textContent = err.message || 'تعذّر حفظ نسب الإنجاز.';
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'حفظ نسب الإنجاز';
+      }
+    });
+
+    load();
+  })();
