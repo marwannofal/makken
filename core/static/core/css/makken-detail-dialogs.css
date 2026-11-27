@@ -240,3 +240,78 @@ dialog.detail-dialog,
     font-size: 14px !important;
   }
 }
+
+
+/* === Unified site-wide pop-up close button === */
+dialog .dialog-top .icon-button,
+dialog .dialog-head .icon-button,
+dialog .dialog-header .icon-button,
+dialog .modal-header .icon-button,
+dialog .icon-button[data-dismiss-dialog],
+dialog .icon-button[data-market-close],
+dialog .icon-button[data-profile-dialog-close],
+dialog .icon-button[data-dependency-close],
+dialog .icon-button.dialog-close,
+dialog .flex-close-btn,
+dialog .pub-dialog-close,
+.modal .icon-button.dialog-close,
+.mk-modal-close {
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  min-height: 38px !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 12px !important;
+  border: 1.5px solid #005b85 !important;
+  color: #005b85 !important;
+  background: #f0f7fb !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  flex-shrink: 0 !important;
+  font-size: 1.25rem !important;
+  line-height: 1 !important;
+  transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease !important;
+}
+dialog .dialog-top .icon-button svg,
+dialog .dialog-head .icon-button svg,
+dialog .dialog-header .icon-button svg,
+dialog .modal-header .icon-button svg,
+dialog .icon-button[data-dismiss-dialog] svg,
+dialog .icon-button[data-market-close] svg,
+dialog .icon-button[data-profile-dialog-close] svg,
+dialog .icon-button[data-dependency-close] svg,
+dialog .icon-button.dialog-close svg {
+  width: 18px !important;
+  height: 18px !important;
+  stroke: currentColor !important;
+  stroke-width: 2.1 !important;
+}
+dialog .dialog-top .icon-button:hover,
+dialog .dialog-top .icon-button:focus-visible,
+dialog .dialog-head .icon-button:hover,
+dialog .dialog-head .icon-button:focus-visible,
+dialog .dialog-header .icon-button:hover,
+dialog .dialog-header .icon-button:focus-visible,
+dialog .modal-header .icon-button:hover,
+dialog .modal-header .icon-button:focus-visible,
+dialog .icon-button[data-dismiss-dialog]:hover,
+dialog .icon-button[data-dismiss-dialog]:focus-visible,
+dialog .icon-button[data-market-close]:hover,
+dialog .icon-button[data-market-close]:focus-visible,
+dialog .icon-button[data-profile-dialog-close]:hover,
+dialog .icon-button[data-profile-dialog-close]:focus-visible,
+dialog .icon-button[data-dependency-close]:hover,
+dialog .icon-button[data-dependency-close]:focus-visible,
+dialog .icon-button.dialog-close:hover,
+dialog .icon-button.dialog-close:focus-visible,
+dialog .flex-close-btn:hover,
+dialog .flex-close-btn:focus-visible,
+dialog .pub-dialog-close:hover,
+dialog .pub-dialog-close:focus-visible {
+  background: #005b85 !important;
+  color: #ffffff !important;
+  outline: none !important;
+}

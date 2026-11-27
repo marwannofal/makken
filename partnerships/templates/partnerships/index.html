@@ -9,7 +9,7 @@
 {% block extra_head %}
   <link rel="stylesheet" href="{% static 'partnerships/willingness_upload.css' %}?v=20261121-blue6">
   <link rel="stylesheet" href="{% static 'care_states/states.css' %}?v=20261121-blue6">
-  <link rel="stylesheet" href="{% static 'partnerships/partnerships.css' %}?v=20261124-opt2-v3">
+  <link rel="stylesheet" href="{% static 'partnerships/partnerships.css' %}?v=20261127-modal43">
   <script src="{% static 'partnerships/partnerships.js' %}?v=20261124-opt2-v3" defer></script>
   {% include "partnerships/_financial_assets.html" %}
   {% include "partnerships/_development_filter_assets.html" %}
@@ -171,9 +171,36 @@
     <dialog id="partnership-detail" class="partnership-dialog detail-dialog" aria-labelledby="detail-title" open data-server-dialog data-close-url="{{ list_url }}">
       <div class="dialog-body">
         <div class="dialog-top">
-          <p class="eyebrow">تفاصيل الشراكة المحتملة</p><a class="icon-button" href="{{ list_url }}" aria-label="إغلاق التفاصيل" autofocus><svg aria-hidden="true"><use href="#icon-close"/></svg></a>
+          <div class="mk-detail-eyebrow-wrap"><p class="eyebrow">{% if detail.development_state_id == "capability" %}تفاصيل شراكة القدرة{% elif detail.development_state_id == "willingness" %}تفاصيل شراكة الرغبة{% elif detail.development_state_id == "care" %}تفاصيل شراكة الرعاية{% else %}تفاصيل الشراكة{% endif %}</p>{% development_pill detail.development_state %}</div><a class="icon-button" href="{{ list_url }}" aria-label="إغلاق التفاصيل" autofocus><svg aria-hidden="true"><use href="#icon-close"/></svg></a>
         </div>
         <h2 id="detail-title"><bdi>{{ detail.name }}</bdi></h2>
+        {% if detail.development_state_id != 'capability' %}
+          <div class="mk-detail-term-banner" aria-label="مدة وتواريخ الشراكة">
+            <div class="mk-term-highlight-grid">
+              <div class="mk-term-highlight-card">
+                <span class="mk-term-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span>
+                <div>
+                  <span class="mk-term-label">تاريخ بداية الشراكة</span>
+                  <strong class="mk-term-value">{% if detail.starts_on %}<time datetime="{{ detail.starts_on|date:'Y-m-d' }}"><bdi dir="ltr">{{ detail.starts_on|date:'d/m/Y' }}</bdi></time>{% else %}غير محدد{% endif %}</strong>
+                </div>
+              </div>
+              <div class="mk-term-highlight-card">
+                <span class="mk-term-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="m9 16 2 2 4-4"/></svg></span>
+                <div>
+                  <span class="mk-term-label">تاريخ نهاية الشراكة</span>
+                  <strong class="mk-term-value">{% if detail.ends_on %}<time datetime="{{ detail.ends_on|date:'Y-m-d' }}"><bdi dir="ltr">{{ detail.ends_on|date:'d/m/Y' }}</bdi></time>{% else %}غير محدد{% endif %}</strong>
+                </div>
+              </div>
+            </div>
+            {% if detail.signed_on or detail.duration_months or detail.partnership_status %}
+              <div class="mk-term-meta-chips">
+                {% if detail.signed_on %}<span class="mk-term-meta-chip">تاريخ التوقيع: <bdi dir="ltr">{{ detail.signed_on|date:'d/m/Y' }}</bdi></span>{% endif %}
+                {% if detail.duration_months %}<span class="mk-term-meta-chip">المدة: {{ detail.duration_months }} شهر</span>{% endif %}
+                {% if detail.partnership_status %}<span class="mk-pstatus-pill {{ detail.partnership_status|partnership_status_tone }}">{{ detail.partnership_status.name }}</span>{% endif %}
+              </div>
+            {% endif %}
+          </div>
+        {% endif %}
         <dl class="detail-grid">
           <div>
             <dt>اسم الممثل عن الجهة</dt><dd><bdi>{{ detail.representative }}</bdi></dd>
@@ -208,12 +235,6 @@
             {% endif %}
             </dd>
           </div>
-          {% if detail.development_state_id == 'willingness' or detail.signed_on or detail.starts_on or detail.ends_on %}
-            {% if detail.signed_on %}<div><dt>تاريخ توقيع الشراكة</dt><dd><time datetime="{{ detail.signed_on|date:'Y-m-d' }}"><bdi dir="ltr">{{ detail.signed_on|date:'d/m/Y' }}</bdi></time></dd></div>{% endif %}
-            {% include "partnerships/_term_dates.html" with starts_on=detail.starts_on ends_on=detail.ends_on only %}
-            {% if detail.duration_months %}<div><dt>مدة الشراكة بالأشهر</dt><dd>{{ detail.duration_months }} شهر</dd></div>{% endif %}
-          {% endif %}
-          {% if detail.partnership_status %}<div><dt>حالة الشراكة</dt><dd><span class="mk-pstatus-pill {{ detail.partnership_status|partnership_status_tone }}">{{ detail.partnership_status.name }}</span></dd></div>{% endif %}
         </dl>
         <div class="detail-offerings">
           <h3>القطاعات والتخصصات وأشكال الرعاية</h3><p class="table-scroll-hint">اسحب الجدول أفقيًا لعرض جميع الأعمدة عند الحاجة.</p>

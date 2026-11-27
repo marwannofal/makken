@@ -2063,3 +2063,96 @@ tbody tr:last-child:not(:first-child) .mk-contact-tip-box {
   color: #005b85;
   border-color: #c9e0ec;
 }
+
+
+/* === View Modal: dynamic state header & highlighted term dates banner === */
+.mk-detail-eyebrow-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.mk-detail-eyebrow-wrap .eyebrow {
+  margin: 0;
+}
+.mk-detail-term-banner {
+  margin: 12px 0 16px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #eef6fb 0%, #f4fafc 100%);
+  border: 1.5px solid #bfe0f0;
+  border-inline-start: 4px solid #005b85;
+}
+.mk-term-highlight-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.mk-term-highlight-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 11px;
+  background: #ffffff;
+  border: 1px solid #d5e8f2;
+  box-shadow: 0 2px 6px rgba(0, 91, 133, 0.05);
+}
+.mk-term-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #e6f2f8;
+  color: #005b85;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 36px;
+}
+.mk-term-icon svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.mk-term-label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #4b6b7c;
+  margin-bottom: 2px;
+}
+.mk-term-value {
+  display: block;
+  font-size: 1.02rem;
+  font-weight: 800;
+  color: #0b3b54;
+  font-variant-numeric: tabular-nums;
+}
+.mk-term-meta-chips {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed #c7dfec;
+}
+.mk-term-meta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1px solid #d5e8f2;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #2b4c5e;
+}
+@media (max-width: 640px) {
+  .mk-term-highlight-grid {
+    grid-template-columns: 1fr;
+  }
+}

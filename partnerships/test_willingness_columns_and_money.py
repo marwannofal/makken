@@ -129,3 +129,38 @@ class WillingnessColumnsAndMoneyFormattingTests(TestCase):
         bad = WillingnessDetailsForm(data={"starts_on": "2026-02-01", "duration_months": ""}, partnership=self.p_will)
         self.assertFalse(bad.is_valid())
         self.assertIn("duration_months", bad.errors)
+
+    def test_view_modal_dynamic_titles_state_badges_and_highlighted_dates(self):
+        p_care = Partnership.objects.create(
+            name="شركة الرعاية للاختبار",
+            representative="ممثل الرعاية",
+            phone_country="SA",
+            phone="+966550003333",
+            email="care@demo.sa",
+            entity=self.entity,
+            scope="local",
+            development_state_id=DevelopmentState.CARE,
+            financial_capacity=Decimal("2400000.00"),
+            starts_on=date(2026, 5, 1),
+            ends_on=date(2027, 5, 1),
+        )
+        cap_res = self.client.get(reverse("partnerships:capability_index") + f"?detail={self.p_cap.pk}")
+        self.assertEqual(cap_res.status_code, 200)
+        self.assertContains(cap_res, "تفاصيل شراكة القدرة")
+        self.assertNotContains(cap_res, "تفاصيل الشراكة المحتملة")
+        self.assertContains(cap_res, "mk-detail-eyebrow-wrap")
+        self.assertNotContains(cap_res, "mk-detail-term-banner")
+
+        will_res = self.client.get(reverse("partnerships:willingness_index") + f"?detail={self.p_will.pk}")
+        self.assertEqual(will_res.status_code, 200)
+        self.assertContains(will_res, "تفاصيل شراكة الرغبة")
+        self.assertContains(will_res, "mk-detail-term-banner")
+        self.assertContains(will_res, "15/01/2026")
+        self.assertContains(will_res, "15/01/2027")
+
+        care_res = self.client.get(reverse("partnerships:all_index") + f"?detail={p_care.pk}")
+        self.assertEqual(care_res.status_code, 200)
+        self.assertContains(care_res, "تفاصيل شراكة الرعاية")
+        self.assertContains(care_res, "mk-detail-term-banner")
+        self.assertContains(care_res, "01/05/2026")
+        self.assertContains(care_res, "01/05/2027")
