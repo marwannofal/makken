@@ -246,7 +246,7 @@
                       </td>
                       <td data-work-manager>{{ wk.manager.get_full_name|default:wk.manager.username }}</td>
                       <td data-work-status>{{ wk.get_status_display }} ({{ wk.progress }}%){% if wk.is_overdue %} <span class="subtle-badge is-overdue-badge">متأخرة</span>{% endif %}</td>
-                      {% if can_edit_work %}<td class="action-cell"><div class="row-actions"><button type="button" class="row-action" data-edit-work-url="{% url 'partnerships:work_edit' item.pk wk.pk %}" data-edit-work-row="{{ wk.pk }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m16 4 4 4M4 20l5-1L20 8a2.8 2.8 0 0 0-4-4L5 15Z"/></svg><span>عرض / تعديل</span></button></div></td>{% endif %}
+                      {% if can_edit_work %}<td class="action-cell"><div class="row-actions"><button type="button" class="row-action" data-edit-work-url="{% url 'partnerships:work_edit' item.pk wk.pk %}" data-edit-work-row="{{ wk.pk }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m16 4 4 4M4 20l5-1L20 8a2.8 2.8 0 0 0-4-4L5 15Z"/></svg><span>عرض أو تعديل</span></button></div></td>{% endif %}
                     </tr>
                   {% endfor %}
                 </tbody>

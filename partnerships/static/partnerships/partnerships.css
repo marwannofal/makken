@@ -1887,8 +1887,8 @@
 #partnership-work-dialog .we-status-due-grid .mk-dd-trigger,
 #partnership-work-dialog .we-status-due-grid input[type="date"],
 #partnership-work-dialog .we-status-due-grid .mk-date-display {
-  height: 50px !important;
-  min-height: 50px !important;
+  height: 44px !important;
+  min-height: 44px !important;
   margin: 0 !important;
   box-sizing: border-box !important;
 }

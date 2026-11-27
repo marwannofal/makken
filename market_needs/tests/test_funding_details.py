@@ -187,7 +187,7 @@ class FundingDetailsTests(MarketFixtures, TestCase):
     def test_table_headers_follow_requested_order_and_extra_data_remains(self):
         need=self.create_need(); record=self.attach(need,self.organization())
         response=self.client.get('/market-needs/')
-        headers=['حاجة السوق','القطاع','التخصص','البرنامج التدريبي','حالة البرنامج','نوع الرعاية','عدد المتدربين','تكلفة البرنامج','نوع التدريب','الإجراء']
+        headers=['حاجة السوق','القطاع','التخصص','البرنامج التدريبي','حالة الدعم','نوع الرعاية','عدد المتدربين','تكلفة البرنامج','نوع التدريب','الإجراء']
         html=response.content.decode();positions=[html.index(f'<th scope="col">{text}</th>') for text in headers]
         self.assertEqual(positions,sorted(positions));self.assertContains(response,need.number)
         response=self.client.get(f'/market-needs/{need.pk}/sponsors/')
