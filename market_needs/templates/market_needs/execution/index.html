@@ -88,7 +88,7 @@
             <dt>المناطق</dt><dd>{% for region in detail.regions.all %}{{ region.name }}{% if not forloop.last %} / {% endif %}{% empty %}—{% endfor %}</dd>
           </div>
           <div>
-            <dt>المدة الزمنية</dt><dd>{{ detail.duration }} {{ detail.get_duration_unit_display }}</dd>
+            <dt>المدة الزمنية</dt><dd>{{ detail.duration_display }}</dd>
           </div>
           <div>
             <dt>مصدر الحاجة</dt><dd>{{ detail.source }}</dd>

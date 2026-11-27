@@ -37,7 +37,7 @@ def audit(need, actor, action, before=None, after=None, sponsorship=None):
 
 
 def card_data(need):
-    return {**{name: str(getattr(need, name)) for name in ("title", "beneficiaries", "duration", "duration_unit", "source", "description", "observed_on", "is_active", "total_cost", "requested_support", "status", "approved_support")},
+    return {**{name: str(getattr(need, name)) for name in ("title", "beneficiaries", "duration", "duration_unit", "duration_days", "duration_months", "duration_years", "source", "description", "observed_on", "is_active", "total_cost", "requested_support", "status", "approved_support")},
             "sector": need.sector.name, "specialization": need.specialization.name,
             "program": need.program_name, "program_category": need.program_category, "training_type": need.training_type,
             "regions": "، ".join(need.regions.values_list("name", flat=True)),
@@ -98,7 +98,7 @@ def save_need(data, actor, pk=None, version=None, nonce=None):
     ensure_allowed(need, "edit", clean["is_active"] == "1")
     before = card_data(need) if need else {}
     if need and need.sponsorships.filter(status=SponsorshipStatus.APPROVED).exists():
-        protected = ("sector", "specialization", "program", "beneficiaries", "requested_support")
+        protected = ("sector", "specialization", "program", "beneficiaries")
         changed = any(getattr(need, name + "_id" if name in ("sector", "specialization", "program") else name) != (clean[name].pk if name in ("sector", "specialization", "program") else clean[name]) for name in protected)
         old_lines = sorted((x.expense_item_id, x.sponsorship_shape_id, x.amount) for x in need.expense_lines.all())
         new_lines = sorted((x["expense"], x["shape"], x["amount"]) for x in clean["lines"])
@@ -107,7 +107,7 @@ def save_need(data, actor, pk=None, version=None, nonce=None):
     new = need is None
     if new:
         need = Need(created_by=actor, request_key=nonce or uuid.uuid4())
-    for field in ("title", "sector", "specialization", "description", "duration", "duration_unit", "source", "beneficiaries", "program", "requested_support", "observed_on"):
+    for field in ("title", "sector", "specialization", "description", "duration", "duration_unit", "duration_days", "duration_months", "duration_years", "source", "beneficiaries", "program", "requested_support", "observed_on"):
         setattr(need, field, clean[field])
     need.search_states = list(clean.get("search_states") or [])
     need.search_scopes = list(clean.get("search_scopes") or [])

@@ -92,8 +92,8 @@ def failure(exc):
 
 def initial(need):
     if not need:
-        return {"lines": "[]", "is_active": "1"}
-    data = {name: getattr(need, name) for name in ("title", "description", "duration", "duration_unit", "source", "beneficiaries", "requested_support", "observed_on")}
+        return {"lines": "[]", "is_active": "1", "duration_days": 0, "duration_months": 0, "duration_years": 0}
+    data = {name: getattr(need, name) for name in ("title", "description", "duration_days", "duration_months", "duration_years", "source", "beneficiaries", "observed_on")}
     data.update(sector=need.sector_id, specialization=need.specialization_id, program=need.program_id,
                 regions=list(need.regions.values_list("pk", flat=True)), is_active="1" if need.is_active else "0",
                 search_states=list(need.search_states or []), search_scopes=list(need.search_scopes or []),

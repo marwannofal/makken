@@ -38,8 +38,39 @@
           {% include "market_needs/_field.html" with field=form.specialization %}
           {% include "market_needs/_field.html" with field=form.regions wide=True %}
           {% include "market_needs/_field.html" with field=form.description wide=True %}
-          {% include "market_needs/_field.html" with field=form.duration %}
-          {% include "market_needs/_field.html" with field=form.duration_unit %}
+          <div class="partnership-field market-wide mk-duration-field">
+            <div class="mk-duration-head">
+              <label for="{{ form.duration_days.id_for_label }}">المدة الزمنية <span class="required" aria-hidden="true">*</span></label>
+              <span class="mk-duration-preview" data-duration-preview>—</span>
+            </div>
+            <div class="mk-duration-steppers" data-duration-steppers>
+              <div class="mk-stepper" data-stepper data-min="0" data-max="31">
+                <label class="mk-stepper-label" for="{{ form.duration_days.id_for_label }}">يوم <small>(0–31)</small></label>
+                <div class="mk-stepper-ctrl">
+                  <button type="button" class="mk-stepper-btn" data-step="-1" aria-label="إنقاص الأيام">−</button>
+                  {{ form.duration_days }}
+                  <button type="button" class="mk-stepper-btn" data-step="1" aria-label="زيادة الأيام">+</button>
+                </div>
+              </div>
+              <div class="mk-stepper" data-stepper data-min="0" data-max="12">
+                <label class="mk-stepper-label" for="{{ form.duration_months.id_for_label }}">شهر <small>(0–12)</small></label>
+                <div class="mk-stepper-ctrl">
+                  <button type="button" class="mk-stepper-btn" data-step="-1" aria-label="إنقاص الأشهر">−</button>
+                  {{ form.duration_months }}
+                  <button type="button" class="mk-stepper-btn" data-step="1" aria-label="زيادة الأشهر">+</button>
+                </div>
+              </div>
+              <div class="mk-stepper" data-stepper data-min="0" data-max="12">
+                <label class="mk-stepper-label" for="{{ form.duration_years.id_for_label }}">سنة <small>(0–12)</small></label>
+                <div class="mk-stepper-ctrl">
+                  <button type="button" class="mk-stepper-btn" data-step="-1" aria-label="إنقاص السنوات">−</button>
+                  {{ form.duration_years }}
+                  <button type="button" class="mk-stepper-btn" data-step="1" aria-label="زيادة السنوات">+</button>
+                </div>
+              </div>
+            </div>
+            <div class="field-error" id="error-duration_days" role="alert">{{ form.duration_days.errors }}{{ form.duration_months.errors }}{{ form.duration_years.errors }}<span data-duration-error></span></div>
+          </div>
           {% include "market_needs/_field.html" with field=form.source wide=True %}
           {% include "market_needs/_field.html" with field=form.beneficiaries %}
           <div class="partnership-field">
@@ -55,11 +86,11 @@
         </div>
       </div>
     </details>
-    <details class="mk-accordion"{% if form.program.errors or form.lines.errors or form.requested_support.errors %} open{% endif %}>
+    <details class="mk-accordion"{% if form.program.errors or form.lines.errors %} open{% endif %}>
       <summary>
         <div class="mk-acc-head">
           <h2 class="mk-acc-title">02 · البرنامج التدريبي وبنود الصرف</h2>
-          <p class="mk-acc-subtitle">اختر البرنامج، ثم حدد البنود وأشكال الرعاية المطلوبة والدعم المطلوب.</p>
+          <p class="mk-acc-subtitle">اختر البرنامج، ثم حدّد شكل الرعاية والمبلغ لكل بند من بنود الصرف المرتبطة.</p>
         </div>
         <span class="mk-acc-meta">
           <svg class="mk-acc-arrow" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
@@ -98,13 +129,13 @@
         <div class="field-error" id="error-lines" role="alert">
           {{ form.lines.errors }}<span data-line-error></span>
         </div>
-        <p class="table-scroll-hint">كل بند مشمول يحتاج شكل رعاية ومبلغًا أكبر من صفر. حصة البند = مبلغه ÷ مجموع البنود × 100.</p>
+        <p class="table-scroll-hint">جميع بنود الصرف المرتبطة بالبرنامج التدريبي إلزامية؛ حدّد شكل الرعاية ومبلغًا أكبر من صفر لكل بند. حصة البند = مبلغه ÷ مجموع البنود × 100.</p>
         <div class="table-scroll" tabindex="0" aria-label="جدول يمكن تمريره أفقيًا">
           <table class="partnership-table market-edit-lines" data-no-export>
             <caption class="visually-hidden">تحديد بنود صرف الحاجة</caption>
             <thead>
               <tr>
-                <th scope="col">تضمين</th><th scope="col">بنود الصرف</th><th scope="col">شكل الرعاية</th><th scope="col">المبلغ</th><th scope="col">النسبة %</th>
+                <th scope="col">بنود الصرف</th><th scope="col">شكل الرعاية</th><th scope="col">المبلغ</th><th scope="col">النسبة %</th>
               </tr>
             </thead>
             <tbody data-expense-rows>
@@ -115,10 +146,6 @@
         <div class="market-total">
           <span>إجمالي تكلفة الحاجة</span><strong><bdi data-total>0.00</bdi> <img src="{% static 'partnerships/saudi-riyal.svg' %}" alt="ريال سعودي" width="20" height="20"></strong>
         </div>
-        <div class="partnership-form-grid">
-          {% include "market_needs/_field.html" with field=form.requested_support %}
-        </div>
-        <p class="market-help"><strong>تُحسب نسبة الدعم واكتماله من إجمالي تكلفة الحاجة، وليس من حقل الدعم المطلوب.</strong></p>
       </div>
     </details>
     <input type="hidden" name="search_criteria_present" value="1">

@@ -32,6 +32,9 @@ class Need(models.Model):
     description = models.TextField("وصف الحاجة", max_length=4000)
     duration = models.PositiveIntegerField("المدة الزمنية")
     duration_unit = models.CharField(max_length=8, choices=[("day", "يوم"), ("month", "شهر"), ("year", "سنة")])
+    duration_days = models.PositiveSmallIntegerField("أيام", default=0)
+    duration_months = models.PositiveSmallIntegerField("أشهر", default=0)
+    duration_years = models.PositiveSmallIntegerField("سنوات", default=0)
     source = models.CharField("مصدر الحاجة", max_length=300)
     beneficiaries = models.PositiveIntegerField("عدد المستفيدين")
     program = models.ForeignKey("training_programs.TrainingProgram", on_delete=models.PROTECT)
@@ -64,6 +67,20 @@ class Need(models.Model):
             models.CheckConstraint(condition=models.Q(status__in=NeedStatus.values), name="market_need_status_enum"),
             models.CheckConstraint(condition=models.Q(duration_unit__in=["day", "month", "year"]), name="market_need_duration_enum"),
         ]
+
+    @property
+    def duration_display(self):
+        parts = []
+        y, mo, d = int(self.duration_years or 0), int(self.duration_months or 0), int(self.duration_days or 0)
+        if y:
+            parts.append("سنة" if y == 1 else ("سنتان" if y == 2 else (f"{y} سنوات" if 3 <= y <= 10 else f"{y} سنة")))
+        if mo:
+            parts.append("شهر" if mo == 1 else ("شهران" if mo == 2 else (f"{mo} أشهر" if 3 <= mo <= 10 else f"{mo} شهرًا")))
+        if d:
+            parts.append("يوم" if d == 1 else ("يومان" if d == 2 else (f"{d} أيام" if 3 <= d <= 10 else f"{d} يومًا")))
+        if parts:
+            return " و".join(parts)
+        return f"{self.duration} {self.get_duration_unit_display()}"
 
     @property
     def number(self):

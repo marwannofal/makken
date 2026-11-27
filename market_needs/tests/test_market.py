@@ -65,7 +65,7 @@ class MarketFixtures:
         setting=override_settings(MAKKEN_PRIVATE_UPLOAD_ROOT=self.temp.name);setting.enable();self.addCleanup(setting.disable)
 
     def data(self,**changes):
-        data={'title':'حاجة سوق تجريبية','sector':str(self.sector.pk),'specialization':str(self.spec.pk),'regions':[str(self.region.pk),str(self.region2.pk)],'description':'تدريب وتأهيل المستفيدين','duration':'3','duration_unit':'month','source':'دراسة السوق','beneficiaries':'3','program':str(self.program.pk),'requested_support':'90.00','observed_on':'2026-10-18','is_active':'1','lines':json.dumps([{'expense':self.expense.pk,'shape':self.shape.pk,'amount':'60.00'},{'expense':self.expense2.pk,'shape':self.shape2.pk,'amount':'40.00'}])}
+        data={'title':'حاجة سوق تجريبية','sector':str(self.sector.pk),'specialization':str(self.spec.pk),'regions':[str(self.region.pk),str(self.region2.pk)],'description':'تدريب وتأهيل المستفيدين','duration_days':'0','duration_months':'3','duration_years':'0','source':'دراسة السوق','beneficiaries':'3','program':str(self.program.pk),'observed_on':'2026-10-18','is_active':'1','lines':json.dumps([{'expense':self.expense.pk,'shape':self.shape.pk,'amount':'60.00'},{'expense':self.expense2.pk,'shape':self.shape2.pk,'amount':'40.00'}])}
         data.update(changes);return data
 
     def create_need(self,**changes):
@@ -104,6 +104,15 @@ class MarketFixtures:
 
 
 class NeedCardTests(MarketFixtures,TestCase):
+    def test_compound_duration_mandatory_expenses_and_auto_requested_support(self):
+        need = self.create_need(duration_years='1', duration_months='8', duration_days='6')
+        self.assertEqual(need.duration_display, 'سنة و8 أشهر و6 أيام')
+        self.assertEqual(need.requested_support, need.total_cost)
+        partial_lines = json.dumps([{'expense': self.expense.pk, 'shape': self.shape.pk, 'amount': '60.00'}])
+        form = NeedForm(self.data(lines=partial_lines))
+        self.assertFalse(form.is_valid())
+        self.assertIn('lines', form.errors)
+
     def test_create_calculations_ignore_client_system_fields(self):
         need=self.create_need(total_cost='1',approved_support='999',status='complete')
         self.assertEqual(need.total_cost,Decimal('100.00'))
@@ -112,7 +121,7 @@ class NeedCardTests(MarketFixtures,TestCase):
         self.assertEqual(need.expense_lines.count(),2);self.assertEqual(need.events.count(),1)
 
     def test_required_range_and_sector_relationship_validation(self):
-        for changes in [{'title':''},{'regions':[]},{'beneficiaries':'0'},{'duration':'0'},{'requested_support':'100.01'},{'requested_support':'0'},{'specialization':str(self.spec2.pk)}]:
+        for changes in [{'title':''},{'regions':[]},{'beneficiaries':'0'},{'duration_days':'0','duration_months':'0','duration_years':'0'},{'duration_days':'32'},{'duration_months':'13'},{'duration_years':'13'},{'specialization':str(self.spec2.pk)}]:
             with self.subTest(changes=changes):self.assertFalse(NeedForm(self.data(**changes)).is_valid())
 
     def test_line_validation_duplicate_unrelated_inactive_and_amounts(self):
@@ -140,7 +149,7 @@ class NeedCardTests(MarketFixtures,TestCase):
     def test_approved_financial_and_matching_basis_locked_but_description_editable(self):
         need=self.create_need();record=self.attach(need,self.organization());self.approve(need,record)
         need.refresh_from_db()
-        for changes in [{'requested_support':'99'},{'beneficiaries':'4'},{'regions':[str(self.region.pk)]},{'lines':json.dumps([{'expense':self.expense.pk,'shape':self.shape.pk,'amount':'100'}])}]:
+        for changes in [{'beneficiaries':'4'},{'regions':[str(self.region.pk)]},{'lines':json.dumps([{'expense':self.expense.pk,'shape':self.shape.pk,'amount':'70.00'},{'expense':self.expense2.pk,'shape':self.shape2.pk,'amount':'30.00'}])}]:
             with self.subTest(changes=changes),self.assertRaises(services.Conflict):services.save_need(self.data(**changes),self.user,need.pk,need.version)
         saved=services.save_need(self.data(description='وصف محدث'),self.user,need.pk,need.version)
         self.assertEqual(saved.description,'وصف محدث');self.assertEqual(saved.approved_support,20)

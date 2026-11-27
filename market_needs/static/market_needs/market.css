@@ -1813,3 +1813,111 @@ details.market-card-fold[open] .market-fold-closed-label {
   min-height: 36px;
   border-radius: 999px;
 }
+
+/* Compound duration steppers (days / months / years) */
+.mk-duration-field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mk-duration-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.mk-duration-preview {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: #edf6fb;
+  border: 1px solid #c6e0ee;
+  color: #005b85;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.mk-duration-steppers {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.mk-stepper {
+  background: #f8fbfd;
+  border: 1px solid #d5e4ec;
+  border-radius: 14px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mk-stepper-label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #163749;
+  margin: 0;
+}
+
+.mk-stepper-label small {
+  font-weight: 500;
+  color: #607a88;
+}
+
+.mk-stepper-ctrl {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) 40px;
+  align-items: center;
+  gap: 8px;
+}
+
+.mk-stepper-ctrl input {
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.05rem;
+  height: 40px;
+  padding: 0 8px;
+  border-radius: 10px;
+  border: 1px solid #c5dae6;
+  background: #ffffff;
+  color: #0e2e3f;
+}
+
+.mk-stepper-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid #c5dae6;
+  background: #ffffff;
+  color: #005b85;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.mk-stepper-btn:hover {
+  background: #005b85;
+  border-color: #005b85;
+  color: #ffffff;
+}
+
+.mk-stepper-btn:focus-visible {
+  outline: 2px solid #005b85;
+  outline-offset: 2px;
+}
+
+@media (max-width: 720px) {
+  .mk-duration-steppers {
+    grid-template-columns: 1fr;
+  }
+}

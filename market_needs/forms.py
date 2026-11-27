@@ -36,11 +36,11 @@ class NeedForm(forms.Form):
     specialization = forms.ModelChoiceField(label="التخصص", queryset=Specialization.objects.none())
     regions = forms.ModelMultipleChoiceField(label="المناطق", queryset=Region.objects.none())
     description = forms.CharField(label="وصف الحاجة", max_length=4000, widget=forms.Textarea(attrs={"rows": 3}), validators=[validate_description])
-    duration = forms.IntegerField(label="المدة الزمنية", min_value=1, max_value=100000)
-    duration_unit = forms.ChoiceField(label="وحدة المدة", choices=[("day", "يوم"), ("month", "شهر"), ("year", "سنة")])
+    duration_days = forms.IntegerField(label="يوم", min_value=0, max_value=31, initial=0, required=False)
+    duration_months = forms.IntegerField(label="شهر", min_value=0, max_value=12, initial=0, required=False)
+    duration_years = forms.IntegerField(label="سنة", min_value=0, max_value=12, initial=0, required=False)
     source = forms.CharField(label="مصدر الحاجة", max_length=300, validators=[validate_name])
     beneficiaries = forms.IntegerField(label="عدد المستفيدين", min_value=1, max_value=1000000000)
-    requested_support = SARAmountField(label="قيمة الدعم المطلوبة")
     observed_on = forms.DateField(label="تاريخ الرصد", initial=timezone.localdate, widget=forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"), input_formats=["%d/%m/%Y", "%Y-%m-%d"])
     is_active = forms.ChoiceField(label="حالة السجل", choices=[("1", "نشط"), ("0", "غير نشط")], initial="1")
     program = forms.ModelChoiceField(label="البرنامج التدريبي", queryset=TrainingProgram.objects.none())
@@ -133,10 +133,32 @@ class NeedForm(forms.Form):
         except (ValueError, TypeError, forms.ValidationError) as exc:
             self.add_error("lines", exc if isinstance(exc, forms.ValidationError) else "راجع البنود وأشكال الرعاية؛ توجد قيمة غير متاحة أو بند مكرر.")
             return data
+        d_days = data.get("duration_days")
+        d_months = data.get("duration_months")
+        d_years = data.get("duration_years")
+        if d_days is None and d_months is None and d_years is None:
+            d_days, d_months, d_years = 0, 0, 0
+        else:
+            d_days = int(d_days or 0)
+            d_months = int(d_months or 0)
+            d_years = int(d_years or 0)
+        data["duration_days"] = d_days
+        data["duration_months"] = d_months
+        data["duration_years"] = d_years
+        if (d_days + d_months + d_years) <= 0 and not any(k in self.errors for k in ("duration_days", "duration_months", "duration_years")):
+            self.add_error("duration_days", "حدّد المدة الزمنية (يوم أو شهر أو سنة على الأقل).")
+        if d_years > 0 and d_months == 0 and d_days == 0:
+            data["duration"], data["duration_unit"] = d_years, "year"
+        elif d_months > 0 and d_years == 0 and d_days == 0:
+            data["duration"], data["duration_unit"] = d_months, "month"
+        else:
+            data["duration"], data["duration_unit"] = max(1, d_years * 365 + d_months * 30 + d_days), "day"
+        if program and (allowed - seen):
+            self.add_error("lines", "جميع بنود الصرف المرتبطة بالبرنامج التدريبي إلزامية؛ يرجى تحديد شكل الرعاية ومبلغ موجب لكل بند.")
+            return data
         data["lines"] = result
         data["total_cost"] = total
-        if data.get("requested_support") and data["requested_support"] > total:
-            self.add_error("requested_support", "الدعم المطلوب لا يمكن أن يتجاوز إجمالي تكلفة الحاجة.")
+        data["requested_support"] = total
         if self.data.get("search_criteria_present") == "1":
             if not data.get("search_states"):
                 self.add_error("search_states", "اختر حالة واحدة على الأقل للبحث في المنظمات (قدرة / رغبة / رعاية).")
