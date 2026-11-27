@@ -901,105 +901,170 @@
     const saveBtn = panel.querySelector('[data-emp-cp-save]');
     let rows = [];
 
+    function paintAvg(formatted) {
+      if (!avgEl) return;
+      avgEl.textContent = formatted || '—';
+      const badge = avgEl.closest('.subtle-badge');
+      if (!badge) return;
+      const num = parseFloat(String(formatted || '0').replace('%', '')) || 0;
+      badge.classList.toggle('mk-cp-overall-green', num >= 50);
+      badge.classList.toggle('mk-cp-overall-red', num < 50);
+    }
+
+    function recalcAvg() {
+      if (!rows.length) { paintAvg('—'); return; }
+      const avg = rows.reduce((s, r) => s + Math.max(0, Math.min(100, Number(r.progress) || 0)), 0) / rows.length;
+      const formatted = (Number.isInteger(avg) ? String(avg) : avg.toFixed(2).replace(/\.00$/, '')) + '%';
+      paintAvg(formatted);
+    }
+
     function renderRows() {
       if (!listRoot) return;
       listRoot.replaceChildren();
       if (!rows.length) {
-        const p = document.createElement('p');
-        p.className = 'field-help';
-        p.textContent = 'لا توجد بنود اتفاقية مسندة لهذه الشراكة حاليًا.';
-        listRoot.append(p);
+        const empty = document.createElement('div');
+        empty.className = 'mk-cp-empty';
+        empty.textContent = 'لا توجد بنود اتفاقية مسندة لهذه الشراكة حاليًا.';
+        listRoot.append(empty);
         return;
       }
-      rows.forEach((row, idx) => {
-        const card = document.createElement('div');
-        card.className = 'mk-cp-item' + (Number(row.progress) >= 50 ? ' is-high' : '');
+      rows.forEach((item, idx) => {
+        const row = document.createElement('div');
+        row.className = 'mk-cp-row';
 
+        const info = document.createElement('div');
+        info.className = 'mk-cp-info';
         const head = document.createElement('div');
-        head.className = 'mk-cp-item-head';
-        const title = document.createElement('div');
-        title.className = 'mk-cp-item-title';
+        head.className = 'mk-cp-clause-head';
         const num = document.createElement('span');
         num.className = 'mk-cp-num';
         num.textContent = String(idx + 1);
-        const name = document.createElement('strong');
-        name.textContent = row.name;
-        title.append(num, name);
+        const name = document.createElement('span');
+        name.className = 'mk-cp-clause-name';
+        name.textContent = item.name || '';
+        head.append(num, name);
         const resp = document.createElement('span');
-        resp.className = 'subtle-badge';
-        resp.textContent = 'المسؤولية: ' + (row.responsibility_label || '');
-        head.append(title, resp);
+        resp.className = 'mk-cp-resp';
+        resp.textContent = 'المسؤولية: ' + (item.responsibility_label || '');
+        info.append(head, resp);
 
-        const controls = document.createElement('div');
-        controls.className = 'mk-cp-controls';
-        [0, 25, 50, 75, 100].forEach(preset => {
+        const inputWrap = document.createElement('div');
+        inputWrap.className = 'mk-cp-input-wrap';
+        const presets = document.createElement('div');
+        presets.className = 'mk-cp-presets';
+
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.min = '0';
+        input.max = '100';
+        input.step = '1';
+        input.dir = 'ltr';
+        input.className = 'mk-cp-input';
+        input.value = String(item.progress ?? 0);
+        input.setAttribute('aria-label', 'نسبة الإنجاز للبند ' + (item.name || ''));
+
+        const bar = document.createElement('progress');
+        bar.className = 'mk-cp-progress';
+        bar.max = 100;
+        bar.value = Math.max(0, Math.min(100, Number(item.progress) || 0));
+
+        const presetBtns = [0, 25, 50, 75, 100].map(val => {
           const b = document.createElement('button');
           b.type = 'button';
-          b.className = 'button button-secondary mk-cp-preset' + (Number(row.progress) === preset ? ' is-active' : '');
-          b.textContent = preset + '%';
+          b.className = 'mk-cp-preset-chip';
+          b.dataset.presetVal = String(val);
+          b.textContent = val + '%';
           b.addEventListener('click', () => {
-            row.progress = preset;
-            renderRows();
+            input.value = String(val);
+            input.dispatchEvent(new Event('input', { bubbles: true }));
           });
-          controls.append(b);
+          presets.append(b);
+          return b;
         });
-        const numInput = document.createElement('input');
-        numInput.type = 'number';
-        numInput.min = '0';
-        numInput.max = '100';
-        numInput.step = '1';
-        numInput.dir = 'ltr';
-        numInput.className = 'mk-cp-input';
-        numInput.value = String(row.progress ?? 0);
-        numInput.setAttribute('aria-label', 'نسبة الإنجاز للبند ' + row.name);
-        numInput.addEventListener('input', () => {
-          const val = Math.max(0, Math.min(100, parseInt(numInput.value || '0', 10) || 0));
-          row.progress = val;
-          card.classList.toggle('is-high', val >= 50);
-        });
-        controls.append(numInput);
 
-        const body = document.createElement('div');
-        body.className = 'mk-cp-extra';
+        function syncVisual(rawVal) {
+          const v = Math.max(0, Math.min(100, Number(rawVal) || 0));
+          item.progress = v;
+          bar.value = v;
+          row.classList.toggle('is-done', v === 100);
+          row.classList.toggle('is-zero', v === 0);
+          presetBtns.forEach(b => b.classList.toggle('is-on', Number(b.dataset.presetVal) === v));
+        }
+        syncVisual(item.progress ?? 0);
+
+        input.addEventListener('input', () => {
+          const v = Math.max(0, Math.min(100, parseInt(input.value || '0', 10) || 0));
+          syncVisual(v);
+          recalcAvg();
+        });
+
+        const pct = document.createElement('span');
+        pct.className = 'mk-cp-pct';
+        pct.textContent = '%';
+        inputWrap.append(presets, input, pct);
+
+        const extras = document.createElement('div');
+        extras.className = 'mk-cp-extras';
+
+        const notesWrap = document.createElement('div');
         const notesLabel = document.createElement('label');
+        notesLabel.className = 'mk-cp-notes-label';
         notesLabel.textContent = 'ملاحظات البند';
         const notes = document.createElement('textarea');
+        notes.className = 'mk-cp-notes';
         notes.rows = 2;
         notes.maxLength = 2000;
         notes.placeholder = 'أضف ملاحظات المتابعة الخاصة بهذا البند…';
-        notes.value = row.notes || '';
-        notes.addEventListener('input', () => { row.notes = notes.value; });
-        notesLabel.append(notes);
+        notes.value = item.notes || '';
+        notes.addEventListener('input', () => { item.notes = notes.value; });
+        notesWrap.append(notesLabel, notes);
 
         const evWrap = document.createElement('div');
-        evWrap.className = 'mk-cp-evidences';
         const evLabel = document.createElement('label');
+        evLabel.className = 'mk-cp-ev-label';
         evLabel.textContent = 'الشواهد والمرفقات (PDF / PNG / JPG)';
-        const evInput = document.createElement('input');
-        evInput.type = 'file';
-        evInput.multiple = true;
-        evInput.accept = '.pdf,.png,.jpg,.jpeg';
-        evInput.dataset.empEvidenceFor = String(row.id);
-        evLabel.append(evInput);
         evWrap.append(evLabel);
 
-        if (row.evidences && row.evidences.length) {
-          const evList = document.createElement('ul');
-          evList.className = 'mk-cp-ev-list';
-          row.evidences.forEach(ev => {
-            const li = document.createElement('li');
-            const a = document.createElement('a');
-            a.href = ev.download_url;
-            a.textContent = ev.name + (ev.uploaded_at ? ' (' + ev.uploaded_at + ')' : '');
-            li.append(a);
-            evList.append(li);
+        if (item.evidences && item.evidences.length) {
+          const evList = document.createElement('div');
+          evList.className = 'mk-cp-ev-files';
+          item.evidences.forEach(ev => {
+            const link = document.createElement('a');
+            link.className = 'mk-cp-ev-chip';
+            link.href = ev.download_url;
+            link.target = '_blank';
+            link.rel = 'noopener';
+            link.textContent = ev.name + (ev.uploaded_at ? ' (' + ev.uploaded_at + ')' : '');
+            evList.append(link);
           });
           evWrap.append(evList);
         }
 
-        body.append(notesLabel, evWrap);
-        card.append(head, controls, body);
-        listRoot.append(card);
+        const uploadWrap = document.createElement('div');
+        uploadWrap.className = 'mk-cp-upload-wrap';
+        const uploadBtn = document.createElement('label');
+        uploadBtn.className = 'mk-cp-upload-btn';
+        uploadBtn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0-4 4m4-4 4 4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg><span>اختيار شواهد ومرفقات</span>';
+        const fileInput = document.createElement('input');
+        fileInput.className = 'mk-cp-ev-input';
+        fileInput.type = 'file';
+        fileInput.multiple = true;
+        fileInput.accept = '.pdf,.png,.jpg,.jpeg';
+        fileInput.dataset.empEvidenceFor = String(item.id);
+        const uploadStatus = document.createElement('span');
+        uploadStatus.className = 'mk-cp-upload-status';
+        uploadStatus.textContent = 'لم يتم اختيار ملفات جديدة';
+        fileInput.addEventListener('change', () => {
+          const names = [...(fileInput.files || [])].map(f => f.name);
+          uploadStatus.textContent = names.length ? `تم اختيار (${names.length}): ${names.join('، ')}` : 'لم يتم اختيار ملفات جديدة';
+        });
+        uploadBtn.append(fileInput);
+        uploadWrap.append(uploadBtn, uploadStatus);
+        evWrap.append(uploadWrap);
+
+        extras.append(notesWrap, evWrap);
+        row.append(info, inputWrap, bar, extras);
+        listRoot.append(row);
       });
     }
 
@@ -1009,7 +1074,7 @@
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'تعذّر تحميل بنود الاتفاقية.');
         rows = data.clauses || [];
-        if (avgEl) avgEl.textContent = data.overall_display || '—';
+        paintAvg(data.overall_display || '—');
         renderRows();
       } catch (err) {
         if (errEl) errEl.textContent = err.message || 'تعذّر تحميل بنود الاتفاقية.';
@@ -1037,7 +1102,7 @@
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'تعذّر حفظ نسب الإنجاز.');
         rows = data.clauses || rows;
-        if (avgEl) avgEl.textContent = data.overall_display || '—';
+        paintAvg(data.overall_display || '—');
         renderRows();
         if (okEl) {
           okEl.textContent = data.message || 'تم حفظ نسب إنجاز البنود بنجاح.';
