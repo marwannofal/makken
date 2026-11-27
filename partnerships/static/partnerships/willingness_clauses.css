@@ -238,3 +238,31 @@
     grid-template-columns: 1fr;
   }
 }
+
+.mk-term-row-4 .partnership-field {
+  min-width: 0;
+  margin: 0;
+}
+.mk-term-row-4 label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.86rem;
+}
+.mk-term-row-4 .expiry-readonly-box {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 0.84rem;
+  padding: 6px 10px;
+}
+dialog.willingness-big-dialog .mk-term-row-4 {
+  gap: 10px;
+}
+@media (max-width: 900px) {
+  .mk-term-row-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
