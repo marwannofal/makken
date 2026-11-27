@@ -722,14 +722,25 @@
     const weInstructions = $('#we-instructions', workDialog);
     const weError = $('[data-we-error]', workDialog);
     const weSubmit = $('[data-we-submit]', workDialog);
+    const weProgressPill = $('[data-we-progress-pill]', workDialog);
+    const weProgressVal = $('[data-we-progress-val]', workDialog);
+    function syncWeProgressBadge(val) {
+      const pct = Math.max(0, Math.min(100, Number(val) || 0));
+      if (weProgress) weProgress.value = String(pct);
+      if (weProgressVal) weProgressVal.textContent = pct + '%';
+      if (weProgressPill) {
+        weProgressPill.classList.toggle('is-green', pct >= 50);
+        weProgressPill.classList.toggle('is-red', pct < 50);
+      }
+    }
     let activeWorkUrl = '';
     let activeWorkRowId = '';
 
     weStatus?.addEventListener('change', () => {
       if (weStatus.value === 'complete') {
-        weProgress.value = '100';
+        syncWeProgressBadge(100);
       } else if (Number(weProgress.value) >= 100) {
-        weProgress.value = weStatus.value === 'new' ? '0' : '90';
+        syncWeProgressBadge(weStatus.value === 'new' ? 0 : 90);
       }
     });
     weProgress?.addEventListener('change', () => {
@@ -757,7 +768,7 @@
           weTitle.value = w.title || '';
           weInstructions.value = w.instructions || '';
           weDue.value = w.due_on || '';
-          weProgress.value = String(w.progress ?? 0);
+          syncWeProgressBadge(w.progress ?? 0);
 
           weStatus.replaceChildren();
           (w.status_choices || []).forEach(ch => {

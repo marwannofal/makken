@@ -8,10 +8,10 @@
 {% block extra_head %}
   <link rel="stylesheet" href="{% static 'partnerships/single_specialization.css' %}?v=20261121-blue6">
   <link rel="stylesheet" href="{% static 'care_states/states.css' %}?v=20261121-blue6">
-  <link rel="stylesheet" href="{% static 'partnerships/partnerships.css' %}?v=20261121-blue14">
+  <link rel="stylesheet" href="{% static 'partnerships/partnerships.css' %}?v=20261127-workdlg1">
   <link rel="stylesheet" href="{% static 'partnerships/willingness_upload.css' %}?v=20261121-blue6">
   <link rel="stylesheet" href="{% static 'partnerships/willingness_clauses.css' %}?v=20261123-sec1">
-  <script src="{% static 'partnerships/partnerships.js' %}?v=20261123-sec1" defer></script>
+  <script src="{% static 'partnerships/partnerships.js' %}?v=20261127-workdlg1" defer></script>
   <script src="{% static 'partnerships/willingness_clauses.js' %}?v=20261121-dmy" defer></script>
   {% include "partnerships/_financial_assets.html" %}
   {% include "partnerships/_editor_fields_assets.html" %}
@@ -325,42 +325,50 @@
     </div>
   </dialog>
   {% if can_edit_work %}
-  <dialog id="partnership-work-dialog" class="partnership-dialog offering-dialog" aria-labelledby="work-dialog-title">
+  <dialog id="partnership-work-dialog" class="partnership-dialog offering-dialog we-modern-dialog" aria-labelledby="work-dialog-title">
     <form class="dialog-body" data-work-edit-form>
       <div class="dialog-top">
-        <span class="dialog-symbol"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><button type="button" class="icon-button" data-dismiss-dialog aria-label="إغلاق"><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+        <span class="dialog-symbol"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
+        <button type="button" class="icon-button we-close-btn" data-dismiss-dialog aria-label="إغلاق"><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
       </div>
-      <p class="eyebrow">إسناد المهام</p>
-      <h2 id="work-dialog-title">عرض وتعديل المهمة</h2>
-      <div class="partnership-field">
-        <label for="we-title">عنوان المهمة <span class="required">*</span></label>
-        <input type="text" id="we-title" name="title" maxlength="160" required>
-      </div>
-      <div class="partnership-field">
-        <label for="we-assignees">الموظفون المسند إليهم <span class="required">*</span></label>
-        <select id="we-assignees" name="assignee_ids" multiple data-market-select data-label="الموظفون المسند إليهم"></select>
-      </div>
-      <div class="partnership-field">
-        <label for="we-manager">المشرف / المدير <span class="required">*</span></label>
-        <select id="we-manager" name="manager_id" required></select>
-      </div>
-      <div class="partnership-form-grid">
-        <div class="partnership-field">
-          <label for="we-status">الحالة <span class="required">*</span></label>
-          <select id="we-status" name="status" required></select>
+      <div class="we-dialog-header">
+        <div>
+          <p class="eyebrow">إسناد المهام</p>
+          <h2 id="work-dialog-title">عرض وتعديل المهمة</h2>
         </div>
-        <div class="partnership-field">
-          <label for="we-progress">نسبة الإنجاز (%) <small>(تلقائي من بنود الاتفاقية)</small></label>
-          <input type="number" id="we-progress" name="progress" min="0" max="100" step="1" dir="ltr" readonly>
+        <div class="we-meta-badges">
+          <span class="we-progress-pill is-red" data-we-progress-pill>نسبة إنجاز المهمة: <strong><bdi data-we-progress-val>0%</bdi></strong></span>
+          <span class="we-source-pill">تلقائي من بنود الاتفاقية</span>
         </div>
       </div>
-      <div class="partnership-field">
-        <label for="we-due">تاريخ الاستحقاق</label>
-        <input type="date" id="we-due" name="due_on" dir="ltr">
-      </div>
-      <div class="partnership-field">
-        <label for="we-instructions">تفاصيل العمل</label>
-        <textarea id="we-instructions" name="instructions" rows="3" maxlength="3000"></textarea>
+      <input type="hidden" id="we-progress" name="progress" value="0">
+      <div class="we-card-body">
+        <div class="partnership-field">
+          <label for="we-title">عنوان المهمة <span class="required">*</span></label>
+          <input type="text" id="we-title" name="title" maxlength="160" required>
+        </div>
+        <div class="partnership-field">
+          <label for="we-assignees">الموظفون المسند إليهم <span class="required">*</span></label>
+          <select id="we-assignees" name="assignee_ids" multiple data-market-select data-label="الموظفون المسند إليهم"></select>
+        </div>
+        <div class="partnership-field">
+          <label for="we-manager">المشرف / المدير <span class="required">*</span></label>
+          <select id="we-manager" name="manager_id" required></select>
+        </div>
+        <div class="partnership-form-grid we-status-due-grid">
+          <div class="partnership-field">
+            <label for="we-status">الحالة <span class="required">*</span></label>
+            <select id="we-status" name="status" required></select>
+          </div>
+          <div class="partnership-field">
+            <label for="we-due">تاريخ الاستحقاق</label>
+            <input type="date" id="we-due" name="due_on" dir="ltr">
+          </div>
+        </div>
+        <div class="partnership-field">
+          <label for="we-instructions">تفاصيل العمل</label>
+          <textarea id="we-instructions" name="instructions" rows="3" maxlength="3000"></textarea>
+        </div>
       </div>
       <p class="field-error" data-we-error role="alert"></p>
       <div class="dialog-actions">
