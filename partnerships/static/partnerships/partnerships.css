@@ -2141,3 +2141,17 @@ tbody tr:last-child:not(:first-child) .mk-contact-tip-box {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* === Kill vertical scrollbar on table-scroll === */
+.table-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.mk-contact-tip-box {
+  display: none;
+}
+.mk-name-hover-wrap:hover .mk-contact-tip-box,
+.mk-name-hover-wrap:focus-within .mk-contact-tip-box {
+  display: block;
+}
