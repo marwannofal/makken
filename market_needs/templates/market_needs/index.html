@@ -127,8 +127,7 @@
         <h3>سجلات الرعاية</h3>
         {% for record in detail.visible_sponsorships %}
           <div class="market-sponsor-detail">
-            <strong>{{ record.partnership.name }}</strong> · {{ record.get_status_display }} ·
-            {% include "market_needs/_money.html" with value=record.amount %}
+            <strong>{{ record.partnership.name }}</strong> · <span class="market-status state-{{ record.status }}">{{ record.get_status_display }}</span>{% if record.status == 'approved' %} · {% include "market_needs/_money.html" with value=record.amount %}{% endif %}
             <p class="muted">{{ record.notes }}
             {% if record.rejection_reason %}
               · سبب الرفض: {{ record.rejection_reason }}

@@ -218,6 +218,7 @@ def followup(pk, version, sponsorship_id, record_version, operation, data, files
                 record.level_name = level.name
                 record.status = SponsorshipStatus.APPROVED
                 record.decided_at = timezone.now()
+                previous_state = organization.development_state_id
                 if organization.development_state_id != DevelopmentState.CARE:
                     if not StateColor.objects.filter(pk=DevelopmentState.CARE).exists():
                         raise Conflict("حالة رعاية غير معرفة. طبّق ترحيلات حالات التطور أولًا.")
@@ -228,8 +229,35 @@ def followup(pk, version, sponsorship_id, record_version, operation, data, files
                     DevelopmentHistory.objects.create(partnership=organization, state_id=DevelopmentState.CARE, entered_at=entered)
                     organization.development_state_id = DevelopmentState.CARE
                     organization.development_state_at = entered
+                    org_update_fields = ["development_state", "development_state_at", "version", "updated_at"]
+                    if previous == DevelopmentState.CAPABILITY:
+                        sel_type = clean.get("agreement_type")
+                        if sel_type is not None:
+                            from partnerships.models import PreliminaryAgreementType
+                            from partnerships.willingness import LEGACY_TYPE_BY_NAME
+                            organization.partnership_type = sel_type
+                            organization.preliminary_agreement_type = LEGACY_TYPE_BY_NAME.get(sel_type.name, PreliminaryAgreementType.OTHER)
+                            org_update_fields.extend(["partnership_type", "preliminary_agreement_type"])
+                        organization.ensure_agreement_number()
+                        if "agreement_number" not in org_update_fields:
+                            org_update_fields.append("agreement_number")
                     organization.version += 1
-                    organization.save(update_fields=["development_state", "development_state_at", "version", "updated_at"])
+                    organization.save(update_fields=org_update_fields)
+                    if previous == DevelopmentState.CAPABILITY:
+                        from django.contrib.auth import get_user_model
+                        from makken_mail.models import WorkAssignment
+                        if not WorkAssignment.objects.filter(target_model="partnerships.partnership", target_key=organization.pk).exists():
+                            mgr = need.created_by if (need.created_by_id and need.created_by_id != actor.pk) else get_user_model().objects.filter(is_active=True).exclude(pk=actor.pk).order_by("-is_superuser", "pk").first()
+                            if mgr is not None:
+                                wk = WorkAssignment.objects.create(
+                                    title=f"متابعة رعاية: {need.title}"[:160],
+                                    target_model="partnerships.partnership",
+                                    target_key=organization.pk,
+                                    employee=actor,
+                                    manager=mgr,
+                                    created_by=actor,
+                                )
+                                wk.assignees.add(actor)
                     audit(need, actor, "انتقال الجهة إلى رعاية", {"organization": organization.name, "state": previous}, {"organization": organization.name, "state": DevelopmentState.CARE, "entered_at": entered.isoformat()}, record)
             elif operation == "reject":
                 record.status = SponsorshipStatus.REJECTED
@@ -253,6 +281,16 @@ def followup(pk, version, sponsorship_id, record_version, operation, data, files
                     if actual != name:
                         saved_paths.append(actual)
                     SupportAttachment.objects.create(sponsorship=record, file=actual, original_name=safe_filename(upload.name), size=upload.size, content_type=upload.verified_content_type, uploaded_by=actor)
+                    if previous_state == DevelopmentState.CAPABILITY:
+                        from partnerships.models import WillingnessAttachment
+                        if hasattr(upload, "seek"):
+                            upload.seek(0)
+                        w_name = "willingness/" + uuid.uuid4().hex + Path(upload.name).suffix.lower()
+                        saved_paths.append(w_name)
+                        w_actual = storage.save(w_name, upload)
+                        if w_actual != w_name:
+                            saved_paths.append(w_actual)
+                        WillingnessAttachment.objects.create(partnership=organization, file=w_actual, original_name=safe_filename(upload.name), size=upload.size, content_type=upload.verified_content_type, uploaded_by=actor)
             audit(need, actor, {"notes": "تسجيل نتيجة التواصل", "approve": "اعتماد مساهمة", "reject": "رفض جهة مرشحة", "allocate": "توزيع مساهمة سابقة على بنود الصرف"}[operation], before, {**sponsor_data(record), "attachments": [safe_filename(u.name) for u in clean["attachments"]]}, record)
             recompute(need, actor)
             return need

@@ -1,3 +1,4 @@
+from django.urls import reverse
 from datetime import timedelta
 from decimal import Decimal
 
@@ -23,6 +24,10 @@ class FundingDetailsTests(MarketFixtures, TestCase):
 
     def submit(self, need, record, data, operation="approve", actor=None, files=None):
         need.refresh_from_db(); record.refresh_from_db()
+        if operation == "approve" and record.partnership.development_state_id == "capability" and "agreement_type" not in data:
+            from partnerships.models import PartnershipType
+            pt = PartnershipType.objects.filter(is_active=True).first() or PartnershipType.objects.create(name="اتفاقية تعاون", is_active=True)
+            data = {**data, "agreement_type": str(pt.pk)}
         if files is None:
             files = {"attachments": [self.png()]} if operation == "approve" else {}
         return services.followup(need.pk, need.version, record.pk, record.version, operation, data, files, actor or self.user)
@@ -241,6 +246,64 @@ class FundingDetailsTests(MarketFixtures, TestCase):
         self.assertEqual(second.level.funding_key, "bronze")
         self.assertEqual(need.approved_support, Decimal("100.00"))
         self.assertEqual(need.arrangement_key, "alliance")
+
+
+    def test_complete_card_shows_only_approved_and_rejected_sponsors(self):
+        need = self.create_need()
+        org_approved = self.organization("جهة معتمدة بالكامل")
+        org_rejected = self.organization("جهة مرفوضة")
+        org_pending = self.organization("جهة مرشحة بلا إجراء")
+        org_unlinked = self.organization("جهة غير مرتبطة")
+        rec_app = self.attach(need, org_approved)
+        rec_rej = self.attach(need, org_rejected)
+        self.attach(need, org_pending)
+        services.followup(need.pk, need.version, rec_rej.pk, rec_rej.version, "reject", {"rejection_reason": "عدم ملاءمة الميزانية", "notes": "ملاحظة رفض"}, {}, self.user)
+        need.refresh_from_db(); rec_app.refresh_from_db()
+        self.submit(need, rec_app, self.allocation_data(need, ["60.00", "40.00"], support_percent="100"))
+        need.refresh_from_db()
+        self.assertEqual(need.status, "complete")
+
+        res = self.client.get(reverse("market_needs:followup", args=[need.pk]))
+        self.assertEqual(res.status_code, 200)
+        table_names = [r["record"].partnership.name for r in res.context["records"]]
+        self.assertEqual(set(table_names), {"جهة معتمدة بالكامل", "جهة مرفوضة"})
+
+        det = self.client.get(reverse("market_needs:index") + f"?detail={need.pk}")
+        self.assertEqual(det.status_code, 200)
+        det_names = [r.partnership.name for r in det.context["detail"].visible_sponsorships]
+        self.assertEqual(set(det_names), {"جهة معتمدة بالكامل", "جهة مرفوضة"})
+        self.assertContains(det, "عدم ملاءمة الميزانية")
+
+
+    def test_two_way_amount_binding_and_capability_promotion(self):
+        from partnerships.models import PartnershipType, WillingnessAttachment
+        from makken_mail.models import WorkAssignment
+        from django.contrib.auth import get_user_model
+        mgr = get_user_model().objects.create_user("promo_mgr", "promo_mgr@example.com", "StrongPass123!", is_superuser=True)
+        pt = PartnershipType.objects.filter(is_active=True).first() or PartnershipType.objects.create(name="مذكرة تفاهم", is_active=True)
+        need = self.create_need()
+        org = self.organization("جهة قدرة للترقية", state="capability")
+        record = self.attach(need, org)
+        with self.assertRaises(services.InvalidForm):
+            services.followup(
+                need.pk, need.version, record.pk, record.version, "approve",
+                {"entry_mode": "amount", "amount": "33.33", "notes": "موافقة مباشرة"},
+                {"attachments": [self.png()]}, self.user,
+            )
+        need.refresh_from_db(); record.refresh_from_db()
+        services.followup(
+            need.pk, need.version, record.pk, record.version, "approve",
+            {"entry_mode": "amount", "amount": "33.33", "agreement_type": str(pt.pk), "notes": "موافقة وترقية"},
+            {"attachments": [self.png()]}, self.user,
+        )
+        record.refresh_from_db(); org.refresh_from_db()
+        self.assertEqual(record.amount, Decimal("33.33"))
+        self.assertEqual(org.development_state_id, "care")
+        self.assertEqual(org.partnership_type_id, pt.pk)
+        self.assertTrue(WillingnessAttachment.objects.filter(partnership=org).exists())
+        wk = WorkAssignment.objects.get(target_model="partnerships.partnership", target_key=org.pk)
+        self.assertEqual(wk.employee_id, self.user.pk)
+        self.assertNotEqual(wk.manager_id, self.user.pk)
 
 
 class FundingMigrationTests(MarketFixtures, TransactionTestCase):

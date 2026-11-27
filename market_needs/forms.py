@@ -227,9 +227,11 @@ def _auto_allocate_lines(lines, amount, allowed_shapes=None):
 
 
 class FollowupForm(forms.Form):
+    entry_mode = forms.CharField(required=False, initial="percent", widget=forms.HiddenInput)
     notes = forms.CharField(label="نتيجة التواصل / الملاحظات", required=False, max_length=4000, widget=forms.Textarea(attrs={"rows": 3}), validators=[validate_description])
     amount = SARAmountField(label="قيمة الدعم المعتمد", required=False)
     support_percent = MoneyField(label="نسبة الدعم في الرعاية %", required=False, min_value=Decimal(".01"), max_value=Decimal("100"), max_digits=5, decimal_places=2)
+    agreement_type = forms.ModelChoiceField(label="نوع الاتفاقية", queryset=None, required=False, empty_label="اختر نوع الاتفاقية")
     rejection_reason = forms.CharField(label="سبب الرفض", required=False, max_length=2000, widget=forms.Textarea(attrs={"rows": 3}), validators=[validate_description])
     attachments = OptionalAttachments(label="مستندات إثبات الدعم", required=False, widget=MultipleAttachmentInput(attrs={"accept": ".pdf,.png,.jpg,.jpeg"}))
 
@@ -255,7 +257,15 @@ class FollowupForm(forms.Form):
                 if self.allowed_shapes is not None and line.sponsorship_shape_id not in self.allowed_shapes:
                     self.fields[name].widget.attrs["disabled"] = True
                 line.allocation_field_name = name
-            self.fields["amount"].widget.attrs["readonly"] = True
+            if operation == "allocate":
+                self.fields["amount"].widget.attrs["readonly"] = True
+        from partnerships.models import PartnershipType
+        self.fields["agreement_type"].queryset = PartnershipType.objects.filter(is_active=True).order_by("id")
+        self.fields["agreement_type"].widget.attrs["data-market-select"] = ""
+        self.is_capability_promotion = bool(
+            operation == "approve" and record is not None and getattr(record.partnership, "development_state_id", None) == DevelopmentState.CAPABILITY
+        )
+        self.fields["agreement_type"].required = self.is_capability_promotion
         self.fields["rejection_reason"].required = operation == "reject"
         for name, field in self.fields.items():
             field.error_messages["required"] = "هذا الحقل مطلوب."
@@ -277,16 +287,27 @@ class FollowupForm(forms.Form):
         else:
             amount = data.get("amount")
             percent = data.get("support_percent")
-            if percent is not None and self.need is not None:
-                calculated = (self.need.remaining * percent / 100).quantize(Decimal(".01"), rounding=ROUND_HALF_UP)
-                if calculated <= 0:
-                    self.add_error("support_percent", "النسبة صغيرة جدًا؛ يجب أن تعادل المساهمة هللة واحدة على الأقل.")
-                elif amount is not None and amount != calculated:
-                    self.add_error("amount", "المبلغ لا يطابق النسبة المدخلة وتكلفة الحاجة.")
-                amount = calculated
-                data["amount"] = calculated
-            if amount is None:
-                self.add_error("amount", "أدخل نسبة الدعم لحساب مبلغ المساهمة.")
+            entry_mode = (self.data.get("entry_mode") or "percent").strip()
+            if entry_mode == "amount" or (percent is None and amount is not None):
+                if amount is None or amount <= 0:
+                    self.add_error("amount", "أدخل مبلغ مساهمة موجبًا.")
+                elif self.need is not None and self.need.remaining > 0:
+                    calc_pct = (amount * Decimal("100") / self.need.remaining).quantize(Decimal(".01"), rounding=ROUND_HALF_UP)
+                    data["support_percent"] = min(calc_pct, Decimal("100.00"))
+                    data["amount"] = amount
+            else:
+                if percent is not None and self.need is not None:
+                    calculated = (self.need.remaining * percent / 100).quantize(Decimal(".01"), rounding=ROUND_HALF_UP)
+                    if calculated <= 0:
+                        self.add_error("support_percent", "النسبة صغيرة جدًا؛ يجب أن تعادل المساهمة هللة واحدة على الأقل.")
+                    elif amount is not None and amount != calculated:
+                        self.add_error("amount", "المبلغ لا يطابق النسبة المدخلة وتكلفة الحاجة.")
+                    amount = calculated
+                    data["amount"] = calculated
+                if amount is None:
+                    self.add_error("amount", "أدخل نسبة الدعم أو مبلغ المساهمة.")
+            if self.is_capability_promotion and not data.get("agreement_type"):
+                self.add_error("agreement_type", "اختر نوع الاتفاقية للترقية التلقائية من قدرة إلى رعاية.")
         if self.need is not None:
             allowed = {line.allocation_field_name for line in self.allocation_lines}
             if any(name.startswith("allocation_") and name not in allowed for name in self.data):

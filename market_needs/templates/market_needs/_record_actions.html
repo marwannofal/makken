@@ -7,7 +7,7 @@
     {% if row.record.status == 'new' %}
       {% allowed 'market_needs' 'edit' row.record %}
         {% allowed 'market_needs' 'change_status' row.record %}
-          <a class="row-action" href="?{{ filter_query }}&amp;{{ row.detail_param }}&amp;operation=approve" data-followup-open data-operation="approve" data-allowed-lines="{{ row.allowed_lines }}" data-snapshot="{{ row.approve_token }}" data-name="{{ row.record.partnership.name }}" data-notes="{{ row.record.notes }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg><span>اعتماد</span></a>
+          <a class="row-action" href="?{{ filter_query }}&amp;{{ row.detail_param }}&amp;operation=approve" data-followup-open data-operation="approve" data-dev-state="{{ row.record.partnership.development_state_id }}" data-allowed-lines="{{ row.allowed_lines }}" data-snapshot="{{ row.approve_token }}" data-name="{{ row.record.partnership.name }}" data-notes="{{ row.record.notes }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg><span>اعتماد</span></a>
         {% endallowed %}
       {% endallowed %}
       {% allowed 'market_needs' 'edit' row.record %}

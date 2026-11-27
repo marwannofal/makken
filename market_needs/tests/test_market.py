@@ -87,7 +87,11 @@ class MarketFixtures:
     def approve(self,need,record,amount='20.00',files=None):
         need.refresh_from_db();record.refresh_from_db()
         from market_needs.funding import expense_funding
-        data={'amount':amount,'notes':'تم التواصل'}
+        data={'amount':amount,'notes':'تم التواصل','entry_mode':'amount'}
+        if record.partnership.development_state_id == 'capability':
+            from partnerships.models import PartnershipType
+            pt = PartnershipType.objects.filter(is_active=True).first() or PartnershipType.objects.create(name='اتفاقية تعاون', is_active=True)
+            data['agreement_type'] = str(pt.pk)
         try:
             remaining=Decimal(amount)
             for line in expense_funding(need):
@@ -296,7 +300,7 @@ class FundingTests(MarketFixtures,TestCase):
         self.assertEqual(record.status,'approved');self.assertEqual(org.development_state_id,'care')
         self.assertEqual(org.development_history.get(state_id='capability').entered_at,entered)
         self.assertFalse(org.development_history.filter(state_id='willingness').exists())
-        self.assertEqual(org.preliminary_agreement_type,'')
+        self.assertTrue(org.partnership_type_id)
 
     def test_new_care_candidate_approval_preserves_original_timestamp(self):
         org=self.organization(state='care');entered=org.development_state_at

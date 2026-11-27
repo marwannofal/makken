@@ -167,12 +167,32 @@
 
   const followup=$('[data-followup-form]'), followupDialog=$('#market-followup-dialog');let uploads=[];
   function fileList(){const root=$('[data-upload-files]');if(!root)return;root.replaceChildren();uploads.forEach((file,i)=>{const row=make('div'),label=make('span','',file.name),size=make('small','',formatter.format(file.size/1048576)+' MiB'),remove=make('button','','إزالة');remove.type='button';remove.setAttribute('aria-label','إزالة '+file.name);label.append(size);remove.addEventListener('click',()=>{uploads.splice(i,1);fileList();});row.append(label,remove);root.append(row);});}
-  function syncFunding(validate=false){
+  function syncFunding(validate=false, source='percent'){
     if(!followup)return true;
     const op=followup.dataset.operation, active=op==='approve'||op==='allocate';if(!active)return true;
-    const total=cents(followup.dataset.totalCost)||0n, percent=cents($('#id_support_percent').value);
-    const remainingBase=total-(cents(followup.dataset.approvedSupport)||0n);let contribution=op==='allocate'?cents(followup.dataset.recordAmount):(percent!==null&&remainingBase>0n?(remainingBase*percent+5000n)/10000n:null);
-    $('#id_amount').value=amount(contribution);
+    const total=cents(followup.dataset.totalCost)||0n;
+    const remainingBase=total-(cents(followup.dataset.approvedSupport)||0n);
+    const modeInput=$('input[name="entry_mode"]',followup);
+    let contribution=null;
+    if(op==='allocate'){
+      contribution=cents(followup.dataset.recordAmount);
+      $('#id_amount').value=amount(contribution);
+    } else if(source==='amount'){
+      if(modeInput)modeInput.value='amount';
+      contribution=cents($('#id_amount').value);
+      if(contribution!==null&&remainingBase>0n){
+        const pctCents=(contribution*10000n+remainingBase/2n)/remainingBase;
+        const clampedPct=pctCents>10000n?10000n:pctCents;
+        $('#id_support_percent').value=amount(clampedPct);
+      } else {
+        $('#id_support_percent').value='';
+      }
+    } else {
+      if(modeInput)modeInput.value='percent';
+      const percent=cents($('#id_support_percent').value);
+      contribution=percent!==null&&remainingBase>0n?(remainingBase*percent+5000n)/10000n:null;
+      $('#id_amount').value=amount(contribution);
+    }
     const levelInfo=contribution&&total?(contribution===total?['استراتيجي','strategic']:contribution*100n>=total*80n?['ذهبي','gold']:contribution*100n>=total*60n?['فضي','silver']:['برونزي','bronze']):['—',''];const lp=$('[data-level-preview]');if(lp){lp.textContent=levelInfo[0];lp.classList.remove('market-level','level-strategic','level-gold','level-silver','level-bronze');if(levelInfo[1])lp.classList.add('market-level','level-'+levelInfo[1]);}
     let sum=0n,valid=true;$$('[data-allocation-input]',followup).forEach(input=>{const value=input.disabled?0n:input.value.trim()?cents(input.value):0n;const remaining=cents(input.dataset.remaining)||0n;const error=$('#error-'+input.name,followup);if(value===null||value<0n||value>remaining){valid=false;if(validate&&error)error.textContent='أدخل مبلغًا صحيحًا لا يتجاوز المتبقي للبند.';}else{sum+=value;if(error)error.textContent='';}});
     $('[data-allocation-total]').textContent=formatter.format(Number(sum)/100);$('[data-allocation-status]').textContent=contribution!==null&&sum===contribution&&valid?'التوزيع يطابق مبلغ المساهمة.':'وزّع مبلغ المساهمة بالكامل على البنود.';
@@ -192,25 +212,28 @@
   function configureFollowup(operation){
     followup.dataset.operation=operation;const approve=operation==='approve',allocate=operation==='allocate',funding=approve||allocate,reject=operation==='reject';
     $('[data-approval-fields]').hidden=!funding;const fs=$('[data-funding-summary]',followup);if(fs)fs.hidden=!funding;$('[data-allocation-fields]').hidden=true;$('[data-rejection-fields]').hidden=!reject;$('[data-evidence-fields]').hidden=!approve;
-    $('#id_amount').disabled=!funding;$('#id_amount').required=false;$('#id_amount').readOnly=true;
+    $('#id_amount').disabled=!funding;$('#id_amount').required=approve;$('#id_amount').readOnly=!approve;
     $('#id_support_percent').disabled=!approve;$('#id_support_percent').required=approve;
     $('#id_support_percent').readOnly=false;
+    const isCapPromo=approve&&followup.dataset.devState==='capability';
+    const promoBox=$('[data-capability-promotion]',followup);if(promoBox)promoBox.hidden=!isCapPromo;
+    const agrSel=$('#id_agreement_type',followup);if(agrSel){agrSel.disabled=!isCapPromo;agrSel.required=isCapPromo;controls.get(agrSel)?.update();}
     if(allocate){const total=cents(followup.dataset.totalCost),support=cents(followup.dataset.recordAmount);$('#id_support_percent').value=total&&support!==null?amount((support*10000n+total/2n)/total):'';}
     $('#id_rejection_reason').disabled=!reject;$('#id_rejection_reason').required=reject;$('#id_attachments').disabled=!approve;
     const allowed=(followup.dataset.allowedLines||'').split(',');$$('[data-allocation-input]',followup).forEach(input=>{input.disabled=true;});
     $('#followup-dialog-title').textContent=approve?'اعتماد مساهمة الجهة':allocate?'توزيع مساهمة سابقة على بنود الصرف':reject?'تسجيل رفض الجهة':'تسجيل نتيجة التواصل';
     $('[data-followup-submit]').textContent=approve?'حفظ واعتماد الدعم':allocate?'تأكيد توزيع الدعم السابق':reject?'حفظ الرفض':'حفظ المتابعة';syncFunding();
   }
-  $$('[data-followup-open]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();const parentDetail=a.closest('dialog.market-record-detail');if(parentDetail&&parentDetail.open)parentDetail.close();followup.reset();uploads=[];fileList();$$('.field-error',followup).forEach(n=>n.textContent='');$('[data-upload-progress]').hidden=true;$('[name=snapshot]',followup).value=a.dataset.snapshot;$('[data-followup-name]').textContent=a.dataset.name;$('#id_notes').value=a.dataset.notes;followup.dataset.recordAmount=a.dataset.recordAmount||'';followup.dataset.allowedLines=a.dataset.allowedLines||'';configureFollowup(a.dataset.operation);show(followupDialog);}));
-  if(followup){$('#id_support_percent').addEventListener('input',e=>{const el=e.target;let v=el.value.replace(/-/g,'').replace(/[^0-9.]/g,'');const parts=v.split('.');if(parts.length>2)v=parts[0]+'.'+parts.slice(1).join('');const num=parseFloat(v);if(!Number.isNaN(num)&&num>100)v='100';if(el.value!==v)el.value=v;syncFunding();});$$('[data-allocation-input]',followup).forEach(input=>input.addEventListener('input',()=>syncFunding()));configureFollowup(followup.dataset.operation||'notes');$('#id_attachments').addEventListener('change',e=>{const error=$('[data-followup-error]');error.textContent='';for(const file of e.target.files){if(!/\.(pdf|png|jpe?g)$/i.test(file.name)||!file.size||file.size>Number(followup.dataset.limit)){error.textContent='نوع ملف غير مسموح أو حجم يتجاوز الحد. راجع التعليمات.';continue;}if(uploads.length>=Number(followup.dataset.maxFiles)){error.textContent='تجاوزت العدد المسموح للمرفقات.';break;}if(!uploads.some(f=>f.name===file.name&&f.size===file.size&&f.lastModified===file.lastModified))uploads.push(file);}e.target.value='';fileList();});followupDialog.addEventListener('cancel',e=>{if(busy)e.preventDefault();});}
+  $$('[data-followup-open]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();const parentDetail=a.closest('dialog.market-record-detail');if(parentDetail&&parentDetail.open)parentDetail.close();followup.reset();uploads=[];fileList();$$('.field-error',followup).forEach(n=>n.textContent='');$('[data-upload-progress]').hidden=true;$('[name=snapshot]',followup).value=a.dataset.snapshot;$('[data-followup-name]').textContent=a.dataset.name;$('#id_notes').value=a.dataset.notes;followup.dataset.recordAmount=a.dataset.recordAmount||'';followup.dataset.allowedLines=a.dataset.allowedLines||'';followup.dataset.devState=a.dataset.devState||'';const mi=$('input[name="entry_mode"]',followup);if(mi)mi.value='percent';configureFollowup(a.dataset.operation);show(followupDialog);}));
+  if(followup){$('#id_support_percent').addEventListener('input',e=>{const el=e.target;let v=el.value.replace(/-/g,'').replace(/[^0-9.]/g,'');const parts=v.split('.');if(parts.length>2)v=parts[0]+'.'+parts.slice(1).join('');const num=parseFloat(v);if(!Number.isNaN(num)&&num>100)v='100';if(el.value!==v)el.value=v;syncFunding(false,'percent');});$('#id_amount').addEventListener('input',e=>{if(followup.dataset.operation!=='approve')return;const el=e.target;let v=el.value.replace(/-/g,'').replace(/[^0-9.]/g,'');const parts=v.split('.');if(parts.length>2)v=parts[0]+'.'+parts.slice(1).join('');const total=cents(followup.dataset.totalCost)||0n;const rem=total-(cents(followup.dataset.approvedSupport)||0n);const cur=cents(v);if(cur!==null&&rem>0n&&cur>rem)v=amount(rem);if(el.value!==v)el.value=v;syncFunding(false,'amount');});$$('[data-allocation-input]',followup).forEach(input=>input.addEventListener('input',()=>syncFunding()));configureFollowup(followup.dataset.operation||'notes');$('#id_attachments').addEventListener('change',e=>{const error=$('[data-followup-error]');error.textContent='';for(const file of e.target.files){if(!/\.(pdf|png|jpe?g)$/i.test(file.name)||!file.size||file.size>Number(followup.dataset.limit)){error.textContent='نوع ملف غير مسموح أو حجم يتجاوز الحد. راجع التعليمات.';continue;}if(uploads.length>=Number(followup.dataset.maxFiles)){error.textContent='تجاوزت العدد المسموح للمرفقات.';break;}if(!uploads.some(f=>f.name===file.name&&f.size===file.size&&f.lastModified===file.lastModified))uploads.push(file);}e.target.value='';fileList();});followupDialog.addEventListener('cancel',e=>{if(busy)e.preventDefault();});}
   function sendFollowup(form){
-    const body=new FormData(form);body.delete('attachments');uploads.forEach(f=>body.append('attachments',f));const area=$('[data-upload-progress]'),bar=$('progress',area),status=$('[data-upload-status]'),error=$('[data-followup-error]');const xhr=new XMLHttpRequest();busy=true;area.hidden=false;bar.value=0;status.textContent=uploads.length?'جار رفع مستندات الدعم…':'جار التحقق والحفظ…';error.textContent='';$$('button,input,textarea',form).forEach(n=>n.disabled=true);
-    function unlock(){busy=false;$$('button,input,textarea',form).forEach(n=>n.disabled=false);configureFollowup(form.dataset.operation);}
+    const body=new FormData(form);body.delete('attachments');uploads.forEach(f=>body.append('attachments',f));const area=$('[data-upload-progress]'),bar=$('progress',area),status=$('[data-upload-status]'),error=$('[data-followup-error]');const xhr=new XMLHttpRequest();busy=true;area.hidden=false;bar.value=0;status.textContent=uploads.length?'جار رفع مستندات الدعم…':'جار التحقق والحفظ…';error.textContent='';$$('button,input,textarea,select',form).forEach(n=>n.disabled=true);
+    function unlock(){busy=false;$$('button,input,textarea,select',form).forEach(n=>n.disabled=false);configureFollowup(form.dataset.operation);}
     xhr.upload.addEventListener('progress',e=>{if(e.lengthComputable){bar.value=Math.floor(e.loaded/e.total*100);status.textContent=bar.value<100?'جار رفع المرفقات: '+bar.value+'%':'اكتمل الإرسال. جار التحقق من المحتوى وحفظ القرار…';}});
     xhr.addEventListener('load',()=>{let data;try{data=JSON.parse(xhr.responseText);}catch{}if(xhr.status>=200&&xhr.status<300&&data?.redirect){location.assign(data.redirect);return;}unlock();status.textContent='لم يكتمل الحفظ. راجع الرسالة وأعد المحاولة.';error.textContent=data?.error||'تعذّر حفظ القرار. حدّث الصفحة للتحقق من النتيجة قبل إعادة المحاولة.';for(const [key,messages]of Object.entries(data?.fields||{})){const target=$('#error-'+key,form);if(target)target.textContent=messages.map(m=>m.message).join(' ');}error.focus();});
     xhr.addEventListener('error',()=>{unlock();status.textContent='انقطع الاتصال. تحقق من حالة البطاقة قبل إعادة الإرسال.';error.textContent='تعذّر الاتصال بالخادم؛ قد يكون القرار وصل. حدّث الصفحة للتحقق.';});
     xhr.addEventListener('timeout',()=>{unlock();error.textContent='انتهت مهلة الاتصال. حدّث الصفحة للتحقق من نتيجة الحفظ.';});
     xhr.open('POST',form.getAttribute('action')||location.href);xhr.setRequestHeader('X-Requested-With','XMLHttpRequest');xhr.timeout=600000;xhr.send(body);
   }
-  $$('form[data-market-confirm]').forEach(form=>form.addEventListener('submit',e=>{e.preventDefault();if(busy)return;if(form===editor&&!syncEditor())return;if(form===followup&&!syncFunding(true))return;if(form.matches('[data-candidates]')&&!$('input[name=organizations]:checked',form)){$('[data-candidate-error]').textContent='اختر جهة واحدة على الأقل للمتابعة.';return;}if(!form.reportValidity())return;ask(form.dataset.marketConfirm,()=>{if(form===followup){sendFollowup(form);return;}$$('button[type=submit]',form).forEach(b=>{b.disabled=true;b.textContent='جار الحفظ…';});HTMLFormElement.prototype.submit.call(form);},form.hasAttribute('data-danger')||form.dataset.operation==='reject');}));
+  $$('form[data-market-confirm]').forEach(form=>form.addEventListener('submit',e=>{e.preventDefault();if(busy)return;if(form===editor&&!syncEditor())return;if(form===followup&&!syncFunding(true,$('input[name="entry_mode"]',followup)?.value||'percent'))return;if(form.matches('[data-candidates]')&&!$('input[name=organizations]:checked',form)){$('[data-candidate-error]').textContent='اختر جهة واحدة على الأقل للمتابعة.';return;}if(!form.reportValidity())return;ask(form.dataset.marketConfirm,()=>{if(form===followup){sendFollowup(form);return;}$$('button[type=submit]',form).forEach(b=>{b.disabled=true;b.textContent='جار الحفظ…';});HTMLFormElement.prototype.submit.call(form);},form.hasAttribute('data-danger')||form.dataset.operation==='reject');}));
 })();

@@ -222,7 +222,10 @@ def index(request):
     detail = None
     if request.GET.get("detail", "").isascii() and request.GET.get("detail", "").isdigit():
         detail = get_object_or_404(query(request.user).prefetch_related("expense_lines__expense_item", "expense_lines__sponsorship_shape", "sponsorships__partnership", "sponsorships__attachments"), pk=int(request.GET["detail"]))
-        detail.visible_sponsorships = sponsorship_query(detail, request.user)
+        detail_sponsorships = sponsorship_query(detail, request.user)
+        if detail.status == NeedStatus.COMPLETE:
+            detail_sponsorships = detail_sponsorships.filter(status__in=[SponsorshipStatus.APPROVED, SponsorshipStatus.REJECTED])
+        detail.visible_sponsorships = detail_sponsorships
         funding_details(detail)
         context["history_page"] = Paginator(regional_history(detail.events, request.user).select_related("actor"), 20).get_page(request.GET.get("history_page"))
         context["history_query"] = urlencode({"q": q, "active": active, "state": state, "page": page.number, "detail": detail.pk})
@@ -327,7 +330,10 @@ def followup(request, pk):
     # Search is a read-only GET. It never creates candidates or advances states.
     queryset = candidates(need, active_filter_data, actor=request.user).select_related("partnership_status") if valid_filters else candidates(need, actor=request.user).none()
     page = Paginator(queryset, resolve_page_size(request, 10)).get_page(request.GET.get("page"))
-    linked_records = list(sponsorship_query(need, request.user))
+    sponsorships_qs = sponsorship_query(need, request.user)
+    if need.status == NeedStatus.COMPLETE:
+        sponsorships_qs = sponsorships_qs.filter(status__in=[SponsorshipStatus.APPROVED, SponsorshipStatus.REJECTED])
+    linked_records = list(sponsorships_qs)
     auto_matched_orgs = list(queryset) if need.status != NeedStatus.COMPLETE else []
     unified_items = [("linked", r) for r in linked_records] + [("org", o) for o in auto_matched_orgs]
     record_page = Paginator(unified_items, resolve_page_size(request, 25, param="followup_per_page")).get_page(request.GET.get("followup_page"))

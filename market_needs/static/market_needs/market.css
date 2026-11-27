@@ -1921,3 +1921,21 @@ details.market-card-fold[open] .market-fold-closed-label {
     grid-template-columns: 1fr;
   }
 }
+
+/* Capability-to-Care promotion box inside approval popup */
+.market-promo-box {
+  background: #f0f8fc;
+  border: 1px solid #c0dfee;
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.market-promo-banner {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #0e4a69;
+  line-height: 1.6;
+}
