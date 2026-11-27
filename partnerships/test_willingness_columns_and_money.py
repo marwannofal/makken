@@ -94,3 +94,38 @@ class WillingnessColumnsAndMoneyFormattingTests(TestCase):
             res = self.client.get(reverse("partnerships:sponsor_request_review", args=[req.pk]))
         self.assertEqual(res.status_code, 200)
         self.assertContains(res, "1,000,000.00")
+
+    def test_unified_dates_removed_from_section1_and_computed_from_starts_on(self):
+        from partnerships.willingness_workflow import WillingnessDetailsForm, apply_willingness_details
+        cap_create = self.client.get(reverse("partnerships:create"))
+        self.assertEqual(cap_create.status_code, 200)
+        self.assertNotContains(cap_create, "مدة الشراكة")
+        self.assertNotContains(cap_create, "id_partnership_date")
+        self.assertNotContains(cap_create, "mk-term-row-4")
+
+        will_edit = self.client.get(reverse("partnerships:edit", args=[self.p_will.pk]))
+        self.assertEqual(will_edit.status_code, 200)
+        self.assertNotContains(will_edit, "<h3>مدة الشراكة</h3>")
+        self.assertNotContains(will_edit, "id_partnership_date")
+        self.assertContains(will_edit, "mk-term-row-4")
+        self.assertContains(will_edit, "تاريخ توقيع الشراكة")
+        self.assertContains(will_edit, "تاريخ بداية الشراكة")
+        self.assertContains(will_edit, "مدة الشراكة بالأشهر")
+
+        # Separate signed_on vs starts_on + auto ends_on
+        form = WillingnessDetailsForm(
+            data={"signed_on": "2026-03-10", "starts_on": "2026-02-01", "duration_months": "18"},
+            partnership=self.p_will,
+        )
+        self.assertTrue(form.is_valid(), form.errors)
+        apply_willingness_details(self.p_will, form.cleaned_data)
+        self.p_will.save()
+        self.p_will.refresh_from_db()
+        self.assertEqual(self.p_will.signed_on, date(2026, 3, 10))
+        self.assertEqual(self.p_will.starts_on, date(2026, 2, 1))
+        self.assertEqual(self.p_will.ends_on, date(2027, 8, 1))
+
+        # starts_on without duration_months is rejected cleanly
+        bad = WillingnessDetailsForm(data={"starts_on": "2026-02-01", "duration_months": ""}, partnership=self.p_will)
+        self.assertFalse(bad.is_valid())
+        self.assertIn("duration_months", bad.errors)

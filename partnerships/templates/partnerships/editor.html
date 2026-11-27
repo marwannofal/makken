@@ -112,7 +112,6 @@
               {{ form.administrative_regions.errors }}
             </div>
           </div>
-          {% include "partnerships/_field.html" with field=form.partnership_date %}
           {% guarded_status 'partnerships' %}
             <fieldset class="partnership-field">
               <legend>حالة السجل <span class="required" aria-hidden="true">*</span></legend>
@@ -126,11 +125,6 @@
               </div>
             </fieldset>
           {% endguarded_status %}
-        </div>
-        <h3>مدة الشراكة</h3> <p class="field-help">يمكن ترك التاريخين فارغين. إذا حدّدت أحدهما، أدخل الآخر، على ألا تسبق النهاية البداية.</p>
-        <div class="partnership-form-grid">
-          {% include "partnerships/_field.html" with field=form.starts_on %}
-          {% include "partnerships/_field.html" with field=form.ends_on %}
         </div>
         {% if is_will_create or show_edit_clauses %}{% include "partnerships/_section_save.html" %}{% endif %}
       </div>

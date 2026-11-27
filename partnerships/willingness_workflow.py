@@ -29,6 +29,7 @@ DETAIL_FIELDS = (
     'institution_rep_phone',
     'partnership_type',
     'signed_on',
+    'starts_on',
     'duration_months',
     'renewal_rule',
     'partnership_status',
@@ -59,8 +60,9 @@ class WillingnessDetailsForm(forms.Form):
     institution_rep_name = forms.CharField(label='اسم ممثل المؤسسة', max_length=160, required=False, widget=forms.TextInput(attrs={'placeholder': 'الاسم الكامل لممثل المؤسسة'}))
     institution_rep_email = forms.EmailField(label='البريد الإلكتروني لممثل المؤسسة', max_length=254, required=False, widget=forms.EmailInput(attrs={'dir': 'ltr', 'placeholder': 'example@tvtc.gov.sa'}))
     institution_rep_phone = forms.CharField(label='رقم الجوال لممثل المؤسسة', max_length=32, required=False, widget=forms.TextInput(attrs={'dir': 'ltr', 'placeholder': '+9665XXXXXXXX'}))
-    signed_on = forms.DateField(label='تاريخ التوقيع (بداية الشراكة)', required=False, widget=forms.DateInput(attrs={'type': 'date', 'data-signed-on': ''}, format='%Y-%m-%d'))
-    duration_months = forms.IntegerField(label='مدة الاتفاقية (بالأشهر)', min_value=1, max_value=600, required=False, widget=forms.NumberInput(attrs={'min': '1', 'max': '600', 'placeholder': 'مثال: 12 أو 24', 'data-duration-months': ''}))
+    signed_on = forms.DateField(label='تاريخ توقيع الشراكة', required=False, widget=forms.DateInput(attrs={'type': 'date', 'data-signed-on': ''}, format='%Y-%m-%d'))
+    starts_on = forms.DateField(label='تاريخ بداية الشراكة', required=False, widget=forms.DateInput(attrs={'type': 'date', 'data-starts-on': ''}, format='%Y-%m-%d'))
+    duration_months = forms.IntegerField(label='مدة الشراكة بالأشهر', min_value=1, max_value=600, required=False, widget=forms.NumberInput(attrs={'min': '1', 'max': '600', 'placeholder': 'مثال: 12 أو 24', 'data-duration-months': ''}))
     partnership_type = forms.ModelChoiceField(label='نوع الشراكة', queryset=PartnershipType.objects.none(), required=False, empty_label='اختر نوع الشراكة')
     renewal_rule = forms.ChoiceField(label='نوع التجديد', choices=[('', 'اختر نوع التجديد'), *RenewalRule.choices], required=False)
     partnership_status = forms.ModelChoiceField(label='حالة الشراكة', queryset=AgreementOption.objects.none(), required=False, empty_label='اختر حالة الشراكة')
@@ -87,6 +89,17 @@ class WillingnessDetailsForm(forms.Form):
     audience = forms.CharField(label='الفئات المستهدفة', max_length=2000, required=False, widget=forms.Textarea(attrs={'rows': 3, 'placeholder': 'حدد الفئات المستهدفة من الشراكة'}))
     expected_results = forms.CharField(label='النتائج المتوقعة', max_length=2000, required=False, widget=forms.Textarea(attrs={'rows': 3, 'placeholder': 'اذكر النتائج والمخرجات المتوقعة'}))
 
+    def clean(self):
+        cleaned = super().clean()
+        starts = cleaned.get('starts_on')
+        signed = cleaned.get('signed_on')
+        months = cleaned.get('duration_months')
+        if starts and not months:
+            self.add_error('duration_months', 'أدخل مدة الشراكة بالأشهر لحساب تاريخ نهاية الشراكة تلقائيًا.')
+        elif months and not starts and not signed:
+            self.add_error('starts_on', 'أدخل تاريخ بداية الشراكة عند تحديد المدة بالأشهر.')
+        return cleaned
+
 
 def details_initial(partnership):
     if not partnership or not partnership.pk:
@@ -99,7 +112,7 @@ def details_initial(partnership):
             out[field] = getattr(partnership, f'{field}_id')
         else:
             val = getattr(partnership, field)
-            out[field] = val.isoformat() if field == 'signed_on' and val else ('' if val is None else val)
+            out[field] = val.isoformat() if field in {'signed_on', 'starts_on'} and val else ('' if val is None else val)
     return out
 
 
@@ -107,7 +120,7 @@ def serialize_details(cleaned):
     out = {}
     for field in DETAIL_FIELDS:
         val = cleaned.get(field)
-        if field == 'signed_on':
+        if field in {'signed_on', 'starts_on'}:
             out[field] = val.isoformat() if val else ''
         elif field == 'duration_months':
             out[field] = val if val is not None else None
@@ -140,7 +153,7 @@ def apply_willingness_details(partnership, cleaned_or_serialized, *, skip_partne
         if field == 'partnership_status':
             partnership.partnership_status_id = val.pk if hasattr(val, 'pk') else (int(val) if val else None)
             continue
-        if field == 'signed_on':
+        if field in {'signed_on', 'starts_on'}:
             if isinstance(val, str):
                 val = date.fromisoformat(val) if val else None
         elif field == 'duration_months':
@@ -151,10 +164,13 @@ def apply_willingness_details(partnership, cleaned_or_serialized, *, skip_partne
         else:
             val = (val or '').strip()
         setattr(partnership, field, val)
-    expiry = partnership.calculated_expiry
-    if partnership.signed_on and expiry and (not partnership.ends_on or not partnership.starts_on):
+    if partnership.starts_on and partnership.duration_months:
+        partnership.ends_on = partnership.calculated_expiry
+    elif partnership.signed_on and partnership.duration_months and not partnership.starts_on:
         partnership.starts_on = partnership.signed_on
-        partnership.ends_on = expiry
+        partnership.ends_on = partnership.calculated_expiry
+    elif 'starts_on' in cleaned_or_serialized and not partnership.starts_on:
+        partnership.ends_on = None
 
 
 def save_partnership_departments(partnership, cleaned_or_serialized):

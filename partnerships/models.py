@@ -146,9 +146,10 @@ class Partnership(models.Model):
 
     @property
     def calculated_expiry(self):
-        if self.signed_on and self.duration_months:
+        base = self.starts_on or self.signed_on
+        if base and self.duration_months:
             from agreement_clauses.calendar import end_after_months
-            return end_after_months(self.signed_on, self.duration_months)
+            return end_after_months(base, self.duration_months)
         return None
 
     def format_agreement_number(self):

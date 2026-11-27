@@ -14,16 +14,17 @@
   }
 
   function initExpiryCalculator(root) {
+    const startsInput = root.querySelector('[data-starts-on]');
     const signedInput = root.querySelector('[data-signed-on]');
     const monthsInput = root.querySelector('[data-duration-months]');
     const output = root.querySelector('[data-calculated-expiry]');
-    if (!signedInput || !monthsInput || !output) return;
+    if ((!startsInput && !signedInput) || !monthsInput || !output) return;
 
     function compute() {
-      const rawDate = signedInput.value;
+      const rawDate = (startsInput && startsInput.value) || (signedInput && signedInput.value) || '';
       const months = parseInt(monthsInput.value, 10);
       if (!rawDate || !months || months < 1 || months > 600) {
-        output.textContent = 'يُحسب تلقائيًا عند إدخال تاريخ التوقيع والمدة';
+        output.textContent = 'يُحسب تلقائيًا عند إدخال تاريخ البداية والمدة';
         return;
       }
       const parts = rawDate.split('-').map(Number);
@@ -38,8 +39,14 @@
       output.textContent = `${pad(targetDay)}/${pad(targetMonth)}/${targetYear}`;
     }
 
-    signedInput.addEventListener('input', compute);
-    signedInput.addEventListener('change', compute);
+    if (startsInput) {
+      startsInput.addEventListener('input', compute);
+      startsInput.addEventListener('change', compute);
+    }
+    if (signedInput) {
+      signedInput.addEventListener('input', compute);
+      signedInput.addEventListener('change', compute);
+    }
     monthsInput.addEventListener('input', compute);
     monthsInput.addEventListener('change', compute);
     compute();

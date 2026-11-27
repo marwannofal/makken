@@ -1,7 +1,7 @@
 <details class="mk-accordion" {% if open_details %}open{% endif %}>
   <summary>
     <div class="mk-acc-head">
-      <h3 class="mk-acc-title">{{ num_term|default:"04" }} · مدة الاتفاقية والتوقيع والتجديد</h3> <p class="mk-acc-subtitle">تاريخ التوقيع ومدة الاتفاقية بالأشهر وحساب تاريخ الانتهاء آليًا ونوع التجديد.</p>
+      <h3 class="mk-acc-title">{{ num_term|default:"04" }} · مدة الاتفاقية والتوقيع والتجديد</h3> <p class="mk-acc-subtitle">تاريخ توقيع الشراكة، تاريخ البداية، المدة بالأشهر وحساب تاريخ النهاية تلقائيًا ونوع التجديد.</p>
     </div>
     <span class="mk-acc-meta">
     {% if item and item.agreement_number %}
@@ -10,11 +10,17 @@
     <svg class="mk-acc-arrow" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg> </span>
   </summary>
   <div class="mk-acc-body" data-expiry-scope>
-    <div class="work-grid-2">
+    <div class="mk-term-row-4">
       <div class="partnership-field">
         <label for="{{ details_form.signed_on.id_for_label }}">{{ details_form.signed_on.label }}</label> {{ details_form.signed_on }}
         <div class="field-error" role="alert">
           {{ details_form.signed_on.errors }}
+        </div>
+      </div>
+      <div class="partnership-field">
+        <label for="{{ details_form.starts_on.id_for_label }}">{{ details_form.starts_on.label }}</label> {{ details_form.starts_on }}
+        <div class="field-error" role="alert">
+          {{ details_form.starts_on.errors }}
         </div>
       </div>
       <div class="partnership-field">
@@ -24,15 +30,19 @@
         </div>
       </div>
       <div class="partnership-field">
-        <label>تاريخ الانتهاء (يُحسب آليًا)</label>
+        <label>تاريخ نهاية الشراكة (يُحسب تلقائيًا)</label>
         <div class="expiry-readonly-box" dir="ltr" data-calculated-expiry>
-          {% if item and item.calculated_expiry %}
+          {% if item and item.ends_on %}
+            {{ item.ends_on|date:"d/m/Y" }}
+          {% elif item and item.calculated_expiry %}
             {{ item.calculated_expiry|date:"d/m/Y" }}
           {% else %}
-            يُحسب تلقائيًا عند إدخال تاريخ التوقيع والمدة
+            يُحسب تلقائيًا عند إدخال تاريخ البداية والمدة
           {% endif %}
         </div>
       </div>
+    </div>
+    <div class="work-grid-2">
       <div class="partnership-field">
         <label for="{{ details_form.renewal_rule.id_for_label }}">{{ details_form.renewal_rule.label }}</label> {{ details_form.renewal_rule }}
         <div class="field-error" role="alert">

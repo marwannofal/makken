@@ -25,12 +25,11 @@
           <span>القدرة المالية</span>
           {% include "partnerships/_financial_value.html" with amount=pending.financial_capacity %}
         </div>
+        {% if pending.starts_on or pending.ends_on %}
         <dl class="detail-grid">
-          <div>
-            <dt>تاريخ الشراكة</dt><dd><bdi dir="ltr">{{ pending.partnership_date|default:"غير محدد" }}</bdi></dd>
-          </div>
           {% include "partnerships/_term_dates.html" with starts_on=pending.starts_on ends_on=pending.ends_on only %}
         </dl>
+        {% endif %}
       {% endif %}
       {% if pending.action == 'advance' %}
         {% include "partnerships/_willingness_form.html" %}

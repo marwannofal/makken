@@ -208,10 +208,11 @@
             {% endif %}
             </dd>
           </div>
-          <div>
-            <dt>تاريخ الشراكة</dt><dd><bdi dir="ltr">{{ detail.partnership_date|default:"غير محدد" }}</bdi></dd>
-          </div>
-          {% include "partnerships/_term_dates.html" with starts_on=detail.starts_on ends_on=detail.ends_on only %}
+          {% if detail.development_state_id == 'willingness' or detail.signed_on or detail.starts_on or detail.ends_on %}
+            {% if detail.signed_on %}<div><dt>تاريخ توقيع الشراكة</dt><dd><time datetime="{{ detail.signed_on|date:'Y-m-d' }}"><bdi dir="ltr">{{ detail.signed_on|date:'d/m/Y' }}</bdi></time></dd></div>{% endif %}
+            {% include "partnerships/_term_dates.html" with starts_on=detail.starts_on ends_on=detail.ends_on only %}
+            {% if detail.duration_months %}<div><dt>مدة الشراكة بالأشهر</dt><dd>{{ detail.duration_months }} شهر</dd></div>{% endif %}
+          {% endif %}
           {% if detail.partnership_status %}<div><dt>حالة الشراكة</dt><dd><span class="mk-pstatus-pill {{ detail.partnership_status|partnership_status_tone }}">{{ detail.partnership_status.name }}</span></dd></div>{% endif %}
         </dl>
         <div class="detail-offerings">

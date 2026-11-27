@@ -218,3 +218,23 @@
   padding-top: 12px;
   border-top: 1px solid #e2edf3;
 }
+
+
+/* === 4.1 Unified 1-row partnership dates & duration === */
+.mk-term-row-4 {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  align-items: start;
+  margin-bottom: 16px;
+}
+@media (max-width: 1024px) {
+  .mk-term-row-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 640px) {
+  .mk-term-row-4 {
+    grid-template-columns: 1fr;
+  }
+}
