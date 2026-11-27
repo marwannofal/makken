@@ -304,6 +304,7 @@ class SplitCapabilityWillingnessPagesTests(TestCase):
         self.assertEqual(res.status_code, 200)
         work_api_url = reverse('partnerships:work_edit', args=[self.p_will.pk, wk.pk])
         self.assertContains(res, f'data-edit-work-url="{work_api_url}"')
+        self.assertContains(res, '<td class="action-cell"><div class="row-actions"><button type="button" class="row-action" data-edit-work-url=')
         self.assertNotContains(res, reverse('makken_mail:work_detail', args=[wk.pk]))
         self.assertContains(res, 'id="we-assignees" name="assignee_ids" multiple data-market-select')
 
