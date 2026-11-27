@@ -9,7 +9,7 @@ STATE_KEYS = {str(label): key for key, label in DevelopmentState.choices}
 class DevelopmentFilterForm(forms.Form):
     development_state = forms.ChoiceField(
         required=False,
-        label="حالة التطور الحالي للجهة",
+        label="حالة التطور",
         choices=[("", "جميع الحالات"), *((label, label) for label in STATE_KEYS)],
         error_messages={"invalid_choice": "اختر قدرة أو رغبة أو رعاية من قائمة حالات التطور."},
         widget=forms.Select(attrs={
