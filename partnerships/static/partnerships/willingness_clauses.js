@@ -24,7 +24,7 @@
       const rawDate = (startsInput && startsInput.value) || (signedInput && signedInput.value) || '';
       const months = parseInt(monthsInput.value, 10);
       if (!rawDate || !months || months < 1 || months > 600) {
-        output.textContent = 'يُحسب تلقائيًا عند إدخال تاريخ البداية والمدة';
+        output.textContent = 'يُحسب تلقائيًا';
         return;
       }
       const parts = rawDate.split('-').map(Number);
