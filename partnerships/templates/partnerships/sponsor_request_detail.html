@@ -50,7 +50,7 @@
         {{ req.sector.name|default:'—' }}{% if req.sponsorship_shape %} — {{ req.sponsorship_shape.name }}{% endif %}
       {% endif %}
     </dd></div>
-    <div><dt>القدرة المالية</dt><dd>{% if req.financial_capacity is not None %}<bdi>{{ req.financial_capacity }}</bdi> ريال{% else %}—{% endif %}</dd></div>
+    <div><dt>القدرة المالية</dt><dd>{% include "partnerships/_financial_value.html" with amount=req.financial_capacity %}</dd></div>
     <div><dt>نوع الشراكة</dt><dd>{{ req.partnership_type.name|default:'—' }}</dd></div>
     <div><dt>المرفقات الداعمة</dt><dd>
       {% if req.attachments.all %}

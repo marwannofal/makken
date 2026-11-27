@@ -88,7 +88,7 @@ def _base(request, title, active):
 
 
 def _query(actor=None):
-    return scoped(Partnership.objects.all(), actor).select_related("entity", "development_state", "followup_updated_by").prefetch_related(
+    return scoped(Partnership.objects.all(), actor).select_related("entity", "development_state", "followup_updated_by", "partnership_status").prefetch_related(
         Prefetch("offerings", queryset=PartnershipOffering.objects.select_related("sector", "sponsorship_shape").prefetch_related("specializations")),
         "development_history__state", "willingness_attachments", "administrative_regions")
 

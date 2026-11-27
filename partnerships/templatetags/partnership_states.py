@@ -1,4 +1,5 @@
 """Render the current development state using its configured color."""
+from decimal import Decimal, InvalidOperation
 import re
 from django import template
 
@@ -19,3 +20,29 @@ def development_pill(state):
         'state_color': color,
         'text_class': 'development-pill-dark' if luminance > .179 else 'development-pill-light',
     }
+
+
+@register.filter
+def sar_money(value):
+    """Format SAR amount with thousand commas and 2 decimals regardless of Arabic locale."""
+    if value is None or value == '':
+        return '—'
+    try:
+        return format(Decimal(value), ',.2f')
+    except (TypeError, ValueError, InvalidOperation):
+        return str(value)
+
+
+@register.filter
+def partnership_status_tone(status_obj):
+    """Return a semantic pill tone class for AgreementOption partnership status."""
+    name = (getattr(status_obj, 'name', '') or str(status_obj or '')).strip()
+    if any(k in name for k in ('مستمر', 'ساري', 'نشط', 'فعّال', 'فعال')):
+        return 'is-active'
+    if any(k in name for k in ('منتهي', 'مكتمل')):
+        return 'is-ended'
+    if any(k in name for k in ('معلق', 'موقوف', 'قيد')):
+        return 'is-paused'
+    if any(k in name for k in ('متعثر', 'ملغ', 'مرفوض')):
+        return 'is-stalled'
+    return 'is-neutral'
