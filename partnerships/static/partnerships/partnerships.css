@@ -1854,3 +1854,41 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Align status + due date on one exact baseline and add gap above card body */
+#partnership-work-dialog .we-card-body {
+  margin-top: 16px !important;
+}
+
+#partnership-work-dialog .we-status-due-grid {
+  align-items: end !important;
+}
+
+#partnership-work-dialog .we-status-due-grid > .partnership-field {
+  margin: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  min-width: 0;
+}
+
+#partnership-work-dialog .we-status-due-grid > .partnership-field > label {
+  margin: 0 !important;
+  line-height: 1.5 !important;
+  min-height: 24px;
+}
+
+#partnership-work-dialog .we-status-due-grid .mk-dd-wrap,
+#partnership-work-dialog .we-status-due-grid .mk-date-wrap {
+  margin: 0 !important;
+  width: 100%;
+}
+
+#partnership-work-dialog .we-status-due-grid .mk-dd-trigger,
+#partnership-work-dialog .we-status-due-grid input[type="date"],
+#partnership-work-dialog .we-status-due-grid .mk-date-display {
+  height: 50px !important;
+  min-height: 50px !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}
