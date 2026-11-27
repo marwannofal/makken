@@ -65,15 +65,27 @@ class WillingnessDetailsForm(forms.Form):
     duration_months = forms.IntegerField(label='مدة الشراكة بالأشهر', min_value=1, max_value=600, required=False, widget=forms.NumberInput(attrs={'min': '1', 'max': '600', 'placeholder': 'مثال: 12 أو 24', 'data-duration-months': ''}))
     partnership_type = forms.ModelChoiceField(label='نوع الشراكة', queryset=PartnershipType.objects.none(), required=False, empty_label='اختر نوع الشراكة')
     renewal_rule = forms.ChoiceField(label='نوع التجديد', choices=[('', 'اختر نوع التجديد'), *RenewalRule.choices], required=False)
-    partnership_status = forms.ModelChoiceField(label='حالة الشراكة', queryset=AgreementOption.objects.none(), required=False, empty_label='اختر حالة الشراكة')
+    partnership_status = forms.ModelChoiceField(label='حالة الشراكة', queryset=AgreementOption.objects.none(), required=False, empty_label='اختر حالة الشراكة', widget=forms.Select(attrs={'data-partnership-status': ''}))
     signing_region = forms.ModelChoiceField(label='منطقة التوقيع', queryset=Region.objects.none(), required=False, empty_label='اختر منطقة التوقيع')
     agreement_classification = forms.ModelChoiceField(label='تصنيف الاتفاقية', queryset=AgreementClassification.objects.none(), required=False, empty_label='اختر تصنيف الاتفاقية')
     concerned_departments = DepartmentMultiField(label='الإدارة المعنية', queryset=Department.objects.none(), required=False, widget=forms.SelectMultiple(attrs={**SELECT, 'data-label': 'الإدارة المعنية'}), help_text='يمكنك اختيار إدارة واحدة أو أكثر (تُعرض مع نوعها: إدارات المؤسسة / وحدات المؤسسة).')
     headquarters_city = forms.CharField(label='عنوان الجهة (مدينة المقر)', max_length=120, required=False, widget=forms.TextInput(attrs={'placeholder': 'أدخل مدينة المقر'}))
     signing_city = forms.CharField(label='مدينة التوقيع', max_length=120, required=False, widget=forms.TextInput(attrs={'placeholder': 'أدخل مدينة التوقيع'}))
 
-    def __init__(self, *args, partnership=None, **kwargs):
+    def __init__(self, *args, partnership=None, require_term_fields=False, **kwargs):
         super().__init__(*args, **kwargs)
+        self.require_term_fields = bool(require_term_fields)
+        if require_term_fields:
+            req_msgs = {
+                'signed_on': 'أدخل تاريخ توقيع الشراكة.',
+                'starts_on': 'أدخل تاريخ بداية الشراكة.',
+                'duration_months': 'أدخل مدة الشراكة بالأشهر.',
+                'renewal_rule': 'اختر نوع التجديد.',
+                'partnership_status': 'اختر حالة الشراكة.',
+            }
+            for fname, msg in req_msgs.items():
+                self.fields[fname].required = True
+                self.fields[fname].error_messages['required'] = msg
         cur_type_id = partnership.partnership_type_id if partnership and partnership.pk else None
         cur_reg_id = partnership.signing_region_id if partnership and partnership.pk else None
         cur_cls_id = partnership.agreement_classification_id if partnership and partnership.pk else None

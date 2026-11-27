@@ -87,6 +87,13 @@ def _base(request, title, active):
     return {"page_heading": title, "active_page": active, "display_name": name, "avatar_initial": name[:1]}
 
 
+def _has_work_input(post_data):
+    return any(
+        (post_data.get(f"work-{f}") or "").strip()
+        for f in ("title", "instructions", "manager", "due_on")
+    ) or bool(post_data.getlist("work-assignees"))
+
+
 def _query(actor=None):
     return scoped(Partnership.objects.all(), actor).select_related("entity", "development_state", "followup_updated_by", "partnership_status").prefetch_related(
         Prefetch("offerings", queryset=PartnershipOffering.objects.select_related("sector", "sponsorship_shape").prefetch_related("specializations")),
@@ -264,10 +271,10 @@ def editor(request, pk=None, initial_state=DevelopmentState.CAPABILITY):
     snapshot = _sign({"kind": "editor", "id": pk, "version": item.version if item else None, "nonce": str(uuid.uuid4()), "initial_state": initial_state, "return_to": return_to}, request.user)
     form = PartnershipForm(initial=_initial(item), instance=item, actor=request.user)
     willingness_form = WillingnessTransitionForm() if is_will_create else None
-    work_form = PartnershipWorkForm(prefix="work", actor=request.user) if is_will_create else None
+    work_form = PartnershipWorkForm(prefix="work", actor=request.user, optional=True) if is_will_create else None
     clauses_json = json.dumps(existing_clause_rows(item)) if show_edit_clauses else "[]"
     clauses_error = ""
-    details_form = WillingnessDetailsForm(prefix="details", initial=details_initial(item), partnership=item) if (is_will_create or show_edit_clauses) else None
+    details_form = WillingnessDetailsForm(prefix="details", initial=details_initial(item), partnership=item, require_term_fields=True) if (is_will_create or show_edit_clauses) else None
     teams_json = json.dumps(existing_team_rows(item)) if show_edit_clauses else "[]"
     teams_error = ""
     saved_paths = []
@@ -284,8 +291,9 @@ def editor(request, pk=None, initial_state=DevelopmentState.CAPABILITY):
                 snapshot = request.POST["snapshot"]
                 form = PartnershipForm(request.POST, instance=None, actor=request.user)
                 willingness_form = WillingnessTransitionForm(request.POST, request.FILES)
-                work_form = PartnershipWorkForm(request.POST, prefix="work", actor=request.user)
-                details_form = WillingnessDetailsForm(request.POST, prefix="details")
+                has_work = _has_work_input(request.POST)
+                work_form = PartnershipWorkForm(request.POST, prefix="work", actor=request.user, optional=not has_work)
+                details_form = WillingnessDetailsForm(request.POST, prefix="details", require_term_fields=True)
                 clauses_json = request.POST.get("clauses_json", "[]")
                 teams_json = request.POST.get("teams_json", "[]")
                 parsed_clauses = None
@@ -299,7 +307,7 @@ def editor(request, pk=None, initial_state=DevelopmentState.CAPABILITY):
                 except django_forms.ValidationError as exc:
                     teams_error = " ".join(exc.messages)
 
-                if form.is_valid() and willingness_form.is_valid() and work_form.is_valid() and details_form.is_valid() and parsed_clauses is not None and parsed_teams is not None:
+                if form.is_valid() and willingness_form.is_valid() and (work_form.is_valid() if has_work else True) and details_form.is_valid() and parsed_clauses is not None and parsed_teams is not None:
                     with regional_transaction(request.user):
                         if not StateColor.objects.filter(pk=DevelopmentState.WILLINGNESS).exists():
                             raise Conflict("حالة رغبة غير موجودة. تأكد من تطبيق ترحيلات حالات التطور.")
@@ -330,8 +338,9 @@ def editor(request, pk=None, initial_state=DevelopmentState.CAPABILITY):
                         new_item.ensure_agreement_number()
                         save_partnership_clauses(new_item, parsed_clauses, request.user, allow_progress=False)
                         save_partnership_teams(new_item, parsed_teams)
-                        create_partnership_work(request.user, work_form.cleaned_data, new_item)
-                    messages.success(request, "تم إنشاء الشراكة في حالة رغبة وحفظ المرفقات وبنود الاتفاقية وإسناد العمل بنجاح.")
+                        if has_work:
+                            create_partnership_work(request.user, work_form.cleaned_data, new_item)
+                    messages.success(request, "تم إنشاء الشراكة في حالة رغبة وحفظ المرفقات وبنود الاتفاقية بنجاح.")
                     return add_login_headers(_redirect_to_list_with_highlight(request, new_item, return_to="willingness"))
                 else:
                     status = 400
@@ -349,7 +358,7 @@ def editor(request, pk=None, initial_state=DevelopmentState.CAPABILITY):
                     parsed_teams = None
                     details_valid = True
                     if show_edit_clauses:
-                        details_form = WillingnessDetailsForm(request.POST, prefix="details", partnership=item)
+                        details_form = WillingnessDetailsForm(request.POST, prefix="details", partnership=item, require_term_fields=True)
                         details_valid = details_form.is_valid()
                         clauses_json = request.POST.get("clauses_json", "[]")
                         teams_json = request.POST.get("teams_json", "[]")
@@ -519,8 +528,8 @@ def _render_index(request, fixed_state=None, read_only=False):
     status, pending = 200, None
     saved_paths = []
     willingness_form = WillingnessTransitionForm()
-    work_form = PartnershipWorkForm(prefix="work", actor=request.user)
-    details_form = WillingnessDetailsForm(prefix="details")
+    work_form = PartnershipWorkForm(prefix="work", actor=request.user, optional=True)
+    details_form = WillingnessDetailsForm(prefix="details", require_term_fields=True)
     clauses_json = "[]"
     clauses_error = ""
     teams_json = "[]"
@@ -552,8 +561,9 @@ def _render_index(request, fixed_state=None, read_only=False):
                 else:
                     if data["operation"] == "advance":
                         willingness_form = WillingnessTransitionForm(request.POST, request.FILES, partnership=item)
-                        work_form = PartnershipWorkForm(request.POST, prefix="work", actor=request.user)
-                        details_form = WillingnessDetailsForm(request.POST, prefix="details")
+                        has_work = _has_work_input(request.POST)
+                        work_form = PartnershipWorkForm(request.POST, prefix="work", actor=request.user, optional=not has_work)
+                        details_form = WillingnessDetailsForm(request.POST, prefix="details", partnership=item, require_term_fields=True)
                         clauses_json = request.POST.get("clauses_json", "[]")
                         teams_json = request.POST.get("teams_json", "[]")
                         parsed_clauses = None
@@ -567,7 +577,7 @@ def _render_index(request, fixed_state=None, read_only=False):
                         except django_forms.ValidationError as exc:
                             teams_error = " ".join(exc.messages)
 
-                        if not (willingness_form.is_valid() and work_form.is_valid() and details_form.is_valid() and parsed_clauses is not None and parsed_teams is not None):
+                        if not (willingness_form.is_valid() and (work_form.is_valid() if has_work else True) and details_form.is_valid() and parsed_clauses is not None and parsed_teams is not None):
                             pending = {"title": "التحويل من قدرة إلى رغبة", "name": item.name, "action": "advance", "button": "حفظ والتحويل إلى رغبة", "token": request.POST.get("token")}
                             raise InvalidWillingnessForm
 
@@ -586,8 +596,9 @@ def _render_index(request, fixed_state=None, read_only=False):
                         item.ensure_agreement_number()
                         save_partnership_clauses(item, parsed_clauses, request.user, allow_progress=False)
                         save_partnership_teams(item, parsed_teams)
-                        create_partnership_work(request.user, work_form.cleaned_data, item)
-                        message = "تم حفظ المرفقات وبنود الاتفاقية وإسناد العمل وتحويل الجهة إلى رغبة بنجاح."
+                        if has_work:
+                            create_partnership_work(request.user, work_form.cleaned_data, item)
+                        message = "تم حفظ المرفقات وبنود الاتفاقية وتحويل الجهة إلى رغبة بنجاح."
                     elif data["operation"] == "delete":
                         item.delete()
                         message = "تم حذف الجهة وبيانات شراكتها بنجاح."

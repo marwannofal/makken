@@ -164,3 +164,37 @@ class WillingnessColumnsAndMoneyFormattingTests(TestCase):
         self.assertContains(care_res, "mk-detail-term-banner")
         self.assertContains(care_res, "01/05/2026")
         self.assertContains(care_res, "01/05/2027")
+
+    def test_willingness_mandatory_term_optional_work_and_signatories_columns(self):
+        from partnerships.willingness_workflow import WillingnessDetailsForm
+        from partnerships.models import RenewalRule
+
+        # Required 5 core fields when require_term_fields=True
+        empty_req = WillingnessDetailsForm(data={}, partnership=self.p_will, require_term_fields=True)
+        self.assertFalse(empty_req.is_valid())
+        for fname in ("signed_on", "starts_on", "duration_months", "renewal_rule", "partnership_status"):
+            self.assertIn(fname, empty_req.errors)
+
+        valid_req = WillingnessDetailsForm(
+            data={
+                "signed_on": "2026-01-10",
+                "starts_on": "2026-01-15",
+                "duration_months": "12",
+                "renewal_rule": RenewalRule.AUTOMATIC,
+                "partnership_status": str(self.status_active.pk),
+            },
+            partnership=self.p_will,
+            require_term_fields=True,
+        )
+        self.assertTrue(valid_req.is_valid(), valid_req.errors)
+
+        # UI checks on willingness create & edit: 2-col signatories, required/optional badges, warning hook
+        for url in (reverse("partnerships:create_willingness"), reverse("partnerships:edit", args=[self.p_will.pk])):
+            res = self.client.get(url)
+            self.assertEqual(res.status_code, 200)
+            self.assertContains(res, "mk-signatories-cols")
+            self.assertContains(res, "بيانات المؤسسة")
+            self.assertContains(res, "بيانات الجهة")
+            self.assertContains(res, "is-required-badge")
+            self.assertContains(res, "is-optional-badge")
+            self.assertContains(res, "data-status-date-warning")

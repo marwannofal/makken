@@ -18,25 +18,137 @@
     const signedInput = root.querySelector('[data-signed-on]');
     const monthsInput = root.querySelector('[data-duration-months]');
     const output = root.querySelector('[data-calculated-expiry]');
+    const statusSelect = root.querySelector('[data-partnership-status]');
+    const inlineWarn = root.querySelector('[data-status-date-warning]');
     if ((!startsInput && !signedInput) || !monthsInput || !output) return;
 
-    function compute() {
+    const pad = n => String(n).padStart(2, '0');
+
+    function computeDates() {
       const rawDate = (startsInput && startsInput.value) || (signedInput && signedInput.value) || '';
       const months = parseInt(monthsInput.value, 10);
       if (!rawDate || !months || months < 1 || months > 600) {
-        output.textContent = 'يُحسب تلقائيًا';
-        return;
+        return null;
       }
       const parts = rawDate.split('-').map(Number);
-      if (parts.length !== 3 || parts.some(Number.isNaN)) return;
+      if (parts.length !== 3 || parts.some(Number.isNaN)) return null;
       const [y, m, d] = parts;
       const totalMonths = (m - 1) + months;
       const targetYear = y + Math.floor(totalMonths / 12);
       const targetMonth = (totalMonths % 12) + 1;
       const lastDay = new Date(Date.UTC(targetYear, targetMonth, 0)).getUTCDate();
       const targetDay = Math.min(d, lastDay);
-      const pad = n => String(n).padStart(2, '0');
-      output.textContent = `${pad(targetDay)}/${pad(targetMonth)}/${targetYear}`;
+      return {
+        startIso: `${y}-${pad(m)}-${pad(d)}`,
+        startDmy: `${pad(d)}/${pad(m)}/${y}`,
+        endIso: `${targetYear}-${pad(targetMonth)}-${pad(targetDay)}`,
+        endDmy: `${pad(targetDay)}/${pad(targetMonth)}/${targetYear}`,
+      };
+    }
+
+    function getWarningMessage(dates) {
+      if (!statusSelect || !dates) return '';
+      const opt = statusSelect.options[statusSelect.selectedIndex];
+      const label = opt && opt.value ? (opt.textContent || '').trim() : '';
+      if (!label) return '';
+      const now = new Date();
+      const todayIso = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+      if (label.includes('منتهي') && dates.endIso >= todayIso) {
+        return `هل أنت متأكد أن الاتفاقية «${label}» رغم أن تاريخ النهاية (${dates.endDmy}) لم ينتهِ بعد؟`;
+      }
+      if (label.includes('مستمر') && dates.endIso < todayIso) {
+        return `هل أنت متأكد أن الاتفاقية «${label}» رغم أن تاريخ النهاية (${dates.endDmy}) قد انتهى بالفعل؟`;
+      }
+      if (label.includes('مستمر') && dates.startIso > todayIso) {
+        return `هل أنت متأكد أن الاتفاقية «${label}» رغم أن تاريخ البداية (${dates.startDmy}) لم يبدأ بعد؟`;
+      }
+      return '';
+    }
+
+    function compute() {
+      const dates = computeDates();
+      if (!dates) {
+        output.textContent = 'يُحسب تلقائيًا عند إدخال تاريخ البداية والمدة';
+      } else {
+        output.textContent = dates.endDmy;
+      }
+      if (inlineWarn) {
+        const msg = getWarningMessage(dates);
+        inlineWarn.textContent = msg;
+        inlineWarn.hidden = !msg;
+      }
+    }
+
+    function openWarningDialog(msg, form) {
+      let dlg = document.getElementById('mk-status-date-warn-dialog');
+      if (!dlg) {
+        dlg = document.createElement('dialog');
+        dlg.id = 'mk-status-date-warn-dialog';
+        dlg.className = 'partnership-dialog mk-status-warn-dialog';
+        const body = document.createElement('div');
+        body.className = 'dialog-body';
+        const top = document.createElement('div');
+        top.className = 'dialog-top';
+        const eye = document.createElement('p');
+        eye.className = 'eyebrow';
+        eye.textContent = 'تنبيه ذكي حول حالة الشراكة';
+        const closeBtn = document.createElement('button');
+        closeBtn.type = 'button';
+        closeBtn.className = 'icon-button';
+        closeBtn.setAttribute('aria-label', 'إغلاق');
+        closeBtn.setAttribute('data-warn-cancel', '');
+        closeBtn.textContent = '×';
+        top.appendChild(eye);
+        top.appendChild(closeBtn);
+        const h2 = document.createElement('h2');
+        h2.textContent = 'تعارض بين حالة الشراكة والتواريخ';
+        const p = document.createElement('p');
+        p.className = 'mk-status-warn-msg';
+        p.setAttribute('data-warn-text', '');
+        const actions = document.createElement('div');
+        actions.className = 'dialog-actions';
+        const proceed = document.createElement('button');
+        proceed.type = 'button';
+        proceed.className = 'button button-primary';
+        proceed.setAttribute('data-warn-proceed', '');
+        proceed.textContent = 'نعم، متابعة الحفظ';
+        const cancel = document.createElement('button');
+        cancel.type = 'button';
+        cancel.className = 'button button-secondary';
+        cancel.setAttribute('data-warn-cancel', '');
+        cancel.textContent = 'إلغاء ومراجعة الحالة';
+        actions.appendChild(proceed);
+        actions.appendChild(cancel);
+        body.appendChild(top);
+        body.appendChild(h2);
+        body.appendChild(p);
+        body.appendChild(actions);
+        dlg.appendChild(body);
+        document.body.appendChild(dlg);
+      }
+      dlg.querySelector('[data-warn-text]').textContent = msg;
+      const proceedBtn = dlg.querySelector('[data-warn-proceed]');
+      const cancelBtns = dlg.querySelectorAll('[data-warn-cancel]');
+      const onProceed = () => {
+        dlg.close();
+        form.dataset.statusWarnConfirmed = '1';
+        if (typeof form.requestSubmit === 'function') {
+          form.requestSubmit();
+        } else {
+          form.submit();
+        }
+      };
+      const onCancel = () => {
+        dlg.close();
+        if (statusSelect) statusSelect.focus();
+      };
+      proceedBtn.onclick = onProceed;
+      cancelBtns.forEach(btn => { btn.onclick = onCancel; });
+      if (typeof dlg.showModal === 'function') {
+        dlg.showModal();
+      } else {
+        dlg.setAttribute('open', '');
+      }
     }
 
     if (startsInput) {
@@ -49,6 +161,26 @@
     }
     monthsInput.addEventListener('input', compute);
     monthsInput.addEventListener('change', compute);
+    if (statusSelect) {
+      statusSelect.addEventListener('change', compute);
+    }
+
+    const parentForm = root.closest('form');
+    if (parentForm && !parentForm.dataset.statusWarnBound) {
+      parentForm.dataset.statusWarnBound = '1';
+      parentForm.addEventListener('submit', e => {
+        if (parentForm.dataset.statusWarnConfirmed === '1') {
+          delete parentForm.dataset.statusWarnConfirmed;
+          return;
+        }
+        const msg = getWarningMessage(computeDates());
+        if (msg) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          openWarningDialog(msg, parentForm);
+        }
+      }, true);
+    }
     compute();
   }
 

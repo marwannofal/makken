@@ -7,11 +7,11 @@
   <details class="mk-accordion" open>
     <summary>
       <div class="mk-acc-head">
-        <h3 class="mk-acc-title">01 · نوع الاتفاق المبدئي والمرفقات الداعمة</h3>
+        <h3 class="mk-acc-title">01 · نوع الاتفاق المبدئي والمرفقات الداعمة <span class="required" aria-hidden="true">*</span></h3>
         <p class="mk-acc-subtitle">اختر نوع الاتفاق المبدئي وأرفق المستندات الداعمة المطلوبة.</p>
       </div>
       <span class="mk-acc-meta">
-        <span class="subtle-badge">مطلوب</span>
+        <span class="subtle-badge is-required-badge">مطلوب</span>
         <svg class="mk-acc-arrow" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
       </span>
     </summary>
@@ -48,11 +48,11 @@
   <details class="mk-accordion" open>
     <summary>
       <div class="mk-acc-head">
-        <h3 class="mk-acc-title">02 · بنود الاتفاقية</h3>
+        <h3 class="mk-acc-title">02 · بنود الاتفاقية <span class="required" aria-hidden="true">*</span></h3>
         <p class="mk-acc-subtitle">بند واحد على الأقل · نسبة الإنجاز تُعدّل لاحقًا من صفحة تعديل الشراكة.</p>
       </div>
       <span class="mk-acc-meta">
-        <span class="subtle-badge">مطلوب</span>
+        <span class="subtle-badge is-required-badge">مطلوب</span>
         <svg class="mk-acc-arrow" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
       </span>
     </summary>
@@ -61,19 +61,19 @@
     </div>
   </details>
 
-  <details class="mk-accordion" open>
+  <details class="mk-accordion"{% if work_form and work_form.errors %} open{% endif %}>
     <summary>
       <div class="mk-acc-head">
         <h3 class="mk-acc-title">03 · إسناد عمل</h3>
-        <p class="mk-acc-subtitle">يُربط تلقائيًا بهذه الشراكة عند الحفظ.</p>
+        <p class="mk-acc-subtitle">اختياري — يُربط تلقائيًا بهذه الشراكة عند تعبئته.</p>
       </div>
       <span class="mk-acc-meta">
-        <span class="subtle-badge">مطلوب</span>
+        <span class="subtle-badge is-optional-badge">اختياري</span>
         <svg class="mk-acc-arrow" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
       </span>
     </summary>
     <div class="mk-acc-body">
-      {% include "partnerships/_work_section.html" %}
+      {% include "partnerships/_work_section.html" with work_optional=True %}
     </div>
   </details>
 
