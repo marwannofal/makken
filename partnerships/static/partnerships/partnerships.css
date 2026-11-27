@@ -1933,90 +1933,76 @@
 }
 
 
-/* === Willingness table: contact tooltip, dates & partnership status pills (4.2) === */
-.mk-name-with-tip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  max-width: 100%;
-}
-.mk-contact-tip {
+/* === Willingness table: clean hover contact card, dates & partnership status pills (4.2) === */
+.mk-name-hover-wrap {
   position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  flex: 0 0 24px;
-  border-radius: 999px;
-  background: #eaf3f8;
-  color: #005b85;
-  border: 1px solid #c9e0ec;
-  cursor: help;
-  outline: none;
-  transition: background-color 0.15s ease, color 0.15s ease;
-}
-.mk-contact-tip svg {
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-.mk-contact-tip:hover,
-.mk-contact-tip:focus,
-.mk-contact-tip:focus-within {
-  background: #005b85;
-  color: #ffffff;
+  display: inline-block;
+  max-width: 100%;
 }
 .mk-contact-tip-box {
   position: absolute;
-  top: calc(100% + 6px);
+  top: calc(100% + 8px);
   inset-inline-start: 0;
-  min-width: 220px;
-  max-width: 320px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  background: #0f293a;
-  color: #f8fafc;
+  min-width: 225px;
+  max-width: 300px;
+  padding: 10px 13px;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #1e3a4c;
+  border: 1px solid #cfe2ee;
+  border-top: 3px solid #005b85;
+  box-shadow: 0 12px 28px rgba(0, 62, 92, 0.14);
   font-size: 0.82rem;
   font-weight: 500;
-  line-height: 1.55;
-  box-shadow: 0 10px 24px rgba(15, 41, 58, 0.24);
+  line-height: 1.5;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
   transform: translateY(-4px);
-  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
+  transition: opacity 0.16s ease, transform 0.16s ease, visibility 0.16s ease;
   z-index: 40;
   text-align: start;
 }
 tbody tr:last-child:not(:first-child) .mk-contact-tip-box {
   top: auto;
-  bottom: calc(100% + 6px);
+  bottom: calc(100% + 8px);
   transform: translateY(4px);
 }
-.mk-contact-tip:hover .mk-contact-tip-box,
-.mk-contact-tip:focus .mk-contact-tip-box,
-.mk-contact-tip:focus-within .mk-contact-tip-box {
+.mk-name-hover-wrap:hover .mk-contact-tip-box,
+.mk-name-hover-wrap:focus-within .mk-contact-tip-box {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
   transform: translateY(0);
 }
-.mk-tip-line {
+.mk-tip-heading {
   display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #5b7a8c;
+  margin-bottom: 6px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #edf4f8;
+}
+.mk-tip-line {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #0f2f42;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .mk-tip-line + .mk-tip-line {
-  margin-top: 4px;
+  margin-top: 5px;
 }
-.mk-tip-line strong {
-  color: #93c5fd;
-  font-weight: 600;
-  margin-inline-end: 4px;
+.mk-tip-line svg {
+  flex: 0 0 13px;
+  fill: none;
+  stroke: #005b85;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 .mk-date-cell {
   white-space: nowrap;
@@ -2063,7 +2049,6 @@ tbody tr:last-child:not(:first-child) .mk-contact-tip-box {
   color: #005b85;
   border-color: #c9e0ec;
 }
-
 
 /* === View Modal: dynamic state header & highlighted term dates banner === */
 .mk-detail-eyebrow-wrap {
