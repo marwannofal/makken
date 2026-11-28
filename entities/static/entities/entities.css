@@ -425,9 +425,10 @@
 .entity-kind, .entity-branch-name {
   display: block;
   overflow-wrap: anywhere;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.9;
-  color: #576b75;
+  color: black;
+  font-weight: 700;
 }
 
 .cell-label {
