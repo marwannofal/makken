@@ -1,0 +1,121 @@
+/* === Global Unified 4-Color KPI Cards (Blue -> Green -> Yellow -> Red) === */
+
+/* 1st card (4n+1): Blue */
+.ac-kpis > :nth-child(4n+1),
+.inq-stats-grid > .inq-stat-card:nth-child(4n+1),
+.market-summary > :nth-child(4n+1),
+.ach-kpis > .ach-kpi:nth-child(4n+1),
+.work-stats-kpis > .work-kpi:nth-child(4n+1),
+.dash-metrics > .dash-metric:nth-child(4n+1),
+.dash-finance-grid > .dash-money:nth-child(4n+1),
+.market-funding-kpis > .market-funding-kpi:nth-child(4n+1),
+.sr-kpis > .sr-kpi:first-child {
+  background: linear-gradient(180deg, #f4f9fd 0%, #eaf4fb 100%) !important;
+  border: 1px solid #b8daf0 !important;
+  border-top: 3px solid #005b85 !important;
+}
+.ac-kpis > :nth-child(4n+1) strong,
+.inq-stats-grid > .inq-stat-card:nth-child(4n+1) .inq-stat-value,
+.market-summary > :nth-child(4n+1) strong,
+.ach-kpis > .ach-kpi:nth-child(4n+1) strong,
+.work-stats-kpis > .work-kpi:nth-child(4n+1) strong,
+.dash-metrics > .dash-metric:nth-child(4n+1) strong,
+.dash-finance-grid > .dash-money:nth-child(4n+1) strong,
+.market-funding-kpis > .market-funding-kpi:nth-child(4n+1) strong,
+.sr-kpis > .sr-kpi:first-child strong {
+  color: #004a6e !important;
+}
+.dash-metrics > .dash-metric:nth-child(4n+1) .dash-metric-icon {
+  background: #dceefa !important;
+  color: #005b85 !important;
+}
+
+/* 2nd card (4n+2): Green */
+.ac-kpis > :nth-child(4n+2),
+.inq-stats-grid > .inq-stat-card:nth-child(4n+2),
+.market-summary > :nth-child(4n+2),
+.ach-kpis > .ach-kpi:nth-child(4n+2),
+.work-stats-kpis > .work-kpi:nth-child(4n+2),
+.dash-metrics > .dash-metric:nth-child(4n+2),
+.dash-finance-grid > .dash-money:nth-child(4n+2),
+.market-funding-kpis > .market-funding-kpi:nth-child(4n+2),
+.sr-kpis > .sr-kpi.is-approved {
+  background: linear-gradient(180deg, #f3fcf7 0%, #e6f7ee 100%) !important;
+  border: 1px solid #b2e5ca !important;
+  border-top: 3px solid #0f8a53 !important;
+}
+.ac-kpis > :nth-child(4n+2) strong,
+.inq-stats-grid > .inq-stat-card:nth-child(4n+2) .inq-stat-value,
+.market-summary > :nth-child(4n+2) strong,
+.ach-kpis > .ach-kpi:nth-child(4n+2) strong,
+.work-stats-kpis > .work-kpi:nth-child(4n+2) strong,
+.dash-metrics > .dash-metric:nth-child(4n+2) strong,
+.dash-finance-grid > .dash-money:nth-child(4n+2) strong,
+.market-funding-kpis > .market-funding-kpi:nth-child(4n+2) strong,
+.sr-kpis > .sr-kpi.is-approved strong {
+  color: #0b663d !important;
+}
+.dash-metrics > .dash-metric:nth-child(4n+2) .dash-metric-icon {
+  background: #d5f2e3 !important;
+  color: #0f8a53 !important;
+}
+
+/* 3rd card (4n+3): Yellow / Amber */
+.ac-kpis > :nth-child(4n+3),
+.inq-stats-grid > .inq-stat-card:nth-child(4n+3),
+.market-summary > :nth-child(4n+3),
+.ach-kpis > .ach-kpi:nth-child(4n+3),
+.work-stats-kpis > .work-kpi:nth-child(4n+3),
+.dash-metrics > .dash-metric:nth-child(4n+3),
+.dash-finance-grid > .dash-money:nth-child(4n+3),
+.market-funding-kpis > .market-funding-kpi:nth-child(4n+3),
+.sr-kpis > .sr-kpi.is-new {
+  background: linear-gradient(180deg, #fffdf4 0%, #fef3c7 100%) !important;
+  border: 1px solid #f7d88a !important;
+  border-top: 3px solid #d97706 !important;
+}
+.ac-kpis > :nth-child(4n+3) strong,
+.inq-stats-grid > .inq-stat-card:nth-child(4n+3) .inq-stat-value,
+.market-summary > :nth-child(4n+3) strong,
+.ach-kpis > .ach-kpi:nth-child(4n+3) strong,
+.work-stats-kpis > .work-kpi:nth-child(4n+3) strong,
+.dash-metrics > .dash-metric:nth-child(4n+3) strong,
+.dash-finance-grid > .dash-money:nth-child(4n+3) strong,
+.market-funding-kpis > .market-funding-kpi:nth-child(4n+3) strong,
+.sr-kpis > .sr-kpi.is-new strong {
+  color: #92400e !important;
+}
+.dash-metrics > .dash-metric:nth-child(4n+3) .dash-metric-icon {
+  background: #fde68a !important;
+  color: #b45309 !important;
+}
+
+/* 4th card (4n+4): Red */
+.ac-kpis > :nth-child(4n+4),
+.inq-stats-grid > .inq-stat-card:nth-child(4n+4),
+.market-summary > :nth-child(4n+4),
+.ach-kpis > .ach-kpi:nth-child(4n+4),
+.work-stats-kpis > .work-kpi:nth-child(4n+4),
+.dash-metrics > .dash-metric:nth-child(4n+4),
+.dash-finance-grid > .dash-money:nth-child(4n+4),
+.market-funding-kpis > .market-funding-kpi:nth-child(4n+4),
+.sr-kpis > .sr-kpi.is-rejected {
+  background: linear-gradient(180deg, #fff7f7 0%, #fee2e2 100%) !important;
+  border: 1px solid #f8b4b4 !important;
+  border-top: 3px solid #dc2626 !important;
+}
+.ac-kpis > :nth-child(4n+4) strong,
+.inq-stats-grid > .inq-stat-card:nth-child(4n+4) .inq-stat-value,
+.market-summary > :nth-child(4n+4) strong,
+.ach-kpis > .ach-kpi:nth-child(4n+4) strong,
+.work-stats-kpis > .work-kpi:nth-child(4n+4) strong,
+.dash-metrics > .dash-metric:nth-child(4n+4) strong,
+.dash-finance-grid > .dash-money:nth-child(4n+4) strong,
+.market-funding-kpis > .market-funding-kpi:nth-child(4n+4) strong,
+.sr-kpis > .sr-kpi.is-rejected strong {
+  color: #991b1b !important;
+}
+.dash-metrics > .dash-metric:nth-child(4n+4) .dash-metric-icon {
+  background: #fecaca !important;
+  color: #dc2626 !important;
+}
