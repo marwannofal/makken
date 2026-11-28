@@ -320,17 +320,17 @@ dialog .pub-dialog-close:focus-visible {
 /* === Global Topbar Profile Dropdown Stacking Fix === */
 header.topbar {
   position: sticky;
-  z-index: 900 !important;
+  z-index: 45 !important;
   overflow: visible !important;
 }
 header.topbar .topbar-actions {
   position: relative;
-  z-index: 910 !important;
+  z-index: 46 !important;
   overflow: visible !important;
 }
 header.topbar .topbar-actions [class*="dropdown"],
 header.topbar .topbar-actions [class*="menu"],
 header.topbar .topbar-actions [role="menu"],
 header.topbar .topbar-actions details[open] > :not(summary) {
-  z-index: 920 !important;
+  z-index: 250 !important;
 }
