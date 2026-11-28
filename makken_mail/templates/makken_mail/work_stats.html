@@ -1,4 +1,5 @@
 {% extends 'makken_mail/base.html' %}
+{% load dashboard_tags %}
 {% block title %}إحصائيات المهام | مكّن{% endblock %}
 {% block mail_content %}<section class="partnership-card mail-card">
 <header class="card-heading">
@@ -99,7 +100,7 @@
         <td><span class="mail-pill{% if row.complete %} is-on{% endif %}"><bdi>{{ row.complete }}</bdi></span></td>
         <td><bdi>{{ row.cancelled }}</bdi></td>
         <td><span class="mail-pill{% if row.overdue %} is-warn{% endif %}"><bdi>{{ row.overdue }}</bdi></span></td>
-        <td><bdi>{{ row.avg_progress }}%</bdi></td>
+        <td><span class="mk-pct-badge {{ row.avg_progress|progress_tone }}"><bdi>{{ row.avg_progress }}%</bdi></span></td>
       </tr>
       {% empty %}
       <tr>
@@ -117,7 +118,7 @@
         <td><strong><bdi>{{ stats.totals.complete }}</bdi></strong></td>
         <td><strong><bdi>{{ stats.totals.cancelled }}</bdi></strong></td>
         <td><strong><bdi>{{ stats.totals.overdue }}</bdi></strong></td>
-        <td><strong><bdi>{{ stats.totals.avg_progress }}%</bdi></strong></td>
+        <td><span class="mk-pct-badge {{ stats.totals.avg_progress|progress_tone }}"><bdi>{{ stats.totals.avg_progress }}%</bdi></span></td>
       </tr>
     </tfoot>
     {% endif %}

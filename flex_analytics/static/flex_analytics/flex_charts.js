@@ -146,6 +146,8 @@
       const val = Number(firstData[0] || 0);
       const maxVal = Math.max(100, val);
       const pct = Math.max(0, Math.min(1, val / maxVal));
+      const ringColor = (pct * 100) >= 50 ? '#0d8a68' : '#c0394d';
+      const ringTextColor = (pct * 100) >= 50 ? '#0a664d' : '#8f2536';
       const cx = W / 2;
       const cy = chartType === 'gauge' ? H * 0.72 : H / 2;
       const r = 88;
@@ -159,19 +161,19 @@
         const ey = cy - r * Math.sin(ang);
         svg.appendChild(el('path', {
           d: 'M ' + (cx - r) + ' ' + cy + ' A ' + r + ' ' + r + ' 0 0 1 ' + ex + ' ' + ey,
-          fill: 'none', stroke: '#005b85', 'stroke-width': 20, 'stroke-linecap': 'round'
+          fill: 'none', stroke: ringColor, 'stroke-width': 20, 'stroke-linecap': 'round'
         }));
-        svg.appendChild(el('text', { x: cx, y: cy - 12, 'text-anchor': 'middle', 'font-size': 26, 'font-weight': 800, fill: '#003b5c' }, fmtNum(val)));
+        svg.appendChild(el('text', { x: cx, y: cy - 12, 'text-anchor': 'middle', 'font-size': 26, 'font-weight': 800, fill: ringTextColor }, fmtNum(val)));
         svg.appendChild(el('text', { x: cx, y: cy + 16, 'text-anchor': 'middle', 'font-size': 12, fill: '#5a7184' }, truncateLabel(labels[0], 28)));
       } else {
         const circ = 2 * Math.PI * r;
         svg.appendChild(el('circle', { cx: cx, cy: cy, r: r, fill: 'none', stroke: '#e2eef5', 'stroke-width': 18 }));
         svg.appendChild(el('circle', {
-          cx: cx, cy: cy, r: r, fill: 'none', stroke: '#005b85', 'stroke-width': 18,
+          cx: cx, cy: cy, r: r, fill: 'none', stroke: ringColor, 'stroke-width': 18,
           'stroke-dasharray': (circ * pct) + ' ' + circ,
           transform: 'rotate(-90 ' + cx + ' ' + cy + ')'
         }));
-        svg.appendChild(el('text', { x: cx, y: cy + 6, 'text-anchor': 'middle', 'font-size': 24, 'font-weight': 800, fill: '#003b5c' }, fmtNum(val)));
+        svg.appendChild(el('text', { x: cx, y: cy + 6, 'text-anchor': 'middle', 'font-size': 24, 'font-weight': 800, fill: ringTextColor }, fmtNum(val)));
       }
       shell.appendChild(svg);
       container.appendChild(shell);
@@ -214,7 +216,7 @@
         if (onPointClick) rect.addEventListener('click', function () { onPointClick(lbl, val); });
         svg.appendChild(rect);
         svg.appendChild(el('text', { x: W - padR + 8, y: y + barH / 2 + 4, 'text-anchor': 'start', 'font-size': 11, fill: '#0f293a' }, truncateLabel(lbl, 18)));
-        svg.appendChild(el('text', { x: W - padR - bw - 6, y: y + barH / 2 + 4, 'text-anchor': 'end', 'font-size': 11, 'font-weight': 700, fill: '#003b5c' }, fmtNum(val)));
+        svg.appendChild(el('text', { x: W - padR - bw - 6, y: y + barH / 2 + 4, 'text-anchor': 'end', 'font-size': 11, 'font-weight': 700, fill: ringTextColor }, fmtNum(val)));
       });
       shell.appendChild(svg);
       container.appendChild(shell);

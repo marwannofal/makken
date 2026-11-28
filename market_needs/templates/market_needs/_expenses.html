@@ -1,3 +1,4 @@
+{% load dashboard_tags %}
 {% load access_tags %}
 {# MAKKEN ACCESS UI v1 #}
 <div class="table-scroll" tabindex="0" aria-label="جدول يمكن تمريره أفقيًا">
@@ -15,7 +16,7 @@
           {% include 'market_needs/_money.html' with value=line.amount %}
           </td><td><bdi>{{ line.share }}%</bdi></td><td>
           {% include 'market_needs/_money.html' with value=line.approved_amount %}
-          </td><td><bdi>{{ line.coverage_percent }}%</bdi></td><td>
+          </td><td><span class="mk-pct-badge {{ line.coverage_percent|progress_tone }}"><bdi>{{ line.coverage_percent }}%</bdi></span></td><td>
           {% include 'market_needs/_money.html' with value=line.remaining_amount %}
           </td>
         </tr>

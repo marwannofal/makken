@@ -354,7 +354,7 @@
           avgBadge.textContent = '0%';
         } else {
           const sum = rows.reduce((acc, r) => acc + (Math.max(0, Math.min(100, Number(r.progress) || 0))), 0);
-          avgBadge.textContent = (sum / rows.length).toFixed(2).replace(/\.00$/, '') + '%';
+          const avgVal = sum / rows.length; avgBadge.textContent = avgVal.toFixed(2).replace(/\.00$/, '') + '%'; const badgeWrap = avgBadge.closest('.subtle-badge') || avgBadge; badgeWrap.classList.toggle('mk-pct-high', avgVal >= 50); badgeWrap.classList.toggle('mk-pct-low', avgVal < 50);
         }
       }
 
@@ -413,7 +413,7 @@
             })));
             if (avgBadge && rows.length) {
               const sum = rows.reduce((acc, r) => acc + (Math.max(0, Math.min(100, Number(r.progress) || 0))), 0);
-              avgBadge.textContent = (sum / rows.length).toFixed(2).replace(/\.00$/, '') + '%';
+              const avgVal = sum / rows.length; avgBadge.textContent = avgVal.toFixed(2).replace(/\.00$/, '') + '%'; const badgeWrap = avgBadge.closest('.subtle-badge') || avgBadge; badgeWrap.classList.toggle('mk-pct-high', avgVal >= 50); badgeWrap.classList.toggle('mk-pct-low', avgVal < 50);
             }
           });
           const pct = document.createElement('span');

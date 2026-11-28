@@ -1,4 +1,5 @@
 {% extends 'makken_mail/base.html' %}
+{% load dashboard_tags %}
 {% load tz %}
 {% block mail_content %}
   <section class="partnership-card mail-card">
@@ -38,7 +39,7 @@
       <p class="mail-notes">{{ work.instructions }}</p>
     {% endif %}
     <div class="mail-progress">
-      <label for="work-progress">الإنجاز <bdi>{{ work.progress }}%</bdi></label><progress id="work-progress" value="{{ work.progress }}" max="100">{{ work.progress }}%</progress>
+      <label for="work-progress">الإنجاز <span class="mk-pct-badge {{ work.progress|progress_tone }}"><bdi>{{ work.progress }}%</bdi></span></label><progress id="work-progress" class="{{ work.progress|progress_tone }}" value="{{ work.progress }}" max="100">{{ work.progress }}%</progress>
     </div>
     <div class="mail-inline mail-actions">
       {% if can_reassign %}
@@ -79,7 +80,7 @@
               {% timezone 'Asia/Riyadh' %}
                 {{ row.created_at|date:"d/m/Y H:i" }}
               {% endtimezone %}
-              </bdi></td><td>{{ row.status_label }}</td><td><bdi>{{ row.snapshot.progress }}%</bdi></td><td class="mail-notes">{{ row.note|default:'—' }}</td>
+              </bdi></td><td>{{ row.status_label }}</td><td><span class="mk-pct-badge {{ row.snapshot.progress|progress_tone }}"><bdi>{{ row.snapshot.progress }}%</bdi></span></td><td class="mail-notes">{{ row.note|default:'—' }}</td>
             </tr>
           {% empty %}
             <tr>

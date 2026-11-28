@@ -1,4 +1,5 @@
 {% extends "core/makken_base.html" %}
+{% load dashboard_tags %}
 {% load makken_pagination %}
 {% load access_tags static %}
 {% block title %}تقرير إنجاز الشراكات | مكّن{% endblock %}
@@ -127,7 +128,7 @@
   <div class="ach-kpi is-accent">
     <span>متوسط نسبة الإنجاز</span>
     <strong><bdi>{{ report.totals.avg_progress }}%</bdi></strong>
-    <progress max="100" value="{{ report.totals.avg_progress }}"></progress>
+    <progress max="100" class="{{ report.totals.avg_progress|progress_tone }}" value="{{ report.totals.avg_progress }}"></progress>
   </div>
   <div class="ach-kpi is-complete">
     <span>الشراكات المكتملة (100%)</span>
@@ -164,7 +165,7 @@
           <td><strong><bdi>{{ grp.partnership_count }}</bdi></strong></td>
           <td><bdi>{{ grp.active_count }}</bdi></td>
           <td><bdi>{{ grp.completed_count }}</bdi></td>
-          <td><span class="ach-pct"><bdi>{{ grp.avg_progress }}%</bdi></span></td>
+          <td><span class="ach-pct mk-pct-badge {{ grp.avg_progress|progress_tone }}"><bdi>{{ grp.avg_progress }}%</bdi></span></td>
         </tr>
         {% empty %}
         <tr>
@@ -216,7 +217,7 @@
             {% if row.agreement_statuses_label != '—' %}<small>{{ row.agreement_statuses_label }}</small>{% endif %}
           </td>
           <td><bdi>{{ row.clause_count }}</bdi></td>
-          <td><span class="ach-pct{% if row.progress >= 100 %} is-full{% endif %}"><bdi>{{ row.progress }}%</bdi></span></td>
+          <td><span class="ach-pct mk-pct-badge {{ row.progress|progress_tone }}"><bdi>{{ row.progress }}%</bdi></span></td>
         </tr>
         {% empty %}
         <tr>
@@ -229,7 +230,7 @@
         <tr>
           <th scope="row" colspan="6">الإجمالي / المتوسط العام</th>
           <td><strong><bdi>{{ report.totals.clause_count }}</bdi></strong></td>
-          <td><strong><bdi>{{ report.totals.avg_progress }}%</bdi></strong></td>
+          <td><span class="mk-pct-badge {{ report.totals.avg_progress|progress_tone }}"><bdi>{{ report.totals.avg_progress }}%</bdi></span></td>
         </tr>
       </tfoot>
       {% endif %}

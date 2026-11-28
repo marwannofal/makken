@@ -644,7 +644,7 @@
 
       if (data.target_pct !== null && data.target_pct !== undefined) {
         const prog = document.createElement('progress');
-        prog.className = 'fx-progress-track';
+        prog.className = 'fx-progress-track ' + (Number(data.target_pct) >= 50 ? 'mk-pct-high' : 'mk-pct-low');
         prog.max = 100;
         prog.value = Math.min(100, Math.max(0, Number(data.target_pct)));
         container.appendChild(prog);

@@ -242,7 +242,7 @@
 
           const bar = make('progress', 'mk-cp-progress');
           bar.max = 100;
-          bar.value = Math.max(0, Math.min(100, Number(item.progress) || 0));
+          const initP = Math.max(0, Math.min(100, Number(item.progress) || 0)); bar.value = initP; bar.classList.toggle('mk-pct-high', initP >= 50); bar.classList.toggle('mk-pct-low', initP < 50);
           inputWrap.prepend(presets);
 
           input.addEventListener('input', () => {
@@ -966,7 +966,7 @@
         const bar = document.createElement('progress');
         bar.className = 'mk-cp-progress';
         bar.max = 100;
-        bar.value = Math.max(0, Math.min(100, Number(item.progress) || 0));
+        const initP = Math.max(0, Math.min(100, Number(item.progress) || 0)); bar.value = initP; bar.classList.toggle('mk-pct-high', initP >= 50); bar.classList.toggle('mk-pct-low', initP < 50);
 
         const presetBtns = [0, 25, 50, 75, 100].map(val => {
           const b = document.createElement('button');

@@ -1,3 +1,4 @@
+{% load dashboard_tags %}
 {% load access_tags %}
 {# MAKKEN ACCESS UI v1 #}
 {% load market_tags %}
@@ -18,7 +19,7 @@
     </strong>
   </div>
   <div>
-    <span>نسبة الدعم</span><strong><bdi>{{ need.funding_percent }}%</bdi></strong><progress max="100" value="{{ need.funding_percent|stringformat:'f' }}" aria-label="نسبة الدعم المعتمد"></progress>
+    <span>نسبة الدعم</span><strong><bdi>{{ need.funding_percent }}%</bdi></strong><progress max="100" class="{{ need.funding_percent|progress_tone }}" value="{{ need.funding_percent|stringformat:'f' }}" aria-label="نسبة الدعم المعتمد"></progress>
   </div>
 </div>
 <p class="market-help">نسبة الدعم = المساهمات المعتمدة ÷ إجمالي تكلفة الحاجة × 100. الدعم المطلوب:

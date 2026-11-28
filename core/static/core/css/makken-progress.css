@@ -1,0 +1,52 @@
+/* === Global Unified Progress Color Coding (<50% Crimson, >=50% Emerald) === */
+.mk-pct-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+.mk-pct-badge.mk-pct-low,
+.ach-pct.mk-pct-low,
+.subtle-badge.mk-pct-low {
+  background: #fdf2f3 !important;
+  color: #8f2536 !important;
+  border-color: #f0cdd1 !important;
+}
+.mk-pct-badge.mk-pct-high,
+.ach-pct.mk-pct-high,
+.subtle-badge.mk-pct-high {
+  background: #eaf8f3 !important;
+  color: #0a664d !important;
+  border-color: #b8e6d6 !important;
+}
+.mk-pct-text.mk-pct-low {
+  color: #a32638 !important;
+}
+.mk-pct-text.mk-pct-high {
+  color: #0b7355 !important;
+}
+
+progress.mk-pct-low {
+  accent-color: #c0394d;
+}
+progress.mk-pct-low::-webkit-progress-value {
+  background: #c0394d !important;
+}
+progress.mk-pct-low::-moz-progress-bar {
+  background: #c0394d !important;
+}
+
+progress.mk-pct-high {
+  accent-color: #0d8a68;
+}
+progress.mk-pct-high::-webkit-progress-value {
+  background: #0d8a68 !important;
+}
+progress.mk-pct-high::-moz-progress-bar {
+  background: #0d8a68 !important;
+}

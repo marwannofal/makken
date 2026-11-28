@@ -110,7 +110,7 @@
           {% endfor %}
         </div>
         <div class="dash-finance-bottom">
-          <strong>نسبة التغطية: <bdi>{{ dashboard.summary.percentage }}%</bdi></strong><progress value="{{ dashboard.summary.percentage }}" max="100" aria-label="نسبة الدعم المعتمد إلى تكلفة البطاقات"></progress><p>الدعم المعتمد ÷ إجمالي التكلفة. الاعتماد لا يثبت التحصيل النقدي.</p>
+          <strong>نسبة التغطية: <span class="mk-pct-badge {{ dashboard.summary.percentage|progress_tone }}"><bdi>{{ dashboard.summary.percentage }}%</bdi></span></strong><progress class="{{ dashboard.summary.percentage|progress_tone }}" value="{{ dashboard.summary.percentage }}" max="100" aria-label="نسبة الدعم المعتمد إلى تكلفة البطاقات"></progress><p>الدعم المعتمد ÷ إجمالي التكلفة. الاعتماد لا يثبت التحصيل النقدي.</p>
         </div>
       </section>
     {% endif %}

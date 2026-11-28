@@ -1,4 +1,5 @@
 {% extends "market_needs/base.html" %}
+{% load dashboard_tags %}
 {% load access_tags %}
 {# MAKKEN ACCESS UI v1 #}
 {% load market_tags %}
@@ -62,7 +63,7 @@
               {% include "market_needs/_money.html" with value=row.need.total_cost %}
               <small>الدعم المعتمد:
               {% include "market_needs/_money.html" with value=row.need.approved_support %}
-              · <bdi>{{ row.need.funding_percent }}%</bdi></small></td><td>{{ row.need.training_type }}</td><td>
+              · <span class="mk-pct-text {{ row.need.funding_percent|progress_tone }}"><bdi>{{ row.need.funding_percent }}%</bdi></span></small></td><td>{{ row.need.training_type }}</td><td>
               <div class="row-actions">
                 <a class="row-action mk-view-action" href="?{{ filter_query }}&amp;page={{ page_obj.number }}&amp;detail={{ row.need.pk }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg><span>مشاهدة</span></a>
                 {% if row.need.status != 'complete' %}
