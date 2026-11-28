@@ -1360,3 +1360,52 @@ textarea.flex-input {
     white-space: nowrap;
   }
 }
+
+
+/* === Oracle APEX-style Chart Hover Zoom & Series Focus === */
+.flex-widget:has(.fx-chart-shell) {
+  transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 0.2s ease,
+              background-color 0.2s ease;
+  will-change: transform;
+  z-index: 1;
+}
+#flex-studio-root:not(:has(.flex-badge-edit)) .flex-widget:has(.fx-chart-shell):not(.is-dragging):hover {
+  transform: scale(1.03) translateY(-3px);
+  box-shadow: 0 18px 38px rgba(0, 62, 92, 0.14), 0 4px 12px rgba(0, 91, 133, 0.08);
+  border-color: #005b85;
+  background: #ffffff;
+  z-index: 20;
+}
+
+/* Series / Slice micro-zoom (Oracle JET interactive focus) */
+.fx-chart-svg {
+  overflow: visible;
+}
+.fx-chart-svg .fx-chart-clickable {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 0.18s ease,
+              filter 0.2s ease;
+}
+.fx-chart-svg:has(.fx-chart-clickable:hover) .fx-chart-clickable:not(:hover) {
+  opacity: 0.58;
+}
+.fx-chart-svg .fx-chart-clickable:hover {
+  opacity: 1 !important;
+  transform: scale(1.055);
+  filter: drop-shadow(0 4px 10px rgba(0, 62, 92, 0.22));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flex-widget:has(.fx-chart-shell),
+  .fx-chart-svg .fx-chart-clickable {
+    transition: none !important;
+  }
+  #flex-studio-root:not(:has(.flex-badge-edit)) .flex-widget:has(.fx-chart-shell):not(.is-dragging):hover,
+  .fx-chart-svg .fx-chart-clickable:hover {
+    transform: none !important;
+  }
+}
