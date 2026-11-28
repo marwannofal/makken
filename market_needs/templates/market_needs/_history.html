@@ -3,7 +3,7 @@
 {# MAKKEN ACCESS UI v1 #}
 {% load market_tags %}
 <section class="market-history">
-  <h3>سجل دورة الحياة</h3><p class="muted">تُسجّل التغييرات مع المنفذ والتاريخ، ويُحتفظ بالقيم السابقة.</p>
+  <h3>سجل التغييرات</h3><p class="muted">تُسجّل التغييرات مع المنفذ والتاريخ، ويُحتفظ بالقيم السابقة.</p>
   {% for raw_event in history_page %}
     {% regional_event raw_event as event %}
     <details class="market-event">
@@ -46,5 +46,5 @@
   {% empty %}
     <p class="muted">لا توجد تغييرات مسجلة.</p>
   {% endfor %}
-  {% makken_pagination history_page page_param="history_page" per_page_param="" aria_label="صفحات سجل دورة الحياة" %}
+  {% makken_pagination history_page page_param="history_page" per_page_param="" aria_label="صفحات سجل التغييرات" %}
 </section>
