@@ -273,3 +273,52 @@ class ExecutionTests(MarketFixtures, TestCase):
         permissions=Permission.objects.filter(codename__endswith="_provider_assignments",content_type__app_label="access_control")
         self.assertEqual(permissions.count(),6)
         self.assertFalse(permissions.filter(group__isnull=False).exists())
+
+    def test_phase3_running_locks_providers_and_complete_is_readonly(self):
+        need = self.funded()
+        p1 = self.provider(name="أكاديمية أولى")
+        p2 = self.provider(name="أكاديمية ثانية")
+        url = reverse("program_execution:assignment", args=[need.pk])
+        list_url = reverse("program_execution:index")
+
+        # 1. New state: collapsible top sections + search tables visible + مزود الخدمة & تعديل in list
+        res_new = self.client.get(url)
+        self.assertEqual(res_new.status_code, 200)
+        self.assertContains(res_new, "mk-exec-fold")
+        self.assertContains(res_new, "البحث الذكي")
+        self.assertNotContains(res_new, "mk-exec-profile-card")
+        lst_new = self.client.get(list_url)
+        self.assertContains(lst_new, "مزود الخدمة")
+
+        # 2. Save as running -> locks providers, hides search, shows تعديل الحالة only in list
+        self.save(need, [p1.pk], status="running")
+        lst_run = self.client.get(list_url)
+        self.assertContains(lst_run, "تعديل الحالة")
+        self.assertNotContains(lst_run, "مزود الخدمة</a>")
+        res_run = self.client.get(url)
+        self.assertContains(res_run, "mk-exec-profile-card")
+        self.assertContains(res_run, "أكاديمية أولى")
+        self.assertNotContains(res_run, "أكاديمية ثانية")
+        self.assertNotContains(res_run, "البحث الذكي")
+        self.assertNotContains(res_run, 'value="new"')
+
+        # Backend rejects provider swap or reverting to new once running
+        with self.assertRaises(ExecutionConflict):
+            self.save(need, [p2.pk], status="running")
+        with self.assertRaises(ExecutionConflict):
+            self.save(need, [p1.pk], status="new")
+
+        # Transition running -> complete with same providers succeeds
+        done = self.save(need, [p1.pk], status="complete")
+        self.assertEqual(done.status, "complete")
+
+        # 3. Complete state: read-only, مشاهدة only in list, detail modal includes selected providers
+        lst_done = self.client.get(list_url)
+        self.assertNotContains(lst_done, "تعديل الحالة")
+        self.assertNotContains(lst_done, "مزود الخدمة</a>")
+        det_done = self.client.get(list_url + f"?detail={need.pk}")
+        self.assertContains(det_done, "أكاديمية أولى")
+        res_done = self.client.get(url)
+        self.assertContains(res_done, "mk-exec-profile-card")
+        self.assertNotContains(res_done, "حفظ تعديل الحالة")
+        self.assertNotContains(res_done, "البحث الذكي")

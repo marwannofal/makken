@@ -97,7 +97,7 @@ def list_context(request, assignment=False):
         item.execution_permission = "edit" if hasattr(item, "execution") else "create"
     detail = None
     if request.GET.get("detail"):
-        detail = get_object_or_404(matching.approved_needs(request.user).prefetch_related("expense_lines__expense_item", "expense_lines__sponsorship_shape"), pk=request.GET["detail"]) if request.GET["detail"].isascii() and request.GET["detail"].isdigit() else None
+        detail = get_object_or_404(matching.approved_needs(request.user).prefetch_related("expense_lines__expense_item", "expense_lines__sponsorship_shape", "execution__provider_links__provider", "execution__employer_links__partnership"), pk=request.GET["detail"]) if request.GET["detail"].isascii() and request.GET["detail"].isdigit() else None
         if detail is None:
             raise Http404
         funding_details(detail)
@@ -142,7 +142,10 @@ def assignment(request, pk):
     selected_e = list(visible_employers.values_list('pk',flat=True))
     initial = {"status": execution.status if execution else "new", "notes": execution.notes if execution else "",
                "selection": json.dumps({"providers": selected_p, "employers": selected_e})}
-    form = ExecutionForm(initial=initial)
+    is_running = bool(execution and execution.status == ExecutionStatus.RUNNING)
+    is_complete = bool(execution and execution.status == ExecutionStatus.COMPLETE)
+    providers_locked = is_running or is_complete
+    form = ExecutionForm(initial=initial, locked_running=is_running)
     context = base(request, "اختيار مزود خدمة التدريب", "provider_assignments")
     status_code, pending = 200, None
     snapshot = signed(request, need, execution)
@@ -157,13 +160,18 @@ def assignment(request, pk):
                 messages.success(request, "تم حفظ بيانات التنفيذ بنجاح." + (" اكتمل التنفيذ وأُغلق التعديل." if saved.status == "complete" else ""))
                 return add_login_headers(redirect("program_execution:assignment", pk=pk))
             snapshot = request.POST["snapshot"]
-            form = ExecutionForm(request.POST)
+            form = ExecutionForm(request.POST, locked_running=is_running)
             if not writable:
                 raise ExecutionConflict("لا يمكن تعديل هذا السجل؛ قد يكون التنفيذ مكتملًا أو البطاقة غير نشطة.")
             if payload["version"] != (execution.version if execution else 0) or payload["need_version"] != need.version:
                 raise ExecutionConflict("تغيّرت البيانات منذ فتح النموذج. حدّث الصفحة.")
             if form.is_valid():
                 proposal = form.proposal()
+                if is_running:
+                    if proposal["status"] == ExecutionStatus.NEW:
+                        raise ExecutionConflict("لا يمكن إعادة بطاقة «تحت التنفيذ» إلى حالة «جديد»؛ يمكنك فقط الانتقال إلى «مكتمل التنفيذ».")
+                    if set(proposal["providers"]) != set(selected_p) or set(proposal["employers"]) != set(selected_e):
+                        raise ExecutionConflict("مزودو التدريب وجهات التوظيف مقفلون بعد بدء التنفيذ؛ يمكنك فقط تعديل الحالة إلى «مكتمل التنفيذ».")
                 validate_selection(need, proposal["status"], proposal["providers"], proposal["employers"], selected_p, selected_e, actor=request.user)
                 pending = {"providers": len(proposal["providers"]), "employers": len(proposal["employers"]),
                            "status": ExecutionStatus(proposal["status"]).label,
@@ -196,9 +204,11 @@ def assignment(request, pk):
         return {"item": item, "evidence": evidence, "detail_url": "?" + params.urlencode()}
     p_rows = [candidate_row(item, "provider") for item in p_page]
     e_rows = [candidate_row(item, "employer") for item in e_page]
-    selected_rows = []
+    selected_provider_links, selected_employer_links, selected_rows = [], [], []
     if execution:
-        selected_rows = [*execution.provider_links.filter(provider_id__in=selected_p).select_related("provider"), *execution.employer_links.filter(partnership_id__in=selected_e).select_related("partnership")]
+        selected_provider_links = list(execution.provider_links.filter(provider_id__in=selected_p).select_related("provider", "provider__program"))
+        selected_employer_links = list(execution.employer_links.filter(partnership_id__in=selected_e).select_related("partnership", "partnership__entity", "partnership__development_state"))
+        selected_rows = [*selected_provider_links, *selected_employer_links]
     candidate = None
     raw = request.GET.get("candidate", "")
     if raw.isascii() and raw.isdigit():
@@ -212,7 +222,7 @@ def assignment(request, pk):
                 candidate = {"item": item, "kind": "employer", "evidence": matching.employer_evidence(need, item)}
         if candidate is None:
             raise Http404
-    context.update(need=need, execution=execution, writable=writable, form=form, snapshot=snapshot, pending=pending,
+    context.update(need=need, execution=execution, writable=writable, is_running=is_running, is_complete=is_complete, providers_locked=providers_locked, selected_provider_links=selected_provider_links, selected_employer_links=selected_employer_links, form=form, snapshot=snapshot, pending=pending,
                    provider_rows=p_rows, employer_rows=e_rows,
                    provider_pager=pagination(request, "provider_page", p_page), employer_pager=pagination(request, "employer_page", e_page),
                    provider_q=provider_q, employer_q=employer_q, selected_rows=selected_rows,

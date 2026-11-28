@@ -339,3 +339,63 @@
   margin-top: 0;
   gap: 6px;
 }
+
+
+/* === Phase 3: Collapsible top sections & locked execution profile === */
+.mk-exec-fold {
+  border: 0;
+  background: transparent;
+  margin: 0;
+}
+.mk-exec-fold > summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 2px 0;
+}
+.mk-exec-fold > summary::-webkit-details-marker {
+  display: none;
+}
+.mk-exec-fold-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.mk-exec-fold-head h2 {
+  margin: 0;
+  font-size: 1.08rem;
+}
+.mk-exec-fold-body {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid #e2edf4;
+}
+.mk-exec-fold[open] .market-fold-closed-label { display: none; }
+.mk-exec-fold:not([open]) .market-fold-open-label { display: none; }
+.mk-exec-fold[open] .market-fold-chevron { transform: rotate(180deg); }
+.mk-exec-lock-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: #eaf3f8;
+  color: #005b85;
+  border: 1px solid #c9e0ec;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+.mk-exec-lock-badge.is-complete {
+  background: #e6f7ef;
+  color: #0b6e45;
+  border-color: #b7e4cf;
+}
+.mk-exec-profile-sub {
+  margin: 14px 0 8px;
+  font-size: 0.96rem;
+  color: #0b3b54;
+}

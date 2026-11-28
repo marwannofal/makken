@@ -8,8 +8,10 @@ class ExecutionForm(forms.Form):
     notes = forms.CharField(label="ملاحظات التنفيذ", max_length=4000, required=False, widget=forms.Textarea(attrs={"rows": 3}))
     selection = forms.CharField(max_length=10000, widget=forms.HiddenInput)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, locked_running=False, **kwargs):
         super().__init__(*args, **kwargs)
+        if locked_running:
+            self.fields["status"].choices = [c for c in ExecutionStatus.choices if c[0] != ExecutionStatus.NEW]
         for name, field in self.fields.items():
             field.error_messages.update(required="هذا الحقل مطلوب.", invalid_choice="اختر حالة تنفيذ صحيحة.", max_length="تجاوزت القيمة الحد المسموح.")
             field.widget.attrs.update(id="execution-" + name)

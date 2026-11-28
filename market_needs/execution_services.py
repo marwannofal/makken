@@ -86,6 +86,9 @@ def save_execution(*, need_id, expected_version, expected_need_version, nonce, d
             return execution
         if execution and execution.status == ExecutionStatus.COMPLETE:
             raise ExecutionConflict("اكتمل تنفيذ هذه البطاقة، ولا يمكن تعديل بيانات التنفيذ أو الجهات المرتبطة بها.")
+        if execution and execution.status == ExecutionStatus.RUNNING:
+            if status == ExecutionStatus.NEW:
+                raise ExecutionConflict("لا يمكن إعادة بطاقة «تحت التنفيذ» إلى حالة «جديد»؛ يمكنك فقط الانتقال إلى «مكتمل التنفيذ».")
         if (execution.version if execution else 0) != expected_version or need.version != expected_need_version:
             raise ExecutionConflict("حُفظ تعديل أحدث أثناء عملك. حدّث الصفحة وراجع البيانات قبل الحفظ.")
         total = need.sponsorships.filter(status=SponsorshipStatus.APPROVED).aggregate(value=Sum("amount"))["value"] or 0
@@ -105,6 +108,9 @@ def save_execution(*, need_id, expected_version, expected_need_version, nonce, d
         list(SponsorshipShape.objects.select_for_update().filter(pk__in={o.sponsorship_shape_id for o in offerings}).order_by("pk"))
         old_p = {row.provider_id: row for row in execution.provider_links.all()} if execution else {}
         old_e = {row.partnership_id: row for row in execution.employer_links.all()} if execution else {}
+        if execution and execution.status == ExecutionStatus.RUNNING:
+            if set(provider_ids) != set(old_p.keys()) or set(employer_ids) != set(old_e.keys()):
+                raise ExecutionConflict("مزودو التدريب وجهات التوظيف مقفلون بعد بدء التنفيذ؛ يمكنك فقط تعديل الحالة إلى «مكتمل التنفيذ».")
         prefetch_related_objects([need], "regions")
         valid_p, valid_e = validate_selection(need, status, provider_ids, employer_ids, old_p, old_e, actor=actor)
         before = snapshot(execution)

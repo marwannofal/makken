@@ -41,7 +41,11 @@
               </td><td>
               <div class="row-actions">
                 <a class="row-action" href="?{{ filter_query }}&amp;page={{ page_obj.number }}&amp;detail={{ row.pk }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>مشاهدة</a>
-                {% if row.execution.status != 'complete' %}
+                {% if row.execution and row.execution.status == 'running' %}
+                  {% allowed 'provider_assignments' 'change_status' row %}
+                    <a class="row-action" href="{% url 'program_execution:assignment' row.pk %}?{{ filter_query }}&amp;return_page={{ page_obj.number }}#execution-status-card"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>تعديل الحالة</a>
+                  {% endallowed %}
+                {% elif not row.execution or row.execution.status == 'new' %}
                   {% allowed 'provider_assignments' 'view' %}
                     <a class="row-action" href="{% url 'program_execution:assignment' row.pk %}?{{ filter_query }}&amp;return_page={{ page_obj.number }}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>مزود الخدمة</a>
                     {% allowed 'provider_assignments' row.execution_permission row %}
@@ -138,6 +142,17 @@
             </tfoot>
           </table>
         </div>
+        {% if detail.execution and detail.execution.provider_links.all or detail.execution and detail.execution.employer_links.all %}
+          <h3>مزودو التنفيذ المختارون</h3>
+          <ul class="execution-saved">
+            {% for row in detail.execution.provider_links.all %}
+              <li><strong>مزود تدريب: {{ row.provider.name }}</strong><span>{{ row.provider.get_provider_type_display }} · {{ row.provider.get_scope_display }}</span></li>
+            {% endfor %}
+            {% for row in detail.execution.employer_links.all %}
+              <li><strong>جهة توظيف: {{ row.partnership.name }}</strong><span>{{ row.partnership.get_scope_display }}</span></li>
+            {% endfor %}
+          </ul>
+        {% endif %}
         <div class="dialog-actions detail-dialog-actions">
           <a class="button button-primary detail-close-btn" href="?{{ filter_query }}&amp;page={{ page_obj.number }}">إغلاق</a>
         </div>

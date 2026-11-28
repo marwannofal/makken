@@ -18,17 +18,18 @@
     try {const saved=JSON.parse(sessionStorage.getItem(key));if(saved?.selection&&Array.isArray(saved.selection.providers)&&Array.isArray(saved.selection.employers)){draft=saved.selection;labels={...labels,...(saved.labels||{})};if(status&&saved.status)status.value=saved.status;if(notes)notes.value=saved.notes||'';}} catch {}
   }
   const writable = !!form.querySelector('button[type=submit]');
-  if (!writable) {try {draft=JSON.parse(original.selection);}catch{}}
+  const lockedProviders = page.dataset.providersLocked === '1';
+  if (!writable || lockedProviders) {try {draft=JSON.parse(original.selection);}catch{}}
   const persist=()=>{if(!writable)return;try{sessionStorage.setItem(key,JSON.stringify({selection:draft,labels,status:status?.value,notes:notes?.value}));}catch{}};
   function render() {
     hidden.value=JSON.stringify(draft);
-    const holder=page.querySelector('[data-execution-selection]');holder.replaceChildren();
+    const holder=page.querySelector('[data-execution-selection]');if(holder)holder.replaceChildren();
     for(const kind of ['providers','employers']) {
       const values=new Set(draft[kind]);
       page.querySelectorAll(`[data-execution-select="${kind}"]`).forEach(box=>{box.checked=values.has(Number(box.value));const row=box.closest('tr');labels[kind+'.'+box.value]=row.querySelector('th a')?.textContent.trim()||box.value;});
-      for(const id of values){const button=document.createElement('button');button.type='button';button.disabled=!writable;button.textContent=(kind==='providers'?'مزود تدريب: ':'جهة توظيف: ')+(labels[kind+'.'+id]||'#'+id)+(writable?' ×':'');button.setAttribute('aria-label','إزالة '+button.textContent);button.addEventListener('click',()=>{draft[kind]=draft[kind].filter(value=>value!==id);render();});holder.append(button);}
+      for(const id of values){const button=document.createElement('button');button.type='button';button.disabled=!writable;button.textContent=(kind==='providers'?'مزود تدريب: ':'جهة توظيف: ')+(labels[kind+'.'+id]||'#'+id)+(writable?' ×':'');button.setAttribute('aria-label','إزالة '+button.textContent);button.addEventListener('click',()=>{draft[kind]=draft[kind].filter(value=>value!==id);render();});if(holder)holder.append(button);}
     }
-    page.querySelector('[data-execution-selection-count]').textContent='اختيارات المسودة — مزودو التدريب: '+draft.providers.length+'، جهات التوظيف: '+draft.employers.length;
+    const countEl=page.querySelector('[data-execution-selection-count]');if(countEl)countEl.textContent='اختيارات المسودة — مزودو التدريب: '+draft.providers.length+'، جهات التوظيف: '+draft.employers.length;
     persist();
   }
   page.querySelectorAll('[data-execution-select]').forEach(box=>box.addEventListener('change',()=>{const kind=box.dataset.executionSelect,id=Number(box.value);draft[kind]=box.checked?[...new Set([...draft[kind],id])]:draft[kind].filter(value=>value!==id);render();}));
