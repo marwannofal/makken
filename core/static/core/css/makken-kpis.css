@@ -1,12 +1,10 @@
-/* === Global Unified 4-Color KPI Cards (Smooth Makken Enterprise Theme) === */
+/* === Global Unified 4-Color KPI Cards (Inner Pages Only — Dashboard Untouched) === */
 
 .ac-kpis > *,
 .inq-stats-grid > .inq-stat-card,
 .market-summary > *,
 .ach-kpis > .ach-kpi,
 .work-stats-kpis > .work-kpi,
-.dash-metrics > .dash-metric,
-.dash-finance-grid > .dash-money,
 .market-funding-kpis > .market-funding-kpi,
 .sr-kpis > .sr-kpi {
   box-shadow: 0 2px 10px rgba(0, 62, 92, 0.04) !important;
@@ -19,8 +17,6 @@
 .market-summary > :nth-child(4n+1),
 .ach-kpis > .ach-kpi:nth-child(4n+1),
 .work-stats-kpis > .work-kpi:nth-child(4n+1),
-.dash-metrics > .dash-metric:nth-child(4n+1),
-.dash-finance-grid > .dash-money:nth-child(4n+1),
 .market-funding-kpis > .market-funding-kpi:nth-child(4n+1),
 .sr-kpis > .sr-kpi:first-child {
   background: linear-gradient(135deg, #ffffff 55%, #f2f8fc 100%) !important;
@@ -32,15 +28,9 @@
 .market-summary > :nth-child(4n+1) strong,
 .ach-kpis > .ach-kpi:nth-child(4n+1) strong,
 .work-stats-kpis > .work-kpi:nth-child(4n+1) strong,
-.dash-metrics > .dash-metric:nth-child(4n+1) strong,
-.dash-finance-grid > .dash-money:nth-child(4n+1) strong,
 .market-funding-kpis > .market-funding-kpi:nth-child(4n+1) strong,
 .sr-kpis > .sr-kpi:first-child strong {
   color: #004b6e !important;
-}
-.dash-metrics > .dash-metric:nth-child(4n+1) .dash-metric-icon {
-  background: #e6f2f9 !important;
-  color: #005b85 !important;
 }
 
 /* 2nd card (4n+2): Emerald Teal */
@@ -49,8 +39,6 @@
 .market-summary > :nth-child(4n+2),
 .ach-kpis > .ach-kpi:nth-child(4n+2),
 .work-stats-kpis > .work-kpi:nth-child(4n+2),
-.dash-metrics > .dash-metric:nth-child(4n+2),
-.dash-finance-grid > .dash-money:nth-child(4n+2),
 .market-funding-kpis > .market-funding-kpi:nth-child(4n+2),
 .sr-kpis > .sr-kpi.is-approved {
   background: linear-gradient(135deg, #ffffff 55%, #f1faf6 100%) !important;
@@ -62,15 +50,9 @@
 .market-summary > :nth-child(4n+2) strong,
 .ach-kpis > .ach-kpi:nth-child(4n+2) strong,
 .work-stats-kpis > .work-kpi:nth-child(4n+2) strong,
-.dash-metrics > .dash-metric:nth-child(4n+2) strong,
-.dash-finance-grid > .dash-money:nth-child(4n+2) strong,
 .market-funding-kpis > .market-funding-kpi:nth-child(4n+2) strong,
 .sr-kpis > .sr-kpi.is-approved strong {
   color: #0a664d !important;
-}
-.dash-metrics > .dash-metric:nth-child(4n+2) .dash-metric-icon {
-  background: #e2f5ee !important;
-  color: #0d8a68 !important;
 }
 
 /* 3rd card (4n+3): Warm Gold */
@@ -79,8 +61,6 @@
 .market-summary > :nth-child(4n+3),
 .ach-kpis > .ach-kpi:nth-child(4n+3),
 .work-stats-kpis > .work-kpi:nth-child(4n+3),
-.dash-metrics > .dash-metric:nth-child(4n+3),
-.dash-finance-grid > .dash-money:nth-child(4n+3),
 .market-funding-kpis > .market-funding-kpi:nth-child(4n+3),
 .sr-kpis > .sr-kpi.is-new {
   background: linear-gradient(135deg, #ffffff 55%, #fdf9ef 100%) !important;
@@ -92,15 +72,9 @@
 .market-summary > :nth-child(4n+3) strong,
 .ach-kpis > .ach-kpi:nth-child(4n+3) strong,
 .work-stats-kpis > .work-kpi:nth-child(4n+3) strong,
-.dash-metrics > .dash-metric:nth-child(4n+3) strong,
-.dash-finance-grid > .dash-money:nth-child(4n+3) strong,
 .market-funding-kpis > .market-funding-kpi:nth-child(4n+3) strong,
 .sr-kpis > .sr-kpi.is-new strong {
   color: #8f5e0c !important;
-}
-.dash-metrics > .dash-metric:nth-child(4n+3) .dash-metric-icon {
-  background: #fbf1d8 !important;
-  color: #b07512 !important;
 }
 
 /* 4th card (4n+4): Muted Crimson */
@@ -109,8 +83,6 @@
 .market-summary > :nth-child(4n+4),
 .ach-kpis > .ach-kpi:nth-child(4n+4),
 .work-stats-kpis > .work-kpi:nth-child(4n+4),
-.dash-metrics > .dash-metric:nth-child(4n+4),
-.dash-finance-grid > .dash-money:nth-child(4n+4),
 .market-funding-kpis > .market-funding-kpi:nth-child(4n+4),
 .sr-kpis > .sr-kpi.is-rejected {
   background: linear-gradient(135deg, #ffffff 55%, #fdf4f5 100%) !important;
@@ -122,13 +94,7 @@
 .market-summary > :nth-child(4n+4) strong,
 .ach-kpis > .ach-kpi:nth-child(4n+4) strong,
 .work-stats-kpis > .work-kpi:nth-child(4n+4) strong,
-.dash-metrics > .dash-metric:nth-child(4n+4) strong,
-.dash-finance-grid > .dash-money:nth-child(4n+4) strong,
 .market-funding-kpis > .market-funding-kpi:nth-child(4n+4) strong,
 .sr-kpis > .sr-kpi.is-rejected strong {
   color: #8f2536 !important;
-}
-.dash-metrics > .dash-metric:nth-child(4n+4) .dash-metric-icon {
-  background: #f9e4e7 !important;
-  color: #c0394d !important;
 }
